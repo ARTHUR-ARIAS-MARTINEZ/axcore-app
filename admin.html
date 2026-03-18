@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAESTRO AX-CORE | Control de Bloques</title>
+    <link rel="stylesheet" href="admin.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+</head>
+<body data-theme="admin">
+    
+    <!-- Pantalla de Seguridad -->
+    <div id="admin-login" class="admin-overlay">
+        <div class="glass-card admin-modal">
+            <h1 class="glitch-text">CONSOLA MAESTRA</h1>
+            <p class="tagline">CONTROL ACCESO RESTRINGIDO</p>
+            <div class="input-group">
+                <label>CLAVE DE MANDO</label>
+                <input type="password" id="admin-pass" placeholder="Ingresa clave Arthur">
+            </div>
+            <button id="btn-admin-access" class="btn-premium">AUTENTICAR SISTEMA</button>
+        </div>
+    </div>
+
+    <!-- Layout Admin -->
+    <div id="admin-container" class="hidden">
+        <header class="admin-header">
+            <div class="logo">AX-CORE <span class="tag">ADMIN M36</span></div>
+            <div class="user-info">Administrador de Red: <span id="admin-user">Arthur</span></div>
+            <button id="btn-logout-admin">CERRAR CONSOLA</button>
+        </header>
+
+        <main class="admin-main">
+            <aside class="admin-sidebar">
+                <button class="nav-btn active" data-tab="blocks">Gestión de Bloques</button>
+                <button class="nav-btn" data-tab="gyms">Asignación de Gimnasios</button>
+                <button class="nav-btn" data-tab="codes">Códigos Activos</button>
+                <button class="nav-btn" data-tab="profits" style="color:var(--accent-gold); border-top: 1px solid var(--glass-border); margin-top:10px; padding-top:20px;">Reporte de Ganancias</button>
+            </aside>
+
+            <section class="admin-content">
+                <!-- Tab Bloques -->
+                <div id="tab-blocks" class="admin-pane active">
+                    <div class="pane-header">
+                        <h2>SISTEMA DE BLOQUES Y API KEYS</h2>
+                        <button class="btn-premium small" id="btn-new-block">+ NUEVO BLOQUE</button>
+                    </div>
+                    <div id="blocks-list" class="grid-container">
+                        <!-- Se llena vía JS -->
+                    </div>
+                </div>
+
+                <!-- Tab Ganancias -->
+                <div id="tab-profits" class="admin-pane">
+                    <div class="pane-header">
+                        <h2>METRICAS DE TRACCIÓN (INGRESOS)</h2>
+                    </div>
+                    <div class="grid-container">
+                        <div class="glass-card profit-card">
+                            <h3>TOTAL MENSUAL RECURRENTE</h3>
+                            <div class="profit-value">$ <span id="total-mrr">0.00</span></div>
+                            <p style="font-size:0.7rem; color:var(--text-dim);">Suma de rentas activas en todos los bloques.</p>
+                        </div>
+                        <div class="glass-card profit-card" style="border-color:var(--accent-gold);">
+                            <h3>PROYECCIÓN ANUAL (LTM)</h3>
+                            <div class="profit-value">$ <span id="total-ltm">0.00</span></div>
+                            <p style="font-size:0.7rem; color:var(--text-dim);">Basado en la ocupación actual.</p>
+                        </div>
+                        <div class="glass-card profit-card">
+                            <h3>GIMNASIOS ACTIVOS</h3>
+                            <div class="profit-value"><span id="total-gyms-count">0</span></div>
+                            <p style="font-size:0.7rem; color:var(--text-dim);">Total de gimnasios vinculados.</p>
+                        </div>
+                        <div class="glass-card profit-card">
+                            <h3>USUARIOS REGISTRADOS</h3>
+                            <div class="profit-value"><span id="total-users-count">0</span></div>
+                            <p style="font-size:0.7rem; color:var(--text-dim);">Total de usuarios en todos los gimnasios.</p>
+                        </div>
+                    </div>
+
+                    <!-- Desglose por plan -->
+                    <div style="margin-top:2rem;">
+                        <h3 style="color:var(--accent-gold); font-family:var(--font-accent); margin-bottom:1rem; font-size:0.9rem;">DESGLOSE POR PLAN</h3>
+                        <div class="grid-container" id="plan-breakdown">
+                            <!-- Se llena vía JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab Gimnasios -->
+                <div id="tab-gyms" class="admin-pane">
+                    <div class="pane-header">
+                        <h2>GIMNASIOS VINCULADOS</h2>
+                        <button class="btn-premium small" id="btn-new-gym">+ AGREGAR GIMNASIO</button>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>BLOQUE</th>
+                                    <th>CÓDIGO</th>
+                                    <th>PLAN</th>
+                                    <th>GIMNASIO</th>
+                                    <th>DUEÑO</th>
+                                    <th>PAGO MES</th>
+                                    <th>USUARIOS</th>
+                                    <th>ESTADO</th>
+                                    <th>ACCIONES</th>
+                                </tr>
+                            </thead>
+                            <tbody id="gyms-table-body">
+                                <!-- Se llena vía JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Tab Códigos Activos (NUEVA) -->
+                <div id="tab-codes" class="admin-pane">
+                    <div class="pane-header">
+                        <h2>CÓDIGOS ACTIVOS (PARA DARLE AL GIMNASIO)</h2>
+                    </div>
+                    <p style="color:var(--text-dim); font-size:0.85rem; margin-bottom:1.5rem;">
+                        Aquí ves todos los códigos generados. Copia el código y dáselo al dueño del gimnasio para que sus usuarios se registren.
+                    </p>
+                    <div id="codes-cards" class="grid-container">
+                        <!-- Se llena vía JS -->
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <div id="modal-block" class="modal hidden">
+        <div class="glass-card modal-content">
+            <h3 id="modal-block-title">CONFIGURAR BLOQUE</h3>
+            <div class="input-group">
+                <label>NOMBRE DEL BLOQUE</label>
+                <input type="text" id="block-name" placeholder="Ej. Bloque Norte CDMX">
+            </div>
+            <div class="input-group">
+                <label>API KEY (Perplexity)</label>
+                <input type="text" id="block-key" placeholder="Pega la llave aquí">
+            </div>
+            <div class="modal-actions">
+                <button id="btn-save-block" class="btn-premium">GUARDAR</button>
+                <button class="btn-cancel" onclick="closeModal('modal-block')">CANCELAR</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-gym" class="modal hidden">
+        <div class="glass-card modal-content">
+            <h3>ASIGNAR GIMNASIO</h3>
+            <div class="input-group">
+                <label>BLOQUE ASIGNADO</label>
+                <select id="gym-block-select"></select>
+            </div>
+
+            <!-- SELECCIÓN DE PLAN -->
+            <div class="input-group">
+                <label>PLAN DE PAGO</label>
+                <div class="plan-selector" id="plan-selector">
+                    <button type="button" class="plan-btn active" data-plan="basico" data-price="1500" data-max="50">
+                        <span class="plan-name">BÁSICO</span>
+                        <span class="plan-price">$1,500/mes</span>
+                        <span class="plan-limit">50 usuarios</span>
+                    </button>
+                    <button type="button" class="plan-btn" data-plan="estandar" data-price="2000" data-max="100">
+                        <span class="plan-name" style="color:#00d4ff;">ESTÁNDAR</span>
+                        <span class="plan-price">$2,000/mes</span>
+                        <span class="plan-limit">100 usuarios</span>
+                    </button>
+                    <button type="button" class="plan-btn" data-plan="premium" data-price="3000" data-max="200">
+                        <span class="plan-name" style="color:#ffd700;">PREMIUM</span>
+                        <span class="plan-price">$3,000/mes</span>
+                        <span class="plan-limit">200 usuarios</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>NOMBRE GIMNASIO</label>
+                <input type="text" id="gym-name" placeholder="Nombre comercial">
+            </div>
+            <div class="input-group">
+                <label>NOMBRE DUEÑO</label>
+                <input type="text" id="gym-owner" placeholder="Propietario">
+            </div>
+            <div class="input-group">
+                <label>GERENTE / ENCARGADO</label>
+                <input type="text" id="gym-manager" placeholder="Gerente operativo">
+            </div>
+            <div class="input-group">
+                <label>COACH ENCARGADO</label>
+                <input type="text" id="gym-coach" placeholder="Instructor líder">
+            </div>
+            <div class="modal-actions">
+                <button id="btn-save-gym" class="btn-premium">VINCULAR GIMNASIO</button>
+                <button class="btn-cancel" onclick="closeModal('modal-gym')">CANCELAR</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Código Generado -->
+    <div id="modal-code-result" class="modal hidden">
+        <div class="glass-card modal-content" style="text-align:center;">
+            <h3 style="color:var(--accent-gold);">✅ GIMNASIO VINCULADO</h3>
+            <p style="color:var(--text-dim); margin-bottom:1rem;">Dale este código al dueño del gimnasio:</p>
+            <div id="generated-code-display" style="font-family:monospace; font-size:2rem; background:rgba(0,255,136,0.1); padding:1.5rem; border-radius:15px; border:2px solid var(--accent-main); color:var(--accent-main); letter-spacing:4px; margin-bottom:1rem; user-select:all;"></div>
+            <div id="generated-plan-info" style="font-size:0.85rem; color:var(--text-dim); margin-bottom:1.5rem;"></div>
+            <button class="btn-premium" id="btn-copy-code" style="width:100%; margin-bottom:0.5rem;">📋 COPIAR CÓDIGO</button>
+            <button class="btn-cancel" onclick="closeModal('modal-code-result')" style="width:100%;">CERRAR</button>
+        </div>
+    </div>
+
+    <script src="knowledge.js"></script>
+    <script src="admin.js"></script>
+</body>
+</html>

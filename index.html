@@ -2,8 +2,12 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>AX-CORE By ARTHUR | Powering your Biology</title>
+    <!-- Configuración App Móvil (PWA) -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0a0e14">
+    <link rel="apple-touch-icon" href="logo.png">
     <link rel="stylesheet" href="index.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -77,6 +81,11 @@
                     <span id="live-time">00:00:00</span>
                     <span class="separator">|</span>
                     <span id="live-date">---</span>
+                </div>
+                <!-- Mini cronómetro visible cuando está corriendo -->
+                <div id="sw-mini-container" style="display:none; align-items:center; gap:8px; background:rgba(0,255,136,0.08); padding:4px 12px; border-radius:20px; border:1px solid rgba(0,255,136,0.2); cursor:pointer;" onclick="document.querySelector('[data-page=workout]').click();" title="Clic para ir al cronómetro">
+                    <span style="font-size:0.65rem; color:var(--accent-secondary);">⏱️</span>
+                    <span id="sw-mini-display" style="font-family:var(--font-accent); font-size:0.7rem; color:var(--accent-main); font-variant-numeric:tabular-nums;">00:00:00:00</span>
                 </div>
                 <div class="user-badge">
                     <span class="user-rank" id="display-username">AX-CORE: OPTIMIZED MODE</span>

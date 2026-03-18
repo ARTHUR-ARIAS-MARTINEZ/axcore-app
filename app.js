@@ -33,6 +33,11 @@ document.addEventListener('DOMContentLoaded', () => {
     let sessionActive = false;
     let currentUser = localStorage.getItem('arthur_current_user') || null;
 
+    // --- CRONÓMETRO GLOBAL (persiste entre secciones) ---
+    let swTimer = 0; // en centisegundos
+    let swInterval = null;
+    let swRunning = false;
+
     function getStorageKey() {
         return currentUser ? `arthur_data_${currentUser}` : null;
     }
@@ -62,6 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
         history: [], 
         foodLogToday: [], 
         recommendedDiet: { breakfast: '', lunch: '', dinner: '', snacks: '' },
+        customDietRules: null,
         lastUpdateDate: new Date().toDateString()
     };
 
@@ -162,7 +168,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const u = regUser.value.trim();
         const p = regPass.value.trim();
         const gcc = document.getElementById('reg-gym-code');
-        const gc = gcc ? gcc.value.trim() : '';
+        const gc = gcc ? gcc.value.trim().toUpperCase() : '';
         if (u.length < 3 || p.length < 4) {
             alert("Usuario min 3 caracteres, Clave min 4.");
             return;
@@ -179,6 +185,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const gymApiKey = (typeof getApiKeyFromCode === 'function') ? getApiKeyFromCode(gc) : null;
         if (!gymApiKey) {
             alert("CÓDIGO AX-V INVÁLIDO: Verifica el código con tu entrenador o encargado del gimnasio.");
+            return;
+        }
+        // Verificar si se devolvió un error de límite de usuarios
+        if (typeof gymApiKey === 'object' && gymApiKey.error === 'LÍMITE_USUARIOS') {
+            alert(gymApiKey.message);
             return;
         }
         currentUser = u;
@@ -316,6 +327,16 @@ document.addEventListener('DOMContentLoaded', () => {
             if (pageId === 'diet') renderDietPage();
             if (pageId === 'workout') renderWorkoutPage();
             if (pageId === 'evolution') renderEvolutionPage('all');
+
+            // Mostrar mini-cronómetro cuando NO estamos en workout y está corriendo
+            const miniContainer = document.getElementById('sw-mini-container');
+            if (miniContainer) {
+                if (pageId !== 'workout' && (swRunning || swTimer > 0)) {
+                    miniContainer.style.display = 'flex';
+                } else {
+                    miniContainer.style.display = 'none';
+                }
+            }
         };
     });
 
@@ -458,8 +479,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="meal-item glass-card" style="padding:2rem; margin-bottom:2rem;">
                     <h3 style="color:var(--accent-main); font-size:1rem; margin-bottom:1rem;">REGLAS ESTRUCTURADAS GLOBALES</h3>
                     <ul style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; font-size:0.9rem;">
-                        ${ARTHUR_KNOWLEDGE.diet_rules.map(r => `<li style="margin-bottom:5px; color:var(--text-dim);">• ${r}</li>`).join('')}
+                        ${(userData.customDietRules || ARTHUR_KNOWLEDGE.diet_rules).map(r => `<li style="margin-bottom:5px; color:var(--text-dim);">• ${r}</li>`).join('')}
                     </ul>
+                    <p style="margin-top:1rem; font-size:0.65rem; color:var(--text-dim); text-align:center; font-style:italic;">${userData.customDietRules ? '✅ Reglas personalizadas por tu nutriólogo (generadas por IA)' : 'Reglas base de AX-CORE. Se actualizarán automáticamente al procesar tu dieta del nutriólogo.'}</p>
                 </div>
 
                 <!-- REGISTRO DE CALORÍAS REALES -->
@@ -482,13 +504,14 @@ document.addEventListener('DOMContentLoaded', () => {
             if(!userData.apiKey) return alert("Esta función requiere la API Key conectada.");
             
             const btn = document.getElementById('btn-parse-diet');
-            btn.textContent = "⚙️ PROCESANDO...";
+            btn.textContent = "⚙️ PROCESANDO DIETA Y REGLAS...";
             btn.disabled = true;
             
-            const prompt = `Extrae u organiza el siguiente texto en las comidas requeridas. Responde estrictamente con un JSON válido, sin Markdown, con las claves exactas: "breakfast", "lunch", "dinner", "snacks". Si alguna no existe, déjala vacía. Texto a analizar: "${raw}"`;
+            // PASO 1: Extraer comidas organizadas
+            const promptComidas = `Extrae u organiza el siguiente texto en las comidas requeridas. Responde estrictamente con un JSON válido, sin Markdown, con las claves exactas: "breakfast", "lunch", "dinner", "snacks". Si alguna no existe, déjala vacía. Texto a analizar: "${raw}"`;
             
             try {
-                const res = await callPerplexity(prompt, 'json');
+                const res = await callPerplexity(promptComidas, 'json');
                 const jsonStr = res.substring(res.indexOf('{'), res.lastIndexOf('}') + 1);
                 const parsed = JSON.parse(jsonStr);
                 
@@ -498,13 +521,27 @@ document.addEventListener('DOMContentLoaded', () => {
                     dinner: parsed.dinner || userData.recommendedDiet.dinner || '',
                     snacks: parsed.snacks || userData.recommendedDiet.snacks || ''
                 };
-                // Si la IA identifica reglas, actualizar también
-                if (parsed.rules && Array.isArray(parsed.rules)) {
-                    ARTHUR_KNOWLEDGE.diet_rules = parsed.rules;
+                
+                btn.textContent = "⚙️ GENERANDO REGLAS PERSONALIZADAS...";
+                
+                // PASO 2: Generar reglas estructurales basadas en la dieta del nutriólogo
+                const promptReglas = `Basándote en esta dieta de un nutriólogo, genera entre 5 y 8 REGLAS ESTRUCTURALES concisas y claras que el usuario debe seguir para maximizar los resultados de esta dieta específica. Las reglas deben ser prácticas, directas y adaptadas a los alimentos mencionados. Responde SOLO con un JSON válido con la clave "rules" que sea un array de strings. Dieta: Desayuno: ${userData.recommendedDiet.breakfast}. Comida: ${userData.recommendedDiet.lunch}. Cena: ${userData.recommendedDiet.dinner}. Snacks: ${userData.recommendedDiet.snacks}.`;
+                
+                try {
+                    const resReglas = await callPerplexity(promptReglas, 'json');
+                    const jsonReglas = resReglas.substring(resReglas.indexOf('{'), resReglas.lastIndexOf('}') + 1);
+                    const parsedReglas = JSON.parse(jsonReglas);
+                    
+                    if (parsedReglas.rules && Array.isArray(parsedReglas.rules) && parsedReglas.rules.length > 0) {
+                        userData.customDietRules = parsedReglas.rules;
+                    }
+                } catch(e2) {
+                    console.warn("No se pudieron generar reglas personalizadas, se mantienen las base.", e2);
                 }
+                
                 saveData();
-                renderDietPage(); // Refrescar vista de solo lectura
-                alert('✅ Plan actualizado correctamente.');
+                renderDietPage(); // Refrescar vista con dieta Y reglas actualizadas
+                alert('✅ ¡Dieta Y reglas actualizadas! Las reglas estructurales ahora están basadas en tu dieta del nutriólogo.');
             } catch(e) {
                 console.error(e);
                 alert("Hubo un error al procesar. Revisa la conexión.");
@@ -558,6 +595,47 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
+    // --- CRONÓMETRO GLOBAL (vive fuera del renderWorkoutPage) ---
+    function formatSwTime(timer) {
+        const h = Math.floor(timer/360000).toString().padStart(2,'0');
+        const m = Math.floor((timer % 360000) / 6000).toString().padStart(2,'0');
+        const s = Math.floor((timer % 6000) / 100).toString().padStart(2,'0');
+        const ms = (timer % 100).toString().padStart(2,'0');
+        return `${h}:${m}:${s}:${ms}`;
+    }
+
+    function startGlobalStopwatch() {
+        if (swInterval) return; // Ya corriendo
+        swRunning = true;
+        swInterval = setInterval(() => {
+            swTimer++;
+            // Actualizar display si está visible
+            const disp = document.getElementById('sw-display');
+            if (disp) disp.textContent = formatSwTime(swTimer);
+            // Actualizar mini-display del header si existe
+            const miniDisp = document.getElementById('sw-mini-display');
+            if (miniDisp) miniDisp.textContent = formatSwTime(swTimer);
+        }, 10);
+    }
+
+    function pauseGlobalStopwatch() {
+        clearInterval(swInterval);
+        swInterval = null;
+        swRunning = false;
+    }
+
+    function resetGlobalStopwatch() {
+        pauseGlobalStopwatch();
+        swTimer = 0;
+        const disp = document.getElementById('sw-display');
+        if (disp) disp.textContent = "00:00:00:00";
+        const miniDisp = document.getElementById('sw-mini-display');
+        if (miniDisp) {
+            miniDisp.textContent = "00:00:00:00";
+            miniDisp.parentElement.style.display = 'none';
+        }
+    }
+
     // --- WORKOUT PAGE ---
     function renderWorkoutPage() {
         const workoutEl = document.getElementById('page-workout');
@@ -565,9 +643,10 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="glass-card workout-plan">
                 <div class="stopwatch-container">
                     <h2 style="font-family:var(--font-accent); font-size:1rem; color:var(--accent-secondary);">CRONÓMETRO DE ALTO RENDIMIENTO</h2>
-                    <div class="timer-display" id="sw-display" style="font-variant-numeric: tabular-nums; min-width: 320px;">00:00:00:00</div>
+                    <p style="font-size:0.7rem; color:var(--text-dim); margin-bottom:0.5rem;">⚡ El cronómetro sigue corriendo aunque cambies de sección</p>
+                    <div class="timer-display" id="sw-display" style="font-variant-numeric: tabular-nums; min-width: 320px;">${formatSwTime(swTimer)}</div>
                     <div class="timer-controls">
-                        <button class="btn-premium" id="btn-sw-start" style="font-size:0.7rem; padding:0.8rem 1.5rem;">INICIAR</button>
+                        <button class="btn-premium" id="btn-sw-start" style="font-size:0.7rem; padding:0.8rem 1.5rem;">${swRunning ? '⏱️ CORRIENDO...' : 'INICIAR'}</button>
                         <button class="btn-premium" id="btn-sw-stop" style="font-size:0.7rem; padding:0.8rem 1.5rem;">PAUSAR</button>
                         <button class="btn-premium" id="btn-sw-reset" style="font-size:0.7rem; padding:0.8rem 1.5rem; background:transparent; border-color:var(--accent-alert); color:var(--accent-alert);">REINICIAR</button>
                     </div>
@@ -597,27 +676,21 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
         `;
 
-        // Cronometro logic mejorado (Milisegundos/Centisegundos)
-        let timer = 0; // en centisegundos
-        let interval = null;
-        const disp = document.getElementById('sw-display');
+        // Conectar botones al cronómetro GLOBAL
         document.getElementById('btn-sw-start').onclick = () => {
-            if (interval) return;
-            interval = setInterval(() => {
-                timer++;
-                const h = Math.floor(timer/360000).toString().padStart(2,'0');
-                const m = Math.floor((timer % 360000) / 6000).toString().padStart(2,'0');
-                const s = Math.floor((timer % 6000) / 100).toString().padStart(2,'0');
-                const ms = (timer % 100).toString().padStart(2,'0');
-                disp.textContent = `${h}:${m}:${s}:${ms}`;
-            }, 10); // Cada 10ms
+            startGlobalStopwatch();
+            document.getElementById('btn-sw-start').textContent = '⏱️ CORRIENDO...';
+            // Mostrar mini-display en header
+            const miniDisp = document.getElementById('sw-mini-display');
+            if (miniDisp) miniDisp.parentElement.style.display = 'flex';
         };
-        document.getElementById('btn-sw-stop').onclick = () => { clearInterval(interval); interval = null; };
+        document.getElementById('btn-sw-stop').onclick = () => {
+            pauseGlobalStopwatch();
+            document.getElementById('btn-sw-start').textContent = 'INICIAR';
+        };
         document.getElementById('btn-sw-reset').onclick = () => {
-            clearInterval(interval);
-            interval = null;
-            timer = 0;
-            disp.textContent = "00:00:00:00";
+            resetGlobalStopwatch();
+            document.getElementById('btn-sw-start').textContent = 'INICIAR';
         };
 
         // Registro ejercicio – MÚLTIPLES VECES por ejercicio
@@ -926,3 +999,14 @@ document.addEventListener('DOMContentLoaded', () => {
         } else { btnMic.style.display = 'none'; }
     }
 });
+
+// --- PWA: REGISTRAR SERVICE WORKER ---
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').then(registration => {
+            console.log('AX-CORE PWA lista para instalar en celular: ', registration.scope);
+        }).catch(err => {
+            console.log('AX-CORE PWA Error: ', err);
+        });
+    });
+}

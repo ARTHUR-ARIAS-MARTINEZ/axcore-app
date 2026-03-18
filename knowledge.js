@@ -95,24 +95,106 @@ const NUTRITION_ADVANCES = [
 ];
 
 /**
- * SISTEMA DE CÓDIGOS DE GIMNASIO → API KEY (OFUSCADO)
- * La API Key nunca aparece en texto plano en el código fuente.
- * Se ofusca con XOR + Base64 para prevenir scraping directo.
- * Solo el administrador (Arthur) debe editar la llave maestra.
+ * ================================================================
+ * SISTEMA DE PLANES Y CÓDIGOS DE GIMNASIO
+ * ================================================================
+ * 
+ * PLANES DISPONIBLES:
+ *   BÁSICO   → $1,500 MXN/mes → Hasta 50 usuarios
+ *   ESTÁNDAR → $2,000 MXN/mes → Hasta 100 usuarios
+ *   PREMIUM  → $3,000 MXN/mes → Hasta 200 usuarios
+ * 
+ * Los códigos se generan AUTOMÁTICAMENTE desde el Panel Admin (admin.html).
+ * Arthur NO necesita tocar este archivo para nada.
+ * 
+ * El sistema funciona así:
+ *   1. Arthur abre admin.html → Crea un Bloque → Asigna Gimnasio
+ *   2. Al asignar, elige el PLAN (Básico/Estándar/Premium)
+ *   3. El código se genera automáticamente (Ej: AXV-K8M2)
+ *   4. Ese código se guarda en localStorage del admin Y en GYM_CODES
+ *   5. El usuario final ingresa ese código al registrarse
+ *   6. El sistema valida: ¿código existe? ¿cuántos usuarios tiene? ¿supera el límite del plan?
+ * ================================================================
  */
+
+// Planes de negocio
+const AX_PLANS = {
+    basico:   { name: "BÁSICO",   price: 1500, maxUsers: 50,  color: "#00ff88" },
+    estandar: { name: "ESTÁNDAR", price: 2000, maxUsers: 100, color: "#00d4ff" },
+    premium:  { name: "PREMIUM",  price: 3000, maxUsers: 200, color: "#ffd700" }
+};
+
+// La API Key ofuscada (Arthur la configura desde el Admin)
 const _AX_K = [112,112,108,120,45,56,79,104,53,103,72,77,70,49,70,55,104,54,79,57,97,52,80,74,80,113,70,87,73,116,120,49,76,65,57,106,57,78,109,76,51,97,122,56,115,89,71,49,88,113,111,99,48];
 function _axDecode() { return _AX_K.map(c => String.fromCharCode(c)).join(''); }
 
-const GYM_CODES = {
-    "AXV-DEMO":  true,   // Código de demostración / prueba
-    "V-MXBLQ1":  true,   // Bloque 1 - Gimnasios 1-20
-    "V-MXBLQ2":  true,   // Bloque 2 - Gimnasios 21-40
-    // Agrega más códigos aquí al escalar. Todos usan la misma llave maestra.
+/**
+ * GYM_CODES ahora se carga DINÁMICAMENTE desde localStorage (admin genera los códigos).
+ * Se mantiene AXV-DEMO como código de prueba manual.
+ */
+const GYM_CODES_STATIC = {
+    "AXV-DEMO": { plan: "basico", active: true }
 };
+
+// Cargar códigos dinámicos del Admin
+function loadGymCodes() {
+    const adminRaw = localStorage.getItem('arthur_admin_blocks_data');
+    const dynamicCodes = {};
+    
+    if (adminRaw) {
+        try {
+            const adminData = JSON.parse(adminRaw);
+            if (adminData.gyms && Array.isArray(adminData.gyms)) {
+                adminData.gyms.forEach(gym => {
+                    if (gym.gymCode && gym.active !== false) {
+                        dynamicCodes[gym.gymCode] = {
+                            plan: gym.plan || "basico",
+                            active: gym.active !== false,
+                            maxUsers: gym.maxUsers || AX_PLANS[gym.plan || "basico"].maxUsers,
+                            gymName: gym.name || "Sin nombre"
+                        };
+                    }
+                });
+            }
+        } catch(e) { console.error("Error cargando códigos dinámicos:", e); }
+    }
+    
+    return { ...GYM_CODES_STATIC, ...dynamicCodes };
+}
+
+// Contar usuarios registrados con un código específico
+function countUsersWithCode(code) {
+    let count = 0;
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key.startsWith('arthur_data_')) {
+            try {
+                const data = JSON.parse(localStorage.getItem(key));
+                if (data.gymCode === code) count++;
+            } catch(e) {}
+        }
+    }
+    return count;
+}
 
 // Función para obtener la API Key real desde un código válido
 function getApiKeyFromCode(code) {
-    if (!GYM_CODES[code]) return null;
+    const allCodes = loadGymCodes();
+    const codeInfo = allCodes[code];
+    
+    if (!codeInfo) return null;
+    if (codeInfo.active === false) return null;
+    
+    // Verificar límite de usuarios según el plan
+    const planKey = codeInfo.plan || "basico";
+    const plan = AX_PLANS[planKey];
+    const maxUsers = codeInfo.maxUsers || (plan ? plan.maxUsers : 50);
+    const currentUsers = countUsersWithCode(code);
+    
+    if (currentUsers >= maxUsers) {
+        return { error: "LÍMITE_USUARIOS", message: `Este código ya alcanzó su límite de ${maxUsers} usuarios (Plan ${plan ? plan.name : 'BÁSICO'}). El dueño del gimnasio debe contactar a AX-CORE para ampliar su plan.` };
+    }
+    
     return _axDecode();
 }
 
