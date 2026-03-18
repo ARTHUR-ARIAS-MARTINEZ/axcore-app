@@ -133,7 +133,9 @@ function _axDecode() { return _AX_K.map(c => String.fromCharCode(c)).join(''); }
  * Se mantiene AXV-DEMO como código de prueba manual.
  */
 const GYM_CODES_STATIC = {
-    "AXV-DEMO": { plan: "basico", active: true }
+    "AXV-DEMO": { plan: "basico", active: true },
+    "AX-BOSS1": { plan: "estandar", active: true },
+    "AX-BOSS2": { plan: "premium", active: true }
 };
 
 // Cargar códigos dinámicos del Admin
