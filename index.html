@@ -88,47 +88,77 @@
             <!-- DASHBOARD PAGE -->
             <div id="page-dashboard" class="page active">
                 <div class="grid-stats">
-                    <div class="glass-card stat-card">
+                    <div class="glass-card stat-card" style="position:relative; overflow:hidden;">
+                        <div style="position:absolute; top:10px; right:15px; font-size:2rem; opacity:0.15;">⚖️</div>
                         <h3>PESO ACTUAL</h3>
                         <div class="stat-value"><span id="current-weight">0.0</span><small>KG</small></div>
                         <div class="stat-goal" id="weight-meta-text">Meta: 0 KG</div>
                         <div class="progress-bar-container">
                             <div class="progress-fill" id="weight-progress"></div>
                         </div>
+                        <p id="weight-percent" style="font-size:0.65rem; color:var(--accent-main); text-align:right; margin-top:4px;">0%</p>
                     </div>
-                    <div class="glass-card stat-card">
+                    <div class="glass-card stat-card" style="position:relative; overflow:hidden;">
+                        <div style="position:absolute; top:10px; right:15px; font-size:2rem; opacity:0.15;">🔥</div>
                         <h3>CALORÍAS HOY</h3>
                         <div class="stat-value"><span id="calories-net">0</span><small>KCAL</small></div>
                         <div class="stat-goal" id="cal-rem-text">Límite diario: 1600</div>
                         <div class="progress-bar-container">
                             <div class="progress-fill" id="cal-progress"></div>
                         </div>
+                        <p id="cal-percent" style="font-size:0.65rem; color:var(--accent-main); text-align:right; margin-top:4px;">0%</p>
                     </div>
-                    <div class="glass-card stat-card">
+                    <div class="glass-card stat-card" style="position:relative; overflow:hidden;">
+                        <div style="position:absolute; top:10px; right:15px; font-size:2rem; opacity:0.15;">📏</div>
                         <h3>CINTURA</h3>
                         <div class="stat-value"><span id="current-waist">0</span><small>CM</small></div>
                         <div class="stat-goal" id="waist-meta-text">Meta: 0 CM</div>
                         <div class="progress-bar-container">
                             <div class="progress-fill" id="waist-progress" style="width: 15%;"></div>
                         </div>
+                        <p id="waist-percent" style="font-size:0.65rem; color:var(--accent-main); text-align:right; margin-top:4px;">0%</p>
                     </div>
                 </div>
 
-                <div class="glass-card" style="margin-bottom: 2rem; display: flex; justify-content: space-around; text-align: center; padding:1.5rem; flex-wrap:wrap; gap:1rem;">
-                    <div>
-                        <p style="font-size:0.8rem; color:var(--text-dim); margin-bottom:0.5rem;">Ingeridas Hoy</p>
-                        <h4 style="color:var(--accent-main)">+<span id="cal-in">0</span></h4>
-                    </div>
-                    <div>
-                        <p style="font-size:0.8rem; color:var(--text-dim); margin-bottom:0.5rem;">Gasto Ejercicio Hoy</p>
-                        <h4 style="color:var(--accent-secondary)">-<span id="cal-out">0</span></h4>
-                    </div>
-                    <div>
-                        <p style="font-size:0.8rem; color:var(--text-dim); margin-bottom:0.5rem;">Déficit Histórico (Grasa Quemada)</p>
-                        <h4><span id="total-deficit">0</span> CAL | <span style="color:var(--accent-secondary)" id="kilos-burned-text">0.0 kg</span></h4>
+                <!-- PANEL DE RESUMEN DIARIO -->
+                <div class="glass-card" style="margin-bottom: 2rem; padding:2rem;">
+                    <h3 style="font-family:var(--font-accent); font-size:0.85rem; color:var(--accent-secondary); margin-bottom:1.2rem; letter-spacing:2px; text-align:center;">📊 RESUMEN DEL DÍA</h3>
+                    <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:1.5rem; text-align:center;">
+                        <div style="border-right:1px solid var(--glass-border);">
+                            <p style="font-size:0.7rem; color:var(--text-dim); margin-bottom:0.4rem;">INGERIDAS</p>
+                            <h4 style="color:var(--accent-main); font-size:1.3rem;">+<span id="cal-in">0</span></h4>
+                            <p style="font-size:0.6rem; color:var(--text-dim);">KCAL</p>
+                        </div>
+                        <div style="border-right:1px solid var(--glass-border);">
+                            <p style="font-size:0.7rem; color:var(--text-dim); margin-bottom:0.4rem;">EJERCICIO</p>
+                            <h4 style="color:var(--accent-secondary); font-size:1.3rem;">-<span id="cal-out">0</span></h4>
+                            <p style="font-size:0.6rem; color:var(--text-dim);">KCAL</p>
+                        </div>
+                        <div style="border-right:1px solid var(--glass-border);">
+                            <p style="font-size:0.7rem; color:var(--text-dim); margin-bottom:0.4rem;">DÉFICIT TOTAL</p>
+                            <h4 style="font-size:1.3rem;"><span id="total-deficit">0</span></h4>
+                            <p style="font-size:0.6rem; color:var(--text-dim);">KCAL ACUM.</p>
+                        </div>
+                        <div>
+                            <p style="font-size:0.7rem; color:var(--text-dim); margin-bottom:0.4rem;">GRASA ELIMINADA</p>
+                            <h4 id="kilos-burned-text" style="color:var(--accent-secondary); font-size:1.3rem;">0.00 kg</h4>
+                            <p style="font-size:0.6rem; color:var(--text-dim);">EQUIVALENTE</p>
+                        </div>
                     </div>
                 </div>
-                <p id="last-measure-info" style="text-align:center; font-size:0.75rem; color:var(--text-dim); margin-bottom:1rem; font-style:italic;"></p>
+
+                <!-- IMC + ÚLTIMA MEDIDA -->
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1.5rem; margin-bottom:2rem;">
+                    <div class="glass-card" style="text-align:center; padding:1.5rem;">
+                        <p style="font-size:0.7rem; color:var(--text-dim); margin-bottom:0.3rem;">ÍNDICE DE MASA CORPORAL</p>
+                        <h3 id="imc-value" style="font-family:var(--font-accent); font-size:2rem; color:var(--accent-main);">0.0</h3>
+                        <p id="imc-label" style="font-size:0.7rem; color:var(--accent-secondary); margin-top:0.3rem;">--</p>
+                    </div>
+                    <div class="glass-card" style="text-align:center; padding:1.5rem;">
+                        <p style="font-size:0.7rem; color:var(--text-dim); margin-bottom:0.3rem;">ÚLTIMO REGISTRO</p>
+                        <p id="last-measure-info" style="font-size:0.85rem; color:var(--text-primary); margin-top:0.5rem; font-style:italic;">Sin registros aún</p>
+                    </div>
+                </div>
 
                 <div class="sensations-section">
                     <h2>REGISTRO DE ESTADO VITAL</h2>

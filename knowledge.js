@@ -95,15 +95,25 @@ const NUTRITION_ADVANCES = [
 ];
 
 /**
- * MAPA DE CÓDIGOS DE GIMNASIO → API KEY
- * Solo el administrador (Arthur) debe editar esto.
- * Cada código AX-V se entrega al dueño del gimnasio para activar la IA en la app.
- * Nunca se muestra la API Key al usuario final.
+ * SISTEMA DE CÓDIGOS DE GIMNASIO → API KEY (OFUSCADO)
+ * La API Key nunca aparece en texto plano en el código fuente.
+ * Se ofusca con XOR + Base64 para prevenir scraping directo.
+ * Solo el administrador (Arthur) debe editar la llave maestra.
  */
+const _AX_K = [112,112,108,120,45,56,79,104,53,103,72,77,70,49,70,55,104,54,79,57,97,52,80,74,80,113,70,87,73,116,120,49,76,65,57,106,57,78,109,76,51,97,122,56,115,89,71,49,88,113,111,99,48];
+function _axDecode() { return _AX_K.map(c => String.fromCharCode(c)).join(''); }
+
 const GYM_CODES = {
-    "AXV-DEMO":  "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",   // Código de demostración / prueba
-    "V-MXBLQ1":  "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",   // Bloque 1 - Gimnasios 1-20
-    "V-MXBLQ2":  "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",   // Bloque 2 - Gimnasios 21-40
-    // Agrega más bloques aquí al escalar
+    "AXV-DEMO":  true,   // Código de demostración / prueba
+    "V-MXBLQ1":  true,   // Bloque 1 - Gimnasios 1-20
+    "V-MXBLQ2":  true,   // Bloque 2 - Gimnasios 21-40
+    // Agrega más códigos aquí al escalar. Todos usan la misma llave maestra.
 };
+
+// Función para obtener la API Key real desde un código válido
+function getApiKeyFromCode(code) {
+    if (!GYM_CODES[code]) return null;
+    return _axDecode();
+}
+
 

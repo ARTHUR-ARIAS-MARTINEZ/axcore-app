@@ -175,8 +175,8 @@ document.addEventListener('DOMContentLoaded', () => {
             alert("Este usuario ya existe.");
             return;
         }
-        // Obtener API Key por código de gimnasio
-        const gymApiKey = (typeof GYM_CODES !== 'undefined') ? GYM_CODES[gc] : null;
+        // Obtener API Key por código de gimnasio (ofuscada)
+        const gymApiKey = (typeof getApiKeyFromCode === 'function') ? getApiKeyFromCode(gc) : null;
         if (!gymApiKey) {
             alert("CÓDIGO AX-V INVÁLIDO: Verifica el código con tu entrenador o encargado del gimnasio.");
             return;
@@ -232,6 +232,8 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('weight-meta-text').textContent = `Meta: ${userData.target_weight || 0} KG`;
         const progW = Math.max(0, Math.min(100, ((110 - (userData.weight || 110)) / Math.max(1, (110 - (userData.target_weight || 85)))) * 100));
         document.getElementById('weight-progress').style.width = `${progW}%`;
+        const wpEl = document.getElementById('weight-percent');
+        if (wpEl) wpEl.textContent = `${Math.round(progW)}%`;
 
         // Cintura
         document.getElementById('current-waist').textContent = userData.waist || 0;
@@ -241,12 +243,14 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('waist-meta-text').textContent = `Meta: ${targetWaist} CM`;
         const waistBar = document.getElementById('waist-progress');
         if (waistBar) waistBar.style.width = `${progWaist}%`;
+        const wapEl = document.getElementById('waist-percent');
+        if (wapEl) wapEl.textContent = `${Math.round(progWaist)}%`;
         
         // Calorías
         const net = userData.caloriesConsumedToday - userData.caloriesBurnedToday;
         const calEl = document.getElementById('calories-net');
         calEl.textContent = net;
-        calEl.style.color = net > userData.dailyCalLimit ? 'var(--accent-alert)' : 'white';
+        calEl.style.color = net > userData.dailyCalLimit ? 'var(--accent-alert)' : '';
         document.getElementById('cal-in').textContent = userData.caloriesConsumedToday;
         document.getElementById('cal-out').textContent = userData.caloriesBurnedToday;
         
@@ -255,6 +259,8 @@ document.addEventListener('DOMContentLoaded', () => {
         calBar.style.width = `${calPerc}%`;
         calBar.classList.toggle('warning', userData.caloriesConsumedToday > userData.dailyCalLimit);
         document.getElementById('cal-rem-text').textContent = `Límite diario: ${userData.dailyCalLimit} KCAL`;
+        const cpEl = document.getElementById('cal-percent');
+        if (cpEl) cpEl.textContent = `${Math.round(calPerc)}%`;
 
         // Déficit histórico
         const def = userData.totalNetDeficit || 0;
@@ -262,18 +268,30 @@ document.addEventListener('DOMContentLoaded', () => {
         const kgEquiv = Math.abs(def / 7700).toFixed(2);
         const kbText = document.getElementById('kilos-burned-text');
         if (def >= 0) {
-            kbText.textContent = `Has eliminado ~${kgEquiv} kg de grasa acumulada`;
+            kbText.textContent = `${kgEquiv} kg`;
             kbText.style.color = "var(--accent-secondary)";
         } else {
-            kbText.textContent = `Aumento acumulado: ~${kgEquiv} kg de grasa`;
+            kbText.textContent = `+${kgEquiv} kg`;
             kbText.style.color = "var(--accent-alert)";
+        }
+
+        // IMC
+        const imcEl = document.getElementById('imc-value');
+        const imcLabel = document.getElementById('imc-label');
+        if (imcEl && userData.height > 0 && userData.weight > 0) {
+            const imc = (userData.weight / (userData.height * userData.height)).toFixed(1);
+            imcEl.textContent = imc;
+            if (imc < 18.5) { imcLabel.textContent = 'BAJO PESO'; imcLabel.style.color = 'var(--accent-secondary)'; }
+            else if (imc < 25) { imcLabel.textContent = 'NORMAL'; imcLabel.style.color = 'var(--accent-main)'; }
+            else if (imc < 30) { imcLabel.textContent = 'SOBREPESO'; imcLabel.style.color = 'var(--accent-alert)'; }
+            else { imcLabel.textContent = 'OBESIDAD'; imcLabel.style.color = 'var(--accent-alert)'; }
         }
         
         // Última medida registrada
         const lastEl = document.getElementById('last-measure-info');
         if (lastEl && userData.history && userData.history.length > 0) {
             const last = userData.history[userData.history.length - 1];
-            lastEl.textContent = `Último reg.: ${last.date} | Bícep: ${last.bicep || 0}cm | Cintura: ${last.waist || 0}cm`;
+            lastEl.textContent = `${last.date} | Peso: ${last.weight}kg | Cintura: ${last.waist || 0}cm | Bícep: ${last.bicep || 0}cm`;
         }
     }
 

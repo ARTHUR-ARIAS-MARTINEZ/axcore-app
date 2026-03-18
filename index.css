@@ -757,3 +757,136 @@ body {
         font-size: 1.5rem;
     }
 }
+
+/* =============================================
+   TEMA NATURAL ZEN - Overrides para fondo claro
+   ============================================= */
+[data-theme="natural"] .side-nav {
+    background: rgba(235, 240, 230, 0.95);
+    border-right: 1px solid rgba(46, 125, 50, 0.15);
+}
+[data-theme="natural"] .nav-links li span {
+    color: #3a5a3c;
+}
+[data-theme="natural"] .nav-links li.active span,
+[data-theme="natural"] .nav-links li:hover span {
+    color: var(--accent-main);
+}
+[data-theme="natural"] .top-bar {
+    background: rgba(235, 240, 230, 0.9);
+    border-bottom: 1px solid rgba(46, 125, 50, 0.1);
+}
+[data-theme="natural"] .content-area {
+    color: #1b2e1e;
+}
+[data-theme="natural"] .glass-card {
+    background: rgba(255, 255, 255, 0.85);
+    border-color: rgba(46, 125, 50, 0.12);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+}
+[data-theme="natural"] .stat-card h3,
+[data-theme="natural"] h2,
+[data-theme="natural"] h3,
+[data-theme="natural"] h4 {
+    color: #1b2e1e;
+}
+[data-theme="natural"] .stat-value {
+    color: var(--accent-main);
+}
+[data-theme="natural"] .stat-value small {
+    color: #4a6a4c;
+}
+[data-theme="natural"] .stat-goal {
+    color: #6b7a6d;
+}
+[data-theme="natural"] .progress-bar-container {
+    background: rgba(46, 125, 50, 0.1);
+}
+[data-theme="natural"] .input-group input,
+[data-theme="natural"] .input-group select,
+[data-theme="natural"] textarea {
+    background: rgba(255, 255, 255, 0.9) !important;
+    color: #1b2e1e !important;
+    border-color: rgba(46, 125, 50, 0.3) !important;
+}
+[data-theme="natural"] .input-group input::placeholder,
+[data-theme="natural"] textarea::placeholder {
+    color: #8a9a8c !important;
+}
+[data-theme="natural"] .input-group input:focus {
+    background: #ffffff !important;
+    box-shadow: 0 0 0 2px rgba(46, 125, 50, 0.2) !important;
+}
+[data-theme="natural"] .btn-premium {
+    background: var(--accent-main);
+    color: #ffffff;
+    border-color: var(--accent-main);
+}
+[data-theme="natural"] .btn-premium:hover {
+    background: #1b5e20;
+}
+[data-theme="natural"] .theme-btn {
+    color: #3a5a3c;
+    border-color: rgba(46, 125, 50, 0.2);
+}
+[data-theme="natural"] .theme-btn.active {
+    background: var(--accent-main);
+    color: #ffffff;
+}
+[data-theme="natural"] .overlay {
+    background: rgba(240, 243, 235, 0.97);
+}
+[data-theme="natural"] .user-rank {
+    color: #1b2e1e;
+}
+[data-theme="natural"] #live-time,
+[data-theme="natural"] #live-date {
+    color: #3a5a3c;
+}
+[data-theme="natural"] .separator {
+    color: #8a9a8c;
+}
+[data-theme="natural"] .feeling-btn {
+    color: #1b2e1e;
+    border-color: rgba(46, 125, 50, 0.2);
+    background: rgba(255, 255, 255, 0.7);
+}
+[data-theme="natural"] .feeling-btn:hover {
+    background: rgba(46, 125, 50, 0.1);
+}
+[data-theme="natural"] table th {
+    color: var(--accent-main) !important;
+}
+[data-theme="natural"] table td {
+    color: #1b2e1e !important;
+}
+[data-theme="natural"] .msg.user {
+    background: rgba(46, 125, 50, 0.12);
+    color: #1b2e1e;
+}
+[data-theme="natural"] .msg.system {
+    color: #1b2e1e;
+}
+[data-theme="natural"] .chat-container {
+    background: rgba(255, 255, 255, 0.85);
+}
+[data-theme="natural"] #ai-input {
+    background: rgba(255, 255, 255, 0.9) !important;
+    color: #1b2e1e !important;
+}
+[data-theme="natural"] .exercise-card {
+    background: rgba(255, 255, 255, 0.7) !important;
+}
+[data-theme="natural"] .exercise-card h4 {
+    color: #1b2e1e !important;
+}
+[data-theme="natural"] .exercise-card small {
+    color: #4a6a4c !important;
+}
+[data-theme="natural"] .brand-name {
+    color: var(--accent-main) !important;
+}
+[data-theme="natural"] .brand-name span {
+    color: #3a5a3c !important;
+}
+
