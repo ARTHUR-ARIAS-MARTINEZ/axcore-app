@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AX-CORE By ARTHUR | Powering your Biology</title>
+    <link rel="stylesheet" href="index.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+</head>
+<body data-theme="neon">
+    <!-- Pantalla de Login / Registro (Estilo App Inglés) -->
+    <div id="login-overlay" class="overlay">
+        <div class="glass-card luxury-modal">
+            <h1 class="glitch-text">ACCESO ÉLITE</h1>
+            <p class="tagline">ARTHUR VANGUARDIA SYSTEM</p>
+            <div class="disclaimer-content">
+                <div class="input-group">
+                    <label>USUARIO</label>
+                    <input type="text" id="login-user" placeholder="Tu nombre de usuario">
+                </div>
+                <div class="input-group">
+                    <label>CONTRASEÑA</label>
+                    <input type="password" id="login-pass" placeholder="Tu clave de acceso">
+                </div>
+            </div>
+            <button id="btn-login-access" class="btn-premium">INGRESAR AL SISTEMA</button>
+            <p style="margin-top:1rem; font-size:0.8rem; color:var(--accent-main); cursor:pointer;" id="toggle-to-register">¿No tienes cuenta? Regístrate aquí</p>
+        </div>
+    </div>
+
+    <!-- Pantalla de Registro -->
+    <div id="register-overlay" class="overlay hidden">
+        <div class="glass-card luxury-modal">
+            <h1 class="glitch-text">NUEVO PERFIL</h1>
+            <div class="disclaimer-content">
+                <div class="input-group">
+                    <label>CREAR USUARIO</label>
+                    <input type="text" id="reg-user" placeholder="Ej. Arthur_Fit">
+                </div>
+                <div class="input-group">
+                    <label>CONTRASEÑA</label>
+                    <input type="password" id="reg-pass" placeholder="Mínimo 4 caracteres">
+                </div>
+                <div class="input-group">
+                    <label>CÓDIGO GIMNASIO (AX-V)</label>
+                    <input type="text" id="reg-gym-code" placeholder="Pídelo a tu entrenador o dueño" style="border-color:var(--accent-secondary);">
+                </div>
+            </div>
+            <button id="btn-register-confirm" class="btn-premium">CREAR CUENTA ÉLITE</button>
+            <p style="margin-top:1rem; font-size:0.8rem; color:var(--accent-main); cursor:pointer;" id="toggle-to-login">Ya tengo cuenta. Volver al inicio</p>
+        </div>
+    </div>
+
+    <!-- Layout Principal -->
+    <main id="app-container" class="hidden">
+        <nav class="side-nav">
+            <div class="nav-logo-container" style="text-align:center; margin-bottom:2.5rem; padding: 10px;">
+                <img src="logo.png" alt="AX-CORE" style="width:85px; height:85px; margin-bottom:0.8rem; border-radius:50%; border:1px solid var(--accent-main); box-shadow: 0 0 20px rgba(0,255,136,0.3);">
+                <div class="brand-name" style="font-family:var(--font-accent); font-size:0.95rem; color:var(--accent-main); line-height:1.2; letter-spacing:2px; font-weight:900;">AX-CORE<br><span style="color:white; font-size:0.6rem; letter-spacing:4px; font-weight:400;">BY ARTHUR</span></div>
+            </div>
+            <ul class="nav-links">
+                <li class="active" data-page="dashboard"><i class="icon-dashboard"></i><span>Tablero</span></li>
+                <li data-page="diet"><i class="icon-food"></i><span>Dieta</span></li>
+                <li data-page="workout"><i class="icon-gym"></i><span>Workouts</span></li>
+                <li data-page="evolution"><i class="icon-stats"></i><span>Evolución</span></li>
+                <li data-page="assistant"><i class="icon-ai"></i><span>Asistente AI</span></li>
+                <li data-page="settings"><i class="icon-settings"></i><span>Ajustes</span></li>
+                <li id="nav-logout"><i class="icon-logout"></i><span style="color:var(--accent-alert)">Cerrar Sesión</span></li>
+            </ul>
+        </nav>
+
+        <section class="content-area">
+            <header class="top-bar">
+                <div class="live-stats">
+                    <span id="live-time">00:00:00</span>
+                    <span class="separator">|</span>
+                    <span id="live-date">---</span>
+                </div>
+                <div class="user-badge">
+                    <span class="user-rank" id="display-username">AX-CORE: OPTIMIZED MODE</span>
+                    <input type="file" id="avatar-upload" class="avatar-upload" accept="image/*">
+                    <div class="avatar" id="avatar-preview" title="Cambiar foto de perfil"></div>
+                </div>
+            </header>
+
+            <!-- DASHBOARD PAGE -->
+            <div id="page-dashboard" class="page active">
+                <div class="grid-stats">
+                    <div class="glass-card stat-card">
+                        <h3>PESO ACTUAL</h3>
+                        <div class="stat-value"><span id="current-weight">0.0</span><small>KG</small></div>
+                        <div class="stat-goal" id="weight-meta-text">Meta: 0 KG</div>
+                        <div class="progress-bar-container">
+                            <div class="progress-fill" id="weight-progress"></div>
+                        </div>
+                    </div>
+                    <div class="glass-card stat-card">
+                        <h3>CALORÍAS HOY</h3>
+                        <div class="stat-value"><span id="calories-net">0</span><small>KCAL</small></div>
+                        <div class="stat-goal" id="cal-rem-text">Límite diario: 1600</div>
+                        <div class="progress-bar-container">
+                            <div class="progress-fill" id="cal-progress"></div>
+                        </div>
+                    </div>
+                    <div class="glass-card stat-card">
+                        <h3>CINTURA</h3>
+                        <div class="stat-value"><span id="current-waist">0</span><small>CM</small></div>
+                        <div class="stat-goal" id="waist-meta-text">Meta: 0 CM</div>
+                        <div class="progress-bar-container">
+                            <div class="progress-fill" id="waist-progress" style="width: 15%;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-card" style="margin-bottom: 2rem; display: flex; justify-content: space-around; text-align: center; padding:1.5rem; flex-wrap:wrap; gap:1rem;">
+                    <div>
+                        <p style="font-size:0.8rem; color:var(--text-dim); margin-bottom:0.5rem;">Ingeridas Hoy</p>
+                        <h4 style="color:var(--accent-main)">+<span id="cal-in">0</span></h4>
+                    </div>
+                    <div>
+                        <p style="font-size:0.8rem; color:var(--text-dim); margin-bottom:0.5rem;">Gasto Ejercicio Hoy</p>
+                        <h4 style="color:var(--accent-secondary)">-<span id="cal-out">0</span></h4>
+                    </div>
+                    <div>
+                        <p style="font-size:0.8rem; color:var(--text-dim); margin-bottom:0.5rem;">Déficit Histórico (Grasa Quemada)</p>
+                        <h4><span id="total-deficit">0</span> CAL | <span style="color:var(--accent-secondary)" id="kilos-burned-text">0.0 kg</span></h4>
+                    </div>
+                </div>
+                <p id="last-measure-info" style="text-align:center; font-size:0.75rem; color:var(--text-dim); margin-bottom:1rem; font-style:italic;"></p>
+
+                <div class="sensations-section">
+                    <h2>REGISTRO DE ESTADO VITAL</h2>
+                    <div class="sensations-grid">
+                        <button class="feeling-btn" data-type="hunger" title="Registra si tienes hambre o antojo">😋 ANTOJO / HAMBRE</button>
+                        <button class="feeling-btn" data-type="symptom" title="Registra dolores o sensaciones físicas">⚡ SÍNTOMA FÍSICO</button>
+                        <button class="feeling-btn" data-type="mood" title="Registra tu estado mental o energía">🧠 ESTADO MENTAL</button>
+                    </div>
+                    <div id="sensation-feedback" class="hidden glass-card" style="margin-top:1rem; border-color:var(--accent-secondary); padding:1rem; display:flex; flex-direction:column; gap:10px;">
+                        <p id="sensation-title" style="margin:0; font-size: 0.8rem; color:var(--accent-secondary); font-family:var(--font-accent); font-weight:bold;"></p>
+                        <input type="text" id="sensation-input" placeholder="..." style="background:rgba(0,0,0,0.5); border:1px solid var(--accent-secondary); padding:0.8rem; border-radius:8px; color:white; width:100%; font-family:var(--font-main);">
+                        <div style="display:flex; gap:10px; justify-content: flex-end;">
+                            <button class="btn-premium" style="font-size:0.6rem; padding:0.4rem 0.8rem;" id="btn-just-record">SÓLO REGISTRAR</button>
+                            <button class="btn-premium" style="font-size:0.6rem; padding:0.4rem 0.8rem; background:transparent; border:1px solid var(--accent-secondary);" id="btn-ask-ai-sensation">CONSULTAR A LA IA</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- EVOLUTION PAGE -->
+            <div id="page-evolution" class="page">
+                <div class="glass-card evolution-panel">
+                    <h2 style="font-family:var(--font-accent); color:var(--accent-main); margin-bottom:1.5rem;">HISTORIAL DE MEDIDAS</h2>
+                    <div class="measurement-form" style="display:grid; grid-template-columns: repeat(3, 1fr); gap:15px; margin-bottom:2rem; padding:1.5rem; background:rgba(0,0,0,0.3); border-radius:15px; border:1px solid var(--glass-border);">
+                        <div class="input-group" style="margin:0;">
+                            <label>PESO (KG)</label>
+                            <input type="number" step="0.1" id="log-weight">
+                        </div>
+                        <div class="input-group" style="margin:0;">
+                            <label>CINTURA (CM)</label>
+                            <input type="number" id="log-waist">
+                        </div>
+                        <div class="input-group" style="margin:0;">
+                            <label>BÍCEPS (CM)</label>
+                            <input type="number" id="log-bicep">
+                        </div>
+                        <div class="input-group" style="margin:0;">
+                            <label>TRÍCEPS (CM)</label>
+                            <input type="number" id="log-tricep">
+                        </div>
+                        <div class="input-group" style="margin:0;">
+                            <label>PIERNA (CM)</label>
+                            <input type="number" id="log-leg">
+                        </div>
+                        <div class="input-group" style="margin:0;">
+                            <label>PECHO (CM)</label>
+                            <input type="number" id="log-chest">
+                        </div>
+                        <div class="input-group" style="margin:0;">
+                            <label>CADERA (CM)</label>
+                            <input type="number" id="log-hip">
+                        </div>
+                        <div class="input-group" style="margin:0;">
+                            <label>PANTORRILLA (CM)</label>
+                            <input type="number" id="log-calf">
+                        </div>
+                        <div class="input-group" style="margin:0;">
+                            <label>GLÚTEO (CM)</label>
+                            <input type="number" id="log-glute">
+                        </div>
+                        <div class="input-group" style="margin:0;">
+                            <label>CUELLO (CM)</label>
+                            <input type="number" id="log-neck">
+                        </div>
+                        <div class="input-group" style="margin:0;">
+                            <label>ANTEBRAZO (CM)</label>
+                            <input type="number" id="log-forearm">
+                        </div>
+                        <div class="input-group" style="margin:0;">
+                            <label>ESPALDA (CM)</label>
+                            <input type="number" id="log-back">
+                        </div>
+                        <button class="btn-premium" id="btn-save-daily" style="align-self:end; height:50px;">LOG MEDIDA</button>
+                    </div>
+
+                    <div class="history-controls" style="margin-bottom:1rem; display:flex; gap:10px;">
+                        <button class="theme-btn active" id="filter-all">TODO</button>
+                        <button class="theme-btn" id="filter-week">ESTA SEMANA</button>
+                        <button class="theme-btn" id="filter-month">ESTE MES</button>
+                    </div>
+
+                    <div class="history-table-container" style="max-height:400px; overflow-y:auto; background:rgba(0,0,0,0.5); border-radius:15px; border:1px solid var(--glass-border);">
+                        <table style="width:100%; border-collapse:collapse; text-align:left;">
+                            <thead style="background:var(--glass); border-bottom:1px solid var(--glass-border);">
+                                <tr style="color:var(--accent-main); font-family:var(--font-accent); font-size:0.8rem;">
+                                    <th style="padding:1rem;">FECHA</th>
+                                    <th style="padding:1rem;">PESO</th>
+                                    <th style="padding:1rem;">CINTURA</th>
+                                    <th style="padding:1rem;">BÍCEPS</th>
+                                    <th style="padding:1rem;">TRÍCEPS</th>
+                                    <th style="padding:1rem;">PIERNA</th>
+                                    <th style="padding:1rem;">PECHO</th>
+                                    <th style="padding:1rem;">CADERA</th>
+                                    <th style="padding:1rem;">PANT.</th>
+                                    <th style="padding:1rem;">GLÚTEO</th>
+                                    <th style="padding:1rem;">CUELLO</th>
+                                    <th style="padding:1rem;">ANTEB.</th>
+                                    <th style="padding:1rem;">ESPALDA</th>
+                                    <th style="padding:1rem;">CAMBIO</th>
+                                    <th style="padding:1rem;">DEL</th>
+                                </tr>
+                            </thead>
+                            <tbody id="history-body">
+                                <!-- Se llena via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- OTROS PAGES (Se llenarán via JS/CSS) -->
+            <div id="page-diet" class="page"></div>
+            <div id="page-workout" class="page"></div>
+            <div id="page-assistant" class="page">
+                <div class="chat-container glass-card">
+                    <div class="chat-messages" id="chat-box">
+                        <div class="msg system">Sincronización completa. Soy AX-CORE. ¿En qué optimizamos tu biología hoy?</div>
+                    </div>
+                    <div class="chat-input-area">
+                        <input type="text" id="ai-input" placeholder="Pregunta sobre nutrición, entrenamientos o antojos...">
+                        <button id="btn-mic" class="btn-mic" title="Dictar por voz (Requiere Chrome/Edge)">🎤</button>
+                        <button id="send-ai" class="btn-ai">ENVIAR</button>
+                    </div>
+                </div>
+            </div>
+            <div id="page-settings" class="page">
+                <div class="grid-stats">
+                    <div class="glass-card settings-panel">
+                        <h2 id="elite-title" style="cursor:default; transition:0.3s;">SISTEMA ÉLITE</h2>
+                        <div class="input-group">
+                            <label>NOMBRE DE USUARIO</label>
+                            <input type="text" id="input-username" placeholder="Tu nombre o alias">
+                        </div>
+                        <div class="input-group">
+                            <label>ESTILO VISUAL</label>
+                            <div class="theme-buttons" style="display:grid; grid-template-columns: repeat(2, 1fr); gap:10px;">
+                                <button class="theme-btn active" data-theme="neon">NEON NAVY</button>
+                                <button class="theme-btn" data-theme="original">GOLD ELITE</button>
+                                <button class="theme-btn" data-theme="fuchsia">CORAL GLOW</button>
+                                <button class="theme-btn" data-theme="dark">ULTRA DARK</button>
+                                <button class="theme-btn" data-theme="pride">PRIDE PASTEL</button>
+                                <button class="theme-btn" data-theme="natural">NATURAL ZEN</button>
+                            </div>
+                        </div>
+                        <!-- API Key: solo visible con toque secreto (5x en SISTEMA ÉLITE) -->
+                        <div class="input-group" id="api-key-container" style="display:none; transition:0.3s;">
+                            <label>API LLAVE (Solo Arthur)</label>
+                            <input type="password" id="api-key" style="background:rgba(255,51,102,0.1); border-color:var(--accent-alert);" placeholder="Llave oculta">
+                        </div>
+                        <button id="save-settings" class="btn-premium" style="width:100%">GUARDAR SISTEMA</button>
+                    </div>
+
+                    <div class="glass-card settings-panel">
+                        <h2>PERFIL ANTROPOMÉTRICO</h2>
+                        <div class="input-group">
+                            <label>ALTURA (M)</label>
+                            <input type="number" step="0.01" id="input-height" placeholder="Ej. 1.74">
+                        </div>
+                        <div class="input-group">
+                            <label>PESO INICIAL (KG)</label>
+                            <input type="number" step="0.1" id="input-weight" placeholder="Ej. 100">
+                        </div>
+                        <div class="input-group">
+                            <label>CINTURA (CM)</label>
+                            <input type="number" id="input-waist" placeholder="Ej. 115">
+                        </div>
+                        <div class="input-group">
+                            <label>META DE PESO (KG)</label>
+                            <input type="number" step="0.1" id="input-target-weight" placeholder="Ej. 85">
+                        </div>
+                        <div style="display:flex; gap:10px;">
+                            <button id="save-measurements" class="btn-premium" style="flex:1">ACTUALIZAR</button>
+                            <button id="btn-reset-measurements" class="btn-premium" style="flex:1; background:transparent; border:1px solid var(--accent-alert); color:var(--accent-alert);">REINICIAR MEDIDAS</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="glass-card" style="margin-top:2rem; text-align:center;">
+                    <button id="btn-reset-all" style="background:transparent; border:none; color:var(--accent-alert); cursor:pointer; font-size:0.8rem;">BORRAR TODOS LOS DATOS Y REINICIAR APP</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="knowledge.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
