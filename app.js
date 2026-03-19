@@ -1164,8 +1164,22 @@ document.addEventListener('DOMContentLoaded', () => {
     function startClock() {
         setInterval(() => {
             const now = new Date();
-            liveTimeEl.textContent = now.toLocaleTimeString('es-MX', { hour12: false });
-            liveDateEl.textContent = now.toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long' });
+            
+            // Reloj 12 horas sin AM/PM
+            let h = now.getHours();
+            const m = now.getMinutes().toString().padStart(2, '0');
+            const s = now.getSeconds().toString().padStart(2, '0');
+            h = h % 12 || 12; // Convierte 0 a 12, 13 a 1, etc.
+            liveTimeEl.textContent = `${h.toString().padStart(2, '0')}:${m}:${s}`;
+            
+            // Fecha con mayúsculas en Día y Mes
+            let dateStr = now.toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long' }).replace(',', '');
+            let words = dateStr.split(' ').map(w => {
+                if(w.toLowerCase() === 'de' || w.toLowerCase() === 'del') return w.toLowerCase();
+                return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
+            });
+            liveDateEl.textContent = words.join(' ');
+            
         }, 1000);
     }
 
