@@ -60,23 +60,36 @@
     <!-- Layout Principal -->
     <main id="app-container" class="hidden">
         <nav class="side-nav">
+            <!-- Logo solo en desktop (sidebar) -->
             <div class="nav-logo-container" style="text-align:center; margin-bottom:2.5rem; padding: 10px;">
                 <img src="logo.png" alt="AX-CORE" style="width:85px; height:85px; margin-bottom:0.8rem; border-radius:50%; border:1px solid var(--accent-main); box-shadow: 0 0 20px rgba(0,255,136,0.3);">
                 <div class="brand-name" style="font-family:var(--font-accent); font-size:0.95rem; color:var(--accent-main); line-height:1.2; letter-spacing:2px; font-weight:900;">AX-CORE<br><span style="color:white; font-size:0.6rem; letter-spacing:4px; font-weight:400;">BY ARTHUR</span></div>
             </div>
+            <!-- Logo solo en móvil (barra superior) -->
+            <div class="nav-logo-mobile">
+                <img src="logo.png" alt="AX-CORE" style="width:32px; height:32px; border-radius:50%; border:1px solid var(--accent-main);">
+                <span style="font-family:var(--font-accent); font-size:0.7rem; color:var(--accent-main); letter-spacing:1px; font-weight:900; line-height:1;">AX-CORE<br><span style="font-size:0.5rem; color:var(--text-dim); letter-spacing:2px;">BY ARTHUR</span></span>
+            </div>
             <ul class="nav-links">
-                <li class="active" data-page="dashboard"><i class="icon-dashboard"></i><span>Tablero</span></li>
-                <li data-page="diet"><i class="icon-food"></i><span>Dieta</span></li>
-                <li data-page="workout"><i class="icon-gym"></i><span>Workouts</span></li>
-                <li data-page="evolution"><i class="icon-stats"></i><span>Evolución</span></li>
-                <li data-page="assistant"><i class="icon-ai"></i><span>Asistente AI</span></li>
-                <li data-page="settings"><i class="icon-settings"></i><span>Ajustes</span></li>
-                <li id="nav-logout"><i class="icon-logout"></i><span style="color:var(--accent-alert)">Cerrar Sesión</span></li>
+                <li class="active" data-page="dashboard"><span class="nav-icon">🏠</span><span class="nav-label">Tablero</span></li>
+                <li data-page="diet"><span class="nav-icon">🥗</span><span class="nav-label">Dieta</span></li>
+                <li data-page="workout"><span class="nav-icon">💪</span><span class="nav-label">Workouts</span></li>
+                <li data-page="evolution"><span class="nav-icon">📈</span><span class="nav-label">Evolución</span></li>
+                <li data-page="assistant"><span class="nav-icon">🤖</span><span class="nav-label">Asistente AI</span></li>
+                <li data-page="settings"><span class="nav-icon">⚙️</span><span class="nav-label">Ajustes</span></li>
+                <li id="nav-logout"><span class="nav-icon">🚪</span><span class="nav-label" style="color:var(--accent-alert)">Salir</span></li>
             </ul>
         </nav>
 
         <section class="content-area">
             <header class="top-bar">
+                <!-- Perfil (en móvil aparece arriba) -->
+                <div class="user-badge">
+                    <input type="file" id="avatar-upload" class="avatar-upload" accept="image/*">
+                    <div class="avatar" id="avatar-preview" title="Cambiar foto de perfil"></div>
+                    <span class="user-rank" id="display-username">AX-CORE: OPTIMIZED MODE</span>
+                </div>
+                <!-- Reloj y fecha (en móvil aparece debajo) -->
                 <div class="live-stats">
                     <span id="live-time">00:00:00</span>
                     <span class="separator">|</span>
@@ -86,11 +99,6 @@
                 <div id="sw-mini-container" style="display:none; align-items:center; gap:8px; background:rgba(0,255,136,0.08); padding:4px 12px; border-radius:20px; border:1px solid rgba(0,255,136,0.2); cursor:pointer;" onclick="document.querySelector('[data-page=workout]').click();" title="Clic para ir al cronómetro">
                     <span style="font-size:0.65rem; color:var(--accent-secondary);">⏱️</span>
                     <span id="sw-mini-display" style="font-family:var(--font-accent); font-size:0.7rem; color:var(--accent-main); font-variant-numeric:tabular-nums;">00:00:00:00</span>
-                </div>
-                <div class="user-badge">
-                    <span class="user-rank" id="display-username">AX-CORE: OPTIMIZED MODE</span>
-                    <input type="file" id="avatar-upload" class="avatar-upload" accept="image/*">
-                    <div class="avatar" id="avatar-preview" title="Cambiar foto de perfil"></div>
                 </div>
             </header>
 
@@ -132,7 +140,7 @@
                 <!-- PANEL DE RESUMEN DIARIO -->
                 <div class="glass-card" style="margin-bottom: 2rem; padding:2rem;">
                     <h3 style="font-family:var(--font-accent); font-size:0.85rem; color:var(--accent-secondary); margin-bottom:1.2rem; letter-spacing:2px; text-align:center;">📊 RESUMEN DEL DÍA</h3>
-                    <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:1.5rem; text-align:center;">
+                    <div class="summary-day-grid" style="display:grid; grid-template-columns: repeat(4, 1fr); gap:1.5rem; text-align:center;">
                         <div style="border-right:1px solid var(--glass-border);">
                             <p style="font-size:0.7rem; color:var(--text-dim); margin-bottom:0.4rem;">INGERIDAS</p>
                             <h4 style="color:var(--accent-main); font-size:1.3rem;">+<span id="cal-in">0</span></h4>
