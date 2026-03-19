@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AX-CORE | Código QR de Acceso</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #060d1a;
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        .card {
+            background: rgba(0, 201, 122, 0.04);
+            border: 1px solid rgba(0, 201, 122, 0.2);
+            border-radius: 24px;
+            padding: 3rem 4rem;
+            text-align: center;
+            max-width: 520px;
+            width: 100%;
+            box-shadow: 0 0 40px rgba(0, 201, 122, 0.08);
+        }
+        .brand {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: #00c97a;
+            text-shadow: 0 0 20px rgba(0, 201, 122, 0.4);
+            letter-spacing: 4px;
+            margin-bottom: 0.3rem;
+        }
+        .by {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.5);
+            letter-spacing: 6px;
+            margin-bottom: 2.5rem;
+        }
+        .qr-wrapper {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 16px;
+            display: inline-block;
+            margin-bottom: 2rem;
+            box-shadow: 0 0 30px rgba(0, 201, 122, 0.2);
+        }
+        .qr-wrapper img {
+            display: block;
+            width: 280px;
+            height: 280px;
+        }
+        .instructions {
+            font-size: 0.95rem;
+            color: rgba(255,255,255,0.7);
+            line-height: 1.7;
+            margin-bottom: 1.5rem;
+        }
+        .url {
+            background: rgba(0, 201, 122, 0.08);
+            border: 1px solid rgba(0, 201, 122, 0.3);
+            border-radius: 10px;
+            padding: 0.8rem 1.2rem;
+            font-size: 0.85rem;
+            color: #00c97a;
+            word-break: break-all;
+            margin-bottom: 2rem;
+        }
+        .steps {
+            text-align: left;
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.6);
+            line-height: 2;
+        }
+        .steps strong {
+            color: #00c97a;
+        }
+        .divider {
+            border: none;
+            border-top: 1px solid rgba(255,255,255,0.08);
+            margin: 1.5rem 0;
+        }
+        .footer {
+            margin-top: 2rem;
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.25);
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 2px;
+        }
+        @media print {
+            body { background: white; }
+            .card { border-color: #ccc; box-shadow: none; }
+            .brand { color: #005c38; text-shadow: none; }
+            .qr-wrapper { box-shadow: none; }
+            .url { color: #005c38; border-color: #ccc; background: #f5f5f5; }
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="brand">AX-CORE</div>
+        <div class="by">BY ARTHUR ARIAS</div>
+
+        <div class="qr-wrapper">
+            <img 
+                src="https://api.qrserver.com/v1/create-qr-code/?size=280x280&data=https%3A%2F%2Farthur-arias-martinez.github.io%2Faxcore-app%2F&bgcolor=ffffff&color=000000&qzone=2"
+                alt="QR Code AX-CORE App"
+                onerror="this.src='https://quickchart.io/qr?text=https%3A%2F%2Farthur-arias-martinez.github.io%2Faxcore-app%2F&size=280'"
+            >
+        </div>
+
+        <p class="instructions">
+            📱 <strong>Escanea este código</strong> con la cámara de tu celular<br>
+            para entrar directamente a la aplicación.
+        </p>
+
+        <div class="url">
+            🔗 https://arthur-arias-martinez.github.io/axcore-app/
+        </div>
+
+        <hr class="divider">
+
+        <div class="steps">
+            <strong>🤖 ANDROID</strong> (Chrome):<br>
+            Escanea → Abre Chrome → Menú ⋮ → "Instalar aplicación"
+            <br><br>
+            <strong>🍎 iPHONE</strong> (Safari):<br>
+            Escanea → Abre Safari → Compartir ⬆️ → "Agregar a Inicio"
+        </div>
+
+        <div class="footer">POWERING YOUR BIOLOGY | AX-CORE v2.0</div>
+    </div>
+
+    <script>
+        // El QR NO necesita actualizarse nunca. 
+        // El enlace siempre apunta a la misma URL aunque la app se actualice.
+        console.log("AX-CORE QR Permanente - Enlace: https://arthur-arias-martinez.github.io/axcore-app/");
+    </script>
+</body>
+</html>
