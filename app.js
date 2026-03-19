@@ -146,6 +146,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (ap2) ap2.value = userData.apiKey || '';
         const cw = document.getElementById('current-waist');
         if (cw) cw.textContent = userData.waist || 0;
+
+        // Logros Spans
+        const achUser = document.getElementById('ach-username');
+        if (achUser) achUser.textContent = (userData.username || 'USUARIO').toUpperCase();
+        const achDef = document.getElementById('ach-deficit');
+        if (achDef) achDef.textContent = userData.totalNetDeficit || 0;
+        const achWaist = document.getElementById('ach-waist');
+        if (achWaist) achWaist.textContent = userData.waist || 0;
     }
 
     function saveData() {
@@ -454,22 +462,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 <!-- DIETA RECOMENDADA: SOLO LECTURA -->
                 <div class="meal-item glass-card" style="padding:2rem; border-color:var(--accent-secondary); margin-bottom:2rem;">
                     <h3 style="color:var(--accent-secondary); font-size:1.1rem; margin-bottom:1.5rem; border-bottom:1px solid var(--accent-secondary); padding-bottom:0.5rem;">DIETA DETALLADA</h3>
-                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
-                        <div>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;" class="diet-grid-mobile">
+                        <div style="display:flex; flex-direction:column;">
                             <label style="color:var(--accent-main); font-weight:bold; display:block; font-size:0.85rem; margin-bottom:0.5rem;">DESAYUNO</label>
-                            <div style="min-height:70px; background:rgba(0,0,0,0.4); border:1px solid var(--glass-border); border-radius:8px; padding:0.8rem; color:var(--text-primary); line-height:1.5; font-size:0.9rem;">${diet.breakfast || '<span style="color:var(--text-dim); font-style:italic;">Sin definir. Usa la importación inteligente.</span>'}</div>
+                            <div style="flex:1; background:rgba(0,0,0,0.4); border:1px solid var(--glass-border); border-radius:8px; padding:0.8rem; color:var(--text-primary); line-height:1.5; font-size:0.9rem;">${diet.breakfast || '<span style="color:var(--text-dim); font-style:italic;">Sin definir. Usa la importación inteligente.</span>'}</div>
                         </div>
-                        <div>
+                        <div style="display:flex; flex-direction:column;">
                             <label style="color:var(--accent-main); font-weight:bold; display:block; font-size:0.85rem; margin-bottom:0.5rem;">COMIDA</label>
-                            <div style="min-height:70px; background:rgba(0,0,0,0.4); border:1px solid var(--glass-border); border-radius:8px; padding:0.8rem; color:var(--text-primary); line-height:1.5; font-size:0.9rem;">${diet.lunch || '<span style="color:var(--text-dim); font-style:italic;">Sin definir.</span>'}</div>
+                            <div style="flex:1; background:rgba(0,0,0,0.4); border:1px solid var(--glass-border); border-radius:8px; padding:0.8rem; color:var(--text-primary); line-height:1.5; font-size:0.9rem;">${diet.lunch || '<span style="color:var(--text-dim); font-style:italic;">Sin definir.</span>'}</div>
                         </div>
-                        <div>
+                        <div style="display:flex; flex-direction:column;">
                             <label style="color:var(--accent-main); font-weight:bold; display:block; font-size:0.85rem; margin-bottom:0.5rem;">CENA</label>
-                            <div style="min-height:70px; background:rgba(0,0,0,0.4); border:1px solid var(--glass-border); border-radius:8px; padding:0.8rem; color:var(--text-primary); line-height:1.5; font-size:0.9rem;">${diet.dinner || '<span style="color:var(--text-dim); font-style:italic;">Sin definir.</span>'}</div>
+                            <div style="flex:1; background:rgba(0,0,0,0.4); border:1px solid var(--glass-border); border-radius:8px; padding:0.8rem; color:var(--text-primary); line-height:1.5; font-size:0.9rem;">${diet.dinner || '<span style="color:var(--text-dim); font-style:italic;">Sin definir.</span>'}</div>
                         </div>
-                        <div>
+                        <div style="display:flex; flex-direction:column;">
                             <label style="color:var(--accent-main); font-weight:bold; display:block; font-size:0.85rem; margin-bottom:0.5rem;">SNACKS / ADICIONALES</label>
-                            <div style="min-height:70px; background:rgba(0,0,0,0.4); border:1px solid var(--glass-border); border-radius:8px; padding:0.8rem; color:var(--text-primary); line-height:1.5; font-size:0.9rem;">${diet.snacks || '<span style="color:var(--text-dim); font-style:italic;">Sin definir.</span>'}</div>
+                            <div style="flex:1; background:rgba(0,0,0,0.4); border:1px solid var(--glass-border); border-radius:8px; padding:0.8rem; color:var(--text-primary); line-height:1.5; font-size:0.9rem;">${diet.snacks || '<span style="color:var(--text-dim); font-style:italic;">Sin definir.</span>'}</div>
                         </div>
                     </div>
                     <p style="margin-top:1rem; font-size:0.7rem; color:var(--text-dim); text-align:center;">Para actualizar, usa la sección de Importación Inteligente arriba.</p>
@@ -789,6 +797,36 @@ document.addEventListener('DOMContentLoaded', () => {
             saveData();
         };
     });
+
+    // SHARE BUTTONS
+    const btnShareApp = document.getElementById('btn-share-app');
+    if (btnShareApp) {
+        btnShareApp.onclick = () => {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'AX-CORE By Arthur',
+                    text: 'Únete a la vanguardia de la optimización biológica con AX-CORE.',
+                    url: 'https://arthur-arias-martinez.github.io/axcore-app/'
+                }).catch(err => console.error("Error share app:", err));
+            } else {
+                alert("Tu dispositivo no soporta compartir nativo. Copia este enlace: https://arthur-arias-martinez.github.io/axcore-app/");
+            }
+        };
+    }
+
+    const btnShareAch = document.getElementById('btn-share-achievements');
+    if (btnShareAch) {
+        btnShareAch.onclick = () => {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Mis Logros en AX-CORE',
+                    text: `¡He logrado un déficit acumulado de ${userData.totalNetDeficit || 0} kcal y mi cintura está en ${userData.waist || 0}cm usando AX-CORE by Arthur! 🔥💪`,
+                }).catch(err => console.error("Error share logros:", err));
+            } else {
+                alert("Toma una captura de pantalla para compartir tus logros :D");
+            }
+        };
+    }
 
     saveSettingsBtn.onclick = () => {
         // Guardar nombre de usuario si se editó

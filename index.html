@@ -106,7 +106,8 @@
             <div id="page-dashboard" class="page active">
                 <div class="grid-stats">
                     <div class="glass-card stat-card" style="position:relative; overflow:hidden;">
-                        <div style="position:absolute; top:10px; right:15px; font-size:2rem; opacity:0.15;">⚖️</div>
+                        <!-- Ícono mejorado y más visible -->
+                        <div style="position:absolute; top:10px; right:15px; font-size:2.5rem; opacity:0.35;">📉</div>
                         <h3>PESO ACTUAL</h3>
                         <div class="stat-value"><span id="current-weight">0.0</span><small>KG</small></div>
                         <div class="stat-goal" id="weight-meta-text">Meta: 0 KG</div>
@@ -116,7 +117,7 @@
                         <p id="weight-percent" style="font-size:0.65rem; color:var(--accent-main); text-align:right; margin-top:4px;">0%</p>
                     </div>
                     <div class="glass-card stat-card" style="position:relative; overflow:hidden;">
-                        <div style="position:absolute; top:10px; right:15px; font-size:2rem; opacity:0.15;">🔥</div>
+                        <div style="position:absolute; top:10px; right:15px; font-size:2.5rem; opacity:0.25;">🔥</div>
                         <h3>CALORÍAS HOY</h3>
                         <div class="stat-value"><span id="calories-net">0</span><small>KCAL</small></div>
                         <div class="stat-goal" id="cal-rem-text">Límite diario: 1600</div>
@@ -126,7 +127,7 @@
                         <p id="cal-percent" style="font-size:0.65rem; color:var(--accent-main); text-align:right; margin-top:4px;">0%</p>
                     </div>
                     <div class="glass-card stat-card" style="position:relative; overflow:hidden;">
-                        <div style="position:absolute; top:10px; right:15px; font-size:2rem; opacity:0.15;">📏</div>
+                        <div style="position:absolute; top:10px; right:15px; font-size:2.5rem; opacity:0.25;">📏</div>
                         <h3>CINTURA</h3>
                         <div class="stat-value"><span id="current-waist">0</span><small>CM</small></div>
                         <div class="stat-goal" id="waist-meta-text">Meta: 0 CM</div>
@@ -197,8 +198,35 @@
 
             <!-- EVOLUTION PAGE -->
             <div id="page-evolution" class="page">
+                <!-- Se movió Perfil Antropométrico a Evolución como lo pidio el usuario -->
+                <div class="glass-card settings-panel" style="margin-bottom: 2rem;">
+                    <h2 style="color:var(--accent-main); margin-bottom:1.5rem;">PERFIL ANTROPOMÉTRICO BASE</h2>
+                    <div class="measurement-form" style="display:grid; grid-template-columns: repeat(4, 1fr); gap:15px;">
+                        <div class="input-group" style="margin:0;">
+                            <label>ALTURA (M)</label>
+                            <input type="number" step="0.01" id="input-height" placeholder="Ej. 1.74">
+                        </div>
+                        <div class="input-group" style="margin:0;">
+                            <label>PESO INCIAL (KG)</label>
+                            <input type="number" step="0.1" id="input-weight" placeholder="Ej. 100">
+                        </div>
+                        <div class="input-group" style="margin:0;">
+                            <label>CINTURA INICIAL (CM)</label>
+                            <input type="number" id="input-waist" placeholder="Ej. 115">
+                        </div>
+                        <div class="input-group" style="margin:0;">
+                            <label>META PESO (KG)</label>
+                            <input type="number" step="0.1" id="input-target-weight" placeholder="Ej. 85">
+                        </div>
+                    </div>
+                    <div style="display:flex; gap:10px; justify-content: center; margin-top: 1.5rem;">
+                        <button id="save-measurements" class="btn-premium" style="flex:1;">ACTUALIZAR PERFIL</button>
+                        <button id="btn-reset-measurements" class="btn-premium" style="flex:1; background:transparent; border:1px solid var(--accent-alert); color:var(--accent-alert);">REINICIAR</button>
+                    </div>
+                </div>
+
                 <div class="glass-card evolution-panel">
-                    <h2 style="font-family:var(--font-accent); color:var(--accent-main); margin-bottom:1.5rem;">HISTORIAL DE MEDIDAS</h2>
+                    <h2 style="font-family:var(--font-accent); color:var(--accent-main); margin-bottom:1.5rem;">HISTORIAL DE MEDIDAS (DIARIO)</h2>
                     <div class="measurement-form" style="display:grid; grid-template-columns: repeat(3, 1fr); gap:15px; margin-bottom:2rem; padding:1.5rem; background:rgba(0,0,0,0.3); border-radius:15px; border:1px solid var(--glass-border);">
                         <div class="input-group" style="margin:0;">
                             <label>PESO (KG)</label>
@@ -328,27 +356,23 @@
                         <button id="save-settings" class="btn-premium" style="width:100%">GUARDAR SISTEMA</button>
                     </div>
 
-                    <div class="glass-card settings-panel">
-                        <h2>PERFIL ANTROPOMÉTRICO</h2>
-                        <div class="input-group">
-                            <label>ALTURA (M)</label>
-                            <input type="number" step="0.01" id="input-height" placeholder="Ej. 1.74">
+                    <div class="glass-card settings-panel" style="text-align: center;">
+                        <h2 style="color:var(--accent-main);">🥇 LOGROS Y COMPARTIR</h2>
+                        <p style="font-size:0.8rem; color:var(--text-dim); margin-bottom:1.5rem;">Comparte en tus redes sociales el progreso que has alcanzado y el acceso a la app.</p>
+                        
+                        <div id="achievements-list" style="background:rgba(0,0,0,0.4); padding:1rem; border-radius:12px; margin-bottom:1.5rem; text-align:left; border:1px solid var(--glass-border);">
+                            <h4 style="margin-bottom:0.8rem; color:var(--text-primary); font-family:var(--font-accent);"><span id="ach-username">Usuario</span> ha logrado:</h4>
+                            <ul style="list-style:none; line-height:1.8; color:var(--accent-secondary); font-size:0.85rem; font-weight:bold;">
+                                <li>🔥 Usando AX-CORE Vanguardia</li>
+                                <li>📉 <span id="ach-deficit">0</span> Kcal en Déficit Acumulado</li>
+                                <li>📏 <span id="ach-waist">0</span> cm de Cintura Actual</li>
+                                <li>💪 Optimizando biología.</li>
+                            </ul>
                         </div>
-                        <div class="input-group">
-                            <label>PESO INICIAL (KG)</label>
-                            <input type="number" step="0.1" id="input-weight" placeholder="Ej. 100">
-                        </div>
-                        <div class="input-group">
-                            <label>CINTURA (CM)</label>
-                            <input type="number" id="input-waist" placeholder="Ej. 115">
-                        </div>
-                        <div class="input-group">
-                            <label>META DE PESO (KG)</label>
-                            <input type="number" step="0.1" id="input-target-weight" placeholder="Ej. 85">
-                        </div>
-                        <div style="display:flex; gap:10px;">
-                            <button id="save-measurements" class="btn-premium" style="flex:1">ACTUALIZAR</button>
-                            <button id="btn-reset-measurements" class="btn-premium" style="flex:1; background:transparent; border:1px solid var(--accent-alert); color:var(--accent-alert);">REINICIAR MEDIDAS</button>
+
+                        <div style="display:grid; grid-template-columns: 1fr; gap:10px;">
+                            <button id="btn-share-achievements" class="btn-premium" style="width:100%;">COMPARTIR MIS LOGROS</button>
+                            <button id="btn-share-app" class="btn-premium" style="width:100%; background:transparent; border:1px solid var(--accent-secondary); color:var(--accent-secondary);">COMPARTIR APP AX-CORE</button>
                         </div>
                     </div>
                 </div>

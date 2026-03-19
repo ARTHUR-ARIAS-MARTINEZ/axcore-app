@@ -716,29 +716,35 @@ body {
         flex-direction: row;
         overflow-x: auto;
         overflow-y: hidden;
-        padding: 0.4rem 0.8rem;
+        padding: 0;
         border-right: none;
         border-bottom: 1px solid var(--glass-border);
         align-items: center;
-        gap: 8px;
+        position: relative;
     }
 
-    /* Logo en móvil: visible en la barra superior izquierda */
+    /* Logo en móvil: visible y fijo (sticky) a la izquierda */
     .nav-logo-container { display: none; }
     .nav-logo-mobile {
         display: flex;
         align-items: center;
         gap: 6px;
         flex-shrink: 0;
-        padding-right: 8px;
+        padding: 0.4rem 0.8rem;
         border-right: 1px solid var(--glass-border);
+        position: sticky;
+        left: 0;
+        background: var(--bg-dark);
+        z-index: 50;
+        box-shadow: 5px 0 10px rgba(0,0,0,0.5);
     }
 
     .nav-links {
         display: flex;
         flex: 1;
-        justify-content: space-around;
-        gap: 2px;
+        justify-content: flex-start;
+        gap: 15px;
+        padding: 0 10px;
     }
 
     .nav-links li {
@@ -776,21 +782,29 @@ body {
         gap: 1rem;
     }
 
-    /* TOP BAR: perfil arriba, reloj abajo en móvil */
+    /* TOP BAR: reloj grande y perfil dinámico al centro */
     .top-bar {
-        flex-direction: column-reverse;
-        align-items: flex-start;
-        gap: 0.5rem;
-        margin-bottom: 1rem;
-    }
-
-    .user-badge {
-        width: 100%;
-        justify-content: flex-start;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.8rem;
+        margin-bottom: 1.5rem;
     }
 
     .live-stats {
-        font-size: 0.75rem;
+        font-size: 1.25rem !important; /* Reloj más grande */
+        font-weight: bold;
+        text-align: center;
+        width: 100%;
+    }
+
+    .user-badge {
+        width: auto !important; /* Inteligente según el texto */
+        max-width: 100%;
+        display: inline-flex;
+        justify-content: center;
+        margin: 0 auto;
+        padding: 0.5rem 1rem;
     }
 
     /* Resumen del día: centrado correctamente en móvil */
@@ -814,6 +828,14 @@ body {
 
     .food-entry-group {
         flex-direction: column;
+    }
+
+    /* Cartas de info principal más pequeñas (peso, kcal, cintura) */
+    .stat-card {
+        padding: 1.2rem !important;
+    }
+    .stat-value {
+        font-size: 1.8rem !important;
     }
 
     .measurement-form {
@@ -879,7 +901,7 @@ body {
         gap: 1.5rem;
     }
 
-    /* Chat/Asistente IA: sin scroll horizontal */
+    /* Chat/Asistente IA: Armonioso y centrado */
     #page-assistant {
         overflow-x: hidden;
         padding-bottom: 2rem;
@@ -888,25 +910,40 @@ body {
         overflow: hidden;
         width: 100% !important;
         max-width: 100% !important;
+        padding: 1rem; /* Más armonioso */
+        border-radius: 20px;
+    }
+    .chat-messages {
+        padding: 0;
     }
     .chat-input-area {
         flex-wrap: nowrap;
         width: 100%;
-        gap: 8px;
+        gap: 10px;
         overflow: hidden;
+        align-items: center;
+        margin-top: 1rem;
     }
     .chat-input-area input {
         min-width: 0;
         flex: 1;
+        height: 50px;
+        margin: 0;
+        font-size: 0.9rem;
     }
     .btn-ai {
-        padding: 0 0.8rem;
+        height: 50px;
+        padding: 0 1.2rem;
         font-size: 0.8rem;
         white-space: nowrap;
         flex-shrink: 0;
+        border-radius: 12px;
     }
     .btn-mic {
         flex-shrink: 0;
+        height: 50px;
+        width: 50px;
+        border-radius: 50%;
     }
 
     /* Tablero: botones de sensaciones visibles */

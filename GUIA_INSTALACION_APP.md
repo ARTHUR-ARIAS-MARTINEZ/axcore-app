@@ -40,3 +40,34 @@ Para entrar a generar códigos y ver las finanzas, debes entrar exactamente al m
 Una vez ahí, te pedirá tu clave de administrador secreta para entrar a la bóveda.
 
 **¡Bienvenido a la vanguardia!**
+
+
+
+
+
+
+¡Todo arreglado y actualizado! Acabo de hacer lo siguiente:
+
+1. 📄 QR agregado a la guía
+Ya añadí el código QR gigantesco al documento 
+
+GUIA_INSTALACION_APP.md
+ que está en tu computadora. Cuando los dueños o usuarios lo abran, el QR será lo primero que vean.
+
+2. 🔐 ¿Por qué los códigos te marcaron error "CÓDIGO INVÁLIDO"?
+Esto no es un error de programación, es una realidad de cómo funcionan las aplicaciones web sin servidor (frontend puro) que platicamos antes:
+
+Como todavía no hemos creado el servidor "Backend" de Render, los gimnasios y códigos que tú creaste en tu computadora se guardaron directamente en la base de datos local de tu computadora (LocalStorage). Cuando te fuiste a tu celular, ese celular tiene su propio espacio de memoria vacío (no hay un servidor que comparta los cerebros de ambos dispositivos). Por eso el celular "no reconoció" los códigos que tu computadora sí conocía.
+
+¿Cómo probar generar códigos en el celular AHORA MISMO? Si quieres simular la experiencia completa, ve desde tu celular a https://arthur-arias-martinez.github.io/axcore-app/admin.html, generas un bloque, generas un código ahí, y luego lo usas ahí mismo en el celular. ¡Entrará a la perfección!
+
+🔧 Mi solución rápida para que juegues hoy: Para que no tengas que estar generando códigos mientras haces pruebas en diferentes aparatos, acabo de programar 3 códigos maestros "UNIVERSALES" en la aplicación (están fijos en el código) que SIEMPRE van a funcionar en cualquier computadora, tablet o celular del mundo de inmediato sin tener que entrar al panel admin:
+
+AXV-DEMO (Código Plan Básico)
+AX-BOSS1 (Código Plan Estándar)
+AX-BOSS2 (Código Plan Premium)
+Recarga la página de tu celular, pon AX-BOSS1 ¡y verás cómo te deja entrar y te asigna la cuota de Estándar!
+
+Recuerda: Todo esto del límite entre la compu y el celular se acabará en cuanto me ordenes conectar el Backend en Render (cuando ya vayas a cobrar), porque ahí ya todo el planeta estará conectado a la misma "nube".
+
+Sigue explorando y dime qué te parece el cronómetro que ahora no se "muere" cuando cambias de sección.
