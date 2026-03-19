@@ -172,50 +172,81 @@ document.addEventListener('DOMContentLoaded', () => {
         loginOverlay.classList.remove('hidden');
     };
 
-    document.getElementById('btn-register-confirm').onclick = () => {
+    const API_URL = "https://axcore-appax-core-backend.onrender.com";
+
+    document.getElementById('btn-register-confirm').onclick = async () => {
         const u = regUser.value.trim();
         const p = regPass.value.trim();
         const gcc = document.getElementById('reg-gym-code');
         const gc = gcc ? gcc.value.trim().toUpperCase() : '';
+        
         if (u.length < 3 || p.length < 4) {
             alert("Usuario min 3 caracteres, Clave min 4.");
             return;
         }
         if (!gc) {
-            alert("CÓDIGO AX-V REQUERIDO: Pídeselo a tu entrenador o dueño del gimnasio para acceder.");
+            alert("CÓDIGO AX REQUERIDO: Pídelo en tu gimnasio para crear tu cuenta.");
             return;
         }
         if (localStorage.getItem(`arthur_data_${u}`)) {
-            alert("Este usuario ya existe.");
+            alert("Este usuario ya existe en tu dispositivo.");
             return;
         }
-        // Obtener API Key por código de gimnasio (ofuscada)
-        const gymApiKey = (typeof getApiKeyFromCode === 'function') ? getApiKeyFromCode(gc) : null;
-        if (!gymApiKey) {
-            alert("CÓDIGO AX-V INVÁLIDO: Verifica el código con tu entrenador o encargado del gimnasio.");
-            return;
+
+        const btn = document.getElementById('btn-register-confirm');
+        const originalText = btn.textContent;
+        btn.textContent = "VERIFICANDO...";
+        btn.disabled = true;
+
+        try {
+            // Validar Código con Backend
+            const res = await fetch(`${API_URL}/api/validate`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ code: gc })
+            });
+            const data = await res.json();
+            
+            if (data.success) {
+                currentUser = u;
+                userData.username = u;
+                userData.password = p;
+                userData.gymCode = gc;
+                userData.apiKey = 'validated_via_backend'; 
+                saveData();
+                localStorage.setItem('arthur_current_user', u);
+                alert(data.message);
+                location.reload();
+            } else {
+                alert(data.message); // ej: "Código inactivo o inválido"
+            }
+        } catch(e) {
+            // Si el backend duerme o falla, permitimos modo offline si usan pase maestro
+            if (gc === "AXV-DEMO" || gc === "GYM-MASTER") {
+                currentUser = u;
+                userData.username = u;
+                userData.password = p;
+                userData.gymCode = gc;
+                userData.apiKey = 'validated_offline';
+                saveData();
+                localStorage.setItem('arthur_current_user', u);
+                alert("Modo Fuera de Línea Activado (Servidor reiniciando).");
+                location.reload();
+            } else {
+                alert("Error contactando la Base de Datos Central. Verifica tu conexión o espera 1 minuto a que despierte el servidor.");
+            }
         }
-        // Verificar si se devolvió un error de límite de usuarios
-        if (typeof gymApiKey === 'object' && gymApiKey.error === 'LÍMITE_USUARIOS') {
-            alert(gymApiKey.message);
-            return;
-        }
-        currentUser = u;
-        userData.username = u;
-        userData.password = p;
-        userData.gymCode = gc;
-        userData.apiKey = gymApiKey; // Se asigna automáticamente, NUNCA visible para el usuario
-        saveData();
-        localStorage.setItem('arthur_current_user', u);
-        location.reload();
+        
+        btn.textContent = originalText;
+        btn.disabled = false;
     };
 
-    document.getElementById('btn-login-access').onclick = () => {
+    document.getElementById('btn-login-access').onclick = async () => {
         const u = loginUser.value.trim();
         const p = loginPass.value.trim();
         const savedRaw = localStorage.getItem(`arthur_data_${u}`);
         if (!savedRaw) {
-            alert("Usuario no encontrado.");
+            alert("Usuario no encontrado en este dispositivo.");
             return;
         }
         const saved = JSON.parse(savedRaw);
@@ -223,9 +254,38 @@ document.addEventListener('DOMContentLoaded', () => {
             alert("Contraseña incorrecta.");
             return;
         }
-        currentUser = u;
-        localStorage.setItem('arthur_current_user', u);
-        location.reload();
+
+        const gc = saved.gymCode || "AXV-DEMO"; // Fallback por si era usuario viejo
+        const btn = document.getElementById('btn-login-access');
+        const originalText = btn.textContent;
+        btn.textContent = "CONECTANDO...";
+        btn.disabled = true;
+
+        try {
+            // Cada que el usuario entra, validamos su membresía en tiempo real
+            const res = await fetch(`${API_URL}/api/validate`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ code: gc })
+            });
+            const data = await res.json();
+            
+            if (data.success) {
+                currentUser = u;
+                localStorage.setItem('arthur_current_user', u);
+                location.reload();
+            } else {
+                alert("ACCESO DENEGADO POR TU GIMNASIO: " + data.message);
+            }
+        } catch(e) {
+            // Modo offline permitido para entrar rápido si el servidor se está levantando
+            currentUser = u;
+            localStorage.setItem('arthur_current_user', u);
+            location.reload();
+        }
+
+        btn.textContent = originalText;
+        btn.disabled = false;
     };
 
     // Enter para hacer login rápido
