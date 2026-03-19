@@ -85,4 +85,12 @@ Tus socios no solo entrenarán; tendrán un asesor inteligente las 24 horas del 
 Cobra 50 pesos extras en tu membresía 'Digital Plus'. Con los primeros 30 socios pagas mi licencia, y con los otros 100 socios te estás metiendo **$5,000 MXN adicionales mensuales** de pura utilidad, sin mover un solo aparato."*
 
 ---
+
+## 7. CONTROL DE ACTIVACIÓN Y MOROSIDAD (AX-COACH)
+Para blindar tu negocio y el del gimnasio, el sistema incluye la **Terminal de Coach**:
+*   **Gestión de Pases**: El dueño genera códigos únicos para cobrar la inscripción a la plataforma.
+*   **Filtro Anti-Morosos (Kill Switch)**: El dueño tiene el poder de **Pausar** el software de cualquier cliente que no haya pagado su gimnasio. Esto obliga al cliente a ponerse al corriente para recuperar su IA y sus planes de entrenamiento.
+*   **Cero Riesgo Arthur**: Si el gimnasio deja de pagarte la renta del software, tú apagas el **GYM-ID** completo desde la base de datos de Render y todos los usuarios de ese gimnasio pierden el acceso automáticamente.
+
+---
 *Este plan de negocios es propiedad intelectual de AX-CORE By ARTHUR.*
