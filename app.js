@@ -814,114 +814,263 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    // GENERADOR DE TARJETA DE LOGROS (CANVAS)
+    // GENERADOR DE TARJETA DE LOGROS (CANVAS) — BIO-OPTIMIZATION CARD NEÓN NOIR
     async function generateAchievementCard() {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
+            const W = 1080, H = 1350;
             const canvas = document.createElement('canvas');
-            canvas.width = 1080;
-            canvas.height = 1350; // Post tamaño Portrait HD (Instagram/FB)
+            canvas.width = W;
+            canvas.height = H;
             const ctx = canvas.getContext('2d');
 
-            // Fondo Gradiente Premium
-            const grad = ctx.createLinearGradient(0, 0, 1080, 1350);
-            grad.addColorStop(0, '#060d1a'); // Dark navy
-            grad.addColorStop(1, '#000000'); // Black
-            ctx.fillStyle = grad;
-            ctx.fillRect(0, 0, 1080, 1350);
+            // ─── FONDO NEGRO CARBONO (BASE IDENTIDAD) ───
+            const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
+            bgGrad.addColorStop(0,   '#050505');
+            bgGrad.addColorStop(0.45,'#0d1a10');
+            bgGrad.addColorStop(1,   '#020705');
+            ctx.fillStyle = bgGrad;
+            ctx.fillRect(0, 0, W, H);
 
-            // Patrón de fondo (Anillos de foco/tecnología)
-            ctx.strokeStyle = 'rgba(0, 201, 122, 0.05)';
-            ctx.lineWidth = 3;
-            for(let i=0; i<25; i++) {
+            // ─── REJILLA HOLOGRÁFICA (3-6% opacidad) ───
+            ctx.strokeStyle = 'rgba(0, 255, 163, 0.045)';
+            ctx.lineWidth = 1;
+            for (let x = 0; x < W; x += 54) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
+            for (let y = 0; y < H; y += 54) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
+
+            // ─── ANILLOS DE RADAR DETRÁS DEL LOGO (sutiles, punto áureo arriba) ───
+            const cx = W / 2, cy = 240;
+            for (let r = 60; r < 380; r += 52) {
                 ctx.beginPath();
-                ctx.arc(540, 675, 100 + i*45, 0, Math.PI*2);
+                ctx.arc(cx, cy, r, 0, Math.PI * 2);
+                ctx.strokeStyle = `rgba(0,255,163,${0.06 - r * 0.00012})`;
+                ctx.lineWidth = 1;
                 ctx.stroke();
             }
 
-            // Borde Neón
-            ctx.strokeStyle = '#00c97a'; // Verde AX-CORE
-            ctx.lineWidth = 12;
-            ctx.strokeRect(40, 40, 1000, 1270);
-
-            // Efecto iluminación interior sutil
-            ctx.strokeStyle = 'rgba(0, 201, 122, 0.3)';
+            // ─── BORDE EXTERIOR NEÓN VERDE ───
+            ctx.strokeStyle = '#39FF8A';
+            ctx.lineWidth = 10;
+            ctx.strokeRect(36, 36, W - 72, H - 72);
+            // Borde interior sutil
+            ctx.strokeStyle = 'rgba(57,255,138,0.25)';
             ctx.lineWidth = 2;
-            ctx.strokeRect(55, 55, 970, 1240);
+            ctx.strokeRect(50, 50, W - 100, H - 100);
 
-            // Cargar Logo
+            // ─── SCANLINE HORIZONTAL (efecto holográfico estático) ───
+            // Dibujamos varias líneas de scan a distintas posiciones para simular el frame
+            [180, 450, 900, 1150].forEach(sy => {
+                const sg = ctx.createLinearGradient(0, sy, W, sy + 2);
+                sg.addColorStop(0, 'transparent');
+                sg.addColorStop(0.5, 'rgba(0, 229, 255, 0.06)');
+                sg.addColorStop(1, 'transparent');
+                ctx.fillStyle = sg;
+                ctx.fillRect(0, sy, W, 2);
+            });
+
+            // ─── NOISE CINEMATOGRÁFICO (grano fino) ───
+            // Pintamos píxeles aleatorios muy tenues para quitar lo "plástico"
+            for (let i = 0; i < 6000; i++) {
+                const nx = Math.random() * W;
+                const ny = Math.random() * H;
+                ctx.fillStyle = `rgba(255,255,255,${Math.random() * 0.025})`;
+                ctx.fillRect(nx, ny, 1.2, 1.2);
+            }
+
+            // ─── CARGAR LOGO ───
             const logo = new Image();
             logo.crossOrigin = 'anonymous';
             logo.src = 'logo.png';
-            
-            logo.onload = () => {
-                 // Dibujar Logo circular
-                 ctx.save();
-                 ctx.beginPath();
-                 ctx.arc(540, 240, 130, 0, Math.PI * 2);
-                 ctx.closePath();
-                 ctx.clip();
-                 ctx.drawImage(logo, 410, 110, 260, 260); // Centrado y ajustado
-                 ctx.restore();
 
-                 // Borde del logo
-                 ctx.beginPath();
-                 ctx.arc(540, 240, 130, 0, Math.PI * 2);
-                 ctx.lineWidth = 6;
-                 ctx.strokeStyle = '#00c97a';
-                 ctx.stroke();
+            const drawCard = (logoLoaded) => {
+                // ══════════════════════════════════
+                //  TERCIO 1 (0–450px) — IDENTIDAD
+                // ══════════════════════════════════
 
-                 // Título Principal Élites
-                 ctx.fillStyle = '#00c97a';
-                 ctx.font = 'bold 55px Orbitron, sans-serif';
-                 ctx.textAlign = 'center';
-                 ctx.fillText('BIOLOGÍA OPTIMIZADA', 540, 460);
+                if (logoLoaded) {
+                    // Glow detrás del logo
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, 135, 0, Math.PI * 2);
+                    ctx.shadowColor = '#39FF8A';
+                    ctx.shadowBlur = 50;
+                    ctx.strokeStyle = 'rgba(57,255,138,0.6)';
+                    ctx.lineWidth = 4;
+                    ctx.stroke();
+                    ctx.restore();
 
-                 // Nombre del Usuario
-                 ctx.fillStyle = '#ffffff';
-                 ctx.font = 'bold 80px Inter, sans-serif';
-                 ctx.fillText((userData.username || 'USUARIO ÉLITE').toUpperCase(), 540, 560);
+                    // Clip circular logo
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, 120, 0, Math.PI * 2);
+                    ctx.clip();
+                    ctx.drawImage(logo, cx - 120, cy - 120, 240, 240);
+                    ctx.restore();
+                } else {
+                    // Fallback texto logo
+                    ctx.save();
+                    ctx.shadowColor = '#39FF8A';
+                    ctx.shadowBlur = 30;
+                    ctx.fillStyle = '#39FF8A';
+                    ctx.font = 'bold 64px Orbitron, monospace';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('AX', cx, cy + 20);
+                    ctx.restore();
+                }
 
-                 // Separador de diseño
-                 ctx.fillStyle = 'rgba(255,255,255,0.2)';
-                 ctx.fillRect(240, 620, 600, 4);
+                // AX-CORE BY ARTHUR — Monospace, letter-spacing simulado
+                const brandLetters = 'AX-CORE BY ARTHUR';
+                ctx.save();
+                ctx.fillStyle = 'rgba(200,210,205,0.85)'; // Plata
+                ctx.font = '600 26px Orbitron, monospace';
+                ctx.textAlign = 'center';
+                // Simular letter-spacing de 0.25em (≈ 6.5px por caracter de 26px)
+                const letterSp = 8;
+                const totalW = brandLetters.length * (16 + letterSp);
+                let bx = cx - totalW / 2 + 8;
+                for (const ch of brandLetters) {
+                    ctx.fillText(ch, bx, 400);
+                    bx += ctx.measureText(ch).width + letterSp;
+                }
+                ctx.restore();
 
-                 // Datos 1: Déficit
-                 ctx.fillStyle = '#aaaaaa';
-                 ctx.font = '40px Inter, sans-serif';
-                 ctx.fillText('DÉFICIT ACUMULADO', 540, 720);
-                 
-                 ctx.fillStyle = '#ff3366'; // Rojo vibrante/Coral
-                 ctx.font = 'bold 110px Orbitron, sans-serif';
-                 ctx.fillText((userData.totalNetDeficit || 0) + ' KCAL', 540, 830);
+                // Separador grueso entre tercios 1 y 2
+                const sepGrad1 = ctx.createLinearGradient(100, 450, W - 100, 450);
+                sepGrad1.addColorStop(0, 'transparent');
+                sepGrad1.addColorStop(0.5, 'rgba(57,255,138,0.6)');
+                sepGrad1.addColorStop(1, 'transparent');
+                ctx.fillStyle = sepGrad1;
+                ctx.fillRect(100, 450, W - 200, 2);
 
-                 // Datos 2: Cintura
-                 ctx.fillStyle = '#aaaaaa';
-                 ctx.font = '40px Inter, sans-serif';
-                 ctx.fillText('CINTURA ACTUAL', 540, 960);
-                 
-                 ctx.fillStyle = '#00d4ff'; // Azul Cyan
-                 ctx.font = 'bold 110px Orbitron, sans-serif';
-                 ctx.fillText((userData.waist || 0) + ' CM', 540, 1070);
+                // ══════════════════════════════════
+                //  TERCIO 2 (450–900px) — MÉTRICAS
+                // ══════════════════════════════════
 
-                 // Footer Vanguardia
-                 ctx.fillStyle = 'rgba(255,255,255,0.6)';
-                 ctx.font = '28px Orbitron, sans-serif';
-                 ctx.letterSpacing = "6px"; // Simulando letter-spacing (En un canvas avanzado se hace carácter a carácter, aquí un texto limpio basta)
-                 ctx.fillText('AX-CORE BY ARTHUR', 540, 1240);
+                // Label DÉFICIT
+                ctx.fillStyle = 'rgba(180,195,185,0.7)';
+                ctx.font = '500 30px Inter, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('DÉFICIT ACUMULADO', cx, 520);
 
-                 canvas.toBlob(blob => {
-                     resolve(blob);
-                 }, 'image/png');
+                // NÚMERO DÉFICIT — 96px bold, glow verde intenso
+                const defVal = (userData.totalNetDeficit || 0).toLocaleString('es-MX');
+                ctx.save();
+                ctx.shadowColor = '#39FF8A';
+                ctx.shadowBlur = 28;
+                ctx.fillStyle = '#39FF8A';
+                ctx.font = 'bold 108px Orbitron, monospace';
+                ctx.textAlign = 'center';
+                // Segunda capa sin blur para nitidez
+                ctx.fillText(defVal, cx, 640);
+                ctx.shadowBlur = 0;
+                ctx.fillText(defVal, cx, 640);
+                ctx.restore();
+
+                // Sub-label KCAL
+                ctx.fillStyle = 'rgba(57,255,138,0.55)';
+                ctx.font = '600 28px Orbitron, monospace';
+                ctx.fillText('KCAL', cx, 685);
+
+                // Separador delgado al 40% de ancho
+                const sepGrad2 = ctx.createLinearGradient(W*0.30, 720, W*0.70, 720);
+                sepGrad2.addColorStop(0, 'transparent');
+                sepGrad2.addColorStop(0.5, 'rgba(200,210,205,0.3)');
+                sepGrad2.addColorStop(1, 'transparent');
+                ctx.fillStyle = sepGrad2;
+                ctx.fillRect(W * 0.30, 720, W * 0.40, 1);
+
+                // Label CINTURA
+                ctx.fillStyle = 'rgba(180,195,185,0.7)';
+                ctx.font = '500 30px Inter, sans-serif';
+                ctx.fillText('CINTA LÓGICA (CINTURA)', cx, 770);
+
+                // NÚMERO CINTURA — Cian tecnológico
+                const waistVal = userData.waist || 0;
+                ctx.save();
+                ctx.shadowColor = '#00E5FF';
+                ctx.shadowBlur = 22;
+                ctx.fillStyle = '#00E5FF';
+                ctx.font = 'bold 88px Orbitron, monospace';
+                ctx.fillText(`${waistVal} CM`, cx, 870);
+                ctx.shadowBlur = 0;
+                ctx.fillText(`${waistVal} CM`, cx, 870);
+                ctx.restore();
+
+                // Separador entre tercios 2 y 3
+                const sepGrad3 = ctx.createLinearGradient(100, 900, W - 100, 900);
+                sepGrad3.addColorStop(0, 'transparent');
+                sepGrad3.addColorStop(0.5, 'rgba(57,255,138,0.4)');
+                sepGrad3.addColorStop(1, 'transparent');
+                ctx.fillStyle = sepGrad3;
+                ctx.fillRect(100, 900, W - 200, 1.5);
+
+                // ══════════════════════════════════
+                //  TERCIO 3 (900–1350px) — CTA + BADGE
+                // ══════════════════════════════════
+
+                // USUARIO ÉLITE
+                const uname = `USUARIO ÉLITE: ${(userData.username || 'AX MEMBER').toUpperCase()}`;
+                ctx.fillStyle = 'rgba(230,240,235,0.75)';
+                ctx.font = '500 28px Inter, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(uname, cx, 970);
+
+                // BADGE "BIOLOGÍA OPTIMIZADA" con borde pulsante (simulado doble borde)
+                const badgeY = 1060, bw = 600, bh = 70, br = 35;
+                const bx2 = cx - bw/2, by2 = badgeY - bh/2;
+
+                // Capa exterior del badge (glow pulsante simulado)
+                ctx.save();
+                ctx.shadowColor = '#39FF8A';
+                ctx.shadowBlur = 20;
+                ctx.strokeStyle = 'rgba(57,255,138,0.9)';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.roundRect(bx2, by2, bw, bh, br);
+                ctx.stroke();
+                ctx.restore();
+
+                // Relleno del badge
+                const badgeFill = ctx.createLinearGradient(bx2, by2, bx2 + bw, by2);
+                badgeFill.addColorStop(0, 'rgba(0,40,20,0.85)');
+                badgeFill.addColorStop(1, 'rgba(0,25,12,0.85)');
+                ctx.fillStyle = badgeFill;
+                ctx.beginPath();
+                ctx.roundRect(bx2, by2, bw, bh, br);
+                ctx.fill();
+
+                // Texto del badge
+                ctx.save();
+                ctx.shadowColor = '#39FF8A';
+                ctx.shadowBlur = 12;
+                ctx.fillStyle = '#39FF8A';
+                ctx.font = 'bold 26px Orbitron, monospace';
+                ctx.textAlign = 'center';
+                ctx.fillText('✦  BIOLOGÍA OPTIMIZADA  ✦', cx, badgeY + 10);
+                ctx.restore();
+
+                // TAG inferior (intriga / hash)
+                ctx.fillStyle = 'rgba(255,255,255,0.12)';
+                ctx.font = '18px Inter, monospace';
+                ctx.fillText('#AXCORE  •  POWERED BY AX-CORE SYSTEM', cx, 1160);
+
+                // Línea base final
+                const sepF = ctx.createLinearGradient(80, 1220, W - 80, 1220);
+                sepF.addColorStop(0, 'transparent');
+                sepF.addColorStop(0.5, 'rgba(57,255,138,0.5)');
+                sepF.addColorStop(1, 'transparent');
+                ctx.fillStyle = sepF;
+                ctx.fillRect(80, 1220, W - 160, 1.5);
+
+                // AX-CORE BY ARTHUR — pie de tarjeta
+                ctx.fillStyle = 'rgba(255,255,255,0.35)';
+                ctx.font = '500 20px Orbitron, monospace';
+                ctx.fillText('AX-CORE BY ARTHUR  •  axcore-app.com', cx, 1270);
+
+                canvas.toBlob(blob => resolve(blob), 'image/png');
             };
-            
-            logo.onerror = () => {
-                 // Si por alguna razón el logo falla al cargar, pintar un texto de reemplazo y devolver la imagen
-                 ctx.fillStyle = '#00c97a';
-                 ctx.font = 'bold 60px Orbitron';
-                 ctx.textAlign = 'center';
-                 ctx.fillText('AX-CORE', 540, 240);
-                 canvas.toBlob(blob => resolve(blob), 'image/png');
-            };
+
+            logo.onload  = () => drawCard(true);
+            logo.onerror = () => drawCard(false);
         });
     }
 
