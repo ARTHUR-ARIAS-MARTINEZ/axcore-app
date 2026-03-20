@@ -46,9 +46,9 @@ document.addEventListener('DOMContentLoaded', () => {
         username: '',
         password: '',
         avatar: '',
-        height: 1.74,
-        weight: 100,
-        waist: 115,
+        height: 0,
+        weight: 0,
+        waist: 0,
         bicep: 0,
         tricep: 0,
         leg: 0,
@@ -57,8 +57,8 @@ document.addEventListener('DOMContentLoaded', () => {
         calf: 0,
         glute: 0,
         neck: 0,
-        target_weight: 85,
-        dailyCalLimit: 1600,
+        target_weight: 0,
+        dailyCalLimit: 0,
         caloriesConsumedToday: 0,
         caloriesBurnedToday: 0,
         totalNetDeficit: 0, 
@@ -316,10 +316,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Cintura
         document.getElementById('current-waist').textContent = userData.waist || 0;
-        const targetWaist = userData.target_waist || 100;
-        const initialWaist = 115;
-        const progWaist = Math.max(0, Math.min(100, ((initialWaist - (userData.waist || initialWaist)) / Math.max(1, initialWaist - targetWaist)) * 100));
-        document.getElementById('waist-meta-text').textContent = `Meta: ${targetWaist} CM`;
+        const targetWaist = userData.target_waist || 0;
+        const initialWaist = userData.waist || 0;
+        const progWaist = targetWaist > 0 ? Math.max(0, Math.min(100, ((initialWaist - (userData.waist || initialWaist)) / Math.max(1, initialWaist - targetWaist)) * 100)) : 0;
+        document.getElementById('waist-meta-text').textContent = targetWaist > 0 ? `Meta: ${targetWaist} CM` : `Meta: 0 CM`;
         const waistBar = document.getElementById('waist-progress');
         if (waistBar) waistBar.style.width = `${progWaist}%`;
         const wapEl = document.getElementById('waist-percent');
@@ -515,7 +515,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="meal-item glass-card" style="padding:2rem; border-color:var(--accent-main); margin-bottom:2rem;">
                     <h3 style="color:var(--accent-main); font-size:1.1rem; margin-bottom:1rem;">IMPORTACIÓN INTELIGENTE (IA)</h3>
                     <p style="font-size:0.8rem; color:var(--text-dim); margin-bottom:1rem;">Pega aquí el plan que te dio tu nutriólogo. AX-CORE lo procesará y acomodará en las casillas correspondientes.</p>
-                    <textarea id="diet-raw-text" placeholder="Ej: Lunes: Desayuno 2 huevos con jamón, comida pechuga asada, cena ensalada, snacks cacahuates..." style="width:100%; min-height:80px; background:rgba(0,0,0,0.5); color:white; border:1px dashed var(--accent-main); border-radius:8px; padding:0.8rem; margin-bottom:1rem;"></textarea>
+                    <textarea id="diet-raw-text" placeholder="Ej: Lunes: Desayuno 2 huevos con jamón, comida pechuga asada, cena ensalada, snacks cacahuates..." style="width:100%; min-height:80px; background:var(--glass-bg, rgba(0,0,0,0.2)); color:var(--text-primary); border:1px dashed var(--accent-main); border-radius:8px; padding:0.8rem; margin-bottom:1rem;"></textarea>
                     <button class="btn-premium" id="btn-parse-diet" style="width:100%;">⚙️ PROCESAR CON IA</button>
                 </div>
 
@@ -525,19 +525,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;" class="diet-grid-mobile">
                         <div style="display:flex; flex-direction:column;">
                             <label style="color:var(--accent-main); font-weight:bold; display:block; font-size:0.85rem; margin-bottom:0.5rem;">DESAYUNO</label>
-                            <div style="flex:1; background:rgba(0,0,0,0.4); border:1px solid var(--glass-border); border-radius:8px; padding:0.8rem; color:var(--text-primary); line-height:1.5; font-size:0.9rem;">${diet.breakfast || '<span style="color:var(--text-dim); font-style:italic;">Sin definir. Usa la importación inteligente.</span>'}</div>
+                            <div style="flex:1; background:var(--glass-bg, rgba(0,0,0,0.2)); border:1px solid var(--glass-border); border-radius:8px; padding:0.8rem; color:var(--text-primary); line-height:1.5; font-size:0.9rem;">${diet.breakfast || '<span style="color:var(--text-dim); font-style:italic;">Sin definir. Usa la importación inteligente.</span>'}</div>
                         </div>
                         <div style="display:flex; flex-direction:column;">
                             <label style="color:var(--accent-main); font-weight:bold; display:block; font-size:0.85rem; margin-bottom:0.5rem;">COMIDA</label>
-                            <div style="flex:1; background:rgba(0,0,0,0.4); border:1px solid var(--glass-border); border-radius:8px; padding:0.8rem; color:var(--text-primary); line-height:1.5; font-size:0.9rem;">${diet.lunch || '<span style="color:var(--text-dim); font-style:italic;">Sin definir.</span>'}</div>
+                            <div style="flex:1; background:var(--glass-bg, rgba(0,0,0,0.2)); border:1px solid var(--glass-border); border-radius:8px; padding:0.8rem; color:var(--text-primary); line-height:1.5; font-size:0.9rem;">${diet.lunch || '<span style="color:var(--text-dim); font-style:italic;">Sin definir.</span>'}</div>
                         </div>
                         <div style="display:flex; flex-direction:column;">
                             <label style="color:var(--accent-main); font-weight:bold; display:block; font-size:0.85rem; margin-bottom:0.5rem;">CENA</label>
-                            <div style="flex:1; background:rgba(0,0,0,0.4); border:1px solid var(--glass-border); border-radius:8px; padding:0.8rem; color:var(--text-primary); line-height:1.5; font-size:0.9rem;">${diet.dinner || '<span style="color:var(--text-dim); font-style:italic;">Sin definir.</span>'}</div>
+                            <div style="flex:1; background:var(--glass-bg, rgba(0,0,0,0.2)); border:1px solid var(--glass-border); border-radius:8px; padding:0.8rem; color:var(--text-primary); line-height:1.5; font-size:0.9rem;">${diet.dinner || '<span style="color:var(--text-dim); font-style:italic;">Sin definir.</span>'}</div>
                         </div>
                         <div style="display:flex; flex-direction:column;">
                             <label style="color:var(--accent-main); font-weight:bold; display:block; font-size:0.85rem; margin-bottom:0.5rem;">SNACKS / ADICIONALES</label>
-                            <div style="flex:1; background:rgba(0,0,0,0.4); border:1px solid var(--glass-border); border-radius:8px; padding:0.8rem; color:var(--text-primary); line-height:1.5; font-size:0.9rem;">${diet.snacks || '<span style="color:var(--text-dim); font-style:italic;">Sin definir.</span>'}</div>
+                            <div style="flex:1; background:var(--glass-bg, rgba(0,0,0,0.2)); border:1px solid var(--glass-border); border-radius:8px; padding:0.8rem; color:var(--text-primary); line-height:1.5; font-size:0.9rem;">${diet.snacks || '<span style="color:var(--text-dim); font-style:italic;">Sin definir.</span>'}</div>
                         </div>
                     </div>
                     <p style="margin-top:1rem; font-size:0.7rem; color:var(--text-dim); text-align:center;">Para actualizar, usa la sección de Importación Inteligente arriba.</p>
@@ -547,17 +547,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="meal-item glass-card" style="padding:2rem; margin-bottom:2rem;">
                     <h3 style="color:var(--accent-main); font-size:1rem; margin-bottom:1rem;">REGLAS ESTRUCTURADAS GLOBALES</h3>
                     <ul style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; font-size:0.9rem;">
-                        ${(userData.customDietRules || ARTHUR_KNOWLEDGE.diet_rules).map(r => `<li style="margin-bottom:5px; color:var(--text-dim);">• ${r}</li>`).join('')}
+                        ${(userData.customDietRules || ["Pendiente de importar plan de nutriólogo."]).map(r => `<li style="margin-bottom:5px; color:var(--text-dim);">• ${r}</li>`).join('')}
                     </ul>
                     <p style="margin-top:1rem; font-size:0.65rem; color:var(--text-dim); text-align:center; font-style:italic;">${userData.customDietRules ? '✅ Reglas personalizadas por tu nutriólogo (generadas por IA)' : 'Reglas base de AX-CORE. Se actualizarán automáticamente al procesar tu dieta del nutriólogo.'}</p>
                 </div>
 
                 <!-- REGISTRO DE CALORÍAS REALES -->
-                <div class="reg-food-container" style="border: 2px solid var(--accent-main); background: rgba(0,0,0,0.5); padding:2rem; border-radius:20px;">
+                <div class="reg-food-container" style="border: 2px solid var(--accent-main); background: var(--glass-bg, rgba(0,0,0,0.1)); padding:2rem; border-radius:20px;">
                     <h3 style="color:var(--accent-main); font-family:var(--font-accent); margin-bottom:0.5rem;">REGISTRO DE INGESTA REAL</h3>
                     <p style="font-size:0.8rem; margin-bottom:1.5rem; color:var(--text-dim);">Reporta tus alimentos para que Arthur calibre tu metabolismo.</p>
                     <div class="food-entry-group" style="display:flex; gap:15px;">
-                        <input type="text" id="food-desc" placeholder="Ej. 100g de pollo y media taza de arroz..." style="flex:3; background:rgba(0,0,0,0.7); border:1px solid var(--accent-main); padding:1rem; color:white; border-radius:12px; font-size:1rem;">
+                        <input type="text" id="food-desc" placeholder="Ej. 100g de pollo y media taza de arroz..." style="flex:3; background:var(--glass-bg, rgba(0,0,0,0.2)); border:1px solid var(--accent-main); padding:1rem; color:var(--text-primary); border-radius:12px; font-size:1rem;">
                         <button class="btn-premium" id="btn-add-food" style="flex:1; padding:1rem; font-weight:bold;">REGISTRAR</button>
                     </div>
                 </div>
@@ -731,7 +731,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <span style="font-size:0.7rem; color:var(--bg-dark); background:var(--accent-secondary); border-radius:10px; padding:3px 8px; display:inline-block; margin-bottom:10px; font-weight:bold;">${ex.type}</span>
                             <small>${ex.desc}</small>
                             <div style="margin:1rem 0; display:flex; align-items:center; gap:10px;">
-                                <input type="number" class="ex-input" value="${baseVal}" style="width:60px; background:rgba(0,0,0,0.5); border:1px solid var(--accent-main); color:white; padding:5px; border-radius:5px;">
+                                <input type="number" class="ex-input" value="${baseVal}" style="width:60px; background:var(--glass-bg, rgba(0,0,0,0.2)); border:1px solid var(--accent-main); color:var(--text-primary); padding:5px; border-radius:5px;">
                                 <label style="font-size:0.8rem;">${unit}</label>
                             </div>
                             <button class="btn-finish-ex" 

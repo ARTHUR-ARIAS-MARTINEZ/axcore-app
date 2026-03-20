@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ACCESOS VIP AX-CORE</title>
+    <!-- Fuentes (Gym style) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #0d0d0d; color: #fff; font-family: 'Inter', sans-serif;
+            margin: 0; padding: 40px 20px; text-align: center;
+        }
+        h1 {
+            font-family: 'Oswald', sans-serif; font-size: 3rem; color: #d4af37;
+            letter-spacing: 2px; margin-bottom: 5px; text-transform: uppercase;
+        }
+        h2 { color: #aaa; margin-top: 0; font-size: 1.2rem; font-weight: normal; margin-bottom: 40px; }
+        
+        .grid-container {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px; max-width: 1200px; margin: 0 auto;
+        }
+        
+        .qr-card {
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 15px; padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px);
+            display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+        }
+        
+        .qr-card h3 {
+            font-family: 'Oswald', sans-serif; font-size: 1.8rem; margin: 0 0 10px 0; color: #fff;
+        }
+        .qr-card p { color: #888; font-size: 0.9rem; margin-bottom: 20px; }
+        
+        .qr-image-wrapper {
+            background: #fff; padding: 15px; border-radius: 10px; margin-bottom: 20px;
+        }
+        .qr-image-wrapper img { display: block; width: 200px; height: 200px; }
+        
+        .link-url {
+            background: rgba(0,0,0,0.5); padding: 10px; border-radius: 8px; font-family: monospace;
+            color: #00ff88; word-break: break-all; margin-bottom: 15px; width: 100%; box-sizing: border-box;
+        }
+        
+        .btn-visit {
+            background: #d4af37; color: #000; text-decoration: none; padding: 10px 20px;
+            border-radius: 5px; font-family: 'Oswald', sans-serif; font-weight: bold; width: 100%;
+            display: block; box-sizing: border-box; text-transform: uppercase;
+        }
+        .btn-visit:hover { background: #f5d15a; }
+
+        /* Acentos por tarjeta */
+        .card-maestro { border-top: 5px solid #d4af37; }
+        .card-coach { border-top: 5px solid #00c97a; }
+        .card-app { border-top: 5px solid #e8394a; }
+    </style>
+</head>
+<body>
+
+    <h1>ECOSISTEMA GLOBAL AX-CORE</h1>
+    <h2>Centros de Mando y Accesos para todos los Roles</h2>
+
+    <div class="grid-container">
+
+        <!-- 1. PANEL MAESTRO (TÚ) -->
+        <div class="qr-card card-maestro">
+            <div>
+                <h3 style="color:#d4af37;">1) EL JEFE (TÚ)</h3>
+                <p>Panel Maestro de Franquicias. Crea gimnasios, limita cuentas y controla los pagos.</p>
+            </div>
+            
+            <div class="qr-image-wrapper">
+                <img src="QR_MAESTRO.png" alt="QR Maestro">
+            </div>
+            
+            <div class="link-url">https://arthur-arias-martinez.github.io/axcore-app/admin.html</div>
+            <a href="https://arthur-arias-martinez.github.io/axcore-app/admin.html" target="_blank" class="btn-visit">IR AL PANEL MAESTRO</a>
+        </div>
+
+        <!-- 2. DUEÑO / COACH DEL GIMNASIO -->
+        <div class="qr-card card-coach">
+            <div>
+                <h3 style="color:#00ff88;">2) DUEÑOS DE GIMNASIO</h3>
+                <p>Terminal VIP del Coach. Aquí entran los dueños con el código que tú les vendiste (ej: AXB-A1B2).</p>
+            </div>
+            
+            <div class="qr-image-wrapper">
+                <img src="QR_COACH.png" alt="QR Coach">
+            </div>
+            
+            <div class="link-url">https://arthur-arias-martinez.github.io/axcore-app/coach.html</div>
+            <a href="https://arthur-arias-martinez.github.io/axcore-app/coach.html" target="_blank" class="btn-visit" style="background:#00c97a;">IR AL PANEL COACH</a>
+        </div>
+
+        <!-- 3. APP ATLETAS / CLIENTES -->
+        <div class="qr-card card-app">
+            <div>
+                <h3 style="color:#e8394a;">3) CLIENTES (ATLETAS)</h3>
+                <p>La PWA Inteligente de AX-CORE. Los clientes ingresan sus datos y el código generado por su Coach.</p>
+            </div>
+            
+            <div class="qr-image-wrapper">
+                <img src="QR_APP_ATLETA.png" alt="QR App">
+            </div>
+            
+            <div class="link-url">https://arthur-arias-martinez.github.io/axcore-app/</div>
+            <a href="https://arthur-arias-martinez.github.io/axcore-app/" target="_blank" class="btn-visit" style="background:#e8394a; color:#fff;">IR A LA APP ATLETAS</a>
+        </div>
+
+    </div>
+
+</body>
+</html>

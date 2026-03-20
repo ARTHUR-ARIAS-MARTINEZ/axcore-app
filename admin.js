@@ -47,21 +47,24 @@ document.addEventListener('DOMContentLoaded', () => {
         calculateProfits();
     }
 
+    const API_URL = location.hostname === 'localhost' || location.hostname === '127.0.0.1' ? 'http://localhost:3000' : 'https://axcore-appax-core-backend.onrender.com';
+
     // --- PERSISTENCIA ---
-    function loadAdminData() {
+    async function loadAdminData() {
         const saved = localStorage.getItem('arthur_admin_blocks_data');
         if (saved) {
             adminData = JSON.parse(saved);
-            // Migrar gimnasios antiguos que no tengan plan
-            if (adminData.gyms) {
-                adminData.gyms.forEach(g => {
-                    if (!g.plan) g.plan = 'basico';
-                    if (!g.maxUsers) g.maxUsers = AX_PLANS[g.plan].maxUsers;
-                    if (g.active === undefined) g.active = true;
-                    // Calcular renta desde el plan si no tiene
-                    if (!g.rent || g.rent === 0) g.rent = AX_PLANS[g.plan].price;
-                });
+        }
+        
+        // Sincronizar desde MongoDB
+        try {
+            const res = await fetch(`${API_URL}/api/admin/gyms`);
+            const data = await res.json();
+            if(data.success && data.gyms) {
+                adminData.gyms = data.gyms; // Reemplazar con datos reales
             }
+        } catch(e) {
+            console.error("Modo offline: Cargando gyms locales", e);
         }
     }
 
@@ -187,7 +190,7 @@ document.addEventListener('DOMContentLoaded', () => {
         gymBlockSelect.innerHTML = adminData.blocks.map(b => `<option value="${b.id}">${b.name}</option>`).join('');
     }
 
-    document.getElementById('btn-save-gym').onclick = () => {
+    document.getElementById('btn-save-gym').onclick = async () => {
         const bid = gymBlockSelect.value;
         const gname = document.getElementById('gym-name').value.trim();
         const gowner = document.getElementById('gym-owner').value.trim();
@@ -202,8 +205,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const rent = planInfo.price;
 
         const newGym = {
-            id: Date.now().toString(),
-            blockId: bid,
             gymCode: gymCode,
             name: gname,
             owner: gowner,
@@ -212,12 +213,33 @@ document.addEventListener('DOMContentLoaded', () => {
             plan: selectedPlan,
             maxUsers: planInfo.maxUsers,
             rent: rent,
-            active: true,
-            createdAt: new Date().toISOString()
+            active: true
         };
 
-        adminData.gyms.push(newGym);
-        saveAdminData();
+        document.getElementById('btn-save-gym').textContent = 'Subiendo a la nube...';
+
+        try {
+            // Guardar globalmente
+            const res = await fetch(`${API_URL}/api/admin/gyms`, {
+                method: 'POST',
+                headers:{'Content-Type': 'application/json'},
+                body: JSON.stringify(newGym)
+            });
+            const data = await res.json();
+            if(data.success) {
+                adminData.gyms.push(data.gym);
+                saveAdminData();
+            } else {
+                alert("Error creando en global, se guardará en local.");
+                adminData.gyms.push(newGym);
+                saveAdminData();
+            }
+        } catch(e) {
+            adminData.gyms.push(newGym);
+            saveAdminData();
+        }
+
+        document.getElementById('btn-save-gym').textContent = 'GUARDAR GIMNASIO';
         closeModal('modal-gym');
         renderGyms();
         renderBlocks(); 
@@ -230,7 +252,8 @@ document.addEventListener('DOMContentLoaded', () => {
             <strong>Gimnasio:</strong> ${gname}<br>
             <strong>Plan:</strong> ${planInfo.name} ($${rent.toLocaleString()} MXN/mes)<br>
             <strong>Límite:</strong> ${planInfo.maxUsers} usuarios<br>
-            <strong>Dueño:</strong> ${gowner}
+            <strong>Dueño:</strong> ${gowner}<br>
+            <strong style="color:var(--accent-main); font-size:1.1rem;">Nube: ✅ ACTIVADO</strong>
         `;
         openModal('modal-code-result');
     };
@@ -251,6 +274,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- CONTAR USUARIOS POR CÓDIGO ---
     function countUsersForCode(code) {
+        // Ahora lo leemos directamente si viene del servidor
+        const gymNode = adminData.gyms.find(g => g.gymCode === code);
+        if (gymNode && gymNode.currentUsers !== undefined) {
+            return gymNode.currentUsers;
+        }
+
+        // Fallback local por si estamos offline
         let count = 0;
         for (let i = 0; i < localStorage.length; i++) {
             const key = localStorage.key(i);
@@ -293,8 +323,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         <span style="font-size:0.65rem; padding:3px 8px; border-radius:8px; ${g.active ? 'background:rgba(0,255,136,0.1); color:#00ff88;' : 'background:rgba(255,51,102,0.1); color:#ff3366;'}">${g.active ? '✅ ACTIVO' : '❌ PAUSADO'}</span>
                     </td>
                     <td style="display:flex; gap:4px; flex-wrap:wrap;">
-                        <button class="btn-cancel" style="padding:4px 8px; font-size:0.55rem; background:transparent; border:1px solid ${g.active ? '#ffaa00' : '#00ff88'}; color:${g.active ? '#ffaa00' : '#00ff88'}; border-radius:4px;" onclick="toggleGym('${g.id}')">${g.active ? 'PAUSAR' : 'ACTIVAR'}</button>
-                        <button class="btn-cancel" style="padding:4px 8px; font-size:0.55rem;" onclick="deleteGym('${g.id}')">QUITAR</button>
+                        <button class="btn-cancel" style="padding:4px 8px; font-size:0.55rem; background:transparent; border:1px solid ${g.active ? '#ffaa00' : '#00ff88'}; color:${g.active ? '#ffaa00' : '#00ff88'}; border-radius:4px;" onclick="toggleGym('${g._id || g.id}')">${g.active ? 'PAUSAR' : 'ACTIVAR'}</button>
+                        <button class="btn-cancel" style="padding:4px 8px; font-size:0.55rem;" onclick="deleteGym('${g._id || g.id}')">QUITAR</button>
                     </td>
                 </tr>
             `;
@@ -302,24 +332,42 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- PAUSAR/ACTIVAR GIMNASIO ---
-    window.toggleGym = (id) => {
-        const gym = adminData.gyms.find(g => g.id === id);
+    window.toggleGym = async (id) => {
+        const gym = adminData.gyms.find(g => g._id === id || g.id === id);
         if (gym) {
             gym.active = !gym.active;
+            
+            // Sincronizar en global
+            try {
+                await fetch(`${API_URL}/api/admin/toggle`, {
+                    method: 'POST',
+                    headers:{'Content-Type': 'application/json'},
+                    body: JSON.stringify({ gymCode: gym.gymCode, status: gym.active })
+                });
+            } catch(e) { console.error('Conexion fallida, guardado en local', e); }
+
             saveAdminData();
             renderGyms();
             renderCodes();
             calculateProfits();
             alert(gym.active 
-                ? `✅ Gimnasio "${gym.name}" ACTIVADO. El código ${gym.gymCode} ya funciona.`
-                : `⏸️ Gimnasio "${gym.name}" PAUSADO. Sus usuarios NO podrán registrarse con el código ${gym.gymCode}.`
+                ? `✅ Gimnasio "${gym.name}" ACTIVADO globalmente. El código ${gym.gymCode} ya funciona.`
+                : `⏸️ Gimnasio "${gym.name}" PAUSADO globalmente. Sus usuarios NO podrán registrarse con el código ${gym.gymCode}.`
             );
         }
     };
 
-    window.deleteGym = (id) => {
-        if (confirm("¿Desvincular este gimnasio definitivamente?")) {
-            adminData.gyms = adminData.gyms.filter(g => g.id !== id);
+    window.deleteGym = async (id) => {
+        if (confirm("¿Desvincular este gimnasio definitivamente también de la base de datos GLOBAL?")) {
+            const gym = adminData.gyms.find(g => g._id === id || g.id === id);
+            adminData.gyms = adminData.gyms.filter(g => g._id !== id && g.id !== id);
+            
+            if(gym) {
+                try {
+                    await fetch(`${API_URL}/api/admin/gyms/${gym.gymCode}`, { method: 'DELETE' });
+                } catch(e) {}
+            }
+
             saveAdminData();
             renderGyms();
             renderBlocks();

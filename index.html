@@ -107,8 +107,6 @@
             <div id="page-dashboard" class="page active">
                 <div class="grid-stats">
                     <div class="glass-card stat-card" style="position:relative; overflow:hidden;">
-                        <!-- Ícono mejorado y más visible -->
-                        <div style="position:absolute; top:10px; right:15px; font-size:2.5rem; opacity:0.35;">📉</div>
                         <h3>PESO ACTUAL</h3>
                         <div class="stat-value"><span id="current-weight">0.0</span><small>KG</small></div>
                         <div class="stat-goal" id="weight-meta-text">Meta: 0 KG</div>
@@ -118,17 +116,15 @@
                         <p id="weight-percent" style="font-size:0.65rem; color:var(--accent-main); text-align:right; margin-top:4px;">0%</p>
                     </div>
                     <div class="glass-card stat-card" style="position:relative; overflow:hidden;">
-                        <div style="position:absolute; top:10px; right:15px; font-size:2.5rem; opacity:0.25;">🔥</div>
                         <h3>CALORÍAS HOY</h3>
                         <div class="stat-value"><span id="calories-net">0</span><small>KCAL</small></div>
-                        <div class="stat-goal" id="cal-rem-text">Límite diario: 1600</div>
+                        <div class="stat-goal" id="cal-rem-text">Límite diario: 0</div>
                         <div class="progress-bar-container">
                             <div class="progress-fill" id="cal-progress"></div>
                         </div>
                         <p id="cal-percent" style="font-size:0.65rem; color:var(--accent-main); text-align:right; margin-top:4px;">0%</p>
                     </div>
                     <div class="glass-card stat-card" style="position:relative; overflow:hidden;">
-                        <div style="position:absolute; top:10px; right:15px; font-size:2.5rem; opacity:0.25;">📏</div>
                         <h3>CINTURA</h3>
                         <div class="stat-value"><span id="current-waist">0</span><small>CM</small></div>
                         <div class="stat-goal" id="waist-meta-text">Meta: 0 CM</div>
@@ -188,10 +184,10 @@
                     </div>
                     <div id="sensation-feedback" class="hidden glass-card" style="margin-top:1rem; border-color:var(--accent-secondary); padding:1rem; display:flex; flex-direction:column; gap:10px;">
                         <p id="sensation-title" style="margin:0; font-size: 0.8rem; color:var(--accent-secondary); font-family:var(--font-accent); font-weight:bold;"></p>
-                        <input type="text" id="sensation-input" placeholder="..." style="background:rgba(0,0,0,0.5); border:1px solid var(--accent-secondary); padding:0.8rem; border-radius:8px; color:white; width:100%; font-family:var(--font-main);">
+                        <input type="text" id="sensation-input" placeholder="..." style="background:var(--glass-bg, rgba(0,0,0,0.5)); border:1px solid var(--accent-secondary); padding:0.8rem; border-radius:8px; color:var(--text-primary); width:100%; font-family:var(--font-main);">
                         <div style="display:flex; gap:10px; justify-content: flex-end;">
                             <button class="btn-premium" style="font-size:0.6rem; padding:0.4rem 0.8rem;" id="btn-just-record">SÓLO REGISTRAR</button>
-                            <button class="btn-premium" style="font-size:0.6rem; padding:0.4rem 0.8rem; background:transparent; border:1px solid var(--accent-secondary);" id="btn-ask-ai-sensation">CONSULTAR A LA IA</button>
+                            <button class="btn-premium" style="font-size:0.6rem; padding:0.4rem 0.8rem; background:var(--accent-main); border:1px solid var(--accent-main); color:#000; font-weight:bold;" id="btn-ask-ai-sensation">CONSULTAR A LA IA</button>
                         </div>
                     </div>
                 </div>
@@ -226,9 +222,9 @@
                     </div>
                 </div>
 
-                <div class="glass-card evolution-panel">
+                <div class="glass-card evolution-panel" style="border-left:5px solid var(--accent-main);">
                     <h2 style="font-family:var(--font-accent); color:var(--accent-main); margin-bottom:1.5rem;">HISTORIAL DE MEDIDAS (DIARIO)</h2>
-                    <div class="measurement-form" style="display:grid; grid-template-columns: repeat(3, 1fr); gap:15px; margin-bottom:2rem; padding:1.5rem; background:rgba(0,0,0,0.3); border-radius:15px; border:1px solid var(--glass-border);">
+                    <div class="measurement-form" style="display:grid; grid-template-columns: repeat(3, 1fr); gap:15px; margin-bottom:2rem; padding:1.5rem; background:var(--glass-bg, rgba(0,0,0,0.2)); border-radius:15px; border:1px solid var(--glass-border);">
                         <div class="input-group" style="margin:0;">
                             <label>PESO (KG)</label>
                             <input type="number" step="0.1" id="log-weight">
@@ -286,7 +282,7 @@
                         <button class="theme-btn" id="filter-month">ESTE MES</button>
                     </div>
 
-                    <div class="history-table-container" style="max-height:400px; overflow-y:auto; background:rgba(0,0,0,0.5); border-radius:15px; border:1px solid var(--glass-border);">
+                    <div class="history-table-container" style="max-height:400px; overflow-y:auto; background:var(--glass-bg, rgba(0,0,0,0.2)); border-radius:15px; border:1px solid var(--glass-border);">
                         <table style="width:100%; border-collapse:collapse; text-align:left;">
                             <thead style="background:var(--glass); border-bottom:1px solid var(--glass-border);">
                                 <tr style="color:var(--accent-main); font-family:var(--font-accent); font-size:0.8rem;">
@@ -319,7 +315,7 @@
             <div id="page-diet" class="page"></div>
             <div id="page-workout" class="page"></div>
             <div id="page-assistant" class="page">
-                <div class="chat-container glass-card">
+                <div class="chat-container glass-card" style="border-left:5px solid var(--accent-secondary);">
                     <div class="chat-messages" id="chat-box">
                         <div class="msg system">Sincronización completa. Soy AX-CORE. ¿En qué optimizamos tu biología hoy?</div>
                     </div>
@@ -361,7 +357,7 @@
                         <h2 style="color:var(--accent-main);">🥇 LOGROS Y COMPARTIR</h2>
                         <p style="font-size:0.8rem; color:var(--text-dim); margin-bottom:1.5rem;">Comparte en tus redes sociales el progreso que has alcanzado y el acceso a la app.</p>
                         
-                        <div id="achievements-list" style="background:rgba(0,0,0,0.4); padding:1rem; border-radius:12px; margin-bottom:1.5rem; text-align:left; border:1px solid var(--glass-border);">
+                        <div id="achievements-list" style="background:var(--glass-bg, rgba(0,0,0,0.2)); padding:1rem; border-radius:12px; margin-bottom:1.5rem; text-align:left; border:1px solid var(--glass-border);">
                             <h4 style="margin-bottom:0.8rem; color:var(--text-primary); font-family:var(--font-accent);"><span id="ach-username">Usuario</span> ha logrado:</h4>
                             <ul style="list-style:none; line-height:1.8; color:var(--accent-secondary); font-size:0.85rem; font-weight:bold;">
                                 <li>🔥 Usando AX-CORE Vanguardia</li>

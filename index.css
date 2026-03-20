@@ -70,6 +70,7 @@
     --neon-glow: 0 8px 25px rgba(0, 0, 0, 0.1); 
     --text-primary: #1b2e1e;      
     --text-dim: #415944;
+    --glass-bg: rgba(255, 255, 255, 0.5);
 }
 
 * {
@@ -179,11 +180,11 @@ body {
 }
 .input-group input, .input-group select {
     width: 100%;
-    background: rgba(0,0,0,0.5);
+    background: var(--glass-bg, rgba(0,0,0,0.5));
     border: 1px solid var(--accent-main);
     padding: 1rem;
     border-radius: 8px;
-    color: white;
+    color: var(--text-primary);
     font-family: var(--font-main);
     transition: 0.3s;
 }
@@ -468,9 +469,9 @@ body {
 
 .msg.user {
     align-self: flex-end;
-    background: rgba(0, 0, 0, 0.5);
+    background: var(--glass-bg, rgba(0, 0, 0, 0.5));
     border: 1px solid var(--accent-secondary);
-    color: #ffffff;
+    color: var(--text-primary);
 }
 
 .chat-input-area {
@@ -481,11 +482,11 @@ body {
 
 .chat-input-area input {
     flex: 1;
-    background: rgba(0,0,0,0.5);
+    background: var(--glass-bg, rgba(0,0,0,0.5));
     border: 1px solid var(--glass-border);
     padding: 1rem;
     border-radius: 12px;
-    color: white;
+    color: var(--text-primary);
     font-family: var(--font-main);
 }
 
@@ -587,7 +588,7 @@ body {
 .rules-box {
     margin-top: 2rem;
     padding: 1.5rem;
-    background: rgba(0,0,0,0.5);
+    background: var(--glass-bg, rgba(0,0,0,0.5));
     border: 1px dashed var(--accent-main);
     border-radius: 12px;
 }

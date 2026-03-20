@@ -3,177 +3,228 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AX-CORE COACH TERMINAL</title>
-    <!-- Fuentes (Gym style) -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
+    <title>AX-CORE | COACH TERMINAL VIP</title>
+    <!-- Fuentes premium -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="index.css">
     <style>
-        body[data-theme="dark"] {
-            background-color: #121212;
-            color: #fff;
+        body { background-color: #0b0b0b; overflow-x: hidden; }
+        .gradient-text {
+            background: linear-gradient(90deg, #d4af37, #ffd700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
         .coach-container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
             padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
-        .header-brand {
-            text-align: center;
-            margin-bottom: 2rem;
-            margin-top: 2rem;
+        .dashboard-container {
+            align-items: flex-start;
+            justify-content: flex-start;
         }
-        .header-brand h1 {
-            font-family: 'Oswald', sans-serif;
-            font-size: 3rem;
-            letter-spacing: 2px;
-            color: #d4af37; /* Gold */
+        .header-brand { text-align: center; margin-bottom: 2rem; }
+        .header-brand h1 { font-family: 'Oswald', sans-serif; font-size: 3.5rem; letter-spacing: 2px; line-height: 1; }
+        
+        /* Layouts exclusivos */
+        .dashboard-header {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;
+            background: rgba(0,0,0,0.5); padding: 1.5rem; border-radius: 12px; border: 1px solid rgba(212, 175, 55, 0.3);
+            flex-wrap: wrap; gap: 15px;
         }
-        .auth-card {
-            background: rgba(255, 255, 255, 0.05);
-            border: 2px solid #d4af37;
-            border-radius: 10px;
-            padding: 2rem;
-            text-align: center;
+        .stats-badge {
+            background: rgba(212, 175, 55, 0.1); color: #d4af37; padding: 0.5rem 1rem; border-radius: 30px; font-weight: bold; border: 1px solid rgba(212, 175, 55, 0.3);
+            font-size: 0.9rem;
         }
-        .btn-gold {
-            background: #d4af37;
-            color: #000;
-            border: none;
-            padding: 1rem 2rem;
-            font-family: 'Oswald', sans-serif;
-            font-size: 1.2rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-            width: 100%;
-            margin-top: 1rem;
-        }
-        .btn-gold:hover {
-            background: #f5d15a;
-        }
-        .btn-red {
-            background: #e8394a;
-            color: #fff;
-            border: none;
-            padding: 0.5rem 1rem;
-            font-family: 'Oswald', sans-serif;
-            font-size: 1rem;
-            cursor: pointer;
+        .stats-badge.alert { background: rgba(232, 57, 74, 0.1); color: #e8394a; border-color: rgba(232, 57, 74, 0.3); }
+
+        .client-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px;
         }
         .client-card {
-            background: rgba(255, 255, 255, 0.05);
-            border-left: 5px solid #00c97a;
-            padding: 15px;
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            background: rgba(20, 20, 20, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-left: 4px solid #00ff88;
+            border-radius: 10px;
+            padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between;
+            transition: transform 0.3s;
         }
-        .client-card.paused {
-            border-left: 5px solid #e8394a;
+        .client-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+        .client-card.paused { border-left-color: #e8394a; opacity: 0.7; }
+        
+        .client-card h3 { margin: 0 0 10px 0; font-family: 'Oswald', sans-serif; font-size: 1.5rem; color: #fff; }
+        .client-card p { margin: 0 0 5px 0; color: #aaa; font-size: 0.9rem; }
+        
+        .code-box {
+            font-family: monospace; background: rgba(255,255,255,0.05); padding: 5px 10px; border-radius: 5px; color: #fff; letter-spacing: 2px; font-size: 1.1rem;
         }
-        .client-info h3 { margin: 0; font-family: 'Oswald', sans-serif;}
-        .client-info p { margin: 5px 0 0 0; color: #aaa; font-size: 0.9rem;}
-        #dashboard { display: none; }
+        
+        #dashboard { display: none; margin-top: -5vh; }
     </style>
 </head>
 <body data-theme="dark">
 
-<div class="coach-container">
+<div class="coach-container pb-transition" id="main-container">
     <div class="header-brand">
-        <h1>AX-CORE <br><span style="color:#fff; font-size:1.5rem;">COACH TERMINAL</span></h1>
+        <h1><span class="gradient-text">AX-CORE</span></h1>
+        <p style="font-family: 'Oswald'; font-size: 1.5rem; color:#fff; letter-spacing: 2px; margin-top:5px;">COACH TERMINAL VIP</p>
     </div>
 
     <!-- Login -->
-    <div id="login-section" class="auth-card">
-        <h2>ACCESO EXCLUSIVO GIMNASIOS</h2>
+    <div id="login-section" class="glass-card" style="max-width: 500px; margin: 0 auto; width: 100%;">
+        <h2 style="text-align: center; color: var(--accent-main); font-family: 'Oswald'; margin-bottom: 1.5rem;">CÓDIGO DE FRANQUICIA</h2>
         <div class="input-group">
-            <label>CÓDIGO DE FRANQUICIA (GYM ID)</label>
-            <input type="text" id="gym-id" placeholder="Ej: GYM-MASTER">
+            <label style="color:var(--text-dim); font-size: 0.8rem;">IDENTIFICADOR DE SUCURSAL / GIMNASIO</label>
+            <input type="text" id="gym-id" placeholder="Ej: AXB-1A2B" style="font-size: 1.2rem; text-align: center; letter-spacing: 2px; text-transform: uppercase;">
         </div>
         <div class="input-group">
-            <label>CONTRASEÑA ADMINISTRADOR</label>
-            <input type="password" id="gym-pass" placeholder="****">
+            <label style="color:var(--text-dim); font-size: 0.8rem;">CONTRASEÑA</label>
+            <input type="password" id="gym-pass" placeholder="****" style="font-size: 1.2rem; text-align: center; letter-spacing: 5px;">
         </div>
-        <button class="btn-gold" id="btn-login">AUTORIZAR INGRESO</button>
+        <button class="btn-premium" id="btn-login" style="width: 100%; margin-top: 1.5rem; padding: 1.2rem; font-size: 1.1rem;">AUTORIZAR INGRESO MILITAR</button>
     </div>
 
     <!-- Dashboard -->
-    <div id="dashboard">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-            <h2 style="font-family: 'Oswald'; color:#d4af37;">TUS ATLETAS</h2>
-            <button class="btn-gold" style="width:auto; margin:0;" id="btn-new-code">+ GENERAR PASE</button>
+    <div id="dashboard" class="dashboard-container">
+        
+        <div class="dashboard-header">
+            <div>
+                <h2 style="font-family: 'Oswald'; color:#fff; margin:0;" id="gym-name-display">GIMNASIO...</h2>
+                <p style="margin:5px 0 0 0; color:#aaa; font-size:0.85rem;" id="gym-code-display">CÓDIGO: ---</p>
+            </div>
+            <div style="display:flex; gap: 10px; align-items:center;">
+                <div id="stats-users" class="stats-badge">CARGANDO...</div>
+                <button class="btn-premium" style="margin:0; font-size:0.9rem; padding:0.8rem 1.5rem;" id="btn-new-code">+ GENERAR PASE NUEVO</button>
+            </div>
         </div>
         
-        <div id="client-list">
-            <!-- Cargan via JS -->
-            <p style="color:#aaa;">Cargando base de datos militar...</p>
+        <div id="client-list" class="client-grid">
+            <div class="glass-card" style="grid-column: 1/-1; text-align:center; padding: 3rem;">
+                <p style="color:#aaa; font-size: 1.2rem;">Sincronizando con base de datos global de AX-CORE...</p>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
-    // URL DEL BACKEND RENDER EN VIVO
-    const API_URL = "https://axcore-appax-core-backend.onrender.com";
+    // URL DEL BACKEND (Local si estás tu computadora, Render si está hospedado)
+    const API_URL = location.hostname === 'localhost' || location.hostname === '127.0.0.1' ? 'http://localhost:3000' : 'https://axcore-appax-core-backend.onrender.com';
 
     const loginSection = document.getElementById('login-section');
     const dashboard = document.getElementById('dashboard');
     const btnLogin = document.getElementById('btn-login');
     const clientList = document.getElementById('client-list');
     const btnNewCode = document.getElementById('btn-new-code');
+    const gymContainer = document.getElementById('main-container');
 
     let currentGym = "";
+    let gymData = {};
 
-    btnLogin.onclick = () => {
+    btnLogin.onclick = async () => {
         const gid = document.getElementById('gym-id').value.toUpperCase().trim();
-        const psw = document.getElementById('gym-pass').value;
+        const psw = document.getElementById('gym-pass').value.trim();
 
-        if(gid && psw === "1234") { // Contraseña quemada para pruebas, luego podemos usar algo más seguro
-            currentGym = gid;
-            loginSection.style.display = 'none';
-            dashboard.style.display = 'block';
-            loadClients();
-        } else {
-            alert("Acceso Denegado. Credenciales Inválidas.");
+        if(!gid || !psw) return alert("Completa ambos campos obligatorios.");
+        btnLogin.textContent = "VERIFICANDO...";
+
+        try {
+            const res = await fetch(`${API_URL}/api/coach/login`, {
+                method: 'POST',
+                headers:{ 'Content-Type': 'application/json' },
+                body: JSON.stringify({ gymCode: gid, password: psw })
+            });
+            const data = await res.json();
+            
+            if(data.success) {
+                currentGym = gid;
+                gymData = data.gym;
+                gymData.currentUsers = data.currentUsers;
+
+                loginSection.style.display = 'none';
+                dashboard.style.display = 'block';
+                gymContainer.style.justifyContent = 'flex-start'; // Quitamos el centro vertical al entrar
+
+                document.getElementById('gym-name-display').textContent = gymData.name.toUpperCase();
+                document.getElementById('gym-code-display').textContent = `ID SUCURSAL: ${gymData.gymCode}`;
+                
+                loadClients();
+            } else {
+                alert(data.message);
+            }
+        } catch(e) {
+            alert("Error de conexión al servidor maestro. Intente de nuevo.");
+            console.error(e);
         }
+        btnLogin.textContent = "AUTORIZAR INGRESO MILITAR";
     };
 
     async function loadClients() {
-        clientList.innerHTML = '<p>Conectando al mainframe global...</p>';
         try {
             const res = await fetch(`${API_URL}/api/coach/codes/${currentGym}`);
             const codes = await res.json();
             
             clientList.innerHTML = '';
+            gymData.currentUsers = codes.length;
+            updateStatsBadge();
             
             if(codes.length === 0) {
-                clientList.innerHTML = '<p>No tienes atletas activos con tu membresía.</p>';
+                clientList.innerHTML = `
+                <div class="glass-card" style="grid-column: 1/-1; text-align:center; padding: 3rem;">
+                    <p style="color:#aaa; font-size: 1.2rem;">No tienes atletas activos con tu membresía. Genera un pase nuevo arriba a la derecha.</p>
+                </div>`;
+                return;
             }
 
-            codes.forEach(c => {
+            codes.reverse().forEach(c => {
                 const div = document.createElement('div');
                 div.className = `client-card ${c.active ? '' : 'paused'}`;
                 
                 div.innerHTML = `
-                    <div class="client-info">
-                        <h3>${c.user}</h3>
-                        <p>CÓDIGO: <strong>${c.code}</strong></p>
-                        <p style="color:${c.active ? '#00c97a' : '#e8394a'}">ESTATUS: ${c.active ? 'ACTIVO (PAGO AL CORRIENTE)' : 'MÁQUINA APAGADA (ADEUDO)'}</p>
-                    </div>
                     <div>
-                        <button class="btn-red" style="background:${c.active ? '#e8394a' : '#00c97a'}" onclick="toggleStatus('${c.code}', ${!c.active})">
-                            ${c.active ? 'PAUSAR SOFTWARE' : 'REACTIVAR SOFTWARE'}
+                        <h3>${c.user}</h3>
+                        <p>PASE: <span class="code-box">${c.code}</span></p>
+                        <p style="color:${c.active ? '#00ff88' : '#e8394a'}; font-weight:bold; margin-top: 10px;">
+                            ${c.active ? '✅ ACTIVO Y AL CORRIENTE' : '❌ ADEUDO / CORTADO'}
+                        </p>
+                    </div>
+                    <div style="margin-top: 15px; display:flex; gap:10px;">
+                        <button class="btn-cancel" style="flex:1; padding: 0.6rem; font-size: 0.8rem; background: ${c.active ? 'rgba(232,57,74,0.1)' : 'rgba(0,255,136,0.1)'}; border-color: ${c.active ? '#e8394a' : '#00ff88'}; color: ${c.active ? '#e8394a' : '#00ff88'};" onclick="toggleStatus('${c.code}', ${!c.active})">
+                            ${c.active ? 'CORTAR ACCESO' : 'RESTAURAR ACCESO'}
                         </button>
                     </div>
                 `;
                 clientList.appendChild(div);
             });
         } catch(e) {
-            clientList.innerHTML = '<p style="color:red;">Error conectando al servidor. Asegúrate que AX-CORE Backend esté online.</p>';
+            clientList.innerHTML = '<p style="color:red; text-align:center;">Error conectando al servidor maestro.</p>';
+        }
+    }
+
+    function updateStatsBadge() {
+        const badge = document.getElementById('stats-users');
+        const limitStr = gymData.maxUsers === 9999 ? '∞' : gymData.maxUsers;
+        const used = gymData.currentUsers;
+        
+        badge.innerHTML = `USADOS: ${used} / ${limitStr}`;
+        
+        if (gymData.maxUsers !== 9999 && used >= gymData.maxUsers) {
+            badge.classList.add('alert');
+            badge.innerHTML = `⚠️ LÍMITE ALCANZADO (${used}/${limitStr})`;
+        } else {
+            badge.classList.remove('alert');
         }
     }
 
     btnNewCode.onclick = async () => {
+        if(gymData.maxUsers !== 9999 && gymData.currentUsers >= gymData.maxUsers) {
+            return alert("⛔ HAZ ALCANZADO EL LÍMITE DE USUARIOS PERMITIDO EN ESTA SUCURSAL.\nContacta al corporativo para aumentar la capacidad.");
+        }
+
         const userName = prompt("Nombre completo del nuevo Atleta:");
         if(!userName) return;
 
@@ -186,17 +237,19 @@
             });
             const data = await res.json();
             if(data.success) {
-                alert(`¡PASE GENERADO EXITOSAMENTE!\n\nDale este código a tu cliente para la PWA: ${data.code}`);
+                alert(`¡PASE GENERADO EXITOSAMENTE!\n\nDale este código a tu cliente nuevo: ${data.code}`);
                 loadClients();
+            } else {
+                alert(data.message);
             }
         } catch(e) {
-            alert("Fallo de conexión crítico.");
+            alert("No hay conexión con AX-CORE GLOBAL.");
         }
-        btnNewCode.textContent = "+ GENERAR PASE";
+        btnNewCode.textContent = "+ GENERAR PASE NUEVO";
     };
 
     window.toggleStatus = async (code, newStatus) => {
-        if(!confirm(`¿Estás seguro que deseas ${newStatus ? 'reactivar' : 'cortar el acceso'} al atleta con código ${code}?`)) return;
+        if(!confirm(`¿Seguro que deseas ${newStatus ? 'reestablecer' : 'cortar'} el servicio para el atleta ${code}?`)) return;
 
         try {
             await fetch(`${API_URL}/api/coach/toggle`, {
@@ -206,7 +259,7 @@
             });
             loadClients();
         } catch(e) {
-            alert("Error ejecutando comando.");
+            alert("Error procesando solicitud externa.");
         }
     };
 </script>
