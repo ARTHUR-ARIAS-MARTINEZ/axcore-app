@@ -37,11 +37,12 @@ document.addEventListener('DOMContentLoaded', () => {
         location.reload();
     };
 
-    function showAdmin() {
+    async function showAdmin() {
         loginOverlay.classList.add('hidden');
         adminContainer.classList.remove('hidden');
-        loadAdminData();
+        await loadAdminData();   // ESPERAR a que cargue
         renderBlocks();
+        updateGymBlockSelect();  // Actualizar dropdown después de cargar
         renderGyms();
         renderCodes();
         calculateProfits();
@@ -56,12 +57,24 @@ document.addEventListener('DOMContentLoaded', () => {
             adminData = JSON.parse(saved);
         }
         
-        // Sincronizar desde el servidor en la nube
+        // Sincronizar gimnasios desde el servidor en la nube
         try {
             const res = await fetch(`${API_URL}/api/admin/gyms`);
             const data = await res.json();
             if(data.success && data.gyms) {
-                adminData.gyms = data.gyms; // Reemplazar con datos reales
+                // Fusionar datos del servidor con datos locales (para mantener blockId)
+                data.gyms.forEach(serverGym => {
+                    const localGym = adminData.gyms.find(g => g.gymCode === serverGym.gymCode);
+                    if (localGym) {
+                        // Actualizar datos del servidor pero conservar blockId local
+                        localGym.currentUsers = serverGym.currentUsers;
+                        localGym.active = serverGym.active;
+                    } else {
+                        // Gym nuevo del servidor que no teníamos localmente
+                        adminData.gyms.push(serverGym);
+                    }
+                });
+                saveAdminData();
             }
         } catch(e) {
             console.error("Modo offline: Cargando gyms locales", e);
@@ -82,9 +95,9 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.classList.add('active');
             document.getElementById(`tab-${tab}`).classList.add('active');
 
-            // Actualizar datos al cambiar de pestaña
             if (tab === 'codes') renderCodes();
             if (tab === 'profits') calculateProfits();
+            if (tab === 'gyms') renderGyms();
         };
     });
 
@@ -122,6 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
         closeModal('modal-block');
         renderBlocks();
         updateGymBlockSelect();
+        alert(`✅ Bloque "${name}" creado correctamente.\nAhora ve a "Asignación de Gimnasios" para agregar gimnasios a este bloque.`);
     };
 
     function renderBlocks() {
@@ -131,7 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="block-card">
                     <h4>${b.name.toUpperCase()}</h4>
                     <div class="api-preview">API: ${b.apiKey.substring(0, 8)}...${b.apiKey.slice(-4)}</div>
-                    <div class="gym-count">Status: ${gymsInBlock} / 20 Gimnasios</div>
+                    <div class="gym-count">Gimnasios: ${gymsInBlock} / 20</div>
                     <div class="block-actions">
                         <button class="btn-cancel" style="font-size:0.6rem;" onclick="deleteBlock('${b.id}')">ELIMINAR</button>
                     </div>
@@ -163,7 +177,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     });
 
-    // --- GENERADOR DE CÓDIGO AUTOMÁTICO ---
+    // --- GENERADOR DE CÓDIGO Y CONTRASEÑA ---
     function generateGymCode(plan) {
         const prefixes = {
             basico: 'AXB',
@@ -175,11 +189,15 @@ document.addEventListener('DOMContentLoaded', () => {
         return `${prefix}-${random}`;
     }
 
+    function generatePassword() {
+        // Genera contraseña de 4 dígitos fácil de comunicar por teléfono/WhatsApp
+        return Math.floor(1000 + Math.random() * 9000).toString();
+    }
+
     // --- GESTIÓN DE GIMNASIOS ---
     document.getElementById('btn-new-gym').onclick = () => {
         if (adminData.blocks.length === 0) return alert("Primero debes crear al menos un Bloque.");
         updateGymBlockSelect();
-        // Reset plan selector
         selectedPlan = 'basico';
         document.querySelectorAll('.plan-btn').forEach(b => b.classList.remove('active'));
         document.querySelector('.plan-btn[data-plan="basico"]').classList.add('active');
@@ -187,7 +205,11 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     function updateGymBlockSelect() {
-        gymBlockSelect.innerHTML = adminData.blocks.map(b => `<option value="${b.id}">${b.name}</option>`).join('');
+        if (adminData.blocks.length === 0) {
+            gymBlockSelect.innerHTML = '<option value="">-- Crea un bloque primero --</option>';
+        } else {
+            gymBlockSelect.innerHTML = adminData.blocks.map(b => `<option value="${b.id}">${b.name}</option>`).join('');
+        }
     }
 
     document.getElementById('btn-save-gym').onclick = async () => {
@@ -197,12 +219,17 @@ document.addEventListener('DOMContentLoaded', () => {
         const gmanager = document.getElementById('gym-manager').value.trim();
         const gcoach = document.getElementById('gym-coach').value.trim();
         
+        if (!bid) return alert("Selecciona un bloque primero.");
         if (!gname || !gowner) return alert("Nombre de gimnasio y dueño son obligatorios.");
 
-        // Obtener datos del plan seleccionado
         const planInfo = AX_PLANS[selectedPlan];
         const gymCode = generateGymCode(selectedPlan);
+        const password = generatePassword();
         const rent = planInfo.price;
+
+        // Encontrar el nombre del bloque
+        const block = adminData.blocks.find(b => b.id === bid);
+        const blockName = block ? block.name : "Sin bloque";
 
         const newGym = {
             gymCode: gymCode,
@@ -213,13 +240,14 @@ document.addEventListener('DOMContentLoaded', () => {
             plan: selectedPlan,
             maxUsers: planInfo.maxUsers,
             rent: rent,
-            active: true
+            active: true,
+            blockId: bid,     // GUARDAR referencia al bloque
+            password: password // GUARDAR contraseña generada
         };
 
         document.getElementById('btn-save-gym').textContent = 'Subiendo a la nube...';
 
         try {
-            // Guardar globalmente
             const res = await fetch(`${API_URL}/api/admin/gyms`, {
                 method: 'POST',
                 headers:{'Content-Type': 'application/json'},
@@ -227,6 +255,9 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             const data = await res.json();
             if(data.success) {
+                // Asegurar que blockId se mantenga (el servidor podría no devolverlo)
+                data.gym.blockId = bid;
+                data.gym.password = password;
                 adminData.gyms.push(data.gym);
                 saveAdminData();
             } else {
@@ -239,65 +270,61 @@ document.addEventListener('DOMContentLoaded', () => {
             saveAdminData();
         }
 
-        document.getElementById('btn-save-gym').textContent = 'GUARDAR GIMNASIO';
+        document.getElementById('btn-save-gym').textContent = 'VINCULAR GIMNASIO';
         closeModal('modal-gym');
         renderGyms();
         renderBlocks(); 
         renderCodes();
         calculateProfits();
 
-        // Mostrar modal con el código generado
+        // Mostrar modal con el código Y LA CONTRASEÑA generados
         document.getElementById('generated-code-display').textContent = gymCode;
         document.getElementById('generated-plan-info').innerHTML = `
             <strong>Gimnasio:</strong> ${gname}<br>
+            <strong>Bloque:</strong> ${blockName}<br>
             <strong>Plan:</strong> ${planInfo.name} ($${rent.toLocaleString()} MXN/mes)<br>
             <strong>Límite:</strong> ${planInfo.maxUsers} usuarios<br>
             <strong>Dueño:</strong> ${gowner}<br>
-            <strong style="color:var(--accent-main); font-size:1.1rem;">Nube: ✅ ACTIVADO</strong>
+            <hr style="border-color:rgba(255,255,255,0.1); margin:10px 0;">
+            <strong style="color:#ffaa00; font-size:1rem;">🔑 CONTRASEÑA PARA EL COACH: ${password}</strong><br>
+            <span style="font-size:0.75rem; color:#aaa;">Dale al dueño: Código <strong>${gymCode}</strong> + Contraseña <strong>${password}</strong></span><br>
+            <strong style="color:var(--accent-main); font-size:1rem; margin-top:8px; display:block;">☁️ Nube: ✅ SINCRONIZADO</strong>
         `;
         openModal('modal-code-result');
     };
 
     // Botón copiar código
     document.getElementById('btn-copy-code').onclick = () => {
-        const code = document.getElementById('generated-code-display').textContent;
-        navigator.clipboard.writeText(code).then(() => {
-            document.getElementById('btn-copy-code').textContent = "✅ ¡COPIADO!";
+        const codeEl = document.getElementById('generated-code-display');
+        const code = codeEl.textContent;
+        // Buscar la contraseña en la info generada
+        const gym = adminData.gyms.find(g => g.gymCode === code);
+        const password = gym ? gym.password : '1234';
+        const textToCopy = `Código de Franquicia: ${code}\nContraseña: ${password}\n\nEntra en: https://arthur-arias-martinez.github.io/axcore-app/coach.html`;
+        
+        navigator.clipboard.writeText(textToCopy).then(() => {
+            document.getElementById('btn-copy-code').textContent = "✅ ¡COPIADO! (Código + Contraseña + Link)";
             setTimeout(() => {
-                document.getElementById('btn-copy-code').textContent = "📋 COPIAR CÓDIGO";
-            }, 2000);
+                document.getElementById('btn-copy-code').textContent = "📋 COPIAR TODO (Código + Contraseña + Link)";
+            }, 3000);
         }).catch(() => {
-            // Fallback para navegadores sin clipboard API
-            prompt("Copia este código manualmente:", code);
+            prompt("Copia estos datos manualmente:", textToCopy);
         });
     };
 
     // --- CONTAR USUARIOS POR CÓDIGO ---
     function countUsersForCode(code) {
-        // Ahora lo leemos directamente si viene del servidor
         const gymNode = adminData.gyms.find(g => g.gymCode === code);
         if (gymNode && gymNode.currentUsers !== undefined) {
             return gymNode.currentUsers;
         }
-
-        // Fallback local por si estamos offline
-        let count = 0;
-        for (let i = 0; i < localStorage.length; i++) {
-            const key = localStorage.key(i);
-            if (key.startsWith('arthur_data_')) {
-                try {
-                    const data = JSON.parse(localStorage.getItem(key));
-                    if (data.gymCode === code) count++;
-                } catch(e) {}
-            }
-        }
-        return count;
+        return 0;
     }
 
     function renderGyms() {
         gymsTableBody.innerHTML = adminData.gyms.map(g => {
             const block = adminData.blocks.find(b => b.id === g.blockId);
-            const blockName = block ? block.name : "N/A";
+            const blockName = block ? block.name : "Sin bloque";
             const planInfo = AX_PLANS[g.plan || 'basico'];
             const userCount = countUsersForCode(g.gymCode);
             const maxUsers = g.maxUsers || planInfo.maxUsers;
@@ -323,21 +350,24 @@ document.addEventListener('DOMContentLoaded', () => {
                         <span style="font-size:0.65rem; padding:3px 8px; border-radius:8px; ${g.active ? 'background:rgba(0,255,136,0.1); color:#00ff88;' : 'background:rgba(255,51,102,0.1); color:#ff3366;'}">${g.active ? '✅ ACTIVO' : '❌ PAUSADO'}</span>
                     </td>
                     <td style="display:flex; gap:4px; flex-wrap:wrap;">
-                        <button class="btn-cancel" style="padding:4px 8px; font-size:0.55rem; background:transparent; border:1px solid ${g.active ? '#ffaa00' : '#00ff88'}; color:${g.active ? '#ffaa00' : '#00ff88'}; border-radius:4px;" onclick="toggleGym('${g._id || g.id}')">${g.active ? 'PAUSAR' : 'ACTIVAR'}</button>
-                        <button class="btn-cancel" style="padding:4px 8px; font-size:0.55rem;" onclick="deleteGym('${g._id || g.id}')">QUITAR</button>
+                        <button class="btn-cancel" style="padding:4px 8px; font-size:0.55rem; background:transparent; border:1px solid ${g.active ? '#ffaa00' : '#00ff88'}; color:${g.active ? '#ffaa00' : '#00ff88'}; border-radius:4px;" onclick="toggleGym('${g.gymCode}')">${g.active ? 'PAUSAR' : 'ACTIVAR'}</button>
+                        <button class="btn-cancel" style="padding:4px 8px; font-size:0.55rem;" onclick="deleteGym('${g.gymCode}')">QUITAR</button>
                     </td>
                 </tr>
             `;
         }).join('');
+
+        if (adminData.gyms.length === 0) {
+            gymsTableBody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:2rem; color:var(--text-dim);">No hay gimnasios. Clic en "+ AGREGAR GIMNASIO" para crear uno.</td></tr>`;
+        }
     }
 
     // --- PAUSAR/ACTIVAR GIMNASIO ---
-    window.toggleGym = async (id) => {
-        const gym = adminData.gyms.find(g => g._id === id || g.id === id);
+    window.toggleGym = async (gymCode) => {
+        const gym = adminData.gyms.find(g => g.gymCode === gymCode);
         if (gym) {
             gym.active = !gym.active;
             
-            // Sincronizar en global
             try {
                 await fetch(`${API_URL}/api/admin/toggle`, {
                     method: 'POST',
@@ -351,22 +381,19 @@ document.addEventListener('DOMContentLoaded', () => {
             renderCodes();
             calculateProfits();
             alert(gym.active 
-                ? `✅ Gimnasio "${gym.name}" ACTIVADO globalmente. El código ${gym.gymCode} ya funciona.`
-                : `⏸️ Gimnasio "${gym.name}" PAUSADO globalmente. Sus usuarios NO podrán registrarse con el código ${gym.gymCode}.`
+                ? `✅ Gimnasio "${gym.name}" ACTIVADO. Código ${gym.gymCode} funcional.`
+                : `⏸️ Gimnasio "${gym.name}" PAUSADO. Sus usuarios NO podrán entrar.`
             );
         }
     };
 
-    window.deleteGym = async (id) => {
-        if (confirm("¿Desvincular este gimnasio definitivamente también de la base de datos GLOBAL?")) {
-            const gym = adminData.gyms.find(g => g._id === id || g.id === id);
-            adminData.gyms = adminData.gyms.filter(g => g._id !== id && g.id !== id);
+    window.deleteGym = async (gymCode) => {
+        if (confirm("¿Desvincular este gimnasio definitivamente?")) {
+            adminData.gyms = adminData.gyms.filter(g => g.gymCode !== gymCode);
             
-            if(gym) {
-                try {
-                    await fetch(`${API_URL}/api/admin/gyms/${gym.gymCode}`, { method: 'DELETE' });
-                } catch(e) {}
-            }
+            try {
+                await fetch(`${API_URL}/api/admin/gyms/${gymCode}`, { method: 'DELETE' });
+            } catch(e) {}
 
             saveAdminData();
             renderGyms();
@@ -376,7 +403,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // --- CÓDIGOS ACTIVOS (NUEVA PESTAÑA) ---
+    // --- CÓDIGOS ACTIVOS (PESTAÑA) ---
     function renderCodes() {
         const codesContainer = document.getElementById('codes-cards');
         if (!codesContainer) return;
@@ -385,20 +412,24 @@ document.addEventListener('DOMContentLoaded', () => {
             const planInfo = AX_PLANS[g.plan || 'basico'];
             const userCount = countUsersForCode(g.gymCode);
             const maxUsers = g.maxUsers || planInfo.maxUsers;
+            const block = adminData.blocks.find(b => b.id === g.blockId);
+            const blockName = block ? block.name : "Sin bloque";
             
             return `
                 <div class="block-card" style="border-color:${g.active ? planInfo.color : '#ff3366'}33; position:relative;">
                     ${!g.active ? '<div style="position:absolute; top:10px; right:10px; font-size:0.6rem; background:rgba(255,51,102,0.2); color:#ff3366; padding:2px 8px; border-radius:8px;">PAUSADO</div>' : ''}
                     <h4 style="color:${planInfo.color}; font-size:0.85rem;">${g.name}</h4>
-                    <div style="font-family:monospace; font-size:1.5rem; color:var(--accent-main); background:rgba(0,255,136,0.05); padding:0.8rem; border-radius:10px; text-align:center; letter-spacing:3px; margin:0.8rem 0; user-select:all; cursor:pointer;" onclick="copyCode('${g.gymCode}')" title="Clic para copiar">
+                    <div style="font-size:0.65rem; color:var(--text-dim); margin-bottom:5px;">Bloque: ${blockName}</div>
+                    <div style="font-family:monospace; font-size:1.5rem; color:var(--accent-main); background:rgba(0,255,136,0.05); padding:0.8rem; border-radius:10px; text-align:center; letter-spacing:3px; margin:0.5rem 0; user-select:all; cursor:pointer;" onclick="copyCode('${g.gymCode}')" title="Clic para copiar">
                         ${g.gymCode}
                     </div>
+                    <div style="font-size:0.75rem; color:#ffaa00; text-align:center; margin-bottom:5px;">🔑 Contraseña: <strong>${g.password || '1234'}</strong></div>
                     <div style="font-size:0.7rem; color:var(--text-dim);">
                         <div>Plan: <strong style="color:${planInfo.color};">${planInfo.name}</strong> ($${planInfo.price.toLocaleString()}/mes)</div>
                         <div>Usuarios: <strong>${userCount}/${maxUsers}</strong></div>
                         <div>Dueño: ${g.owner}</div>
                     </div>
-                    <button class="btn-premium small" style="width:100%; margin-top:0.8rem; font-size:0.6rem;" onclick="copyCode('${g.gymCode}')">📋 COPIAR CÓDIGO</button>
+                    <button class="btn-premium small" style="width:100%; margin-top:0.8rem; font-size:0.6rem;" onclick="copyAllInfo('${g.gymCode}')">📋 COPIAR TODO (Código + Contraseña + Link)</button>
                 </div>
             `;
         }).join('');
@@ -410,9 +441,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.copyCode = (code) => {
         navigator.clipboard.writeText(code).then(() => {
-            alert(`✅ Código "${code}" copiado al portapapeles. ¡Dáselo al dueño del gimnasio!`);
+            alert(`✅ Código "${code}" copiado al portapapeles.`);
         }).catch(() => {
             prompt("Copia este código manualmente:", code);
+        });
+    };
+
+    window.copyAllInfo = (gymCode) => {
+        const gym = adminData.gyms.find(g => g.gymCode === gymCode);
+        if (!gym) return;
+        const text = `DATOS DE ACCESO AX-CORE\n\nCódigo de Franquicia: ${gym.gymCode}\nContraseña: ${gym.password || '1234'}\n\nEntra aquí: https://arthur-arias-martinez.github.io/axcore-app/coach.html`;
+        navigator.clipboard.writeText(text).then(() => {
+            alert(`✅ ¡Copiado!\n\nCódigo: ${gym.gymCode}\nContraseña: ${gym.password || '1234'}\nLink: incluido\n\nPégalo en WhatsApp y envíaselo al dueño del gimnasio.`);
+        }).catch(() => {
+            prompt("Copia estos datos:", text);
         });
     };
 
@@ -430,7 +472,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const usersCountEl = document.getElementById('total-users-count');
         if (usersCountEl) usersCountEl.textContent = totalUsers;
 
-        // Desglose por plan
         const breakdownEl = document.getElementById('plan-breakdown');
         if (breakdownEl) {
             const plans = ['basico', 'estandar', 'premium'];

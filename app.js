@@ -189,8 +189,9 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         if (localStorage.getItem(`arthur_data_${u}`)) {
-            alert("Este usuario ya existe en tu dispositivo.");
-            return;
+            if (!confirm("Ya existe un usuario con ese nombre en este dispositivo.\n¿Deseas reemplazarlo con una cuenta nueva?")) {
+                return;
+            }
         }
 
         const btn = document.getElementById('btn-register-confirm');
