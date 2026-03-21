@@ -1026,14 +1026,24 @@ document.addEventListener('DOMContentLoaded', () => {
             const y = (H / 2) - (img.height / 2) * scale;
             ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
         } else {
-            // Fallback liso
-            ctx.fillStyle = tpl.colors[1];
+            ctx.fillStyle = tpl.colors ? tpl.colors[1] : '#000';
             ctx.fillRect(0, 0, W, H);
+            
+            if (tpl.id === 'custom') {
+                ctx.fillStyle = 'rgba(255,255,255,0.05)';
+                ctx.font = '60px Arial'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                ctx.fillText('📷', W/2, H/2);
+            }
         }
     }
 
     function renderStudioCard(canvas, tplId, fmtId, activeMetrics, isPreview) {
-        const tpl = STUDIO_TEMPLATES.find(t=>t.id===tplId) || STUDIO_TEMPLATES[0];
+        let tpl = STUDIO_TEMPLATES.find(t=>t.id===tplId);
+        if (tplId === 'custom') {
+            tpl = { id: 'custom', colors: ['#ffffff','#111111','#00e5ff','#000000'] };
+        } else if (!tpl) {
+            tpl = STUDIO_TEMPLATES[0];
+        }
         const fmt = STUDIO_FORMATS.find(f=>f.id===fmtId) || STUDIO_FORMATS[0];
         const W = fmt.w, H = fmt.h;
         canvas.width = W; canvas.height = H;
@@ -1062,15 +1072,17 @@ document.addEventListener('DOMContentLoaded', () => {
         const tScale = Math.max(0.7, Math.min(1.5, studioState.textSize));
         const customColor = studioState.textColor === 'theme' ? '#ffffff' : studioState.textColor;
 
-        // 3.5 LOGOTIPO (Armónico, centrado y sutil arriba de los títulos)
+        // 3.5 LOGOTIPO (Armónico, centrado y más visible)
         if (STUDIO_LOGO_IMG) {
-            const logoW = isPreview ? 35 : 90;
-            ctx.drawImage(STUDIO_LOGO_IMG, cx - logoW/2, py + (isPreview ? 12 : 30), logoW, logoW);
+            const logoW = isPreview ? 60 : 180;
+            ctx.shadowColor = 'rgba(0,0,0,0.5)'; ctx.shadowBlur = isPreview ? 10 : 30;
+            ctx.drawImage(STUDIO_LOGO_IMG, cx - logoW/2, py + (isPreview ? 15 : 40), logoW, logoW);
+            ctx.shadowBlur = 0;
         }
 
         // 4. Título superior
-        const baseTitleOffset = STUDIO_LOGO_IMG ? (isPreview ? 60 : 140) : (isPreview ? 25 : 80);
-        const titleY = py + (fmtId==='landscape' ? 80 : baseTitleOffset);
+        const baseTitleOffset = STUDIO_LOGO_IMG ? (isPreview ? 85 : 240) : (isPreview ? 25 : 80);
+        const titleY = py + (fmtId==='landscape' ? (STUDIO_LOGO_IMG ? 120 : 80) : baseTitleOffset);
         
         ctx.fillStyle=accent; ctx.font=`800 ${Math.floor((isPreview?16:30)*tScale)}px Inter,sans-serif`;
         ctx.textAlign='center';
@@ -1203,15 +1215,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 <h4 style="color:var(--text-primary); font-size:0.8rem; margin:16px 0 8px;">MÉTRICAS A MOSTRAR</h4>
                 <div class="studio-metrics" id="studio-met-list"></div>
 
-                <div style="display:flex; gap:16px; margin: 16px 0 8px; align-items:center;">
+                <div style="display:flex; flex-direction:column; gap:12px; margin: 16px 0 8px;">
                     <div>
-                        <h4 style="color:var(--text-primary); font-size:0.7rem; margin-bottom:4px;">COLOR LETRA</h4>
-                        <div style="display:flex; align-items:center; gap:8px;">
-                            <input type="color" id="studio-color-picker" value="${studioState.textColor==='theme'?'#ffffff':studioState.textColor}" style="background:transparent; border:1px solid rgba(255,255,255,0.2); width:35px; height:30px; cursor:pointer;" title="Personalizar color">
-                            <button id="studio-color-reset" style="padding:4px 8px; font-size:0.6rem; border-radius:10px; background:var(--accent-secondary); border:none; color:#000; font-weight:bold; cursor:pointer;">AUTO</button>
-                        </div>
+                        <h4 style="color:var(--text-primary); font-size:0.7rem; margin-bottom:8px;">COLOR LETRA</h4>
+                        <div id="studio-color-swatches" style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;"></div>
                     </div>
-                    <div style="flex-grow:1;">
+                    <div>
                         <h4 style="color:var(--text-primary); font-size:0.7rem; margin-bottom:4px;">TAMAÑO LETRA</h4>
                         <input type="range" id="studio-size-picker" min="0.7" max="1.4" step="0.1" value="${studioState.textSize}" style="width:100%; cursor:pointer;">
                     </div>
@@ -1230,6 +1239,41 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // --- Render template thumbnails ---
         const tplList = document.getElementById('studio-tpl-list');
+        
+        // 📷 Botón Subir Foto Personalizada
+        const camCard = document.createElement('div');
+        camCard.className = 'studio-tpl-card' + (studioState.tpl==='custom' ? ' selected' : '');
+        camCard.innerHTML = `<div style="width:100%; height:100%; display:flex; flex-direction:column; justify-content:center; align-items:center; background:linear-gradient(45deg, rgba(255,255,255,0.05), rgba(0,0,0,0.2)); border-radius:12px;">
+            <span style="font-size:32px; margin-bottom:4px;">📷</span>
+            <span style="font-size:0.55rem; text-align:center; font-weight:800; color:#fff; letter-spacing:1px; line-height:1.2;">TU<br>FOTO</span>
+        </div>`;
+        
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.accept = 'image/*';
+        fileInput.style.display = 'none';
+        
+        fileInput.onchange = (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        STUDIO_BG_IMAGES['custom'] = img;
+                        studioState.tpl = 'custom';
+                        renderStudioPage();
+                    };
+                    img.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+            e.target.value = ''; // Reset
+        };
+        camCard.onclick = () => fileInput.click();
+        camCard.appendChild(fileInput);
+        tplList.appendChild(camCard);
+
         STUDIO_TEMPLATES.forEach(tpl => {
             const card = document.createElement('div');
             card.className = 'studio-tpl-card' + (studioState.tpl===tpl.id ? ' selected' : '');
@@ -1271,17 +1315,65 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // --- Preview ---
         const previewCanvas = document.getElementById('studio-preview-canvas');
-        renderStudioCard(previewCanvas, studioState.tpl, studioState.fmt, studioState.metrics, true); // True para isPreview
+        renderStudioCard(previewCanvas, studioState.tpl, studioState.fmt, studioState.metrics, true);
 
-        // --- Eventos controles texto ---
-        const colorPicker = document.getElementById('studio-color-picker');
-        colorPicker.oninput = (e) => { studioState.textColor = e.target.value; renderStudioCard(previewCanvas, studioState.tpl, studioState.fmt, studioState.metrics, true); };
+        // --- Eventos controles texto (Paleta extendida) ---
+        const swatchesContainer = document.getElementById('studio-color-swatches');
+        const palette = [
+            { c:'theme', l:'AUTO', bg:'linear-gradient(45deg, #00ff88, #00d2ff)' },
+            { c:'#ffffff', bg:'#ffffff' },
+            { c:'#ffb6c1', bg:'#ffb6c1' }, // Rosa pastel
+            { c:'#ff00ff', bg:'#ff00ff' }, // Magenta neon
+            { c:'#00e5ff', bg:'#00e5ff' }, // Cyan neon
+            { c:'#00ff66', bg:'#00ff66' }, // Verde toxic
+            { c:'#ffcc00', bg:'#ffcc00' }, // Oro
+            { c:'#ff4400', bg:'#ff4400' }, // Naranja fuerte
+            { c:'#1a1a1a', bg:'#1a1a1a' }  // Negro oscuro
+        ];
         
-        const colorReset = document.getElementById('studio-color-reset');
-        colorReset.onclick = () => { studioState.textColor = 'theme'; renderStudioPage(); };
+        palette.forEach(p => {
+            const btn = document.createElement('button');
+            btn.style.width = '30px'; btn.style.height = '30px'; 
+            btn.style.borderRadius = '8px'; btn.style.border = 'none';
+            btn.style.cursor = 'pointer'; btn.style.background = p.bg;
+            if(p.l) { btn.textContent = p.l; btn.style.fontSize='10px'; btn.style.fontWeight='900'; btn.style.color='#000'; }
+            
+            if (studioState.textColor === p.c) {
+                btn.style.outline = '3px solid var(--accent-main)';
+                btn.style.transform = 'scale(1.1)';
+            } else {
+                btn.style.border = '1px solid rgba(255,255,255,0.2)';
+            }
+            
+            btn.onclick = () => { studioState.textColor = p.c; renderStudioPage(); };
+            swatchesContainer.appendChild(btn);
+        });
+        
+        const customColorPicker = document.createElement('input');
+        customColorPicker.type = 'color';
+        customColorPicker.value = (studioState.textColor!=='theme' && !palette.find(x=>x.c===studioState.textColor)) ? studioState.textColor : '#ffffff';
+        customColorPicker.style.width = '30px'; customColorPicker.style.height = '30px'; 
+        customColorPicker.style.border = '1px solid rgba(255,255,255,0.2)'; customColorPicker.style.borderRadius = '8px';
+        customColorPicker.style.background = 'transparent'; customColorPicker.style.cursor = 'pointer';
+        customColorPicker.title = 'Color Libre';
+        customColorPicker.oninput = (e) => {
+            studioState.textColor = e.target.value; 
+            renderStudioCard(previewCanvas, studioState.tpl, studioState.fmt, studioState.metrics, true);
+            // Optional: reset outlines on preset buttons
+            Array.from(swatchesContainer.children).forEach(child => { 
+                if(child.tagName === 'BUTTON') {
+                    child.style.outline = 'none';
+                    child.style.transform = 'scale(1)';
+                }
+            });
+        };
+        swatchesContainer.appendChild(customColorPicker);
 
         const sizePicker = document.getElementById('studio-size-picker');
-        sizePicker.oninput = (e) => { studioState.textSize = parseFloat(e.target.value); renderStudioCard(previewCanvas, studioState.tpl, studioState.fmt, studioState.metrics, true); };
+        sizePicker.oninput = (e) => { 
+            studioState.textSize = parseFloat(e.target.value); 
+            renderStudioCard(previewCanvas, studioState.tpl, studioState.fmt, studioState.metrics, true); 
+        };
 
         // --- Share button ---
         document.getElementById('btn-studio-share').onclick = async () => {
