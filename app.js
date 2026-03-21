@@ -962,7 +962,17 @@ document.addEventListener('DOMContentLoaded', () => {
         { id:'fuego',     name:'FUEGO',         bg: 'assets/bg_studio_fuego_1774133335029.png', colors:['#ff6b00','#cc2200','#ff9933','#1a0500'] },
         { id:'hielo',     name:'HIELO',         bg: 'assets/bg_studio_hielo_1774133351235.png', colors:['#b3e0ff','#e8f4ff','#0077b3','#003d5c'] },
         { id:'carbono',   name:'CARBONO',       bg: 'assets/bg_studio_carbono_1774133370189.png', colors:['#1a1a1a','#0d0d0d','#d4af37','#8a7220'] },
-        { id:'blood',     name:'BLOOD & IRON',  bg: 'assets/bg_studio_blood_1774133388279.png', colors:['#5c0a0a','#1a0000','#cc1a1a','#330000'] }
+        { id:'blood',     name:'BLOOD & IRON',  bg: 'assets/bg_studio_blood_1774133388279.png', colors:['#5c0a0a','#1a0000','#cc1a1a','#330000'] },
+        { id:'fem1',      name:'YOGA SUNRISE',  bg: 'assets/bg_studio_fem1_1774134638293.png', colors:['#ffd1dc','#3a2c2e','#ffcccc','#1a1516'] },
+        { id:'fem2',      name:'ELEGANCE GYM',  bg: 'assets/bg_studio_fem2_1774134660838.png', colors:['#b76e79','#1a0d0f','#cccccc','#0d0607'] },
+        { id:'fem3',      name:'SUNSET HEALTH', bg: 'assets/bg_studio_fem3_1774134674212.png', colors:['#ffb347','#331100','#ffaa33','#1a0800'] },
+        { id:'fem4',      name:'CYAN AESTHETIC',bg: 'assets/bg_studio_fem4_1774134698585.png', colors:['#00ced1','#001a1a','#48d1cc','#000d0d'] },
+        { id:'gay_m1',    name:'PRIDE NEON',    bg: 'assets/bg_studio_gay_m1_1774134716984.png', colors:['#ff00ff','#0a000a','#00ffff','#1a001a'] },
+        { id:'gay_m2',    name:'LUXURY CLUB',   bg: 'assets/bg_studio_gay_m2_1774134733585.png', colors:['#ffb6c1','#1a0a0f','#add8e6','#0d0508'] },
+        { id:'gay_m3',    name:'BEACH POWER',   bg: 'assets/bg_studio_gay_m3_1774134754666.png', colors:['#ffd700','#1a1500','#ffaa00','#0d0a00'] },
+        { id:'gay_f1',    name:'URBAN PRIDE',   bg: 'assets/bg_studio_gay_f1_1774134772023.png', colors:['#ff4500','#1a0500','#ff1493','#0d0200'] },
+        { id:'gay_f2',    name:'STREET ENERGY', bg: 'assets/bg_studio_gay_f2_1774134789052.png', colors:['#8a2be2','#0a001a','#00ced1','#05000d'] },
+        { id:'gay_f3',    name:'NATURE PEACE',  bg: 'assets/bg_studio_gay_f3_1774134806610.png', colors:['#8fbc8f','#0a1a0f','#556b2f','#050d08'] }
     ];
     const STUDIO_FORMATS = [
         { id:'story', label:'STORY', w:1080, h:1350 },
@@ -980,13 +990,23 @@ document.addEventListener('DOMContentLoaded', () => {
         { key:'back',    label:'Espalda',       val:() => (userData.back||0)+'cm', default:false }
     ];
 
-    let studioState = { tpl: 'militar', fmt: 'story', metrics: ['deficit','weight','waist'] };
+    let studioState = { tpl: 'neon', fmt: 'story', metrics: ['deficit','weight','waist'], textColor: 'theme', textSize: 1.0 };
 
     const STUDIO_BG_IMAGES = {};
     let isStudioPreloading = false;
+    let STUDIO_LOGO_IMG = null;
+
     async function preloadStudioImages() {
         if(Object.keys(STUDIO_BG_IMAGES).length > 0 || isStudioPreloading) return;
         isStudioPreloading = true;
+
+        await new Promise((r) => {
+            const l = new Image(); l.crossOrigin='anonymous';
+            l.onload = () => { STUDIO_LOGO_IMG = l; r(); };
+            l.onerror = () => { r(); };
+            l.src = 'logo.png';
+        });
+
         await Promise.all(STUDIO_TEMPLATES.map(tpl => {
             return new Promise((r) => {
                 const img = new Image();
@@ -1038,84 +1058,111 @@ document.addEventListener('DOMContentLoaded', () => {
         const cx = W/2;
         const accent = tpl.id==='hielo' ? tpl.colors[2] : (tpl.id==='carbono' ? tpl.colors[2] : tpl.id==='neon' ? tpl.colors[2] : tpl.id==='fuego' ? '#ffcc00' : tpl.id==='blood' ? '#ff3333' : '#8aff7a');
 
-        // Text layout helper parameters
-        const isLandscape = fmtId === 'landscape';
-        const titleY = py + (isLandscape ? 80 : 100);
-        const nameY = titleY + (isPreview ? 22 : 60);
+        // TEXT SIZING HELPER
+        const tScale = Math.max(0.7, Math.min(1.5, studioState.textSize));
+        const customColor = studioState.textColor === 'theme' ? '#ffffff' : studioState.textColor;
 
-        // -- TÍtulo superior (Fusionado) --
-        ctx.fillStyle = accent;
-        ctx.font = `800 ${isPreview ? 16 : 30}px Inter,sans-serif`;
-        ctx.textAlign = 'center';
+        // 3.5 LOGOTIPO (Armónico, centrado y sutil arriba de los títulos)
+        if (STUDIO_LOGO_IMG) {
+            const logoW = isPreview ? 35 : 90;
+            ctx.drawImage(STUDIO_LOGO_IMG, cx - logoW/2, py + (isPreview ? 12 : 30), logoW, logoW);
+        }
+
+        // 4. Título superior
+        const baseTitleOffset = STUDIO_LOGO_IMG ? (isPreview ? 60 : 140) : (isPreview ? 25 : 80);
+        const titleY = py + (fmtId==='landscape' ? 80 : baseTitleOffset);
+        
+        ctx.fillStyle=accent; ctx.font=`800 ${Math.floor((isPreview?16:30)*tScale)}px Inter,sans-serif`;
+        ctx.textAlign='center';
+        
         ctx.globalCompositeOperation = 'source-over';
-        // Base opaca fuerte
         ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = isPreview?4:15;
         ctx.fillText('RESULTADOS OFICIALES', cx, titleY);
-        // Resplandor para fusionar
+        
         ctx.shadowColor = accent; ctx.shadowBlur = isPreview?10:25;
         ctx.globalCompositeOperation = 'screen';
         ctx.fillText('RESULTADOS OFICIALES', cx, titleY);
         ctx.globalCompositeOperation = 'source-over';
-        ctx.shadowBlur = 0;
+        ctx.shadowBlur=0;
 
-        // -- Nombre grande --
-        const atletaName = (userData.username || 'ATLETA').toUpperCase();
-        ctx.font = `900 ${isPreview ? 24 : 65}px Inter,sans-serif`;
-        ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = isPreview ? 8 : 20;
-        ctx.fillStyle = '#ffffff';
+        // 5. Nombre grande
+        const nameY = titleY + (isPreview?22:60);
+        const atletaName = (userData.username||'ATLETA').toUpperCase();
+        ctx.font=`900 ${Math.floor((isPreview?24:65)*tScale)}px Inter,sans-serif`;
+        ctx.shadowColor='rgba(0,0,0,0.9)'; ctx.shadowBlur=isPreview?8:20;
+        ctx.fillStyle=customColor;
         ctx.fillText(atletaName, cx, nameY);
-        ctx.shadowBlur = 0;
+        ctx.shadowBlur=0;
         
         ctx.globalCompositeOperation = 'overlay';
         ctx.fillStyle = 'rgba(255,255,255,0.4)';
         ctx.fillText(atletaName, cx, nameY);
         ctx.globalCompositeOperation = 'source-over';
 
-        // -- Divider --
-        const divY = nameY + (isPreview ? 14 : 40);
+        // 6. Divider
+        const divY = nameY + (isPreview?14:40);
         const gradientLine = ctx.createLinearGradient(px, 0, px+pw, 0);
         gradientLine.addColorStop(0, 'rgba(255,255,255,0)');
         gradientLine.addColorStop(0.5, accent);
         gradientLine.addColorStop(1, 'rgba(255,255,255,0)');
         ctx.fillStyle = gradientLine;
-        ctx.fillRect(px + 40, divY, pw - 80, 3);
+        ctx.fillRect(px+40, divY, pw-80, 3);
 
-        // -- Métricas dinámicas (Estilo cinemático) --
+        // 7. Métricas dinámicas (Estilo cinemático con Smart Columns)
         const mets = STUDIO_METRICS.filter(m => activeMetrics.includes(m.key));
-        const metStartY = divY + (isPreview ? 30 : 70);
-        const metSpacing = isLandscape ? (isPreview ? 45 : 100) : (isPreview ? 60 : 140);
+        const metStartY = divY + (isPreview?30:70);
 
         if (isLandscape && mets.length > 1) {
             const colW = pw / Math.min(mets.length, 4);
             mets.forEach((m, i) => {
                 const mx = px + colW/2 + i * colW;
-                ctx.fillStyle = 'rgba(255,255,255,0.6)';
-                ctx.font = `600 ${isPreview ? 10 : 22}px Inter,sans-serif`;
+                ctx.fillStyle='rgba(255,255,255,0.6)'; ctx.font=`600 ${Math.floor((isPreview?10:22)*tScale)}px Inter,sans-serif`;
                 ctx.fillText(m.label.toUpperCase(), mx, metStartY);
-                
-                ctx.fillStyle = '#ffffff';
-                ctx.font = `900 ${isPreview ? 22 : 65}px Inter,sans-serif`;
-                ctx.shadowColor = accent; ctx.shadowBlur = isPreview?8:20;
-                ctx.fillText(m.val(), mx, metStartY + (isPreview ? 26 : 65));
-                ctx.shadowBlur = 0;
+                ctx.fillStyle=customColor; ctx.font=`900 ${Math.floor((isPreview?22:65)*tScale)}px Inter,sans-serif`;
+                ctx.shadowColor=accent; ctx.shadowBlur=isPreview?8:20;
+                ctx.fillText(m.val(), mx, metStartY + (isPreview?26:65));
+                ctx.shadowBlur=0;
             });
-        } else {
+        } else if (mets.length > 4) {
+            // MÁS DE 4 MÉTRICAS -> VISTA DE 2 COLUMNAS AUTOMÁTICA
+            const colW = pw / 2;
+            const mySpacing = isPreview ? 42 : 110;
             mets.forEach((m, i) => {
-                const my = metStartY + i * metSpacing;
-                ctx.fillStyle = 'rgba(255,255,255,0.6)';
-                ctx.font = `600 ${isPreview ? 10 : 24}px Inter,sans-serif`;
-                ctx.fillText(m.label.toUpperCase(), cx, my);
+                const col = i % 2;
+                const row = Math.floor(i / 2);
+                const mx = px + colW/2 + (col * colW);
+                const my = metStartY + (row * mySpacing);
                 
-                ctx.fillStyle = '#ffffff';
-                ctx.font = `900 ${isPreview ? 26 : 85}px Inter,sans-serif`;
-                ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = isPreview?5:15;
-                ctx.fillText(m.val(), cx, my + (isPreview ? 28 : 75));
+                ctx.fillStyle='rgba(255,255,255,0.6)'; ctx.font=`600 ${Math.floor((isPreview?9:20)*tScale)}px Inter,sans-serif`;
+                ctx.fillText(m.label.toUpperCase(), mx, my);
+                
+                ctx.fillStyle=customColor; ctx.font=`900 ${Math.floor((isPreview?18:55)*tScale)}px Inter,sans-serif`;
+                ctx.shadowColor='rgba(0,0,0,0.8)'; ctx.shadowBlur=isPreview?4:15;
+                ctx.fillText(m.val(), mx, my + (isPreview?22:55));
                 
                 ctx.globalCompositeOperation = 'screen';
-                ctx.shadowColor = accent; ctx.shadowBlur = isPreview?10:25;
-                ctx.fillText(m.val(), cx, my + (isPreview ? 28 : 75));
+                ctx.shadowColor = accent; ctx.shadowBlur=isPreview?8:20;
+                ctx.fillText(m.val(), mx, my + (isPreview?22:55));
                 ctx.globalCompositeOperation = 'source-over';
-                ctx.shadowBlur = 0;
+                ctx.shadowBlur=0;
+            });
+        } else {
+            // NORMAL 1 COLUMNA
+            const metSpacing = isPreview ? 60 : 140;
+            mets.forEach((m, i) => {
+                const my = metStartY + i * metSpacing;
+                ctx.fillStyle='rgba(255,255,255,0.6)'; ctx.font=`600 ${Math.floor((isPreview?10:24)*tScale)}px Inter,sans-serif`;
+                ctx.fillText(m.label.toUpperCase(), cx, my);
+                ctx.fillStyle=customColor; ctx.font=`900 ${Math.floor((isPreview?26:85)*tScale)}px Inter,sans-serif`;
+                
+                ctx.shadowColor='rgba(0,0,0,0.8)'; ctx.shadowBlur=isPreview?5:15;
+                ctx.fillText(m.val(), cx, my + (isPreview?28:75));
+                
+                ctx.globalCompositeOperation = 'screen';
+                ctx.shadowColor=accent; ctx.shadowBlur=isPreview?10:25;
+                ctx.fillText(m.val(), cx, my + (isPreview?28:75));
+                ctx.globalCompositeOperation = 'source-over';
+                ctx.shadowBlur=0;
             });
         }
 
@@ -1155,6 +1202,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 <h4 style="color:var(--text-primary); font-size:0.8rem; margin:16px 0 8px;">MÉTRICAS A MOSTRAR</h4>
                 <div class="studio-metrics" id="studio-met-list"></div>
+
+                <div style="display:flex; gap:16px; margin: 16px 0 8px; align-items:center;">
+                    <div>
+                        <h4 style="color:var(--text-primary); font-size:0.7rem; margin-bottom:4px;">COLOR LETRA</h4>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <input type="color" id="studio-color-picker" value="${studioState.textColor==='theme'?'#ffffff':studioState.textColor}" style="background:transparent; border:1px solid rgba(255,255,255,0.2); width:35px; height:30px; cursor:pointer;" title="Personalizar color">
+                            <button id="studio-color-reset" style="padding:4px 8px; font-size:0.6rem; border-radius:10px; background:var(--accent-secondary); border:none; color:#000; font-weight:bold; cursor:pointer;">AUTO</button>
+                        </div>
+                    </div>
+                    <div style="flex-grow:1;">
+                        <h4 style="color:var(--text-primary); font-size:0.7rem; margin-bottom:4px;">TAMAÑO LETRA</h4>
+                        <input type="range" id="studio-size-picker" min="0.7" max="1.4" step="0.1" value="${studioState.textSize}" style="width:100%; cursor:pointer;">
+                    </div>
+                </div>
             </div>
 
             <div class="glass-card" style="padding:1.5rem; margin-bottom:1.5rem;">
@@ -1210,7 +1271,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // --- Preview ---
         const previewCanvas = document.getElementById('studio-preview-canvas');
-        renderStudioCard(previewCanvas, studioState.tpl, studioState.fmt, studioState.metrics, false);
+        renderStudioCard(previewCanvas, studioState.tpl, studioState.fmt, studioState.metrics, true); // True para isPreview
+
+        // --- Eventos controles texto ---
+        const colorPicker = document.getElementById('studio-color-picker');
+        colorPicker.oninput = (e) => { studioState.textColor = e.target.value; renderStudioCard(previewCanvas, studioState.tpl, studioState.fmt, studioState.metrics, true); };
+        
+        const colorReset = document.getElementById('studio-color-reset');
+        colorReset.onclick = () => { studioState.textColor = 'theme'; renderStudioPage(); };
+
+        const sizePicker = document.getElementById('studio-size-picker');
+        sizePicker.oninput = (e) => { studioState.textSize = parseFloat(e.target.value); renderStudioCard(previewCanvas, studioState.tpl, studioState.fmt, studioState.metrics, true); };
 
         // --- Share button ---
         document.getElementById('btn-studio-share').onclick = async () => {
