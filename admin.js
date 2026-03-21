@@ -157,12 +157,28 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    window.deleteBlock = (id) => {
-        if (confirm("¿Seguro que quieres eliminar este bloque? Los gimnasios asociados quedarán huérfanos.")) {
+    window.deleteBlock = async (id) => {
+        if (confirm("¿Seguro que quieres eliminar este bloque? Los gimnasios asociados también SERÁN ELIMINADOS DE LA NUBE permanentemente.")) {
+            // Eliminar gimnasios asociados en la nube
+            const gymsToDelete = adminData.gyms.filter(g => g.blockId === id);
+            for (const gym of gymsToDelete) {
+                try {
+                    await fetch(`${API_URL}/api/admin/gyms/${gym.gymCode}`, { method: 'DELETE' });
+                } catch(e) { console.error("Error borrando gym en nube", e); }
+            }
+            
+            // Remover de la memoria local
             adminData.blocks = adminData.blocks.filter(b => b.id !== id);
+            adminData.gyms = adminData.gyms.filter(g => g.blockId !== id);
+            
             saveAdminData();
             renderBlocks();
+            renderGyms();
+            renderCodes();
+            calculateProfits();
             updateGymBlockSelect();
+            
+            alert("Bloque y gimnasios asociados eliminados exitosamente.");
         }
     };
 

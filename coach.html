@@ -197,6 +197,7 @@
                         <button class="btn-cancel" style="flex:1; padding: 0.6rem; font-size: 0.8rem; background: ${c.active ? 'rgba(232,57,74,0.1)' : 'rgba(0,255,136,0.1)'}; border-color: ${c.active ? '#e8394a' : '#00ff88'}; color: ${c.active ? '#e8394a' : '#00ff88'};" onclick="toggleStatus('${c.code}', ${!c.active})">
                             ${c.active ? 'CORTAR ACCESO' : 'RESTAURAR ACCESO'}
                         </button>
+                        <button class="btn-premium" style="flex:1; padding: 0.6rem; font-size: 0.8rem;" onclick="shareAthleteCode('${c.user}', '${c.code}')">📱 COMPARTIR</button>
                     </div>
                 `;
                 clientList.appendChild(div);
@@ -262,6 +263,15 @@
         } catch(e) {
             alert("Error procesando solicitud externa.");
         }
+    };
+
+    window.shareAthleteCode = (userName, code) => {
+        const text = `¡Hola ${userName}!\nAquí tienes tu pase VIP para entrar a la App AX-CORE:\n\nPASE: ${code}\n\nIngresa desde aquí: https://arthur-arias-martinez.github.io/axcore-app/`;
+        navigator.clipboard.writeText(text).then(() => {
+            alert(`✅ ¡Copiado!\n\nMensaje con el pase de ${userName} copiado al portapapeles. ¡Ve y pégalo en WhatsApp!`);
+        }).catch(() => {
+            prompt("Copia este pase manualmente:", text);
+        });
     };
 </script>
 
