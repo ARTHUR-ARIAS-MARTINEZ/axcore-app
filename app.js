@@ -957,12 +957,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // ESTUDIO DE LOGROS — SECCIÓN INDEPENDIENTE COMPLETA
     // ============================================================
     const STUDIO_TEMPLATES = [
-        { id:'militar',   name:'MILITAR',       colors:['#2d3a1a','#1a2410','#4a5c2a','#0d1508'] },
-        { id:'neon',      name:'NEÓN NOCTURNO', colors:['#0a0a1a','#000','#00e5ff','#ff00e5'] },
-        { id:'fuego',     name:'FUEGO',         colors:['#ff6b00','#cc2200','#ff9933','#1a0500'] },
-        { id:'hielo',     name:'HIELO',         colors:['#b3e0ff','#e8f4ff','#0077b3','#003d5c'] },
-        { id:'carbono',   name:'CARBONO',       colors:['#1a1a1a','#0d0d0d','#d4af37','#8a7220'] },
-        { id:'blood',     name:'BLOOD & IRON',  colors:['#5c0a0a','#1a0000','#cc1a1a','#330000'] }
+        { id:'militar',   name:'MILITAR',       bg: 'assets/bg_studio_militar_1774133302683.png', colors:['#2d3a1a','#1a2410','#4a5c2a','#0d1508'] },
+        { id:'neon',      name:'NEÓN NOCTURNO', bg: 'assets/bg_studio_neon_1774133316841.png', colors:['#0a0a1a','#000','#00e5ff','#ff00e5'] },
+        { id:'fuego',     name:'FUEGO',         bg: 'assets/bg_studio_fuego_1774133335029.png', colors:['#ff6b00','#cc2200','#ff9933','#1a0500'] },
+        { id:'hielo',     name:'HIELO',         bg: 'assets/bg_studio_hielo_1774133351235.png', colors:['#b3e0ff','#e8f4ff','#0077b3','#003d5c'] },
+        { id:'carbono',   name:'CARBONO',       bg: 'assets/bg_studio_carbono_1774133370189.png', colors:['#1a1a1a','#0d0d0d','#d4af37','#8a7220'] },
+        { id:'blood',     name:'BLOOD & IRON',  bg: 'assets/bg_studio_blood_1774133388279.png', colors:['#5c0a0a','#1a0000','#cc1a1a','#330000'] }
     ];
     const STUDIO_FORMATS = [
         { id:'story', label:'STORY', w:1080, h:1350 },
@@ -982,75 +982,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let studioState = { tpl: 'militar', fmt: 'story', metrics: ['deficit','weight','waist'] };
 
+    const STUDIO_BG_IMAGES = {};
+    let isStudioPreloading = false;
+    async function preloadStudioImages() {
+        if(Object.keys(STUDIO_BG_IMAGES).length > 0 || isStudioPreloading) return;
+        isStudioPreloading = true;
+        await Promise.all(STUDIO_TEMPLATES.map(tpl => {
+            return new Promise((r) => {
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+                img.onload = () => { STUDIO_BG_IMAGES[tpl.id] = img; r(); };
+                img.onerror = () => { r(); };
+                img.src = tpl.bg;
+            });
+        }));
+    }
+
     function drawStudioBg(ctx, W, H, tpl) {
-        const c = tpl.colors;
-        switch(tpl.id) {
-            case 'militar': {
-                const g = ctx.createLinearGradient(0,0,0,H);
-                g.addColorStop(0,c[0]); g.addColorStop(0.5,c[1]); g.addColorStop(1,c[3]);
-                ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
-                ctx.strokeStyle='rgba(74,92,42,0.15)'; ctx.lineWidth=2;
-                for(let i=-H;i<W+H;i+=20){ ctx.beginPath(); ctx.moveTo(i,0); ctx.lineTo(i+H,H); ctx.stroke(); }
-                for(let i=-H;i<W+H;i+=20){ ctx.beginPath(); ctx.moveTo(i,H); ctx.lineTo(i+H,0); ctx.stroke(); }
-                break;
-            }
-            case 'neon': {
-                ctx.fillStyle=c[1]; ctx.fillRect(0,0,W,H);
-                const g2 = ctx.createRadialGradient(W/2,H/2,0,W/2,H/2,W*0.7);
-                g2.addColorStop(0,'rgba(0,229,255,0.06)'); g2.addColorStop(1,'transparent');
-                ctx.fillStyle=g2; ctx.fillRect(0,0,W,H);
-                ctx.shadowColor=c[2]; ctx.shadowBlur=30; ctx.strokeStyle=c[2]; ctx.lineWidth=1.5;
-                for(let i=0;i<8;i++){ const y=H*0.1+i*(H*0.1); ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
-                ctx.shadowColor=c[3]; ctx.strokeStyle=c[3];
-                for(let i=0;i<6;i++){ const x=W*0.15+i*(W*0.15); ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
-                ctx.shadowBlur=0;
-                break;
-            }
-            case 'fuego': {
-                const gf=ctx.createLinearGradient(0,0,0,H);
-                gf.addColorStop(0,c[2]); gf.addColorStop(0.4,c[0]); gf.addColorStop(0.7,c[1]); gf.addColorStop(1,c[3]);
-                ctx.fillStyle=gf; ctx.fillRect(0,0,W,H);
-                for(let i=0;i<60;i++){
-                    const px=Math.random()*W, py=Math.random()*H;
-                    const r=Math.random()*4+1;
-                    ctx.beginPath(); ctx.arc(px,py,r,0,Math.PI*2);
-                    ctx.fillStyle=`rgba(255,${Math.floor(Math.random()*150+100)},0,${Math.random()*0.4+0.1})`; ctx.fill();
-                }
-                break;
-            }
-            case 'hielo': {
-                const gi=ctx.createLinearGradient(0,0,W,H);
-                gi.addColorStop(0,c[0]); gi.addColorStop(0.5,c[1]); gi.addColorStop(1,c[0]);
-                ctx.fillStyle=gi; ctx.fillRect(0,0,W,H);
-                ctx.strokeStyle='rgba(0,119,179,0.12)'; ctx.lineWidth=1.5;
-                for(let i=0;i<20;i++){
-                    const cx2=Math.random()*W, cy2=Math.random()*H, sz=Math.random()*60+30;
-                    ctx.beginPath(); for(let s=0;s<6;s++){ const a=Math.PI/3*s-Math.PI/2; ctx.lineTo(cx2+Math.cos(a)*sz, cy2+Math.sin(a)*sz); } ctx.closePath(); ctx.stroke();
-                }
-                break;
-            }
-            case 'carbono': {
-                ctx.fillStyle=c[1]; ctx.fillRect(0,0,W,H);
-                ctx.strokeStyle='rgba(255,255,255,0.04)'; ctx.lineWidth=1;
-                const step=12;
-                for(let i=-H;i<W+H;i+=step){ ctx.beginPath(); ctx.moveTo(i,0); ctx.lineTo(i-H*0.5,H); ctx.stroke(); }
-                for(let i=-H;i<W+H;i+=step){ ctx.beginPath(); ctx.moveTo(i,0); ctx.lineTo(i+H*0.5,H); ctx.stroke(); }
-                ctx.strokeStyle=c[2]; ctx.lineWidth=2; ctx.shadowColor=c[2]; ctx.shadowBlur=15;
-                ctx.strokeRect(W*0.05,H*0.03,W*0.9,H*0.94);
-                ctx.shadowBlur=0;
-                break;
-            }
-            case 'blood': {
-                const gb=ctx.createRadialGradient(W/2,H*0.3,0,W/2,H/2,W);
-                gb.addColorStop(0,c[2]); gb.addColorStop(0.5,c[0]); gb.addColorStop(1,c[1]);
-                ctx.fillStyle=gb; ctx.fillRect(0,0,W,H);
-                ctx.strokeStyle='rgba(204,26,26,0.1)'; ctx.lineWidth=3;
-                for(let i=0;i<12;i++){
-                    const x1=Math.random()*W, y1=Math.random()*H;
-                    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x1+Math.random()*200-100, y1+Math.random()*200-100); ctx.stroke();
-                }
-                break;
-            }
+        if (STUDIO_BG_IMAGES[tpl.id]) {
+            const img = STUDIO_BG_IMAGES[tpl.id];
+            const scale = Math.max(W / img.width, H / img.height);
+            const x = (W / 2) - (img.width / 2) * scale;
+            const y = (H / 2) - (img.height / 2) * scale;
+            ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
+        } else {
+            // Fallback liso
+            ctx.fillStyle = tpl.colors[1];
+            ctx.fillRect(0, 0, W, H);
         }
     }
 
@@ -1080,49 +1038,84 @@ document.addEventListener('DOMContentLoaded', () => {
         const cx = W/2;
         const accent = tpl.id==='hielo' ? tpl.colors[2] : (tpl.id==='carbono' ? tpl.colors[2] : tpl.id==='neon' ? tpl.colors[2] : tpl.id==='fuego' ? '#ffcc00' : tpl.id==='blood' ? '#ff3333' : '#8aff7a');
 
-        // 4. Título superior
-        const titleY = py + (fmtId==='landscape' ? 80 : 100);
-        ctx.fillStyle=accent; ctx.font=`600 ${isPreview?14:24}px Inter,sans-serif`;
-        ctx.textAlign='center'; ctx.shadowColor=accent; ctx.shadowBlur=12;
-        ctx.fillText('RESULTADOS VERIFICADOS', cx, titleY);
-        ctx.shadowBlur=0;
+        // Text layout helper parameters
+        const isLandscape = fmtId === 'landscape';
+        const titleY = py + (isLandscape ? 80 : 100);
+        const nameY = titleY + (isPreview ? 22 : 60);
 
-        // 5. Nombre grande
-        const nameY = titleY + (isPreview?22:60);
-        ctx.fillStyle='#fff'; ctx.font=`800 ${isPreview?24:52}px Inter,sans-serif`;
-        ctx.fillText((userData.username||'ATLETA').toUpperCase(), cx, nameY);
+        // -- TÍtulo superior (Fusionado) --
+        ctx.fillStyle = accent;
+        ctx.font = `800 ${isPreview ? 16 : 30}px Inter,sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.globalCompositeOperation = 'source-over';
+        // Base opaca fuerte
+        ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = isPreview?4:15;
+        ctx.fillText('RESULTADOS OFICIALES', cx, titleY);
+        // Resplandor para fusionar
+        ctx.shadowColor = accent; ctx.shadowBlur = isPreview?10:25;
+        ctx.globalCompositeOperation = 'screen';
+        ctx.fillText('RESULTADOS OFICIALES', cx, titleY);
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.shadowBlur = 0;
 
-        // 6. Divider
-        const divY = nameY + (isPreview?14:40);
-        ctx.fillStyle='rgba(255,255,255,0.1)'; ctx.fillRect(px+40, divY, pw-80, 2);
+        // -- Nombre grande --
+        const atletaName = (userData.username || 'ATLETA').toUpperCase();
+        ctx.font = `900 ${isPreview ? 24 : 65}px Inter,sans-serif`;
+        ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = isPreview ? 8 : 20;
+        ctx.fillStyle = '#ffffff';
+        ctx.fillText(atletaName, cx, nameY);
+        ctx.shadowBlur = 0;
+        
+        ctx.globalCompositeOperation = 'overlay';
+        ctx.fillStyle = 'rgba(255,255,255,0.4)';
+        ctx.fillText(atletaName, cx, nameY);
+        ctx.globalCompositeOperation = 'source-over';
 
-        // 7. Métricas dinámicas
+        // -- Divider --
+        const divY = nameY + (isPreview ? 14 : 40);
+        const gradientLine = ctx.createLinearGradient(px, 0, px+pw, 0);
+        gradientLine.addColorStop(0, 'rgba(255,255,255,0)');
+        gradientLine.addColorStop(0.5, accent);
+        gradientLine.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.fillStyle = gradientLine;
+        ctx.fillRect(px + 40, divY, pw - 80, 3);
+
+        // -- Métricas dinámicas (Estilo cinemático) --
         const mets = STUDIO_METRICS.filter(m => activeMetrics.includes(m.key));
-        const metStartY = divY + (isPreview?25:60);
-        const metSpacing = fmtId==='landscape' ? (isPreview?45:100) : (isPreview?55:130);
-        const isLandscape = fmtId==='landscape';
+        const metStartY = divY + (isPreview ? 30 : 70);
+        const metSpacing = isLandscape ? (isPreview ? 45 : 100) : (isPreview ? 60 : 140);
 
         if (isLandscape && mets.length > 1) {
-            // Landscape: distribute horizontally
             const colW = pw / Math.min(mets.length, 4);
             mets.forEach((m, i) => {
                 const mx = px + colW/2 + i * colW;
-                ctx.fillStyle='rgba(255,255,255,0.5)'; ctx.font=`500 ${isPreview?9:20}px Inter,sans-serif`;
+                ctx.fillStyle = 'rgba(255,255,255,0.6)';
+                ctx.font = `600 ${isPreview ? 10 : 22}px Inter,sans-serif`;
                 ctx.fillText(m.label.toUpperCase(), mx, metStartY);
-                ctx.fillStyle='#fff'; ctx.font=`800 ${isPreview?18:60}px Inter,sans-serif`;
-                ctx.shadowColor='rgba(255,255,255,0.2)'; ctx.shadowBlur=10;
-                ctx.fillText(m.val(), mx, metStartY + (isPreview?20:55));
-                ctx.shadowBlur=0;
+                
+                ctx.fillStyle = '#ffffff';
+                ctx.font = `900 ${isPreview ? 22 : 65}px Inter,sans-serif`;
+                ctx.shadowColor = accent; ctx.shadowBlur = isPreview?8:20;
+                ctx.fillText(m.val(), mx, metStartY + (isPreview ? 26 : 65));
+                ctx.shadowBlur = 0;
             });
         } else {
             mets.forEach((m, i) => {
                 const my = metStartY + i * metSpacing;
-                ctx.fillStyle='rgba(255,255,255,0.5)'; ctx.font=`500 ${isPreview?9:22}px Inter,sans-serif`;
+                ctx.fillStyle = 'rgba(255,255,255,0.6)';
+                ctx.font = `600 ${isPreview ? 10 : 24}px Inter,sans-serif`;
                 ctx.fillText(m.label.toUpperCase(), cx, my);
-                ctx.fillStyle='#fff'; ctx.font=`800 ${isPreview?22:80}px Inter,sans-serif`;
-                ctx.shadowColor='rgba(255,255,255,0.2)'; ctx.shadowBlur=15;
-                ctx.fillText(m.val(), cx, my + (isPreview?22:65));
-                ctx.shadowBlur=0;
+                
+                ctx.fillStyle = '#ffffff';
+                ctx.font = `900 ${isPreview ? 26 : 85}px Inter,sans-serif`;
+                ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = isPreview?5:15;
+                ctx.fillText(m.val(), cx, my + (isPreview ? 28 : 75));
+                
+                ctx.globalCompositeOperation = 'screen';
+                ctx.shadowColor = accent; ctx.shadowBlur = isPreview?10:25;
+                ctx.fillText(m.val(), cx, my + (isPreview ? 28 : 75));
+                ctx.globalCompositeOperation = 'source-over';
+                ctx.shadowBlur = 0;
             });
         }
 
@@ -1141,14 +1134,18 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.fillText('OPTIMIZACIÓN BIOLÓGICA BY ARTHUR', cx, H-(isPreview?10:30));
     }
 
-    function renderStudioPage() {
+    async function renderStudioPage() {
         const el = document.getElementById('page-studio');
         if (!el) return;
+
+        // Añadir indicador de carga visual rápido mientras se cargan fondos
+        el.innerHTML = `<div style="text-align:center; padding:3rem; color:var(--text-dim);">Sincronizando Estudio Gráfico...</div>`;
+        await preloadStudioImages();
 
         el.innerHTML = `
             <div class="glass-card" style="padding:1.5rem; margin-bottom:1.5rem;">
                 <h2 style="color:var(--accent-main); margin-bottom:0.5rem; font-size:1.2rem;">🏆 ESTUDIO DE LOGROS</h2>
-                <p style="font-size:0.75rem; color:var(--text-dim); margin-bottom:1rem;">Personaliza tu tarjeta y compártela en redes.</p>
+                <p style="font-size:0.75rem; color:var(--text-dim); margin-bottom:1rem;">Generador oficial en alta resolución.</p>
 
                 <h4 style="color:var(--text-primary); font-size:0.8rem; margin-bottom:8px;">PLANTILLA</h4>
                 <div class="studio-templates" id="studio-tpl-list"></div>
