@@ -887,32 +887,61 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    // GENERADOR DE TARJETA ESTILO GIMNASIO ALTA GAMA (HIERRO Y METAL)
-    async function generateAchievementCard() {
+    // Helper para cargar imágenes
+    async function loadCanvasImage(src) {
         return new Promise((resolve) => {
+            if(!src) return resolve(null);
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = () => resolve(img);
+            img.onerror = () => resolve(null);
+            img.src = src;
+        });
+    }
+
+    // GENERADOR DE TARJETA ESTILO GIMNASIO ALTA GAMA
+    async function generateAchievementCard() {
+        return new Promise(async (resolve) => {
             const W = 1080, H = 1350;
             const canvas = document.createElement('canvas');
             canvas.width = W;
             canvas.height = H;
             const ctx = canvas.getContext('2d');
 
-            // ─── FONDO OSCURO SÓLIDO (ACERO Y CAUCHO DE GIMNASIO) ───
-            const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
-            bgGrad.addColorStop(0, '#1c1f24'); // Gris oscuro
-            bgGrad.addColorStop(0.5, '#14161a'); 
-            bgGrad.addColorStop(1, '#0b0c0e'); // Casi negro
-            ctx.fillStyle = bgGrad;
-            ctx.fillRect(0, 0, W, H);
+            // ─── CARGAR FONDO ÉPICO AI ───
+            const bgOptions = [
+                'assets/bg_gym_carbon_1774072142046.png',
+                'assets/bg_gym_dumbbells_1774072116018.png',
+                'assets/bg_gym_neon_1774072082081.png'
+            ];
+            const chosenBg = bgOptions[Math.floor(Math.random() * bgOptions.length)];
+            const [bgImg, logoImg] = await Promise.all([
+                loadCanvasImage(chosenBg),
+                loadCanvasImage('logo.png')
+            ]);
 
-            // ─── TEXTURA MALLA DE ACERO ROMBOIDAL (DIAMOND PLATE) ───
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.02)';
-            ctx.lineWidth = 3;
-            for (let i = -H; i < W * 2; i += 50) {
-                ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i + H, H); ctx.stroke();
-                ctx.beginPath(); ctx.moveTo(i + H, 0); ctx.lineTo(i, H); ctx.stroke();
+            if (bgImg) {
+                // Dibujar imagen épica de base (escalada para cubrir)
+                const scale = Math.max(W / bgImg.width, H / bgImg.height);
+                const x = (W / 2) - (bgImg.width / 2) * scale;
+                const y = (H / 2) - (bgImg.height / 2) * scale;
+                ctx.drawImage(bgImg, x, y, bgImg.width * scale, bgImg.height * scale);
+
+                // Overlay oscuro degradado para que resalte la letra brillante de neón
+                const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
+                bgGrad.addColorStop(0, 'rgba(11, 12, 14, 0.3)'); 
+                bgGrad.addColorStop(1, 'rgba(11, 12, 14, 0.95)'); 
+                ctx.fillStyle = bgGrad;
+                ctx.fillRect(0, 0, W, H);
+            } else {
+                // Fallback a gris si por alguna razón falla el celular offline
+                const bgFlat = ctx.createLinearGradient(0, 0, 0, H);
+                bgFlat.addColorStop(0, '#1c1f24'); bgFlat.addColorStop(1, '#0b0c0e');
+                ctx.fillStyle = bgFlat;
+                ctx.fillRect(0, 0, W, H);
             }
 
-            // ─── BORDES Y ESTRUCTURA FUERTE (BARRAS DE PESAS) ───
+            // ─── BORDES Y ESTRUCTURA FUERTE ───
             const accentBase = userData.theme === "original" ? "#d4af37" : (userData.theme === "neon" ? "#00c97a" : "#e8394a");
             
             ctx.strokeStyle = accentBase;
@@ -923,35 +952,29 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.lineWidth = 4;
             ctx.strokeRect(55, 55, W - 110, H - 110);
 
-            // ─── CARGAR LOGO ───
-            const logo = new Image();
-            logo.crossOrigin = 'anonymous';
-            logo.src = 'logo.png';
+            const cx = W / 2, cy = 250;
 
-            const drawCard = (logoLoaded) => {
-                const cx = W / 2, cy = 250;
+            if (logoImg) {
+                // Círculo sólido de fondo para el logo
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(cx, cy, 145, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(10, 10, 12, 0.9)';
+                ctx.fill();
+                ctx.lineWidth = 6;
+                ctx.strokeStyle = accentBase;
+                ctx.stroke();
+                ctx.clip(); // Cortar el logo si sobresale
+                ctx.drawImage(logoImg, cx - 130, cy - 130, 260, 260);
+                ctx.restore();
+            }
 
-                if (logoLoaded) {
-                    // Círculo sólido de fondo para el logo (como un disco de pesas)
-                    ctx.save();
-                    ctx.beginPath();
-                    ctx.arc(cx, cy, 145, 0, Math.PI * 2);
-                    ctx.fillStyle = '#0a0a0c';
-                    ctx.fill();
-                    ctx.lineWidth = 6;
-                    ctx.strokeStyle = accentBase;
-                    ctx.stroke();
-                    ctx.clip(); // Cortar el logo si sobresale
-                    ctx.drawImage(logo, cx - 130, cy - 130, 260, 260);
-                    ctx.restore();
-                }
-
-                // Título Marca
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
-                ctx.font = '700 32px Oswald, sans-serif';
-                ctx.textAlign = 'center';
-                ctx.letterSpacing = "4px";
-                ctx.fillText('AX-CORE BY ARTHUR', cx, 440);
+            // Título Marca
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+            ctx.font = '700 32px Oswald, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.letterSpacing = "4px";
+            ctx.fillText('AX-CORE BY ARTHUR', cx, 440);
 
                 // Divider grueso (Barra de Hierro)
                 ctx.fillStyle = 'rgba(255,255,255,0.15)';
@@ -1026,10 +1049,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.fillText('SOFTWARE DE ENTRENAMIENTO AX-CORE', cx, 1260);
 
                 canvas.toBlob(blob => resolve(blob), 'image/png');
-            };
-
-            logo.onload  = () => drawCard(true);
-            logo.onerror = () => drawCard(false);
         });
     }
 
