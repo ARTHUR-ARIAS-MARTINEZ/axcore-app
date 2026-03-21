@@ -163,6 +163,19 @@ app.post('/api/coach/toggle', async (req, res) => {
     res.json({ success: true });
 });
 
+app.delete('/api/coach/users/:code', async (req, res) => {
+    const code = req.params.code;
+    const initialLen = db.clientCodes.length;
+    db.clientCodes = db.clientCodes.filter(c => c.code !== code);
+    
+    if (db.clientCodes.length < initialLen) {
+        await saveToCloud();
+        res.json({ success: true, message: "Usuario eliminado definitivamente." });
+    } else {
+        res.status(404).json({ success: false, message: "Usuario no encontrado." });
+    }
+});
+
 // ============================================================
 // VALIDACIÓN PARA LA APP DEL USUARIO (app.js)
 // ============================================================

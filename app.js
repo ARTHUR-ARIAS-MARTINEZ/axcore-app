@@ -172,6 +172,14 @@ document.addEventListener('DOMContentLoaded', () => {
         loginOverlay.classList.remove('hidden');
     };
 
+    // Soporte para Enter
+    [regUser, regPass, document.getElementById('reg-gym-code')].forEach(el => {
+        if(el) el.addEventListener('keypress', e => { if(e.key === 'Enter') document.getElementById('btn-register-confirm').click() });
+    });
+    [loginUser, loginPass].forEach(el => {
+        if(el) el.addEventListener('keypress', e => { if(e.key === 'Enter') document.getElementById('btn-login-access').click() });
+    });
+
     const API_URL = "https://axcore-appax-core-backend.onrender.com";
 
     document.getElementById('btn-register-confirm').onclick = async () => {
@@ -1218,6 +1226,25 @@ document.addEventListener('DOMContentLoaded', () => {
             4. Realiza búsquedas en tiempo real en las especialidades citadas para dar consejos de vanguardia 2026.
             5. Considera y menciona proactivamente el ESTADO ACTUAL y ALIMENTOS DE HOY si la pregunta se relaciona con síntomas, hambre o energía. Por ejemplo "Tuviste un pico de insulina porque hace 2 horas comiste X".
             6. Sé conciso y potente. Evita saludos largos.`;
+
+        // Validar que el pase del atleta siga activo antes de consumir IA
+        if (userData.gymCode && userData.gymCode !== "GYM-MASTER" && userData.gymCode !== "AXV-DEMO") {
+            try {
+                // userData.password almacena el pase (ej. AX-TRL0E) que el usuario tipeó al inicio
+                const check = await fetch(`${API_URL}/api/validate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ code: userData.password })
+                });
+                const checkData = await check.json();
+                if (!checkData.success) {
+                    return `⛔ SERVICIO CORTADO.\n\n${checkData.message}`;
+                }
+            } catch(e) {
+                // Ignorar en caso de no haber internet temporalmente para validar, 
+                // pero fetch() de abajo hacia Perplexity también fallará si no hay internet real
+            }
+        }
 
         try {
             const response = await fetch('https://api.perplexity.ai/chat/completions', {
