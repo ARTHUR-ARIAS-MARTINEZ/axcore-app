@@ -213,13 +213,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 userData.username = u;
                 userData.password = p;
                 userData.gymCode = gc;
-                userData.apiKey = 'validated_via_backend'; 
+                userData.apiKey = data.apiKey; // Recibir API Key real del servidor
                 saveData();
                 localStorage.setItem('arthur_current_user', u);
                 alert(data.message);
                 location.reload();
             } else {
-                alert(data.message); // ej: "Código inactivo o inválido"
+                alert(data.message);
             }
         } catch(e) {
             // Si el backend duerme o falla, permitimos modo offline si usan pase maestro

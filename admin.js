@@ -74,6 +74,19 @@ document.addEventListener('DOMContentLoaded', () => {
                         adminData.gyms.push(serverGym);
                     }
                 });
+                
+                // Cleanup: Gimnasios que no tienen un bloque válido en esta consola
+                const validBlockIds = new Set(adminData.blocks.map(b => b.id));
+                const orphanedGyms = adminData.gyms.filter(g => !validBlockIds.has(g.blockId));
+                
+                if (orphanedGyms.length > 0) {
+                    // Borrar de la nube
+                    for (const g of orphanedGyms) {
+                        try { await fetch(`${API_URL}/api/admin/gyms/${g.gymCode}`, { method: 'DELETE' }); } catch(e){}
+                    }
+                    // Borrar de memoria y guardar
+                    adminData.gyms = adminData.gyms.filter(g => validBlockIds.has(g.blockId));
+                }
                 saveAdminData();
             }
         } catch(e) {
@@ -246,6 +259,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Encontrar el nombre del bloque
         const block = adminData.blocks.find(b => b.id === bid);
         const blockName = block ? block.name : "Sin bloque";
+        const apiKey = block ? block.apiKey : "";
 
         const newGym = {
             gymCode: gymCode,
@@ -258,7 +272,8 @@ document.addEventListener('DOMContentLoaded', () => {
             rent: rent,
             active: true,
             blockId: bid,     // GUARDAR referencia al bloque
-            password: password // GUARDAR contraseña generada
+            password: password, // GUARDAR contraseña generada
+            apiKey: apiKey    // GUARDAR api key para el app del usuario final
         };
 
         document.getElementById('btn-save-gym').textContent = 'Subiendo a la nube...';

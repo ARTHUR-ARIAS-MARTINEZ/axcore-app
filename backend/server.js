@@ -186,8 +186,9 @@ app.post('/api/validate', (req, res) => {
             if (gym && !gym.active) {
                 return res.json({ success: false, message: "FRANQUICIA SIN PAGO ACTIVO. COMUNÍCATE CON EL DUEÑO." });
             }
+            return res.json({ success: true, message: "ACCESO ÉLITE CONCEDIDO.", apiKey: gym ? gym.apiKey : "" });
         }
-        return res.json({ success: true, message: "ACCESO ÉLITE CONCEDIDO." });
+        return res.json({ success: true, message: "ACCESO ALFA CONCEDIDO." });
     }
 
     res.json({ success: false, message: "CÓDIGO INEXISTENTE. Pide uno en la recepción del gimnasio." });
