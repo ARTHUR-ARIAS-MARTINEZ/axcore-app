@@ -941,112 +941,105 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.fillRect(0, 0, W, H);
             }
 
-            // ─── BORDES Y ESTRUCTURA FUERTE ───
+            // ─── PANEL CENTRAL DE CRISTAL (GLASSMORPHISM) ───
+            const panelW = W * 0.85;
+            const panelH = H * 0.75;
+            const px = (W - panelW) / 2;
+            const py = (H - panelH) / 2 + 20;
+
             const accentBase = userData.theme === "original" ? "#d4af37" : (userData.theme === "neon" ? "#00c97a" : "#e8394a");
-            
-            ctx.strokeStyle = accentBase;
-            ctx.lineWidth = 14;
-            ctx.strokeRect(40, 40, W - 80, H - 80);
-            
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
-            ctx.lineWidth = 4;
-            ctx.strokeRect(55, 55, W - 110, H - 110);
 
-            const cx = W / 2, cy = 250;
+            ctx.save();
+            ctx.beginPath();
+            if(ctx.roundRect) {
+                ctx.roundRect(px, py, panelW, panelH, 40);
+            } else {
+                ctx.rect(px, py, panelW, panelH); // Fallback
+            }
+            // Fondo oscuro suave para garantizar legibilidad
+            ctx.fillStyle = 'rgba(10, 12, 16, 0.65)'; 
+            ctx.fill();
+            // Borde luminoso sutil
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)'; 
+            ctx.stroke();
 
+            const cx = W / 2;
+
+            // ─── LOGO INTEGRADO ELEGANTE ───
             if (logoImg) {
-                // Círculo sólido de fondo para el logo
-                ctx.save();
-                ctx.beginPath();
-                ctx.arc(cx, cy, 145, 0, Math.PI * 2);
-                ctx.fillStyle = 'rgba(10, 10, 12, 0.9)';
-                ctx.fill();
-                ctx.lineWidth = 6;
-                ctx.strokeStyle = accentBase;
-                ctx.stroke();
-                ctx.clip(); // Cortar el logo si sobresale
-                ctx.drawImage(logoImg, cx - 130, cy - 130, 260, 260);
-                ctx.restore();
+                const logoSize = 180;
+                ctx.drawImage(logoImg, cx - logoSize/2, py + 40, logoSize, logoSize);
             }
 
-            // Título Marca
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-            ctx.font = '700 32px Oswald, sans-serif';
+            // ─── TEXTOS DE IMPACTO Y PERSUASIÓN (MARKETING) ───
+            // Título Superior
+            ctx.fillStyle = accentBase;
+            ctx.font = '600 24px Inter, sans-serif';
             ctx.textAlign = 'center';
+            ctx.letterSpacing = "6px";
+            ctx.shadowColor = accentBase;
+            ctx.shadowBlur = 15;
+            ctx.fillText('RESULTADOS OFICIALES', cx, py + 260);
+            ctx.shadowBlur = 0; // Reset sombra
+
+            const uname = `${(userData.username || 'ATLETA').toUpperCase()}`;
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '800 50px Inter, sans-serif';
+            ctx.letterSpacing = "2px";
+            ctx.fillText(uname, cx, py + 330);
+
+            // Divider Fino
+            ctx.fillStyle = 'rgba(255,255,255,0.1)';
+            ctx.fillRect(px + 60, py + 380, panelW - 120, 2);
+
+            // ─── RENDIMIENTO PRINCIPAL ───
+            const defVal = (userData.totalNetDeficit || 0).toLocaleString('es-MX');
+            
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '900 120px Inter, sans-serif';
+            ctx.shadowColor = 'rgba(255,255,255,0.3)';
+            ctx.shadowBlur = 20;
+            ctx.fillText(defVal, cx, py + 520);
+            ctx.shadowBlur = 0;
+
+            ctx.fillStyle = accentBase;
+            ctx.font = '600 32px Inter, sans-serif';
+            ctx.letterSpacing = "3px";
+            ctx.fillText('KCAL CALCINADAS', cx, py + 570);
+
+            // ─── RENDIMIENTO SECUNDARIO ───
+            const waistVal = userData.waist || 0;
+            ctx.fillStyle = '#a0a5ab'; // Gris plateado legible
+            ctx.font = '500 26px Inter, sans-serif';
+            ctx.letterSpacing = "1px";
+            ctx.fillText('CINTURA ACTUAL', cx, py + 670);
+
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '700 65px Inter, sans-serif';
+            ctx.fillText(`${waistVal} CM`, cx, py + 740);
+
+            // ─── BADGE DE AUTORIDAD (PIE DE PANEL) ───
+            const by = py + panelH - 90;
+            ctx.fillStyle = accentBase;
+            if(ctx.roundRect) {
+                ctx.beginPath(); ctx.roundRect(cx - 200, by, 400, 50, 25); ctx.fill();
+            } else {
+                ctx.fillRect(cx - 200, by, 400, 50);
+            }
+            
+            ctx.fillStyle = '#000000';
+            ctx.font = '800 22px Inter, sans-serif';
             ctx.letterSpacing = "4px";
-            ctx.fillText('AX-CORE BY ARTHUR', cx, 440);
+            ctx.fillText('SISTEMA AX-CORE', cx, by + 34);
+            ctx.restore();
 
-                // Divider grueso (Barra de Hierro)
-                ctx.fillStyle = 'rgba(255,255,255,0.15)';
-                ctx.fillRect(W * 0.15, 480, W * 0.70, 4);
-
-                // ══════════════════════════════════
-                //  BLOQUE CENTRAL DE NÚMEROS DE RENDIMIENTO
-                // ══════════════════════════════════
-
-                // Bloque Déficit (El Esfuerzo)
-                ctx.fillStyle = accentBase; // Resaltado fuerte
-                ctx.font = '700 36px Oswald, sans-serif';
-                ctx.fillText('QUEMA CALÓRICA TOTAL', cx, 580);
-
-                const defVal = (userData.totalNetDeficit || 0).toLocaleString('es-MX');
-                ctx.fillStyle = '#ffffff';
-                ctx.font = '700 130px Oswald, sans-serif';
-                ctx.fillText(defVal, cx, 690);
-
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
-                ctx.font = '700 28px Oswald, sans-serif';
-                ctx.fillText('KILOCALORÍAS DESTRUIDAS', cx, 740);
-
-                // Divider Sub
-                ctx.fillStyle = 'rgba(255,255,255,0.08)';
-                ctx.fillRect(W * 0.35, 790, W * 0.3, 3);
-
-                // Bloque Cintura
-                ctx.fillStyle = '#b0b0b0';
-                ctx.font = '700 28px Oswald, sans-serif';
-                ctx.fillText('CINTURA ACTUAL', cx, 860);
-
-                const waistVal = userData.waist || 0;
-                ctx.fillStyle = '#ffffff';
-                ctx.font = '700 90px Oswald, sans-serif';
-                ctx.fillText(`${waistVal} CM`, cx, 950);
-
-                // ══════════════════════════════════
-                //  BLOQUE INFERIOR DE ESTATUS (CHAMPION)
-                // ══════════════════════════════════
-
-                // Divider inferior
-                ctx.fillStyle = 'rgba(255,255,255,0.15)';
-                ctx.fillRect(W * 0.15, 1020, W * 0.70, 4);
-
-                // Placa de Identificación Física (Estilo Gafete)
-                const uname = `${(userData.username || 'ATLETA AX-CORE').toUpperCase()}`;
-                ctx.fillStyle = '#ffffff';
-                ctx.font = '600 38px Inter, sans-serif';
-                ctx.textAlign = 'center';
-                ctx.fillText(uname, cx, 1100);
-
-                // Caja "MÁQUINA OPTIMIZADA"
-                const bh = 70, bw = 500, bx = cx - bw/2, by = 1140;
-                ctx.fillStyle = accentBase;
-                ctx.beginPath();
-                // Caja rectangular dura militar/gym
-                ctx.moveTo(bx + 15, by); ctx.lineTo(bx + bw - 15, by);
-                ctx.lineTo(bx + bw, by + 15); ctx.lineTo(bx + bw, by + bh - 15);
-                ctx.lineTo(bx + bw - 15, by + bh); ctx.lineTo(bx + 15, by + bh);
-                ctx.lineTo(bx, by + bh - 15); ctx.lineTo(bx, by + 15);
-                ctx.closePath();
-                ctx.fill();
-
-                ctx.fillStyle = '#000000'; // Letra negra gruesa
-                ctx.font = '700 36px Oswald, sans-serif';
-                ctx.fillText('MÁQUINA OPTIMIZADA', cx, by + 48);
-
-                // Footer
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
-                ctx.font = '600 20px Oswald, sans-serif';
-                ctx.fillText('SOFTWARE DE ENTRENAMIENTO AX-CORE', cx, 1260);
+            // ─── FOOTER ABSOLUTO DE LA IMAGEN ───
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+            ctx.font = '500 18px Inter, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.letterSpacing = "2px";
+            ctx.fillText('OPTIMIZACIÓN BIOLÓGICA BY ARTHUR', cx, H - 40);
 
                 canvas.toBlob(blob => resolve(blob), 'image/png');
         });
