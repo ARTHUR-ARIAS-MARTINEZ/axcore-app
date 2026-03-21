@@ -79,6 +79,21 @@ document.addEventListener('DOMContentLoaded', () => {
         if (currentUser) {
             loadUserData();
             showApp();
+            // Restaurar la sección donde estaba el usuario antes de recargar
+            const savedPage = localStorage.getItem('axcore_active_page');
+            if (savedPage) {
+                const targetPage = document.getElementById(`page-${savedPage}`);
+                if (targetPage) {
+                    pages.forEach(p => p.classList.remove('active'));
+                    targetPage.classList.add('active');
+                    navLinks.forEach(l => {
+                        l.classList.toggle('active', l.dataset.page === savedPage);
+                    });
+                    if (savedPage === 'diet') renderDietPage();
+                    if (savedPage === 'workout') renderWorkoutPage();
+                    if (savedPage === 'evolution') renderEvolutionPage('all');
+                }
+            }
         } else {
             showLogin();
         }
@@ -404,6 +419,8 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById(`page-${pageId}`).classList.add('active');
             navLinks.forEach(l => l.classList.remove('active'));
             link.classList.add('active');
+            // Persistir sección activa para que sobreviva al refrescar
+            localStorage.setItem('axcore_active_page', pageId);
             
             if (pageId === 'diet') renderDietPage();
             if (pageId === 'workout') renderWorkoutPage();

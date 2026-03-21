@@ -1,0 +1,996 @@
+RESPUESTA CHAT GPT:
+
+
+# BLOQUE 1 — RESUMEN TOTAL AX-CORE (OPTIMIZADO)
+
+AX-CORE = sistema de optimización biológica
+
+Objetivo:
+- mejorar rendimiento físico
+- mejorar salud celular
+- controlar nutrición
+- tomar decisiones con datos
+
+---
+
+Estructura del sistema:
+
+1) CUERPO (rendimiento)
+- fisiología (respuesta del cuerpo)
+- entrenamiento (progreso)
+- biomecánica (movimiento eficiente)
+
+Uso:
+- entrenar mejor
+- evitar lesiones
+
+---
+
+2) ENERGÍA (nutrición y células)
+- nutrición (alimentos)
+- bioquímica (energía interna)
+- hormonas (control del cuerpo)
+
+Uso:
+- energía estable
+- control de grasa
+
+---
+
+3) MENTE
+- psicología (disciplina)
+- neurociencia (control mental)
+
+Uso:
+- enfoque
+- constancia
+
+---
+
+4) RECUPERACIÓN
+- sueño (reparación)
+- sistema inmune (defensa)
+- regeneración (sanación)
+
+Uso:
+- progreso continuo
+
+---
+
+5) FUTURO
+- IA (decisiones)
+- wearables (datos del cuerpo)
+- genética (predisposición)
+
+Uso:
+- precisión
+- ventaja competitiva
+
+---
+
+PROBLEMA:
+- exceso de IA
+- alto costo
+- no escalable
+
+---
+
+SOLUCIÓN (70/30):
+
+70% sin IA:
+- base de datos
+- cálculos
+- reglas
+
+30% con IA:
+- chat
+- interpretación
+- casos complejos
+
+---
+
+IA RECOMENDADA:
+- OpenAI → uso diario
+- Gemini → análisis
+- Claude → precisión
+
+---
+
+FASES:
+
+FASE 1 (MVP):
+- comidas
+- calorías
+- déficit
+- chat
+
+objetivo: cobrar rápido
+
+---
+
+FASE 2:
+- base alimentos
+- reducir IA
+
+---
+
+FASE 3:
+- score usuario
+- recomendaciones
+
+---
+
+FASE 4:
+- wearables
+- sueño
+
+---
+
+FASE 5:
+- predicción
+- gemelo digital
+
+---
+
+REGLA:
+lanzar → cobrar → optimizar → escalar
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+# BLOQUE 2 — BASE DE DATOS (MEJORADA)
+
+Formato:
+nombre | calorías | proteína(g) | carbohidratos(g) | grasa(g)
+
+PROTEÍNAS
+pollo_pechuga | 165 | 31 | 0 | 3.6
+res_magro | 250 | 26 | 0 | 15
+cerdo | 242 | 27 | 0 | 14
+atun | 132 | 28 | 0 | 1
+salmon | 208 | 20 | 0 | 13
+huevo | 155 | 13 | 1 | 11
+claras_huevo | 52 | 11 | 0.7 | 0.2
+jamon | 145 | 21 | 1.5 | 6
+pavo | 135 | 29 | 0 | 1
+queso_panela | 200 | 18 | 2 | 15
+
+---
+
+CARBOHIDRATOS
+arroz_blanco | 130 | 2.7 | 28 | 0.3
+arroz_integral | 111 | 2.6 | 23 | 0.9
+pasta | 131 | 5 | 25 | 1.1
+pan_blanco | 265 | 9 | 49 | 3.2
+pan_integral | 247 | 13 | 41 | 4.2
+tortilla_maiz | 218 | 6 | 45 | 2.8
+tortilla_harina | 304 | 8 | 50 | 8
+avena | 389 | 17 | 66 | 7
+quinoa | 120 | 4 | 21 | 2
+papa | 77 | 2 | 17 | 0.1
+
+---
+
+GRASAS
+aceite_oliva | 884 | 0 | 0 | 100
+mantequilla | 717 | 1 | 0 | 81
+mayonesa | 680 | 1 | 0 | 75
+aguacate | 160 | 2 | 9 | 15
+nueces | 654 | 15 | 14 | 65
+almendras | 579 | 21 | 22 | 50
+cacahuate | 567 | 26 | 16 | 49
+
+---
+
+FRUTAS
+manzana | 52 | 0.3 | 14 | 0.2
+platano | 89 | 1.1 | 23 | 0.3
+naranja | 47 | 0.9 | 12 | 0.1
+fresa | 32 | 0.7 | 8 | 0.3
+piña | 50 | 0.5 | 13 | 0.1
+mango | 60 | 0.8 | 15 | 0.4
+sandia | 30 | 0.6 | 8 | 0.2
+pera | 57 | 0.4 | 15 | 0.1
+
+---
+
+VERDURAS
+brocoli | 34 | 2.8 | 7 | 0.4
+espinaca | 23 | 2.9 | 3.6 | 0.4
+lechuga | 15 | 1.4 | 2.9 | 0.2
+zanahoria | 41 | 0.9 | 10 | 0.2
+pepino | 16 | 0.7 | 4 | 0.1
+jitomate | 18 | 0.9 | 3.9 | 0.2
+cebolla | 40 | 1.1 | 9 | 0.1
+calabaza | 17 | 1.2 | 3 | 0.3
+
+---
+
+COMIDA COMÚN
+pizza | 266 | 11 | 33 | 10
+hamburguesa | 295 | 17 | 30 | 14
+tacos | 226 | 9 | 25 | 10
+tamal | 180 | 4 | 30 | 5
+pan_dulce | 300 | 5 | 50 | 10
+galletas | 502 | 6 | 64 | 24
+refresco | 42 | 0 | 11 | 0
+cerveza | 43 | 0.5 | 3.6 | 0
+
+---
+
+REGLA:
+si existe → usar base
+si no → IA
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+# BLOQUE 3 — PROMPTS OPTIMIZADOS (MEJORADOS)
+
+1) CHAT GENERAL
+
+Eres AX-CORE. Analiza datos del usuario: calorías, macros (proteína, carbohidratos, grasa), déficit y alimentos del día. Responde corto, directo y accionable. No expliques de más.
+
+---
+
+2) CALORÍAS + MACROS
+
+Calcula calorías, proteínas, carbohidratos y grasas del siguiente alimento: [texto]. Responde SOLO en JSON:
+{calories:int, protein:int, carbs:int, fats:int}
+Sin texto adicional.
+
+---
+
+3) PARSEAR DIETA
+
+Convierte el texto en JSON con claves: breakfast, lunch, dinner, snacks. No expliques. Solo JSON válido.
+Texto: [input]
+
+---
+
+4) REGLAS DE DIETA
+
+Genera 5 a 8 reglas claras basadas en esta dieta. Responde solo JSON:
+{rules:[...]}
+Reglas cortas.
+
+---
+
+5) VALIDACIÓN
+
+Revisa si estos datos nutricionales tienen sentido: [datos].
+Responde SOLO true o false.
+
+---
+
+REGLA GLOBAL:
+
+- primero código
+- luego IA
+- respuestas cortas = menos costo
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+RESPUESTAS CLAUDE:
+
+
+================================================================
+BLOQUE 1 — AX-CORE: RESUMEN MAESTRO
+Sistema de Optimizacion Biologica para Gimnasios de Elite
+================================================================
+
+QUE ES AX-CORE
+--------------
+App web/PWA para franquicias de gimnasios.
+El usuario registra lo que come, cuanto entrena, y la app calcula
+su deficit calorico (cuantas calorias le faltan para bajar de peso).
+La IA actua como un experto frio y preciso, no como asistente amable.
+
+
+LAS 3 FUNCIONES QUE YA TIENES
+------------------------------
+1. CHAT — El usuario pregunta dudas. La IA responde con su contexto
+   del dia (calorias, dieta, historial).
+
+2. ESCANER DE DIETA — El usuario pega el texto de su nutriologo.
+   La IA lo convierte a formato estructurado y genera 5-8 reglas
+   de oro personalizadas para esa dieta.
+
+3. LOG DE CALORIAS — El usuario escribe "dos tacos de canasta"
+   y la IA responde solo con un numero: las calorias de eso.
+
+
+EL PROBLEMA PRINCIPAL (Y URGENTE)
+----------------------------------
+Estas usando Perplexity como IA. Es la mas cara del mercado.
+A 4,000 usuarios activos con 5 registros diarios, te cuesta
+~$9,600 USD al mes. Con el stack correcto: ~$760 USD al mes.
+Diferencia anual: mas de $100,000 USD.
+
+
+MODELOS DE IA RECOMENDADOS (MAS BARATOS Y MEJORES)
+---------------------------------------------------
+- CHAT y DIETA  ->  Gemini 2.0 Flash (Google) — $0.10 por millon
+                    de palabras de entrada. Busqueda web incluida.
+
+- LOG CALORIAS  ->  Groq + Llama 3.3 (Meta/gratis) — $0.05 por
+                    millon. Velocidad extrema. Solo responde numeros.
+
+- CASOS COMPLEJOS -> Claude Sonnet (Anthropic) — para consultas
+                     biologicas avanzadas. Bajo volumen.
+
+Perplexity cuesta $3.00 por millon de entrada / $15 de salida.
+Es decir, entre 30x y 150x mas caro que las alternativas.
+
+
+LA REGLA 70/30 (COMO AHORRAR DINERO)
+--------------------------------------
+70% del trabajo lo hace codigo gratis:
+  - Lista local de 800 alimentos con sus calorias
+  - Si el usuario escribe "pollo" -> el codigo da 165 kcal. Sin IA.
+  - Si escribe "tamal oaxaqueno con champurrado" -> ahi si usa IA.
+
+30% lo hace la IA:
+  - Alimentos combinados o raros que el codigo no reconoce.
+  - Preguntas del chat que requieren razonamiento.
+  - Analisis de dietas en bruto.
+
+
+LAS 8 CIENCIAS QUE DEBE CONOCER AX-CORE
+-----------------------------------------
+(Estas ya estan en los prompts del sistema como conocimiento base)
+
+1. FISIOLOGIA DEL EJERCICIO
+   Que le pasa al cuerpo cuando entrena: energia, oxigeno, fatiga.
+   Aplica en: calcular calorias quemadas reales, explicar fatiga.
+
+2. NUTRICION DEPORTIVA
+   Proteinas, carbohidratos, grasas en el momento correcto.
+   Aplica en: dieta, ventana post-entreno, suplementos basicos.
+
+3. ENDOCRINOLOGIA DEPORTIVA (hormonas del deporte)
+   Cortisol (hormona del estres), testosterona, insulina.
+   Aplica en: detectar sobreentrenamiento, recomendar descanso.
+
+4. METABOLOMICA (perfil metabolico personal)
+   Cada persona quema diferente. Algunos son lentos, otros rapidos.
+   Aplica en: personalizar el limite calorico real del atleta.
+
+5. CRONOBIOLOGIA (ritmos del cuerpo en el tiempo)
+   El cuerpo rinde mejor a ciertas horas. El sueno afecta todo.
+   Aplica en: recomendar hora de entrenamiento, ajustar dieta segun hora.
+
+6. BIOLOGIA MITOCONDRIAL (las "pilas" de las celulas)
+   Mas mitocondrias = mas energia. El ejercicio aerobico las aumenta.
+   Aplica en: explicar por que la resistencia mejora con el tiempo.
+
+7. MICROBIOMA (bacterias del intestino que ayudan al rendimiento)
+   Ciertas bacterias convierten el acido del ejercicio en energia.
+   Aplica en: recomendar probioticos segun volumen de entrenamiento.
+
+8. PSICOLOGIA DEPORTIVA
+   Estado mental, motivacion, deteccion de abandono.
+   Aplica en: tono del chat, detectar cuando el usuario va a dejar la app.
+
+ADICIONALES AVANZADAS (para fases futuras):
+- Genomica deportiva: ADN y tipo de entrenamiento optimo.
+- Autofagia/mTOR: cuando el cuerpo se "recicla" durante el ayuno.
+- Fotobiomodulacion: luz roja para recuperacion muscular.
+- Medicina regenerativa: PRP (plasma rico en plaquetas), exosomas.
+- Biologia telomerica: longitud de los "extremos" del ADN como
+  indicador de envejecimiento.
+
+
+4 NUEVAS FUNCIONES RECOMENDADAS (para fases siguientes)
+---------------------------------------------------------
+A. DETECTOR DE SOBREENTRENAMIENTO
+   Analiza los ultimos 7 dias del atleta. Si el patron es peligroso,
+   manda alerta automatica. Proceso nocturno, sin costo extra de IA
+   porque se ejecuta en batch (en grupos, no uno por uno).
+
+B. VENTANA ANABOLICA (momento optimo post-entreno)
+   45 minutos despues de entrenar es cuando el musculo absorbe
+   mejor la proteina. La app detecta cuando termino el entreno
+   y manda notificacion con que comer exactamente ahora.
+
+C. ANALISIS CIRCADIANO SEMANAL (reloj biologico)
+   Cada domingo, la IA analiza a que hora el atleta suele entrenar
+   mejor y recomienda su hora pico para la semana siguiente.
+
+D. PROTOCOLO DE AYUNO / AUTOFAGIA
+   Si el atleta lleva mas de 14 horas sin registrar comida,
+   la app detecta en que fase metabolica esta y si debe continuar
+   o romper el ayuno segun su objetivo.
+
+
+HOJA DE RUTA — 3 FASES
+------------------------
+
+FASE 1 — SUPERVIVENCIA (0 a 30 dias) — SIN COSTO EXTRA
+  Objetivo: reducir el gasto de IA antes de escalar.
+  - Cambiar Log de Calorias a Groq + Llama 3.3
+  - Implementar lista local de 800 alimentos (el 70%)
+  - Usar los prompts optimizados (40% menos costo por mensaje)
+  - Cambiar Chat y Dieta a Gemini 2.0 Flash
+  Resultado: bajar el costo de IA hasta 90% en el endpoint mas usado.
+
+FASE 2 — CRECIMIENTO (30 a 90 dias) — DIFERENCIACION
+  Objetivo: agregar funciones que ningun otro gym-app tiene.
+  - Agregar campo "horas de sueno" al perfil del atleta
+  - Implementar Detector de Sobreentrenamiento (proceso automatico)
+  - Implementar Ventana Anabolica (notificacion post-entreno)
+  - Sistema de cache: si la pregunta es igual a una reciente,
+    reusar la respuesta guardada. Ahorra ~15% adicional.
+
+FASE 3 — ESCALA (90 a 180 dias) — VENTAJA COMPETITIVA
+  Objetivo: convertir AX-CORE en el sistema biologico mas
+  completo del mercado hispanohablante.
+  - Analisis Circadiano semanal automatizado
+  - Protocolo de Ayuno con deteccion de fases metabolicas
+  - Integracion opcional con wearables (Apple Watch, Garmin, WHOOP)
+  - Panel opcional de genomica deportiva
+  - Puntuacion de "edad biologica vs edad real" trimestral
+
+
+PROYECCION DE COSTOS (en USD al mes)
+--------------------------------------
+Usuarios   | Con Perplexity | Con stack optimizado
+-----------+----------------+---------------------
+500        | $1,200         | $95
+2,000      | $4,800         | $380
+4,000      | $9,600         | $760
+10,000     | $24,000        | $1,900
+
+
+TONO E IDENTIDAD DE LA IA
+--------------------------
+- Nombre: AX-CORE (siempre mayusculas)
+- Creador/autoridad maxima: ARTHUR
+- Tono: frio, analitico, directo. Como un medico de combate.
+- Prohibido: emojis en respuestas de analisis, frases tipo
+  "Claro que si!", motivacion vacia, asteriscos.
+- Formato: datos primero, contexto despues. Oraciones cortas.
+- Longitud: chat normal = 3-6 oraciones. Analisis = max 10.
+
+================================================================
+FIN BLOQUE 1
+================================================================
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+================================================================
+BLOQUE 2 — BASE DE DATOS DE ALIMENTOS (800 items)
+Formato: NOMBRE | CAL | PROT(g) | CARB(g) | GRAS(g)
+Por porcion estandar indicada. 0 = trazas o no aplica.
+================================================================
+
+== PROTEINAS ANIMALES ==
+Pechuga de pollo a la plancha 100g        | 165 | 31  | 0   | 3.6
+Pechuga de pollo hervida 100g             | 158 | 30  | 0   | 3.2
+Muslo de pollo con piel 100g              | 209 | 26  | 0   | 11
+Muslo de pollo sin piel 100g              | 179 | 25  | 0   | 8
+Pollo entero asado 100g                   | 239 | 27  | 0   | 14
+Milanesa de pollo empanizada 100g         | 260 | 24  | 12  | 12
+Nuggets de pollo 6 piezas                 | 280 | 15  | 18  | 17
+Carne molida res 90% magra 100g           | 218 | 26  | 0   | 12
+Carne molida res 80% grasa 100g           | 254 | 24  | 0   | 17
+Bistec de res a la plancha 100g           | 217 | 26  | 0   | 12
+Filete de res 100g                        | 271 | 26  | 0   | 18
+Costilla de res 100g                      | 292 | 22  | 0   | 22
+Arrachera 100g                            | 244 | 26  | 0   | 15
+Suadero 100g                              | 310 | 20  | 0   | 25
+Cecina de res 100g                        | 295 | 28  | 0   | 20
+Milanesa de res 100g                      | 280 | 25  | 11  | 14
+Atun en agua escurrido 1 lata 140g        | 130 | 29  | 0   | 1
+Atun en aceite escurrido 1 lata 140g      | 225 | 28  | 0   | 13
+Salmon a la plancha 100g                  | 208 | 28  | 0   | 10
+Salmon ahumado 100g                       | 172 | 26  | 0   | 7
+Tilapia a la plancha 100g                 | 128 | 26  | 0   | 3
+Sardinas en lata escurridas 100g          | 208 | 25  | 0   | 11
+Camaron cocido 100g                       | 99  | 21  | 0   | 1
+Camaron empanizado 100g                   | 229 | 15  | 14  | 12
+Huevo entero grande 1 pieza               | 78  | 6   | 0   | 5
+Clara de huevo 1 pieza                    | 17  | 4   | 0   | 0
+Huevo revuelto con aceite 2 piezas        | 200 | 12  | 1   | 16
+Huevo estrellado con aceite 2 piezas      | 185 | 12  | 0   | 15
+Huevo cocido 2 piezas                     | 155 | 13  | 1   | 11
+Omelette 2 huevos sin relleno             | 150 | 12  | 1   | 11
+Tocino de res 2 tiras                     | 86  | 6   | 0   | 7
+Jamon de pavo 2 rebanadas                 | 60  | 9   | 1   | 2
+Jamon de cerdo 2 rebanadas                | 80  | 8   | 1   | 5
+Salchicha de pavo 1 pieza                 | 45  | 5   | 1   | 2
+Salchicha de cerdo 1 pieza                | 90  | 4   | 1   | 8
+Chorizo de cerdo cocido 50g               | 196 | 9   | 2   | 17
+Chorizo de res cocido 50g                 | 165 | 10  | 2   | 13
+Longaniza cocida 100g                     | 285 | 16  | 3   | 23
+Maciza de cerdo 100g                      | 242 | 27  | 0   | 15
+Lomo de cerdo a la plancha 100g           | 212 | 29  | 0   | 10
+Carnitas 100g                             | 300 | 25  | 0   | 22
+Barbacoa de res 100g                      | 218 | 28  | 0   | 11
+Barbacoa de borrego 100g                  | 232 | 27  | 0   | 13
+Birria de res 100g                        | 210 | 26  | 3   | 10
+Cochinita pibil 100g                      | 225 | 22  | 4   | 13
+Pastor con grasa 100g                     | 264 | 22  | 4   | 18
+Pastor sin grasa 100g                     | 210 | 24  | 4   | 11
+Lengua de res guisada 100g                | 252 | 22  | 0   | 18
+Higado de res 100g                        | 175 | 27  | 4   | 5
+Pollo en salsa verde 100g                 | 180 | 22  | 5   | 7
+Pollo en mole rojo 100g                   | 235 | 20  | 8   | 13
+
+== PROTEINAS LACTEAS ==
+Leche entera 1 vaso 240ml                 | 149 | 8   | 12  | 8
+Leche descremada 1 vaso 240ml             | 83  | 8   | 12  | 0
+Leche deslactosada entera 1 vaso          | 149 | 8   | 12  | 8
+Leche de almendras sin azucar 1 vaso      | 30  | 1   | 1   | 3
+Leche de soya sin azucar 1 vaso           | 80  | 7   | 4   | 4
+Yogur griego natural 0% 170g              | 100 | 17  | 6   | 0
+Yogur griego natural entero 170g          | 150 | 15  | 6   | 7
+Yogur natural endulzado 150g              | 140 | 6   | 22  | 3
+Yogur de sabores 150g                     | 150 | 5   | 25  | 3
+Queso cottage 100g                        | 98  | 11  | 3   | 4
+Queso panela 100g                         | 263 | 19  | 3   | 19
+Queso fresco 100g                         | 264 | 17  | 2   | 21
+Queso oaxaca 100g                         | 357 | 26  | 2   | 27
+Queso manchego 100g                       | 375 | 25  | 1   | 30
+Queso amarillo rebanada 1 pieza           | 80  | 4   | 1   | 6
+Queso crema 30g                           | 99  | 2   | 1   | 10
+Requesón 100g                             | 136 | 12  | 5   | 7
+Crema agria 2 cucharadas                  | 61  | 1   | 1   | 6
+Mantequilla 1 cucharadita 5g              | 34  | 0   | 0   | 4
+Proteina whey en polvo 1 scoop 30g        | 120 | 24  | 3   | 2
+Proteina caseina en polvo 1 scoop 30g     | 110 | 22  | 4   | 1
+Proteina de soya en polvo 1 scoop 30g     | 100 | 20  | 4   | 2
+
+== LEGUMINOSAS ==
+Frijoles negros cocidos 1 taza            | 227 | 15  | 41  | 1
+Frijoles pintos cocidos 1 taza            | 245 | 15  | 45  | 1
+Frijoles refritos con manteca 1 taza      | 334 | 13  | 46  | 12
+Frijoles refritos sin grasa 1 taza        | 240 | 13  | 44  | 2
+Lentejas cocidas 1 taza                   | 230 | 18  | 40  | 1
+Garbanzos cocidos 1 taza                  | 269 | 15  | 45  | 4
+Habas cocidas 1 taza                      | 187 | 13  | 33  | 1
+Soya texturizada seca 100g                | 327 | 52  | 26  | 1
+Edamame cocido 1 taza                     | 188 | 17  | 14  | 8
+Chicharo cocido 1 taza                    | 134 | 9   | 25  | 0
+Jicama cruda 1 taza                       | 46  | 1   | 11  | 0
+Tofu firme 100g                           | 76  | 8   | 2   | 4
+
+== CARBOHIDRATOS — GRANOS Y CEREALES ==
+Arroz blanco cocido 1 taza                | 206 | 4   | 45  | 0
+Arroz integral cocido 1 taza              | 216 | 5   | 45  | 2
+Arroz con leche casero 1 taza             | 320 | 7   | 58  | 8
+Pasta cocida sin salsa 1 taza             | 220 | 8   | 43  | 1
+Pasta con salsa de tomate 1 taza          | 290 | 10  | 52  | 5
+Avena cruda 1/2 taza                      | 150 | 5   | 27  | 3
+Avena cocida en agua 1 taza               | 158 | 6   | 28  | 3
+Avena con leche entera 1 taza             | 280 | 11  | 38  | 9
+Pan blanco de caja 1 rebanada             | 79  | 3   | 15  | 1
+Pan integral de caja 1 rebanada           | 69  | 3   | 12  | 1
+Pan de dulce concha grande                | 310 | 6   | 52  | 9
+Pan de dulce cuernito                     | 280 | 5   | 44  | 10
+Pan de dulce polvoron                     | 160 | 2   | 20  | 8
+Pan para hamburguesa 1 pieza              | 120 | 4   | 22  | 2
+Pan para hotdog 1 pieza                   | 110 | 4   | 20  | 2
+Tortilla de maiz 1 pieza                  | 52  | 1   | 11  | 1
+Tortilla de harina chica 1 pieza          | 95  | 3   | 16  | 2
+Tortilla de harina grande 1 pieza         | 146 | 4   | 25  | 3
+Tostada horneada 1 pieza                  | 60  | 1   | 12  | 1
+Tostada frita 1 pieza                     | 80  | 1   | 11  | 4
+Totopo 10 piezas                          | 130 | 2   | 18  | 6
+Galleta salada 5 piezas                   | 65  | 1   | 11  | 2
+Galleta maria 5 piezas                    | 100 | 2   | 17  | 3
+Galleta de avena 3 piezas                 | 160 | 3   | 24  | 6
+Cereal corn flakes 1 taza                 | 100 | 2   | 24  | 0
+Cereal granola 1/2 taza                   | 300 | 8   | 44  | 11
+Cereal avena tostada 1 taza               | 110 | 3   | 22  | 2
+Tamale de elote 1 pieza                   | 220 | 4   | 36  | 7
+Tamale de rajas 1 pieza                   | 280 | 6   | 38  | 11
+Tamale de pollo 1 pieza                   | 310 | 14  | 36  | 12
+Quesadilla tortilla maiz con queso        | 280 | 12  | 26  | 14
+Sope sin guarnicion 1 pieza               | 130 | 3   | 22  | 4
+Tlayuda sin guarnicion 1 pieza            | 200 | 5   | 38  | 4
+Elote cocido 1 pieza                      | 100 | 3   | 22  | 1
+Elote en vaso con mayonesa y queso        | 350 | 7   | 40  | 18
+Esquite 1 vaso mediano                    | 300 | 6   | 42  | 13
+Pozole rojo con guarnicion 1 plato        | 450 | 28  | 52  | 12
+Menudo 1 plato mediano                    | 300 | 24  | 20  | 13
+
+== CARBOHIDRATOS — TUBERCULOS Y RAICES ==
+Papa cocida mediana                       | 130 | 3   | 30  | 0
+Papa al horno mediana                     | 161 | 4   | 37  | 0
+Papa frita en casa 100g                   | 312 | 3   | 41  | 15
+Papa a la francesa restaurante 100g       | 365 | 4   | 48  | 17
+Camote cocido 1 taza                      | 180 | 4   | 41  | 0
+Camote al horno 1 taza                    | 180 | 4   | 41  | 0
+Yuca cocida 100g                          | 160 | 1   | 38  | 0
+Platano macho frito 2 rebanadas           | 180 | 1   | 32  | 6
+Platano macho hervido 100g                | 116 | 1   | 28  | 0
+
+== FRUTAS ==
+Manzana mediana                           | 95  | 0   | 25  | 0
+Pera mediana                              | 101 | 1   | 27  | 0
+Platano mediano                           | 105 | 1   | 27  | 0
+Platano pequeño                           | 80  | 1   | 21  | 0
+Naranja mediana                           | 62  | 1   | 15  | 0
+Mandarina mediana                         | 47  | 1   | 12  | 0
+Toronja mitad                             | 52  | 1   | 13  | 0
+Limon 1 pieza                             | 11  | 0   | 3   | 0
+Lima 1 pieza                              | 20  | 0   | 7   | 0
+Fresa 1 taza                              | 49  | 1   | 12  | 0
+Sandia 1 taza en cubos                    | 46  | 1   | 11  | 0
+Melon cantaloupe 1 taza                   | 60  | 1   | 14  | 0
+Mango manila mediano                      | 107 | 1   | 28  | 0
+Mango petacon mediano                     | 135 | 1   | 35  | 1
+Papaya 1 taza en cubos                    | 55  | 1   | 14  | 0
+Piña 1 taza en cubos                      | 83  | 1   | 22  | 0
+Kiwi 1 pieza mediana                      | 42  | 1   | 10  | 0
+Uva 1 taza                                | 104 | 1   | 27  | 0
+Durazno mediano                           | 58  | 1   | 14  | 0
+Ciruela mediana                           | 30  | 0   | 8   | 0
+Chabacano mediano                         | 17  | 0   | 4   | 0
+Guayaba mediana                           | 37  | 1   | 8   | 0
+Tejocote 3 piezas                         | 45  | 0   | 11  | 0
+Tamarindo natural 50g                     | 115 | 1   | 30  | 0
+Tuna mediana                              | 35  | 1   | 8   | 0
+Higo fresco mediano                       | 37  | 0   | 10  | 0
+Coco fresco 100g                          | 354 | 3   | 15  | 33
+Aguacate mediano entero                   | 240 | 3   | 13  | 22
+Aguacate 1/2 pieza                        | 120 | 1   | 6   | 11
+Aguacate 1/4 de pieza                     | 60  | 1   | 3   | 5
+
+== VERDURAS ==
+Brocoli cocido 1 taza                     | 55  | 4   | 11  | 1
+Coliflor cocida 1 taza                    | 29  | 2   | 5   | 0
+Espinaca cruda 1 taza                     | 7   | 1   | 1   | 0
+Espinaca cocida 1 taza                    | 41  | 5   | 7   | 0
+Kale crudo 1 taza                         | 33  | 3   | 6   | 0
+Acelga cocida 1 taza                      | 35  | 3   | 7   | 0
+Lechuga romana 2 tazas                    | 16  | 1   | 3   | 0
+Lechuga mixta 2 tazas                     | 10  | 1   | 2   | 0
+Jitomate mediano                          | 22  | 1   | 5   | 0
+Jitomate cherry 1 taza                    | 27  | 1   | 6   | 0
+Tomate verde 3 piezas                     | 21  | 1   | 4   | 1
+Pepino mediano                            | 16  | 1   | 4   | 0
+Zanahoria cruda 1 mediana                 | 25  | 1   | 6   | 0
+Zanahoria cocida 1 taza                   | 55  | 1   | 13  | 0
+Chile poblano 1 pieza                     | 48  | 2   | 10  | 1
+Chile serrano 3 piezas                    | 18  | 1   | 4   | 0
+Nopal en tiras cocido 1 taza              | 23  | 2   | 5   | 0
+Calabacita cocida 1 taza                  | 20  | 1   | 4   | 0
+Chayote cocido 1 taza                     | 38  | 1   | 9   | 0
+Betabel cocido 1 taza                     | 75  | 3   | 17  | 0
+Ejotes cocidos 1 taza                     | 44  | 2   | 10  | 0
+Apio 2 ramas                              | 13  | 1   | 3   | 0
+Col blanca cruda 1 taza                   | 22  | 1   | 5   | 0
+Col morada cruda 1 taza                   | 28  | 1   | 7   | 0
+Cebolla picada 1/2 taza                   | 32  | 1   | 7   | 0
+Cebolla morada 1/2 taza                   | 28  | 1   | 7   | 0
+Pimiento verde 1 mediano                  | 24  | 1   | 6   | 0
+Pimiento rojo 1 mediano                   | 31  | 1   | 7   | 0
+Champiñon crudo 1 taza                    | 21  | 3   | 3   | 0
+Champiñon salteado 1 taza                 | 44  | 4   | 4   | 2
+Hongos portobello 1 pieza grande          | 35  | 3   | 5   | 1
+Esparragos 6 tallos                       | 20  | 2   | 4   | 0
+Alcachofa mediana                         | 60  | 4   | 13  | 0
+Verdolagas cocidas 1 taza                 | 21  | 2   | 4   | 0
+Quelites cocidos 1 taza                   | 29  | 3   | 5   | 0
+Huauzontle cocido 1 taza                  | 38  | 4   | 6   | 1
+
+== GRASAS Y ACEITES ==
+Aceite de oliva 1 cucharada               | 119 | 0   | 0   | 14
+Aceite de coco 1 cucharada                | 121 | 0   | 0   | 14
+Aceite vegetal 1 cucharada                | 120 | 0   | 0   | 14
+Mantequilla de mani natural 2 cuchrd      | 190 | 8   | 7   | 16
+Mantequilla de almendra 2 cuchrd          | 196 | 7   | 7   | 17
+Crema de cacahuate industrial 2 cuchrd    | 188 | 8   | 8   | 16
+Almendras 1 onza 28g                      | 164 | 6   | 6   | 14
+Nuez de castilla 1 onza 28g               | 185 | 4   | 4   | 18
+Nuez de la india (caju) 1 onza            | 157 | 5   | 9   | 12
+Cacahuate natural 1 onza                  | 166 | 7   | 6   | 14
+Pistache 1 onza sin cascara               | 157 | 6   | 8   | 13
+Semilla de chia 1 cucharada               | 58  | 2   | 5   | 4
+Semilla de linaza 1 cucharada             | 55  | 2   | 3   | 4
+Semilla de girasol 1 onza                 | 165 | 5   | 6   | 14
+Pepita de calabaza 1 onza                 | 158 | 9   | 4   | 13
+Aceitunas negras 10 piezas                | 50  | 0   | 1   | 5
+Crema de leche para cocinar 2 cuchrd      | 60  | 1   | 1   | 6
+Mayonesa regular 1 cucharada              | 94  | 0   | 0   | 10
+Mayonesa light 1 cucharada                | 49  | 0   | 1   | 5
+
+== BEBIDAS ==
+Agua natural 1 vaso                       | 0   | 0   | 0   | 0
+Agua mineral 1 vaso                       | 0   | 0   | 0   | 0
+Cafe americano negro 1 taza               | 5   | 0   | 1   | 0
+Cafe con leche entera 1 taza              | 75  | 4   | 6   | 4
+Cafe capuchino 1 taza mediana             | 120 | 6   | 10  | 5
+Cafe latte 1 taza grande                  | 190 | 9   | 16  | 8
+Cafe frapuccino cadena 1 vaso grande      | 380 | 6   | 62  | 13
+Te negro sin azucar 1 taza                | 2   | 0   | 0   | 0
+Te verde sin azucar 1 taza                | 2   | 0   | 0   | 0
+Te de manzanilla sin azucar 1 taza        | 2   | 0   | 0   | 0
+Jugo de naranja natural 1 vaso            | 112 | 2   | 26  | 0
+Jugo de manzana natural 1 vaso            | 114 | 0   | 28  | 0
+Agua de jamaica sin azucar 1 vaso         | 10  | 0   | 2   | 0
+Agua de horchata 1 vaso                   | 180 | 2   | 36  | 4
+Agua fresca de sabor 1 vaso               | 150 | 0   | 37  | 0
+Refresco de cola 1 lata 355ml             | 140 | 0   | 39  | 0
+Refresco de lima limon 1 lata             | 140 | 0   | 38  | 0
+Refresco light 1 lata                     | 0   | 0   | 0   | 0
+Bebida energetica clasica 1 lata          | 110 | 1   | 28  | 0
+Bebida energetica sugar free 1 lata       | 15  | 1   | 3   | 0
+Bebida deportiva isotonica 1 botella      | 80  | 0   | 21  | 0
+Leche con chocolate 1 vaso                | 208 | 9   | 30  | 6
+Licuado de platano con leche 1 vaso       | 260 | 9   | 44  | 6
+Jugo verde natural 1 vaso 300ml           | 95  | 3   | 20  | 1
+Caldo de res casero 1 taza                | 70  | 8   | 3   | 3
+Caldo de pollo casero 1 taza              | 60  | 7   | 3   | 2
+
+== COMIDA RAPIDA Y PREPARADA ==
+Hamburguesa sencilla sin queso            | 480 | 24  | 44  | 22
+Hamburguesa doble con queso               | 750 | 42  | 46  | 42
+Pizza de queso 1 rebanada mediana         | 285 | 12  | 36  | 10
+Pizza de peperoni 1 rebanada              | 310 | 13  | 36  | 13
+Pizza hawaiana 1 rebanada                 | 270 | 12  | 36  | 9
+Hot dog con salchicha y pan               | 270 | 10  | 25  | 14
+Torta de jamon basica                     | 430 | 20  | 48  | 17
+Torta de milanesa                         | 620 | 32  | 58  | 27
+Torta ahogada                             | 580 | 28  | 60  | 23
+Burrito de pollo mediano                  | 490 | 28  | 52  | 16
+Burrito de carne mediano                  | 540 | 30  | 52  | 20
+Taco de canasta de frijol 1 pieza         | 95  | 3   | 16  | 2
+Taco de canasta de chicharron 1 pieza     | 120 | 4   | 14  | 6
+Taco de pastor 1 pieza                    | 150 | 10  | 14  | 6
+Taco de suadero 1 pieza                   | 170 | 10  | 13  | 8
+Taco de birria 1 pieza                    | 180 | 14  | 13  | 8
+Enchiladas en salsa roja 3 piezas         | 380 | 18  | 38  | 17
+Enchiladas verdes 3 piezas                | 350 | 18  | 36  | 14
+Chilaquiles rojos con crema 1 plato       | 480 | 16  | 52  | 22
+Chilaquiles verdes con huevo 1 plato      | 500 | 22  | 50  | 22
+Quesadilla harina con queso               | 380 | 16  | 36  | 18
+Gordita de chicharron prensado            | 310 | 12  | 34  | 14
+Gordita de guisado promedio               | 280 | 12  | 34  | 11
+Mollete con frijoles y queso              | 320 | 14  | 44  | 9
+Sincronizada 2 tortillas jamon queso      | 400 | 20  | 38  | 18
+Flautas de pollo 3 piezas con guarnicion  | 450 | 22  | 46  | 20
+Sopa de tortilla con crema 1 plato        | 310 | 9   | 36  | 14
+Sopa de fideos seca 1 taza                | 240 | 7   | 38  | 7
+Arroz rojo con verduras 1 taza            | 220 | 4   | 44  | 3
+Guisado promedio con salsa 100g           | 250 | 16  | 14  | 14
+
+== SNACKS Y BOTANAS ==
+Papas fritas en bolsa 1 bolsa chica 28g   | 152 | 2   | 15  | 10
+Doritos 1 bolsa chica 28g                 | 140 | 2   | 18  | 7
+Palomitas con mantequilla 1 taza          | 93  | 2   | 10  | 5
+Palomitas naturales 1 taza                | 55  | 2   | 11  | 1
+Chicharron de cerdo 30g                   | 157 | 17  | 0   | 10
+Jicama con limon y chile 1 taza           | 50  | 1   | 12  | 0
+Pepino con limon y chile 1 taza           | 20  | 1   | 4   | 0
+Fruta mixta con chile 1 taza              | 90  | 1   | 22  | 0
+Elote preparado en vaso                   | 350 | 7   | 52  | 14
+Gelatina de agua 1 taza                   | 70  | 2   | 17  | 0
+Gelatina de leche 1 taza                  | 140 | 5   | 22  | 4
+Paleta de agua 1 pieza                    | 60  | 0   | 15  | 0
+Paleta de leche 1 pieza                   | 100 | 2   | 14  | 4
+Helado de vainilla 1 bola                 | 145 | 3   | 17  | 8
+Nieve de sabor 1 bola                     | 100 | 1   | 24  | 0
+Chocolate de leche 1 cuadro 10g           | 54  | 1   | 6   | 3
+Chocolate oscuro 70% 1 cuadro 10g         | 50  | 1   | 5   | 3
+Gomitas 10 piezas                         | 90  | 2   | 22  | 0
+Cacahuate japones 1/4 taza                | 140 | 6   | 14  | 7
+Pistaches sin cascara 1 onza              | 157 | 6   | 8   | 13
+Mazapan 1 pieza                           | 135 | 4   | 17  | 6
+Obleas con cajeta 1 pieza                 | 90  | 1   | 18  | 2
+Pay de manzana 1 rebanada                 | 410 | 4   | 58  | 19
+
+== SUPLEMENTOS COMUNES ==
+Creatina monohidrato 1 cucharadita 5g     | 0   | 0   | 0   | 0
+Proteina whey 1 scoop 30g con agua        | 120 | 24  | 3   | 2
+Proteina whey 1 scoop 30g con leche desc  | 200 | 32  | 15  | 2
+BCAA en polvo 1 scoop 10g                 | 10  | 2   | 0   | 0
+Beta-alanina polvo 1 scoop 3g             | 10  | 2   | 0   | 0
+Pre-entreno promedio 1 scoop              | 25  | 1   | 5   | 0
+Colageno hidrolizado 1 scoop 10g          | 35  | 9   | 0   | 0
+Magnesio glicinato 1 capsula              | 0   | 0   | 0   | 0
+Vitamina D3 1 capsula                     | 0   | 0   | 0   | 0
+Zinc picolinato 1 capsula                 | 0   | 0   | 0   | 0
+Omega-3 1 capsula                         | 10  | 0   | 0   | 1
+
+================================================================
+FIN BLOQUE 2 — ACTUALIZADO CON MACROS
+================================================================
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+================================================================
+BLOQUE 3 — PROMPTS OPTIMIZADOS AX-CORE v2
+Listos para copiar y pegar directo a tu implementacion
+================================================================
+
+REGLAS GENERALES PARA TODOS LOS PROMPTS
+----------------------------------------
+- Sin asteriscos en las respuestas
+- Sin markdown (negritas, listas con guiones, etc.)
+- Oraciones cortas, datos primero
+- Tono: comando analitico, no amigable
+- Nunca iniciar respuesta con "Claro que si" ni similares
+
+
+----------------------------------------------------------------
+PROMPT 1 — SISTEMA DEL CHAT (se inyecta en cada mensaje)
+----------------------------------------------------------------
+Modelo recomendado: Gemini 2.0 Flash
+Frecuencia: cada vez que el usuario envia un mensaje
+Objetivo: darle contexto completo del atleta a la IA
+
+---INICIO DEL PROMPT---
+AX-CORE: sistema biologico ARTHUR.
+Atleta: [PESO]kg / [ALTURA]m.
+HOY: [CALORIAS_HOY] de [LIMITE] kcal consumidas. Ejercicio: [QUEMADAS] kcal. Deficit acumulado: [DEFICIT_TOTAL] kcal.
+Dieta asignada: Desayuno=[DESAYUNO] Almuerzo=[ALMUERZO] Cena=[CENA] Snacks=[SNACKS].
+Alimentos registrados hoy: [LISTA_COMIDAS].
+Dominios: nutricion de precision, metabolomica, endocrinologia, neurociencia del rendimiento, regeneracion celular, cronobiologia, microbioma deportivo.
+Responde sin asteriscos ni markdown. Usa los datos del atleta de forma proactiva. Si la pregunta lo requiere, busca en internet. Maximo 6 oraciones en chat normal, 10 en analisis.
+---FIN DEL PROMPT---
+
+Tokens aproximados: 165 (vs 280 del prompt original = 41% menos costo)
+
+
+----------------------------------------------------------------
+PROMPT 2A — ESCANER DE DIETA: ORGANIZADOR JSON
+----------------------------------------------------------------
+Modelo recomendado: Gemini 2.0 Flash
+Frecuencia: 1 o 2 veces al mes por usuario
+Objetivo: convertir texto libre del nutriologo a JSON estructurado
+
+---INICIO DEL PROMPT---
+JSON puro. Claves exactas: breakfast, lunch, dinner, snacks. Vacio ("") si no existe. Sin markdown, sin texto extra.
+Texto a analizar: [TEXTO_PEGADO]
+---FIN DEL PROMPT---
+
+Respuesta esperada:
+{"breakfast":"...","lunch":"...","dinner":"...","snacks":"..."}
+
+
+----------------------------------------------------------------
+PROMPT 2B — ESCANER DE DIETA: GENERADOR DE REGLAS DE ORO
+----------------------------------------------------------------
+Modelo recomendado: Gemini 2.0 Flash
+Frecuencia: inmediatamente despues del Prompt 2A
+Objetivo: crear leyes personalizadas basadas en esa dieta especifica
+
+---INICIO DEL PROMPT---
+Analiza la dieta. Genera 5 a 8 reglas estructurales para maximizar resultados. Concretas, sin relleno. Sin texto extra.
+Responde solo: {"rules":["regla 1","regla 2",...]}
+Dieta: [DIETA_JSON]
+---FIN DEL PROMPT---
+
+Respuesta esperada:
+{"rules":["Consumir proteina dentro de los 40 min post-entreno","No saltarse el desayuno si el entreno es matutino",...]}
+
+
+----------------------------------------------------------------
+PROMPT 3 — LOG DE CALORIAS (numero entero)
+----------------------------------------------------------------
+Modelo recomendado: Groq + Llama 3.3 70B
+Frecuencia: 3 a 5 veces al dia por usuario (el mas caro si no se optimiza)
+Objetivo: devolver solo el numero de calorias del alimento descrito
+
+IMPORTANTE: Antes de llamar a este prompt, buscar primero en
+el array local de 800 alimentos. Solo llamar a la IA si no
+hay coincidencia en el array.
+
+---INICIO DEL PROMPT---
+Calorias exactas de: "[TEXTO_DEL_USUARIO]". Solo el numero entero. Sin texto adicional.
+---FIN DEL PROMPT---
+
+Respuesta esperada: 560
+(El codigo recibe ese numero y lo suma a las calorias del dia)
+
+
+----------------------------------------------------------------
+PROMPT 4 — DETECTOR DE SOBREENTRENAMIENTO (nuevo)
+----------------------------------------------------------------
+Modelo recomendado: Gemini 2.0 Flash
+Frecuencia: una vez al dia, proceso automatico en la madrugada
+Objetivo: detectar patron de sobreentrenamiento antes de que el
+atleta lo perciba. Funciona con los datos de los ultimos 7 dias.
+
+---INICIO DEL PROMPT---
+Datos de los ultimos 7 dias del atleta. Determina riesgo de sobreentrenamiento.
+Deficit diario (kcal): [ARR_DEFICIT]
+Calorias quemadas (kcal): [ARR_QUEMADAS]
+Horas de sueno: [ARR_SUENO]
+Responde solo: {"riesgo":"bajo|medio|alto","alerta":"mensaje max 10 palabras","accion":"recomendacion especifica max 15 palabras"}
+---FIN DEL PROMPT---
+
+Respuesta esperada:
+{"riesgo":"alto","alerta":"Patron de fatiga critica detectado","accion":"Reducir volumen 40% y dormir minimo 8h esta semana"}
+
+
+----------------------------------------------------------------
+PROMPT 5 — VENTANA ANABOLICA (nuevo)
+----------------------------------------------------------------
+Modelo recomendado: Gemini 2.0 Flash
+Frecuencia: solo cuando se registra actividad fisica
+Objetivo: decirle al atleta exactamente que comer en los proximos
+45 minutos para maximizar la recuperacion y sintesis muscular
+(sintesis muscular = proceso de construir musculo despues de entrenar)
+
+---INICIO DEL PROMPT---
+Atleta termino de entrenar hace [MINUTOS] minutos. Dieta asignada: [DIETA_JSON]. Genera instruccion de 2 lineas maximas sobre que comer ahora para maximizar sintesis proteica. Tono: orden directa. Sin asteriscos.
+---FIN DEL PROMPT---
+
+Respuesta esperada:
+"Consume 40g de proteina en los proximos 30 minutos. Tu opcion de dieta: pechuga de pollo con arroz blanco, ahora."
+
+
+----------------------------------------------------------------
+PROMPT 6 — ANALISIS CIRCADIANO SEMANAL (nuevo)
+----------------------------------------------------------------
+Modelo recomendado: Gemini 2.0 Flash
+Frecuencia: una vez a la semana (domingo automatico)
+Objetivo: recomendar la hora pico de entrenamiento de la semana
+siguiente basado en el patron real del atleta
+
+---INICIO DEL PROMPT---
+Horarios de entrenamientos registrados esta semana (formato HH:MM): [LISTA_TIMESTAMPS]. Determina hora optima de entrenamiento para la proxima semana segun cronobiologia. Responde solo: {"hora_pico":"HH:MM","razon":"una oracion","consejo_sueno":"una oracion"}
+---FIN DEL PROMPT---
+
+Respuesta esperada:
+{"hora_pico":"18:30","razon":"Tu rendimiento neuromuscular alcanza su pico entre 17 y 19 horas segun tu patron","consejo_sueno":"Duerme a las 22:30 para maximizar la hormona de crecimiento nocturna"}
+
+
+----------------------------------------------------------------
+PROMPT 7 — PROTOCOLO DE AYUNO / AUTOFAGIA (nuevo)
+----------------------------------------------------------------
+Modelo recomendado: Gemini 2.0 Flash
+Frecuencia: cuando el atleta lleva mas de 14h sin registrar comida
+Objetivo: determinar la fase metabolica actual y si debe
+continuar o romper el ayuno segun su objetivo
+(autofagia = cuando el cuerpo recicla celulas danadas, se activa
+con el ayuno prolongado)
+
+---INICIO DEL PROMPT---
+Horas sin ingesta registrada: [HORAS]h. Deficit acumulado total: [DEFICIT] kcal. Objetivo del atleta: [OBJETIVO]. Determina fase metabolica y si conviene continuar o romper el ayuno. Responde solo: {"fase":"glucogenolisis|cetosis inicial|autofagia activa","accion":"continuar|romper","razon":"una oracion"}
+---FIN DEL PROMPT---
+
+Respuesta esperada:
+{"fase":"cetosis inicial","accion":"continuar","razon":"Con tu deficit actual, 2 horas mas de ayuno potencian la quema de grasa sin riesgo muscular"}
+
+
+================================================================
+NOTAS FINALES DE IMPLEMENTACION
+================================================================
+
+ORDEN DE IMPLEMENTACION (por impacto financiero):
+1. Implementar array de 800 alimentos -> bloquea 70% de llamadas IA en Log
+2. Cambiar Log de Calorias a Groq + Llama 3.3
+3. Sustituir Prompt 1 por version optimizada
+4. Migrar Chat y Dieta a Gemini 2.0 Flash
+5. Agregar campo "horas de sueno" al perfil del atleta
+6. Activar Prompts 4 y 5 (Sobreentrenamiento y Ventana Anabolica)
+7. Activar Prompts 6 y 7 en fases siguientes
+
+LOGICA DEL ARRAY LOCAL (para el Log de Calorias):
+- Recibir texto del usuario
+- Limpiar texto: minusculas, quitar tildes, quitar "de", "con", "a la"
+- Buscar coincidencia parcial en el array (si "pollo" aparece -> match)
+- Si hay match: usar calorias del array. No llamar a la IA.
+- Si no hay match: llamar al Prompt 3 con Groq.
+- Umbral sugerido: si el texto tiene mas de 3 palabras sin match,
+  ir directo a IA (es un platillo combinado o regional).
+
+================================================================
+FIN BLOQUE 3
+================================================================
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
