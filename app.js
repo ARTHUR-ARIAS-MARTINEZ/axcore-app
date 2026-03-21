@@ -530,6 +530,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <p style="font-size:0.8rem; color:var(--text-dim); margin-bottom:1rem;">Pega aquí el plan que te dio tu nutriólogo. AX-CORE lo procesará y acomodará en las casillas correspondientes.</p>
                     <textarea id="diet-raw-text" placeholder="Ej: Lunes: Desayuno 2 huevos con jamón, comida pechuga asada, cena ensalada, snacks cacahuates..." style="width:100%; min-height:80px; background:var(--glass-bg, rgba(0,0,0,0.2)); color:var(--text-primary); border:1px dashed var(--accent-main); border-radius:8px; padding:0.8rem; margin-bottom:1rem;"></textarea>
                     <button class="btn-premium" id="btn-parse-diet" style="width:100%;">⚙️ PROCESAR CON IA</button>
+                    <button class="btn-premium" id="btn-reset-diet" style="width:100%; margin-top:10px; background:transparent; border:1px solid var(--accent-alert); color:var(--accent-alert);">🗑️ REINICIAR DIETA Y REGLAS</button>
                 </div>
 
                 <!-- DIETA RECOMENDADA: SOLO LECTURA -->
@@ -588,8 +589,8 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.textContent = "⚙️ PROCESANDO DIETA Y REGLAS...";
             btn.disabled = true;
             
-            // PASO 1: Extraer comidas organizadas
-            const promptComidas = `Extrae u organiza el siguiente texto en las comidas requeridas. Responde estrictamente con un JSON válido, sin Markdown, con las claves exactas: "breakfast", "lunch", "dinner", "snacks". Si alguna no existe, déjala vacía. Texto a analizar: "${raw}"`;
+            // PASO 1: Extraer comidas organizadas e integrarlas con el contexto histórico
+            const promptComidas = `Eres AX-CORE. Esta es la dieta actual del atleta: Desayuno: ${userData.recommendedDiet.breakfast}. Comida: ${userData.recommendedDiet.lunch}. Cena: ${userData.recommendedDiet.dinner}. Snacks: ${userData.recommendedDiet.snacks}. Integra e incorpora de manera inteligente el siguiente nuevo texto/alimentos a la dieta actual: "${raw}". No borres lo anterior, combínalo. Responde SOLO en JSON válido con claves: "breakfast", "lunch", "dinner", "snacks". Usa textos extremadamente cortos y concretos.`;
             
             try {
                 const res = await callPerplexity(promptComidas, 'json');
@@ -605,8 +606,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 btn.textContent = "⚙️ GENERANDO REGLAS PERSONALIZADAS...";
                 
-                // PASO 2: Generar reglas estructurales basadas en la dieta del nutriólogo
-                const promptReglas = `Basándote en esta dieta de un nutriólogo, genera entre 5 y 8 REGLAS ESTRUCTURALES concisas y claras que el usuario debe seguir para maximizar los resultados de esta dieta específica. Las reglas deben ser prácticas, directas y adaptadas a los alimentos mencionados. Responde SOLO con un JSON válido con la clave "rules" que sea un array de strings. Dieta: Desayuno: ${userData.recommendedDiet.breakfast}. Comida: ${userData.recommendedDiet.lunch}. Cena: ${userData.recommendedDiet.dinner}. Snacks: ${userData.recommendedDiet.snacks}.`;
+                // PASO 2: Generar reglas estructurales ultra cortas basadas en la nueva dieta completa
+                const promptReglas = `Genera de 5 a 8 reglas basadas en la dieta actual. Deben ser EXTREMADAMENTE directas, cortas y al grano, sin explicaciones ni rollo motivacional. Máximo 10 palabras por regla. Responde SOLO un JSON: {"rules":["regla 1", ...]}. Dieta actual: Desayuno: ${userData.recommendedDiet.breakfast}. Comida: ${userData.recommendedDiet.lunch}. Snacks: ${userData.recommendedDiet.snacks}.`;
                 
                 try {
                     const resReglas = await callPerplexity(promptReglas, 'json');
@@ -631,6 +632,18 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.disabled = false;
         };
 
+        const btnResetDiet = document.getElementById('btn-reset-diet');
+        if (btnResetDiet) {
+            btnResetDiet.onclick = () => {
+                if (confirm("¿Estás seguro de borrar toda la dieta actual y sus reglas para empezar desde cero?")) {
+                    userData.recommendedDiet = { breakfast: '', lunch: '', dinner: '', snacks: '' };
+                    userData.customDietRules = [];
+                    saveData();
+                    renderDietPage();
+                }
+            };
+        }
+
         document.getElementById('btn-add-food').onclick = async () => {
             const desc = document.getElementById('food-desc').value.trim();
             if (!desc) return;
@@ -642,11 +655,33 @@ document.addEventListener('DOMContentLoaded', () => {
             const calUsed = userData.caloriesConsumedToday;
             const calLimit = userData.dailyCalLimit;
 
-            // Prompt mejorado para obtener calorías reales del internet
-            const prompt = `Busca en fuentes actuales de nutrición y bases de datos como USDA, Cronometer o FatSecret las calorías exactas de: "${desc}". Dame SOLAMENTE un número entero con las calorías. Si hay rango, usa el promedio. No des texto adicional, solo el número.`;
-            
+            const ldesc = desc.toLowerCase().trim();
             let estimatedCal = 200;
-            if (userData.apiKey) {
+            let dbMatch = null;
+            let longestMatchLen = 0;
+
+            // 70% OFFLINE DATA INTERCEPTER
+            if (typeof FOOD_DATABASE !== 'undefined') {
+                for (const food of FOOD_DATABASE) {
+                    if (ldesc.includes(food.name) || food.name.includes(ldesc)) {
+                        if (food.name.length > longestMatchLen) {
+                            longestMatchLen = food.name.length;
+                            dbMatch = food;
+                        }
+                    }
+                }
+            }
+
+            if (dbMatch) {
+                console.log(`[LOCAL DB HIT] Bypass IA: ${dbMatch.name} = ${dbMatch.cal} kcal`);
+                estimatedCal = dbMatch.cal;
+                
+                // Efecto visual rápido ya que no hay latencia IA
+                btn.textContent = "¡Añadido al instante!";
+                setTimeout(() => { btn.textContent = "+ AÑADIR (IA)"; btn.disabled = false; }, 1000);
+            } else if (userData.apiKey) {
+                // 30% IA TAREAS COMPLEJAS
+                const prompt = `Calorías exactas de: "${desc}". Responde SOLAMENTE con un número entero. Cero texto adicional.`;
                 try {
                     const res = await callPerplexity(prompt, 'number');
                     const parsed = parseInt(res.replace(/[^0-9]/g, ""));
@@ -1228,20 +1263,11 @@ document.addEventListener('DOMContentLoaded', () => {
             `DIETA RECOMENDADA: Desayuno: ${userData.recommendedDiet.breakfast}, Comida: ${userData.recommendedDiet.lunch}, Cena: ${userData.recommendedDiet.dinner}, Snacks: ${userData.recommendedDiet.snacks}.` : '';
 
         const sysPrompt = 
-            mode === 'json' ? `Eres un asistente de datos JSON. Analiza el texto y devuelve ÚNICAMENTE un JSON válido sin markdown ni explicaciones extras.` :
-            mode === 'number' ? `Eres un contador de calorías experto. Analiza el alimento y responde ÚNICAMENTE con el número entero de calorías promedio. No escribas nada más.` :
-            `Eres AX-CORE, el sistema de optimización humana diseñado por ARTHUR para un usuario de ${userData.weight}kg y ${userData.height}m. 
-            ESTADO ACTUAL DE HOY: Ingesta: ${userData.caloriesConsumedToday} cal de un límite de ${userData.dailyCalLimit}. Gasto ejercicio: ${userData.caloriesBurnedToday} cal. Déficit histórico: ${userData.totalNetDeficit} cal.
-            ${dietContext}
-            ALIMENTOS REGISTRADOS HOY: ${foodStr}.
-            ESPECIALIDADES: Nutrición avanzada, Biología metabólica, Psicología del éxito, Regeneración celular y Entrenamiento de élite.
-            REGLAS CRÍTICAS: 
-            1. No uses NUNCA asteriscos ni símbolos de formato. 
-            2. No uses NUNCA listas numeradas (1, 2, 3), usa puntos tipo bullet. 
-            3. Habla de forma natural, fluida y directa, como un experto hablando a un socio ejecutivo. 
-            4. Realiza búsquedas en tiempo real en las especialidades citadas para dar consejos de vanguardia 2026.
-            5. Considera y menciona proactivamente el ESTADO ACTUAL y ALIMENTOS DE HOY si la pregunta se relaciona con síntomas, hambre o energía. Por ejemplo "Tuviste un pico de insulina porque hace 2 horas comiste X".
-            6. Sé conciso y potente. Evita saludos largos.`;
+            mode === 'json' ? `Eres un asistente JSON. Devuelve ÚNICAMENTE un JSON válido sin texto extra.` :
+            mode === 'number' ? `Contador de calorías. Responde ÚNICAMENTE con el número entero. Cero texto.` :
+            `Eres AX-CORE, IA táctica. Usuario: ${userData.weight}kg ${userData.height}m. Hoy: ${userData.caloriesConsumedToday}/${userData.dailyCalLimit}cal. Gasto: ${userData.caloriesBurnedToday}cal. Déficit neto histórico: ${userData.totalNetDeficit}cal.
+             ${dietContext} Alimentos hoy: ${foodStr}.
+             Reglas: 1. NO uses asteriscos jamás. 2. NO numeres listas, usa bullets cortos. 3. Sé extremadamente directo, frío, analítico, cero adornos ni motivación vacía. 4. Exige acciones tomando en cuenta las métricas del usuario que acabo de pasarte.`;
 
         // Validar que el pase del atleta siga activo antes de consumir IA
         if (userData.gymCode && userData.gymCode !== "GYM-MASTER" && userData.gymCode !== "AXV-DEMO") {
