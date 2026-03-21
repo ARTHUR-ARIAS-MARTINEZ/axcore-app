@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
             adminData = JSON.parse(saved);
         }
         
-        // Sincronizar desde MongoDB
+        // Sincronizar desde el servidor en la nube
         try {
             const res = await fetch(`${API_URL}/api/admin/gyms`);
             const data = await res.json();

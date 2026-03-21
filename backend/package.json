@@ -1,15 +1,17 @@
 {
   "name": "ax-core-backend",
-  "version": "1.0.0",
-  "description": "Backend System for Coach Terminal",
+  "version": "2.0.0",
+  "description": "Backend AX-CORE - Base de datos en nube npoint.io",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
-    "dotenv": "^17.3.1",
     "express": "^4.18.2",
-    "mongoose": "^9.3.1"
+    "node-fetch": "^2.7.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }
