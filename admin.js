@@ -322,6 +322,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderGyms() {
+        // Auto-asignar gyms viejos sin bloque al primer bloque disponible
+        let needsSave = false;
+        adminData.gyms.forEach(g => {
+            if (!g.blockId && adminData.blocks.length > 0) {
+                g.blockId = adminData.blocks[0].id;
+                needsSave = true;
+            }
+        });
+        if (needsSave) saveAdminData();
+
         gymsTableBody.innerHTML = adminData.gyms.map(g => {
             const block = adminData.blocks.find(b => b.id === g.blockId);
             const blockName = block ? block.name : "Sin bloque";
@@ -358,7 +368,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }).join('');
 
         if (adminData.gyms.length === 0) {
-            gymsTableBody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:2rem; color:var(--text-dim);">No hay gimnasios. Clic en "+ AGREGAR GIMNASIO" para crear uno.</td></tr>`;
+            gymsTableBody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:2rem; color:var(--text-dim); line-height:1.6;">Aún no tienes Gimnasios vinculados aquí.<br><br>💡 (Tus Bloques ya están guardados, pero aquí solo se ven los Gimnasios asignados a esos bloques).<br><button onclick="document.getElementById('btn-new-gym').click()" class="btn-premium small" style="margin-top:15px; font-size:0.8rem; padding:10px 20px;">+ AGREGAR GIMNASIO</button></td></tr>`;
         }
     }
 
