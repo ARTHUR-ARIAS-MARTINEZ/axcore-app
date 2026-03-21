@@ -280,6 +280,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await res.json();
             
             if (data.success) {
+                // ACTUALIZAR API KEY PARA USUARIOS VIEJOS O RECURRENTES
+                saved.apiKey = data.apiKey || saved.apiKey;
+                localStorage.setItem(`arthur_data_${u}`, JSON.stringify(saved));
+                
                 currentUser = u;
                 localStorage.setItem('arthur_current_user', u);
                 location.reload();
@@ -1230,19 +1234,18 @@ document.addEventListener('DOMContentLoaded', () => {
         // Validar que el pase del atleta siga activo antes de consumir IA
         if (userData.gymCode && userData.gymCode !== "GYM-MASTER" && userData.gymCode !== "AXV-DEMO") {
             try {
-                // userData.password almacena el pase (ej. AX-TRL0E) que el usuario tipeó al inicio
+                // userData.gymCode almacena el pase (ej. AX-TRL0E) asignado por la franquicia
                 const check = await fetch(`${API_URL}/api/validate`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ code: userData.password })
+                    body: JSON.stringify({ code: userData.gymCode })
                 });
                 const checkData = await check.json();
                 if (!checkData.success) {
                     return `⛔ SERVICIO CORTADO.\n\n${checkData.message}`;
                 }
             } catch(e) {
-                // Ignorar en caso de no haber internet temporalmente para validar, 
-                // pero fetch() de abajo hacia Perplexity también fallará si no hay internet real
+                // Ignorar si no hay internet temporalmente para validar
             }
         }
 
