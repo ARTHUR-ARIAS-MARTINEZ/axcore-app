@@ -92,6 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (savedPage === 'diet') renderDietPage();
                     if (savedPage === 'workout') renderWorkoutPage();
                     if (savedPage === 'evolution') renderEvolutionPage('all');
+                    if (savedPage === 'studio') renderStudioPage();
                 }
             }
         } else {
@@ -425,6 +426,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (pageId === 'diet') renderDietPage();
             if (pageId === 'workout') renderWorkoutPage();
             if (pageId === 'evolution') renderEvolutionPage('all');
+            if (pageId === 'studio') renderStudioPage();
 
             // Mostrar mini-cronómetro cuando NO estamos en workout y está corriendo
             const miniContainer = document.getElementById('sw-mini-container');
@@ -951,202 +953,301 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // GENERADOR DE TARJETA ESTILO GIMNASIO ALTA GAMA
-    async function generateAchievementCard() {
-        return new Promise(async (resolve) => {
-            const W = 1080, H = 1350;
-            const canvas = document.createElement('canvas');
-            canvas.width = W;
-            canvas.height = H;
-            const ctx = canvas.getContext('2d');
+    // ============================================================
+    // ESTUDIO DE LOGROS — SECCIÓN INDEPENDIENTE COMPLETA
+    // ============================================================
+    const STUDIO_TEMPLATES = [
+        { id:'militar',   name:'MILITAR',       colors:['#2d3a1a','#1a2410','#4a5c2a','#0d1508'] },
+        { id:'neon',      name:'NEÓN NOCTURNO', colors:['#0a0a1a','#000','#00e5ff','#ff00e5'] },
+        { id:'fuego',     name:'FUEGO',         colors:['#ff6b00','#cc2200','#ff9933','#1a0500'] },
+        { id:'hielo',     name:'HIELO',         colors:['#b3e0ff','#e8f4ff','#0077b3','#003d5c'] },
+        { id:'carbono',   name:'CARBONO',       colors:['#1a1a1a','#0d0d0d','#d4af37','#8a7220'] },
+        { id:'blood',     name:'BLOOD & IRON',  colors:['#5c0a0a','#1a0000','#cc1a1a','#330000'] }
+    ];
+    const STUDIO_FORMATS = [
+        { id:'story', label:'STORY', w:1080, h:1350 },
+        { id:'square', label:'CUADRADO', w:1080, h:1080 },
+        { id:'landscape', label:'PAISAJE', w:1920, h:1080 }
+    ];
+    const STUDIO_METRICS = [
+        { key:'deficit', label:'Déficit Kcal', val:() => (userData.totalNetDeficit||0).toLocaleString('es-MX'), default:true },
+        { key:'weight',  label:'Peso actual',  val:() => (userData.weight||0)+'kg', default:true },
+        { key:'waist',   label:'Cintura',       val:() => (userData.waist||0)+'cm', default:true },
+        { key:'bicep',   label:'Bíceps',        val:() => (userData.bicep||0)+'cm', default:false },
+        { key:'chest',   label:'Pecho',         val:() => (userData.chest||0)+'cm', default:false },
+        { key:'leg',     label:'Pierna',        val:() => (userData.leg||0)+'cm', default:false },
+        { key:'hip',     label:'Cadera',        val:() => (userData.hip||0)+'cm', default:false },
+        { key:'back',    label:'Espalda',       val:() => (userData.back||0)+'cm', default:false }
+    ];
 
-            // ─── CARGAR FONDO ÉPICO AI ───
-            const bgOptions = [
-                'assets/bg_gym_carbon_1774072142046.png',
-                'assets/bg_gym_dumbbells_1774072116018.png',
-                'assets/bg_gym_neon_1774072082081.png'
-            ];
-            const chosenBg = bgOptions[Math.floor(Math.random() * bgOptions.length)];
-            const [bgImg, logoImg] = await Promise.all([
-                loadCanvasImage(chosenBg),
-                loadCanvasImage('logo.png')
-            ]);
+    let studioState = { tpl: 'militar', fmt: 'story', metrics: ['deficit','weight','waist'] };
 
-            if (bgImg) {
-                // Dibujar imagen épica de base (escalada para cubrir)
-                const scale = Math.max(W / bgImg.width, H / bgImg.height);
-                const x = (W / 2) - (bgImg.width / 2) * scale;
-                const y = (H / 2) - (bgImg.height / 2) * scale;
-                ctx.drawImage(bgImg, x, y, bgImg.width * scale, bgImg.height * scale);
-
-                // Overlay oscuro degradado para que resalte la letra brillante de neón
-                const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
-                bgGrad.addColorStop(0, 'rgba(11, 12, 14, 0.3)'); 
-                bgGrad.addColorStop(1, 'rgba(11, 12, 14, 0.95)'); 
-                ctx.fillStyle = bgGrad;
-                ctx.fillRect(0, 0, W, H);
-            } else {
-                // Fallback a gris si por alguna razón falla el celular offline
-                const bgFlat = ctx.createLinearGradient(0, 0, 0, H);
-                bgFlat.addColorStop(0, '#1c1f24'); bgFlat.addColorStop(1, '#0b0c0e');
-                ctx.fillStyle = bgFlat;
-                ctx.fillRect(0, 0, W, H);
+    function drawStudioBg(ctx, W, H, tpl) {
+        const c = tpl.colors;
+        switch(tpl.id) {
+            case 'militar': {
+                const g = ctx.createLinearGradient(0,0,0,H);
+                g.addColorStop(0,c[0]); g.addColorStop(0.5,c[1]); g.addColorStop(1,c[3]);
+                ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+                ctx.strokeStyle='rgba(74,92,42,0.15)'; ctx.lineWidth=2;
+                for(let i=-H;i<W+H;i+=20){ ctx.beginPath(); ctx.moveTo(i,0); ctx.lineTo(i+H,H); ctx.stroke(); }
+                for(let i=-H;i<W+H;i+=20){ ctx.beginPath(); ctx.moveTo(i,H); ctx.lineTo(i+H,0); ctx.stroke(); }
+                break;
             }
-
-            // ─── PANEL CENTRAL DE CRISTAL (GLASSMORPHISM) ───
-            const panelW = W * 0.85;
-            const panelH = H * 0.75;
-            const px = (W - panelW) / 2;
-            const py = (H - panelH) / 2 + 20;
-
-            const accentBase = userData.theme === "original" ? "#d4af37" : (userData.theme === "neon" ? "#00c97a" : "#e8394a");
-
-            ctx.save();
-            ctx.beginPath();
-            if(ctx.roundRect) {
-                ctx.roundRect(px, py, panelW, panelH, 40);
-            } else {
-                ctx.rect(px, py, panelW, panelH); // Fallback
+            case 'neon': {
+                ctx.fillStyle=c[1]; ctx.fillRect(0,0,W,H);
+                const g2 = ctx.createRadialGradient(W/2,H/2,0,W/2,H/2,W*0.7);
+                g2.addColorStop(0,'rgba(0,229,255,0.06)'); g2.addColorStop(1,'transparent');
+                ctx.fillStyle=g2; ctx.fillRect(0,0,W,H);
+                ctx.shadowColor=c[2]; ctx.shadowBlur=30; ctx.strokeStyle=c[2]; ctx.lineWidth=1.5;
+                for(let i=0;i<8;i++){ const y=H*0.1+i*(H*0.1); ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+                ctx.shadowColor=c[3]; ctx.strokeStyle=c[3];
+                for(let i=0;i<6;i++){ const x=W*0.15+i*(W*0.15); ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+                ctx.shadowBlur=0;
+                break;
             }
-            // Fondo oscuro suave para garantizar legibilidad
-            ctx.fillStyle = 'rgba(10, 12, 16, 0.65)'; 
-            ctx.fill();
-            // Borde luminoso sutil
-            ctx.lineWidth = 2;
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)'; 
-            ctx.stroke();
-
-            const cx = W / 2;
-
-            // ─── LOGO INTEGRADO ELEGANTE ───
-            if (logoImg) {
-                const logoSize = 180;
-                ctx.drawImage(logoImg, cx - logoSize/2, py + 40, logoSize, logoSize);
+            case 'fuego': {
+                const gf=ctx.createLinearGradient(0,0,0,H);
+                gf.addColorStop(0,c[2]); gf.addColorStop(0.4,c[0]); gf.addColorStop(0.7,c[1]); gf.addColorStop(1,c[3]);
+                ctx.fillStyle=gf; ctx.fillRect(0,0,W,H);
+                for(let i=0;i<60;i++){
+                    const px=Math.random()*W, py=Math.random()*H;
+                    const r=Math.random()*4+1;
+                    ctx.beginPath(); ctx.arc(px,py,r,0,Math.PI*2);
+                    ctx.fillStyle=`rgba(255,${Math.floor(Math.random()*150+100)},0,${Math.random()*0.4+0.1})`; ctx.fill();
+                }
+                break;
             }
-
-            // ─── TEXTOS DE IMPACTO Y PERSUASIÓN (MARKETING) ───
-            // Título Superior
-            ctx.fillStyle = accentBase;
-            ctx.font = '600 24px Inter, sans-serif';
-            ctx.textAlign = 'center';
-            ctx.letterSpacing = "6px";
-            ctx.shadowColor = accentBase;
-            ctx.shadowBlur = 15;
-            ctx.fillText('RESULTADOS OFICIALES', cx, py + 260);
-            ctx.shadowBlur = 0; // Reset sombra
-
-            const uname = `${(userData.username || 'ATLETA').toUpperCase()}`;
-            ctx.fillStyle = '#ffffff';
-            ctx.font = '800 50px Inter, sans-serif';
-            ctx.letterSpacing = "2px";
-            ctx.fillText(uname, cx, py + 330);
-
-            // Divider Fino
-            ctx.fillStyle = 'rgba(255,255,255,0.1)';
-            ctx.fillRect(px + 60, py + 380, panelW - 120, 2);
-
-            // ─── RENDIMIENTO PRINCIPAL ───
-            const defVal = (userData.totalNetDeficit || 0).toLocaleString('es-MX');
-            
-            ctx.fillStyle = '#ffffff';
-            ctx.font = '900 120px Inter, sans-serif';
-            ctx.shadowColor = 'rgba(255,255,255,0.3)';
-            ctx.shadowBlur = 20;
-            ctx.fillText(defVal, cx, py + 520);
-            ctx.shadowBlur = 0;
-
-            ctx.fillStyle = accentBase;
-            ctx.font = '600 32px Inter, sans-serif';
-            ctx.letterSpacing = "3px";
-            ctx.fillText('KCAL CALCINADAS', cx, py + 570);
-
-            // ─── RENDIMIENTO SECUNDARIO ───
-            const waistVal = userData.waist || 0;
-            ctx.fillStyle = '#a0a5ab'; // Gris plateado legible
-            ctx.font = '500 26px Inter, sans-serif';
-            ctx.letterSpacing = "1px";
-            ctx.fillText('CINTURA ACTUAL', cx, py + 670);
-
-            ctx.fillStyle = '#ffffff';
-            ctx.font = '700 65px Inter, sans-serif';
-            ctx.fillText(`${waistVal} CM`, cx, py + 740);
-
-            // ─── BADGE DE AUTORIDAD (PIE DE PANEL) ───
-            const by = py + panelH - 90;
-            ctx.fillStyle = accentBase;
-            if(ctx.roundRect) {
-                ctx.beginPath(); ctx.roundRect(cx - 200, by, 400, 50, 25); ctx.fill();
-            } else {
-                ctx.fillRect(cx - 200, by, 400, 50);
+            case 'hielo': {
+                const gi=ctx.createLinearGradient(0,0,W,H);
+                gi.addColorStop(0,c[0]); gi.addColorStop(0.5,c[1]); gi.addColorStop(1,c[0]);
+                ctx.fillStyle=gi; ctx.fillRect(0,0,W,H);
+                ctx.strokeStyle='rgba(0,119,179,0.12)'; ctx.lineWidth=1.5;
+                for(let i=0;i<20;i++){
+                    const cx2=Math.random()*W, cy2=Math.random()*H, sz=Math.random()*60+30;
+                    ctx.beginPath(); for(let s=0;s<6;s++){ const a=Math.PI/3*s-Math.PI/2; ctx.lineTo(cx2+Math.cos(a)*sz, cy2+Math.sin(a)*sz); } ctx.closePath(); ctx.stroke();
+                }
+                break;
             }
-            
-            ctx.fillStyle = '#000000';
-            ctx.font = '800 22px Inter, sans-serif';
-            ctx.letterSpacing = "4px";
-            ctx.fillText('SISTEMA AX-CORE', cx, by + 34);
-            ctx.restore();
-
-            // ─── FOOTER ABSOLUTO DE LA IMAGEN ───
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
-            ctx.font = '500 18px Inter, sans-serif';
-            ctx.textAlign = 'center';
-            ctx.letterSpacing = "2px";
-            ctx.fillText('OPTIMIZACIÓN BIOLÓGICA BY ARTHUR', cx, H - 40);
-
-                canvas.toBlob(blob => resolve(blob), 'image/png');
-        });
+            case 'carbono': {
+                ctx.fillStyle=c[1]; ctx.fillRect(0,0,W,H);
+                ctx.strokeStyle='rgba(255,255,255,0.04)'; ctx.lineWidth=1;
+                const step=12;
+                for(let i=-H;i<W+H;i+=step){ ctx.beginPath(); ctx.moveTo(i,0); ctx.lineTo(i-H*0.5,H); ctx.stroke(); }
+                for(let i=-H;i<W+H;i+=step){ ctx.beginPath(); ctx.moveTo(i,0); ctx.lineTo(i+H*0.5,H); ctx.stroke(); }
+                ctx.strokeStyle=c[2]; ctx.lineWidth=2; ctx.shadowColor=c[2]; ctx.shadowBlur=15;
+                ctx.strokeRect(W*0.05,H*0.03,W*0.9,H*0.94);
+                ctx.shadowBlur=0;
+                break;
+            }
+            case 'blood': {
+                const gb=ctx.createRadialGradient(W/2,H*0.3,0,W/2,H/2,W);
+                gb.addColorStop(0,c[2]); gb.addColorStop(0.5,c[0]); gb.addColorStop(1,c[1]);
+                ctx.fillStyle=gb; ctx.fillRect(0,0,W,H);
+                ctx.strokeStyle='rgba(204,26,26,0.1)'; ctx.lineWidth=3;
+                for(let i=0;i<12;i++){
+                    const x1=Math.random()*W, y1=Math.random()*H;
+                    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x1+Math.random()*200-100, y1+Math.random()*200-100); ctx.stroke();
+                }
+                break;
+            }
+        }
     }
 
-    const btnShareAch = document.getElementById('btn-share-achievements');
-    if (btnShareAch) {
-        btnShareAch.onclick = async () => {
-            const originalText = btnShareAch.textContent;
-            btnShareAch.textContent = "⏱️ GENERANDO TARJETA...";
-            btnShareAch.style.opacity = '0.7';
-            btnShareAch.disabled = true;
+    function renderStudioCard(canvas, tplId, fmtId, activeMetrics, isPreview) {
+        const tpl = STUDIO_TEMPLATES.find(t=>t.id===tplId) || STUDIO_TEMPLATES[0];
+        const fmt = STUDIO_FORMATS.find(f=>f.id===fmtId) || STUDIO_FORMATS[0];
+        const W = fmt.w, H = fmt.h;
+        canvas.width = W; canvas.height = H;
+        const ctx = canvas.getContext('2d');
 
-            try {
-                const blob = await generateAchievementCard();
-                
-                btnShareAch.textContent = originalText;
-                btnShareAch.style.opacity = '1';
-                btnShareAch.disabled = false;
+        // 1. Fondo temático
+        drawStudioBg(ctx, W, H, tpl);
 
-                if (!blob) {
-                    alert("No se pudo generar la tarjeta de logros.");
-                    return;
-                }
+        // 2. Overlay oscuro degradado
+        const ov = ctx.createLinearGradient(0,0,0,H);
+        ov.addColorStop(0,'rgba(0,0,0,0.2)'); ov.addColorStop(1,'rgba(0,0,0,0.7)');
+        ctx.fillStyle=ov; ctx.fillRect(0,0,W,H);
 
-                // Intentar usar Navigator Share API para archivos
-                const file = new File([blob], 'axcore_logros.png', { type: 'image/png' });
+        // 3. Panel central glassmorphism
+        const pw=W*0.88, ph=H*0.82, px=(W-pw)/2, py=(H-ph)/2;
+        ctx.save();
+        ctx.beginPath();
+        if(ctx.roundRect) ctx.roundRect(px,py,pw,ph,30); else ctx.rect(px,py,pw,ph);
+        ctx.fillStyle='rgba(10,12,18,0.55)'; ctx.fill();
+        ctx.lineWidth=1.5; ctx.strokeStyle='rgba(255,255,255,0.1)'; ctx.stroke();
 
+        const cx = W/2;
+        const accent = tpl.id==='hielo' ? tpl.colors[2] : (tpl.id==='carbono' ? tpl.colors[2] : tpl.id==='neon' ? tpl.colors[2] : tpl.id==='fuego' ? '#ffcc00' : tpl.id==='blood' ? '#ff3333' : '#8aff7a');
+
+        // 4. Título superior
+        const titleY = py + (fmtId==='landscape' ? 80 : 100);
+        ctx.fillStyle=accent; ctx.font=`600 ${isPreview?14:24}px Inter,sans-serif`;
+        ctx.textAlign='center'; ctx.shadowColor=accent; ctx.shadowBlur=12;
+        ctx.fillText('RESULTADOS VERIFICADOS', cx, titleY);
+        ctx.shadowBlur=0;
+
+        // 5. Nombre grande
+        const nameY = titleY + (isPreview?22:60);
+        ctx.fillStyle='#fff'; ctx.font=`800 ${isPreview?24:52}px Inter,sans-serif`;
+        ctx.fillText((userData.username||'ATLETA').toUpperCase(), cx, nameY);
+
+        // 6. Divider
+        const divY = nameY + (isPreview?14:40);
+        ctx.fillStyle='rgba(255,255,255,0.1)'; ctx.fillRect(px+40, divY, pw-80, 2);
+
+        // 7. Métricas dinámicas
+        const mets = STUDIO_METRICS.filter(m => activeMetrics.includes(m.key));
+        const metStartY = divY + (isPreview?25:60);
+        const metSpacing = fmtId==='landscape' ? (isPreview?45:100) : (isPreview?55:130);
+        const isLandscape = fmtId==='landscape';
+
+        if (isLandscape && mets.length > 1) {
+            // Landscape: distribute horizontally
+            const colW = pw / Math.min(mets.length, 4);
+            mets.forEach((m, i) => {
+                const mx = px + colW/2 + i * colW;
+                ctx.fillStyle='rgba(255,255,255,0.5)'; ctx.font=`500 ${isPreview?9:20}px Inter,sans-serif`;
+                ctx.fillText(m.label.toUpperCase(), mx, metStartY);
+                ctx.fillStyle='#fff'; ctx.font=`800 ${isPreview?18:60}px Inter,sans-serif`;
+                ctx.shadowColor='rgba(255,255,255,0.2)'; ctx.shadowBlur=10;
+                ctx.fillText(m.val(), mx, metStartY + (isPreview?20:55));
+                ctx.shadowBlur=0;
+            });
+        } else {
+            mets.forEach((m, i) => {
+                const my = metStartY + i * metSpacing;
+                ctx.fillStyle='rgba(255,255,255,0.5)'; ctx.font=`500 ${isPreview?9:22}px Inter,sans-serif`;
+                ctx.fillText(m.label.toUpperCase(), cx, my);
+                ctx.fillStyle='#fff'; ctx.font=`800 ${isPreview?22:80}px Inter,sans-serif`;
+                ctx.shadowColor='rgba(255,255,255,0.2)'; ctx.shadowBlur=15;
+                ctx.fillText(m.val(), cx, my + (isPreview?22:65));
+                ctx.shadowBlur=0;
+            });
+        }
+
+        // 8. Badge inferior
+        const badgeY = py + ph - (isPreview?28:70);
+        ctx.fillStyle=accent;
+        if(ctx.roundRect){ ctx.beginPath(); ctx.roundRect(cx-120*(isPreview?0.6:1), badgeY, 240*(isPreview?0.6:1), isPreview?22:45, 20); ctx.fill(); }
+        else { ctx.fillRect(cx-120, badgeY, 240, 45); }
+        ctx.fillStyle='#000'; ctx.font=`800 ${isPreview?9:20}px Inter,sans-serif`;
+        ctx.fillText('SISTEMA AX-CORE', cx, badgeY + (isPreview?15:30));
+        ctx.restore();
+
+        // 9. Footer
+        ctx.fillStyle='rgba(255,255,255,0.35)'; ctx.font=`500 ${isPreview?7:16}px Inter,sans-serif`;
+        ctx.textAlign='center';
+        ctx.fillText('OPTIMIZACIÓN BIOLÓGICA BY ARTHUR', cx, H-(isPreview?10:30));
+    }
+
+    function renderStudioPage() {
+        const el = document.getElementById('page-studio');
+        if (!el) return;
+
+        el.innerHTML = `
+            <div class="glass-card" style="padding:1.5rem; margin-bottom:1.5rem;">
+                <h2 style="color:var(--accent-main); margin-bottom:0.5rem; font-size:1.2rem;">🏆 ESTUDIO DE LOGROS</h2>
+                <p style="font-size:0.75rem; color:var(--text-dim); margin-bottom:1rem;">Personaliza tu tarjeta y compártela en redes.</p>
+
+                <h4 style="color:var(--text-primary); font-size:0.8rem; margin-bottom:8px;">PLANTILLA</h4>
+                <div class="studio-templates" id="studio-tpl-list"></div>
+
+                <h4 style="color:var(--text-primary); font-size:0.8rem; margin:16px 0 8px;">FORMATO</h4>
+                <div class="studio-format-btns" id="studio-fmt-btns"></div>
+
+                <h4 style="color:var(--text-primary); font-size:0.8rem; margin:16px 0 8px;">MÉTRICAS A MOSTRAR</h4>
+                <div class="studio-metrics" id="studio-met-list"></div>
+            </div>
+
+            <div class="glass-card" style="padding:1.5rem; margin-bottom:1.5rem;">
+                <h4 style="color:var(--accent-secondary); font-size:0.85rem; margin-bottom:8px; text-align:center;">PREVIEW</h4>
+                <div class="studio-preview-wrap">
+                    <canvas id="studio-preview-canvas"></canvas>
+                </div>
+            </div>
+
+            <button class="btn-premium" id="btn-studio-share" style="width:100%; padding:16px; font-size:1rem;">📤 COMPARTIR TARJETA HD</button>
+        `;
+
+        // --- Render template thumbnails ---
+        const tplList = document.getElementById('studio-tpl-list');
+        STUDIO_TEMPLATES.forEach(tpl => {
+            const card = document.createElement('div');
+            card.className = 'studio-tpl-card' + (studioState.tpl===tpl.id ? ' selected' : '');
+            const miniCanvas = document.createElement('canvas');
+            miniCanvas.width=100; miniCanvas.height=140;
+            drawStudioBg(miniCanvas.getContext('2d'), 100, 140, tpl);
+            card.appendChild(miniCanvas);
+            const label = document.createElement('span');
+            label.textContent = tpl.name;
+            card.appendChild(label);
+            card.onclick = () => { studioState.tpl = tpl.id; renderStudioPage(); };
+            tplList.appendChild(card);
+        });
+
+        // --- Format buttons ---
+        const fmtBtns = document.getElementById('studio-fmt-btns');
+        STUDIO_FORMATS.forEach(fmt => {
+            const btn = document.createElement('button');
+            btn.textContent = fmt.label;
+            if(studioState.fmt===fmt.id) btn.classList.add('active');
+            btn.onclick = () => { studioState.fmt = fmt.id; renderStudioPage(); };
+            fmtBtns.appendChild(btn);
+        });
+
+        // --- Metric toggles ---
+        const metList = document.getElementById('studio-met-list');
+        STUDIO_METRICS.forEach(m => {
+            const isOn = studioState.metrics.includes(m.key);
+            const tog = document.createElement('div');
+            tog.className = 'studio-metric-toggle' + (isOn ? ' on' : '');
+            tog.innerHTML = `<div class="dot"></div> ${m.label}: <strong>${m.val()}</strong>`;
+            tog.onclick = () => {
+                if (isOn) studioState.metrics = studioState.metrics.filter(k=>k!==m.key);
+                else studioState.metrics.push(m.key);
+                renderStudioPage();
+            };
+            metList.appendChild(tog);
+        });
+
+        // --- Preview ---
+        const previewCanvas = document.getElementById('studio-preview-canvas');
+        renderStudioCard(previewCanvas, studioState.tpl, studioState.fmt, studioState.metrics, false);
+
+        // --- Share button ---
+        document.getElementById('btn-studio-share').onclick = async () => {
+            const btn = document.getElementById('btn-studio-share');
+            btn.textContent = '⏱️ GENERANDO HD...';
+            btn.disabled = true;
+
+            const hdCanvas = document.createElement('canvas');
+            renderStudioCard(hdCanvas, studioState.tpl, studioState.fmt, studioState.metrics, false);
+
+            hdCanvas.toBlob(async (blob) => {
+                btn.textContent = '📤 COMPARTIR TARJETA HD';
+                btn.disabled = false;
+                if (!blob) { alert('Error al generar.'); return; }
+
+                const file = new File([blob], 'AX-CORE_Logros.png', { type: 'image/png' });
                 if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
                     await navigator.share({
                         files: [file],
                         title: 'Mis Logros en AX-CORE',
-                        text: `¡Déficit acumulado de ${userData.totalNetDeficit || 0} kcal con AX-CORE By Arthur! 🔥 Envía un mensaje si también quieres optimizar tu biología.`
-                    });
+                        text: `¡Déficit de ${userData.totalNetDeficit||0} kcal con AX-CORE! 🔥`
+                    }).catch(()=>{});
                 } else {
-                    // Descarga directa si el navegador/dispositivo no soporta compartir imágenes (safari desktop antiguo, etc)
                     const url = URL.createObjectURL(blob);
                     const a = document.createElement('a');
-                    a.href = url;
-                    a.download = 'Mis_Logros_AXCORE.png';
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(url);
-                    alert("Tu celular no soporta envío directo de fotos. ¡La Bio-Tarjeta ha sido descargada en tus fotos para que la subas!");
+                    a.href = url; a.download = 'AX-CORE_Logros.png';
+                    document.body.appendChild(a); a.click();
+                    document.body.removeChild(a); URL.revokeObjectURL(url);
+                    alert('¡Tarjeta descargada! Compártela manualmente.');
                 }
-            } catch(error) {
-                console.error("Error al generar tarjeta:", error);
-                btnShareAch.textContent = originalText;
-                btnShareAch.style.opacity = '1';
-                btnShareAch.disabled = false;
-                alert("Hubo un error al generar la gráfica de logros.");
-            }
+            }, 'image/png');
         };
     }
+
 
     saveSettingsBtn.onclick = () => {
         // Guardar nombre de usuario si se editó
