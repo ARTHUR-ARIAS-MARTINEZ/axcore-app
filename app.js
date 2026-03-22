@@ -996,26 +996,33 @@ document.addEventListener('DOMContentLoaded', () => {
     let isStudioPreloading = false;
     let STUDIO_LOGO_IMG = null;
 
+    let _studioLoadPromise = null;
+
     async function preloadStudioImages() {
-        if(Object.keys(STUDIO_BG_IMAGES).length > 0 || isStudioPreloading) return;
-        isStudioPreloading = true;
+        // Si ya cargaron, retornar inmediatamente
+        if (Object.keys(STUDIO_BG_IMAGES).length > 0 && STUDIO_LOGO_IMG) return;
+        // Si ya hay una carga en progreso, esperar esa misma promesa
+        if (_studioLoadPromise) return _studioLoadPromise;
 
-        await new Promise((r) => {
-            const l = new Image(); l.crossOrigin='anonymous';
-            l.onload = () => { STUDIO_LOGO_IMG = l; r(); };
-            l.onerror = () => { r(); };
-            l.src = 'logo.png';
-        });
-
-        await Promise.all(STUDIO_TEMPLATES.map(tpl => {
-            return new Promise((r) => {
+        _studioLoadPromise = (async () => {
+            // Carga del logo
+            await new Promise((r) => {
+                const l = new Image(); l.crossOrigin = 'anonymous';
+                l.onload = () => { STUDIO_LOGO_IMG = l; r(); };
+                l.onerror = () => { r(); };
+                l.src = 'logo.png';
+            });
+            // Carga paralela de fondos
+            await Promise.all(STUDIO_TEMPLATES.map(tpl => new Promise((r) => {
                 const img = new Image();
                 img.crossOrigin = 'anonymous';
                 img.onload = () => { STUDIO_BG_IMAGES[tpl.id] = img; r(); };
                 img.onerror = () => { r(); };
                 img.src = tpl.bg;
-            });
-        }));
+            })));
+        })();
+
+        return _studioLoadPromise;
     }
 
     function drawStudioBg(ctx, W, H, tpl) {
@@ -1194,13 +1201,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const el = document.getElementById('page-studio');
         if (!el) return;
 
-        // Carga silenciosa paralela (No bloquea la interacción del usuario)
-        if (Object.keys(STUDIO_BG_IMAGES).length === 0 && !isStudioPreloading) {
-            preloadStudioImages().then(() => {
-                // Refrescar canvas una vez que las imágenes base estén listas
-                if (document.getElementById('studio-preview-canvas')) renderStudioPage();
-            });
+        // Esperar a que las imágenes carguen (solo la 1a vez, el resto es instantáneo)
+        if (!isStudioPreloading && Object.keys(STUDIO_BG_IMAGES).length === 0) {
+            // Mostrar esqueleto mientras carga la primera vez
+            el.innerHTML = `<div style="text-align:center; padding:3rem; color:var(--text-dim);">
+                <div style="font-size:2rem; margin-bottom:12px;">🏆</div>
+                <div>Preparando Estudio...</div>
+            </div>`;
         }
+        await preloadStudioImages();
 
         el.innerHTML = `
             <div class="glass-card" style="padding:1.5rem; margin-bottom:1.5rem;">
