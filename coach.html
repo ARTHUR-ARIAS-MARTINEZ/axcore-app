@@ -378,14 +378,15 @@
     <!-- Dashboard -->
     <div id="dashboard" class="dashboard-container">
         
-        <div class="dashboard-header">
+        <div class="dashboard-header" style="flex-wrap: wrap;">
             <div>
                 <h2 style="font-family: 'Oswald'; color:#fff; margin:0;" id="gym-name-display">GIMNASIO...</h2>
                 <p style="margin:5px 0 0 0; color:#aaa; font-size:0.85rem;" id="gym-code-display">CÓDIGO: ---</p>
             </div>
-            <div style="display:flex; gap: 10px; align-items:center;">
+            <div style="display:flex; gap: 10px; align-items:center; flex-wrap: wrap;">
                 <div id="stats-users" class="stats-badge">CARGANDO...</div>
-                <button class="btn-premium" style="margin:0; font-size:0.9rem; padding:0.8rem 1.5rem;" id="btn-new-code">+ GENERAR PASE NUEVO</button>
+                <button class="btn-premium" style="margin:0; font-size:0.85rem; padding:0.7rem 1.2rem;" id="btn-new-code">+ PASE NUEVO</button>
+                <button class="btn-cancel" style="padding: 0.7rem 1rem; color:#ff4757; border-color: rgba(255,71,87,0.3); font-size:0.75rem;" onclick="logout()">CERRAR SESIÓN</button>
             </div>
         </div>
         
@@ -432,9 +433,13 @@
                 gymData = data.gym;
                 gymData.currentUsers = data.currentUsers;
 
+                // Guardar sesión para persistencia
+                localStorage.setItem('coach_vip_gym', gid);
+                localStorage.setItem('coach_vip_pass', psw);
+
                 loginSection.style.display = 'none';
                 dashboard.style.display = 'block';
-                gymContainer.style.justifyContent = 'flex-start'; // Quitamos el centro vertical al entrar
+                gymContainer.style.justifyContent = 'flex-start';
 
                 document.getElementById('gym-name-display').textContent = gymData.name.toUpperCase();
                 document.getElementById('gym-code-display').textContent = `ID SUCURSAL: ${gymData.gymCode}`;
@@ -579,13 +584,30 @@
         });
     };
 
-    // --- Enter Key Support ---
     document.getElementById('gym-id').addEventListener('keypress', function(e) {
         if (e.key === 'Enter') btnLogin.click();
     });
     document.getElementById('gym-pass').addEventListener('keypress', function(e) {
         if (e.key === 'Enter') btnLogin.click();
     });
+
+    // --- Cerrar sesión ---
+    window.logout = () => {
+        localStorage.removeItem('coach_vip_gym');
+        localStorage.removeItem('coach_vip_pass');
+        location.reload();
+    };
+
+    // --- Auto-login si hay sesión guardada ---
+    (function autoLogin() {
+        const storedGym = localStorage.getItem('coach_vip_gym');
+        const storedPass = localStorage.getItem('coach_vip_pass');
+        if (storedGym && storedPass) {
+            document.getElementById('gym-id').value = storedGym;
+            document.getElementById('gym-pass').value = storedPass;
+            btnLogin.click();
+        }
+    })();
 </script>
 
 </body>

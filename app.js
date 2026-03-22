@@ -1099,7 +1099,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.stroke();
 
         // LOGO INDEPENDIENTE (Aislado arriba, más grande)
-        const logoTargetY = py + 70;
+        const logoTargetY = py + 30;
         if (STUDIO_LOGO_IMG) {
             const logoW = 280;
             ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 30;
@@ -1143,7 +1143,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.letterSpacing = '0px'; ctx.shadowBlur = 0;
 
         // NOMBRE DEL ATLETA
-        const nameY = textStartY + 64 * tScale;
+        const nameY = textStartY + 85 * tScale;
         const atletaName = (userData.username||'ATLETA').toUpperCase();
         drawAutoText(atletaName, cx, nameY, 70 * tScale, 900, true);
         drawAutoText(atletaName, cx, nameY, 70 * tScale, 900, false);
@@ -1210,15 +1210,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const el = document.getElementById('page-studio');
         if (!el) return;
 
-        // Esperar a que las imágenes carguen (solo la 1a vez, el resto es instantáneo)
-        if (!isStudioPreloading && Object.keys(STUDIO_BG_IMAGES).length === 0) {
-            // Mostrar esqueleto mientras carga la primera vez
-            el.innerHTML = `<div style="text-align:center; padding:3rem; color:var(--text-dim);">
-                <div style="font-size:2rem; margin-bottom:12px;">🏆</div>
-                <div>Preparando Estudio...</div>
-            </div>`;
-        }
-        await preloadStudioImages();
+        // Cargar imágenes en segundo plano SIN bloquear la interfaz
+        preloadStudioImages();
 
         el.innerHTML = `
             <div class="glass-card" style="padding:1.5rem; margin-bottom:1.5rem;">
