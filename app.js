@@ -1231,17 +1231,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 drawAutoText(m.val(), cx, my + 80*tScale, 80*tScale, 900, false);
             });
         }
-
-        // FOOTER / DISTINTIVO
-        const badgeY = py + ph - 70;
-        ctx.fillStyle = accent;
-        if(ctx.roundRect) { ctx.beginPath(); ctx.roundRect(cx-110, badgeY, 220, 40, 20); ctx.fill(); }
-        else { ctx.fillRect(cx-110, badgeY, 220, 40); }
-        ctx.fillStyle = '#000'; ctx.font = `800 17px Inter,sans-serif`;
-        ctx.fillText('SISTEMA AX-CORE', cx, badgeY + 26);
-        
-        ctx.fillStyle = 'rgba(255,255,255,0.3)'; ctx.font = `500 16px Inter,sans-serif`;
-        ctx.fillText('OPTIMIZACIÓN BIOLÓGICA BY ARTHUR', cx, H-30);
     }
 
     async function renderStudioPage() {
@@ -1328,14 +1317,22 @@ document.addEventListener('DOMContentLoaded', () => {
             const card = document.createElement('div');
             card.className = 'studio-tpl-card' + (studioState.tpl===tpl.id ? ' selected' : '');
             const miniCanvas = document.createElement('canvas');
-            miniCanvas.id = 'studio-mini-' + tpl.id; // Asignar un ID para redibujarlo asincronamente
+            miniCanvas.id = 'studio-mini-' + tpl.id;
             miniCanvas.width=100; miniCanvas.height=140;
             drawStudioBg(miniCanvas.getContext('2d'), 100, 140, tpl);
             card.appendChild(miniCanvas);
             const label = document.createElement('span');
             label.textContent = tpl.name;
             card.appendChild(label);
-            card.onclick = () => { studioState.tpl = tpl.id; renderStudioPage(); };
+            card.onclick = () => {
+                studioState.tpl = tpl.id;
+                // Actualizar selección visual SIN reconstruir todo el DOM (evita reset de scroll)
+                tplList.querySelectorAll('.studio-tpl-card').forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+                // Solo redibujar el canvas de preview
+                const previewCanvas = document.getElementById('studio-preview-canvas');
+                if (previewCanvas) renderStudioCard(previewCanvas, studioState.tpl, studioState.fmt, studioState.metrics, true);
+            };
             tplList.appendChild(card);
         });
 

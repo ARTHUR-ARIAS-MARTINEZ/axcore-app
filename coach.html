@@ -128,7 +128,7 @@
             background: rgba(10,10,18,0.75);
             backdrop-filter: blur(20px);
             padding: 1.5rem 2rem;
-            border-radius: 16px;
+            border-radius: 12px;
             border: 1px solid rgba(212,175,55,0.15);
             flex-wrap: wrap;
             gap: 16px;
@@ -353,6 +353,7 @@
             .dashboard-header { padding: 0.8rem; gap: 8px; }
             .dashboard-header h2 { font-size: 1rem !important; }
             .client-grid { grid-template-columns: 1fr; }
+            .stats-badge { font-size: 0.6rem; padding: 0.3rem 0.6rem; }
             .client-card { padding: 0.9rem; }
             .stats-badge { font-size: 0.7rem; padding: 0.4rem 0.8rem; }
         }
@@ -486,19 +487,19 @@
                 div.className = `client-card ${c.active ? '' : 'paused'}`;
                 
                 div.innerHTML = `
-                    <button class="btn-delete-x" onclick="deleteClient('${c.code}', '${c.user}')">X</button>
+                    <button class="btn-delete-x" style="width:20px; height:20px; font-size:0.65rem; top:10px; right:10px;" onclick="deleteClient('${c.code}', '${c.user}')">X</button>
                     <div>
-                        <h3>${c.user}</h3>
-                        <p>PASE: <span class="code-box">${c.code}</span></p>
-                        <p style="color:${c.active ? '#00ff88' : '#e8394a'}; font-weight:bold; margin-top: 10px;">
-                            ${c.active ? '✅ ACTIVO Y AL CORRIENTE' : '❌ ADEUDO / CORTADO'}
+                        <h3 style="font-size:1rem; margin-bottom:2px;">${c.user}</h3>
+                        <p style="font-size:0.65rem; margin-bottom:2px;">PASE: <span class="code-box" style="font-size:0.75rem; padding:2px 6px;">${c.code}</span></p>
+                        <p style="color:${c.active ? '#00ff88' : '#e8394a'}; font-weight:bold; margin-top: 5px; font-size:0.6rem;">
+                            ${c.active ? '✅ ACTIVO' : '❌ ADEUDO'}
                         </p>
                     </div>
-                    <div style="margin-top: 15px; display:flex; gap:10px;">
-                        <button class="btn-cancel" style="flex:1; padding: 0.6rem; font-size: 0.8rem; background: ${c.active ? 'rgba(232,57,74,0.1)' : 'rgba(0,255,136,0.1)'}; border-color: ${c.active ? '#e8394a' : '#00ff88'}; color: ${c.active ? '#e8394a' : '#00ff88'};" onclick="toggleStatus('${c.code}', ${!c.active})">
-                            ${c.active ? 'CORTAR ACCESO' : 'RESTAURAR ACCESO'}
+                    <div style="margin-top: 8px; display:flex; gap:6px;">
+                        <button class="btn-cancel" style="flex:1; padding: 0.4rem; font-size: 0.6rem; background: ${c.active ? 'rgba(232,57,74,0.1)' : 'rgba(0,255,136,0.1)'}; border-color: ${c.active ? '#e8394a' : '#00ff88'}; color: ${c.active ? '#e8394a' : '#00ff88'};" onclick="toggleStatus('${c.code}', ${!c.active})">
+                            ${c.active ? 'CORTAR' : 'RESTAURAR'}
                         </button>
-                        <button class="btn-premium" style="flex:1; padding: 0.6rem; font-size: 0.8rem;" onclick="shareAthleteCode('${c.user}', '${c.code}')">📱 COMPARTIR</button>
+                        <button class="btn-premium" style="flex:1; padding: 0.4rem; font-size: 0.6rem;" onclick="shareAthleteCode('${c.user}', '${c.code}')">📱 COMPARTIR</button>
                     </div>
                 `;
                 clientList.appendChild(div);
@@ -618,7 +619,7 @@
         }
     })();
 
-    // --- INSTALACI�N PWA ---
+    // --- INSTALACI�N PWA ---
     let deferredPrompt = null;
     const btnInstallCoach = document.getElementById('btn-install-coach');
     window.addEventListener('beforeinstallprompt', (e) => {
