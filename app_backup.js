@@ -355,109 +355,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- DASHBOARD & STATS ---
-    let chartWeight, chartCalories, chartWaist, chartHistory;
-
-    function initOrUpdateCharts(progW, progWaist, calPerc) {
-        if (typeof ApexCharts === 'undefined' || !document.getElementById('chart-weight')) return;
-
-        const commonOptions = {
-            chart: { type: 'radialBar', height: 160, sparkline: { enabled: true } },
-            plotOptions: {
-                radialBar: {
-                    hollow: { size: '60%', background: 'transparent' },
-                    track: { background: 'rgba(255,255,255,0.05)' },
-                    dataLabels: {
-                        name: { show: false },
-                        value: {
-                            show: true,
-                            fontSize: '18px',
-                            fontFamily: 'var(--font-accent)',
-                            fontWeight: 'bold',
-                            color: 'var(--accent-main)',
-                            formatter: function (val) { return Math.round(val) + "%" }
-                        }
-                    }
-                }
-            },
-            stroke: { lineCap: 'round' }
-        };
-
-        // Weight
-        if (!chartWeight) {
-            chartWeight = new ApexCharts(document.querySelector("#chart-weight"), {
-                ...commonOptions, series: [progW], colors: ['#00ff88']
-            });
-            chartWeight.render();
-        } else {
-            chartWeight.updateSeries([progW]);
-        }
-
-        // Calories
-        let colorCal = (userData.caloriesConsumedToday > userData.dailyCalLimit) ? '#ff3366' : '#00ff88';
-        if (!chartCalories) {
-            chartCalories = new ApexCharts(document.querySelector("#chart-calories"), {
-                ...commonOptions, 
-                series: [Math.min(calPerc, 100)], 
-                colors: [colorCal],
-                plotOptions: { radialBar: { ...commonOptions.plotOptions.radialBar, dataLabels: { value: { ...commonOptions.plotOptions.radialBar.dataLabels.value, color: colorCal } } } }
-            });
-            chartCalories.render();
-        } else {
-            chartCalories.updateOptions({ colors: [colorCal], plotOptions: { radialBar: { dataLabels: { value: { color: colorCal } } } } });
-            chartCalories.updateSeries([Math.min(calPerc, 100)]);
-        }
-
-        // Waist
-        if (!chartWaist) {
-            chartWaist = new ApexCharts(document.querySelector("#chart-waist"), {
-                ...commonOptions, series: [progWaist], colors: ['#d4af37']
-            });
-            chartWaist.render();
-        } else {
-            chartWaist.updateSeries([progWaist]);
-        }
-
-        // History
-        const historyData = userData.history || [];
-        const dates = historyData.map(h => h.date).slice(-10); // last 10
-        const weights = historyData.map(h => h.weight).slice(-10);
-        const waists = historyData.map(h => h.waist || 0).slice(-10);
-
-        if (!chartHistory && document.querySelector("#chart-history")) {
-            const histOptions = {
-                series: [
-                    { name: 'Peso', type: 'area', data: weights },
-                    { name: 'Cintura', type: 'line', data: waists }
-                ],
-                chart: { height: 250, type: 'line', toolbar: { show: false }, background: 'transparent', parentHeightOffset: 0 },
-                stroke: { curve: 'smooth', width: [3, 3] },
-                fill: { type: ['gradient', 'solid'], gradient: { shadeIntensity: 1, opacityFrom: 0.3, opacityTo: 0, stops: [0, 90, 100] } },
-                labels: dates,
-                theme: { mode: 'dark' },
-                colors: ['#00ff88', '#d4af37'],
-                xaxis: { labels: { style: { colors: '#888' } }, axisBorder: { show: false }, axisTicks: { show: false }, tooltip: { enabled: false } },
-                yaxis: [
-                    { labels: { style: { colors: '#888' } } },
-                    { opposite: true, labels: { style: { colors: '#888' } } }
-                ],
-                legend: { position: 'top', labels: { colors: '#fff' } },
-                tooltip: { theme: 'dark' },
-                grid: { borderColor: 'rgba(255,255,255,0.05)', strokeDashArray: 4 }
-            };
-
-            chartHistory = new ApexCharts(document.querySelector("#chart-history"), histOptions);
-            chartHistory.render();
-        } else if (chartHistory) {
-            chartHistory.updateOptions({ xaxis: { categories: dates } });
-            chartHistory.updateSeries([ { name: 'Peso', data: weights }, { name: 'Cintura', data: waists } ]);
-        }
-    }
-
     function updateDashboard() {
         // Peso
         document.getElementById('current-weight').textContent = (userData.weight || 0).toFixed(1);
         document.getElementById('weight-meta-text').textContent = `Meta: ${userData.target_weight || 0} KG`;
         const progW = Math.max(0, Math.min(100, ((110 - (userData.weight || 110)) / Math.max(1, (110 - (userData.target_weight || 85)))) * 100));
+        document.getElementById('weight-progress').style.width = `${progW}%`;
+        const wpEl = document.getElementById('weight-percent');
+        if (wpEl) wpEl.textContent = `${Math.round(progW)}%`;
 
         // Cintura
         document.getElementById('current-waist').textContent = userData.waist || 0;
@@ -465,6 +370,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const initialWaist = userData.waist || 0;
         const progWaist = targetWaist > 0 ? Math.max(0, Math.min(100, ((initialWaist - (userData.waist || initialWaist)) / Math.max(1, initialWaist - targetWaist)) * 100)) : 0;
         document.getElementById('waist-meta-text').textContent = targetWaist > 0 ? `Meta: ${targetWaist} CM` : `Meta: 0 CM`;
+        const waistBar = document.getElementById('waist-progress');
+        if (waistBar) waistBar.style.width = `${progWaist}%`;
+        const wapEl = document.getElementById('waist-percent');
+        if (wapEl) wapEl.textContent = `${Math.round(progWaist)}%`;
         
         // Calorías
         const net = userData.caloriesConsumedToday - userData.caloriesBurnedToday;
@@ -474,11 +383,13 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('cal-in').textContent = userData.caloriesConsumedToday;
         document.getElementById('cal-out').textContent = userData.caloriesBurnedToday;
         
-        const calPerc = userData.dailyCalLimit ? Math.max(0, (userData.caloriesConsumedToday / userData.dailyCalLimit) * 100) : 0;
+        const calPerc = Math.min(100, (userData.caloriesConsumedToday / userData.dailyCalLimit) * 100);
+        const calBar = document.getElementById('cal-progress');
+        calBar.style.width = `${calPerc}%`;
+        calBar.classList.toggle('warning', userData.caloriesConsumedToday > userData.dailyCalLimit);
         document.getElementById('cal-rem-text').textContent = `Límite diario: ${userData.dailyCalLimit} KCAL`;
-
-        // Render o Update de Gráficas
-        initOrUpdateCharts(progW, progWaist, calPerc);
+        const cpEl = document.getElementById('cal-percent');
+        if (cpEl) cpEl.textContent = `${Math.round(calPerc)}%`;
 
         // Déficit histórico
         const def = userData.totalNetDeficit || 0;

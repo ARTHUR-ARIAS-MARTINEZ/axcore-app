@@ -9,8 +9,6 @@
     <meta name="theme-color" content="#0a0e14">
     <link rel="apple-touch-icon" href="logo.png">
     <link rel="stylesheet" href="index.css">
-    <!-- ApexCharts CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <!-- Fuentes: Inter para cuerpos de texto, Oswald (Heavy Gym) para titulares -->
@@ -65,15 +63,15 @@
         <nav class="side-nav">
             <!-- Logo solo en desktop (sidebar) -->
             <div class="nav-logo-container" style="text-align:center; margin-bottom:2rem; padding: 10px;">
-                <div style="width:90px; height:90px; margin:0 auto 8px; display:flex; justify-content:center; align-items:center;">
-                    <img src="logo.png" alt="AX-CORE" style="width:100%; height:100%; object-fit:cover; mix-blend-mode: screen; filter: drop-shadow(0 0 10px rgba(0,255,136,0.3));">
+                <div style="width:90px; height:90px; border-radius:50%; overflow:hidden; margin:0 auto 8px; border:2px solid var(--accent-main); box-shadow: 0 0 20px rgba(0,255,136,0.3); background:#000;">
+                    <img src="logo.png" alt="AX-CORE" style="width:100%; height:100%; object-fit:cover;">
                 </div>
                 <div style="font-family:var(--font-accent); font-size:0.85rem; color:var(--accent-main); line-height:1.2; letter-spacing:2px; font-weight:900;">AX-CORE<br><span style="color:white; font-size:0.55rem; letter-spacing:3px; font-weight:400;">BY ARTHUR</span></div>
             </div>
             <!-- Logo solo en móvil (barra superior) -->
             <div class="nav-logo-mobile">
-                <div style="width:32px; height:32px; display:flex; justify-content:center; align-items:center; flex-shrink:0;">
-                    <img src="logo.png" alt="AX-CORE" style="width:100%; height:100%; object-fit:cover; mix-blend-mode: screen;">
+                <div style="width:32px; height:32px; border-radius:50%; overflow:hidden; border:1px solid var(--accent-main); background:#000; flex-shrink:0;">
+                    <img src="logo.png" alt="AX-CORE" style="width:100%; height:100%; object-fit:cover;">
                 </div>
                 <span style="font-family:var(--font-accent); font-size:0.7rem; color:var(--accent-main); letter-spacing:1px; font-weight:900; line-height:1;">AX-CORE</span>
             </div>
@@ -117,19 +115,28 @@
                         <h3>PESO ACTUAL</h3>
                         <div class="stat-value"><span id="current-weight">0.0</span><small>KG</small></div>
                         <div class="stat-goal" id="weight-meta-text">Meta: 0 KG</div>
-                        <div id="chart-weight" style="min-height: 120px; margin-top: -10px; display: flex; justify-content: center;"></div>
+                        <div class="progress-bar-container">
+                            <div class="progress-fill" id="weight-progress"></div>
+                        </div>
+                        <p id="weight-percent" style="font-size:0.65rem; color:var(--accent-main); text-align:right; margin-top:4px;">0%</p>
                     </div>
                     <div class="glass-card stat-card" style="position:relative; overflow:hidden;">
                         <h3>CALORÍAS HOY</h3>
                         <div class="stat-value"><span id="calories-net">0</span><small>KCAL</small></div>
                         <div class="stat-goal" id="cal-rem-text">Límite diario: 0</div>
-                        <div id="chart-calories" style="min-height: 120px; margin-top: -10px; display: flex; justify-content: center;"></div>
+                        <div class="progress-bar-container">
+                            <div class="progress-fill" id="cal-progress"></div>
+                        </div>
+                        <p id="cal-percent" style="font-size:0.65rem; color:var(--accent-main); text-align:right; margin-top:4px;">0%</p>
                     </div>
                     <div class="glass-card stat-card" style="position:relative; overflow:hidden;">
                         <h3>CINTURA</h3>
                         <div class="stat-value"><span id="current-waist">0</span><small>CM</small></div>
                         <div class="stat-goal" id="waist-meta-text">Meta: 0 CM</div>
-                        <div id="chart-waist" style="min-height: 120px; margin-top: -10px; display: flex; justify-content: center;"></div>
+                        <div class="progress-bar-container">
+                            <div class="progress-fill" id="waist-progress" style="width: 15%;"></div>
+                        </div>
+                        <p id="waist-percent" style="font-size:0.65rem; color:var(--accent-main); text-align:right; margin-top:4px;">0%</p>
                     </div>
                 </div>
 
@@ -157,11 +164,6 @@
                             <h4 id="kilos-burned-text" style="color:var(--accent-secondary); font-size:1.3rem;">0.00 kg</h4>
                             <p style="font-size:0.6rem; color:var(--text-dim);">EQUIVALENTE</p>
                         </div>
-                    </div>
-                    
-                    <div style="margin-top: 2rem; border-top: 1px solid var(--glass-border); padding-top: 1.5rem;">
-                        <h3 style="font-family:var(--font-accent); font-size:0.85rem; color:var(--accent-main); margin-bottom:1rem; letter-spacing:1px; text-align:center;">EVOLUCIÓN RECIENTE</h3>
-                        <div id="chart-history" style="min-height: 250px; width: 100%;"></div>
                     </div>
                 </div>
 
@@ -362,9 +364,9 @@
                         <p style="font-size:0.8rem; color:var(--text-dim); margin-bottom:1rem;">Comparte el acceso a AX-CORE con otros atletas.</p>
                         <button id="btn-share-app" class="btn-premium" style="width:100%; background:transparent; border:1px solid var(--accent-secondary); color:var(--accent-secondary); margin-bottom:1rem;">COMPARTIR APP AX-CORE</button>
                         
-                        <h2 style="color:var(--accent-main); margin-top:2rem;">⬇ DESCARGAR APP</h2>
+                        <h2 style="color:#d4af37; margin-top:2rem;">⬇ DESCARGAR APP</h2>
                         <p style="font-size:0.8rem; color:var(--text-dim); margin-bottom:1rem;">Instala AX-CORE en tu celular para acceder más rápido.</p>
-                        <button id="btn-install-app" class="btn-premium" style="width:100%; display:none; background:rgba(0,0,0,0.5); border:1px solid var(--accent-main); color:var(--accent-main);">INSTALAR AHORA</button>
+                        <button id="btn-install-app" class="btn-premium" style="width:100%; display:none; background: linear-gradient(135deg, #d4af37, #f0c040);">INSTALAR AHORA</button>
 
                         <p style="font-size:0.75rem; color:var(--text-dim); margin-top:2rem;">Para compartir tus logros con tarjetas personalizadas, ve a la sección <strong style="color:var(--accent-main);">🏆 Estudio</strong>.</p>
                     </div>
