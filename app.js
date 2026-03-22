@@ -1077,21 +1077,21 @@ document.addEventListener('DOMContentLoaded', () => {
         const accent = accentMap[tpl.id] || '#8aff7a';
 
         // TEXT SIZING HELPER
-        const tScale = Math.max(0.7, Math.min(1.5, studioState.textSize));
+        const tScale = Math.max(0.7, Math.min(2.5, studioState.textSize));
         const customColor = studioState.textColor === 'theme' ? '#ffffff' : studioState.textColor;
 
         // 3.5 LOGOTIPO (Armónico y visible con sombra suave)
         if (STUDIO_LOGO_IMG) {
-            const logoW = isPreview ? 50 : 140;
+            const logoW = isPreview ? 100 : 250;
             ctx.globalAlpha = 0.9;
             ctx.shadowColor = 'rgba(0,0,0,0.6)'; ctx.shadowBlur = isPreview ? 8 : 25;
-            ctx.drawImage(STUDIO_LOGO_IMG, cx - logoW/2, py + (isPreview ? 12 : 35), logoW, logoW);
+            ctx.drawImage(STUDIO_LOGO_IMG, cx - logoW/2, py + (isPreview ? 25 : 55), logoW, logoW);
             ctx.shadowBlur = 0; ctx.globalAlpha = 1.0;
         }
 
         // 4. Título superior
-        const logoOffset = STUDIO_LOGO_IMG ? (isPreview ? 70 : 190) : (isPreview ? 25 : 80);
-        const titleY = py + (isLandscape ? (STUDIO_LOGO_IMG ? 100 : 80) : logoOffset);
+        const logoOffset = STUDIO_LOGO_IMG ? (isPreview ? 140 : 340) : (isPreview ? 25 : 80);
+        const titleY = py + (isLandscape ? (STUDIO_LOGO_IMG ? 150 : 80) : logoOffset);
         
         ctx.fillStyle=accent; ctx.font=`800 ${Math.floor((isPreview?14:28)*tScale)}px Inter,sans-serif`;
         ctx.textAlign='center';
@@ -1194,9 +1194,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const el = document.getElementById('page-studio');
         if (!el) return;
 
-        // Añadir indicador de carga visual rápido mientras se cargan fondos
-        el.innerHTML = `<div style="text-align:center; padding:3rem; color:var(--text-dim);">Sincronizando Estudio Gráfico...</div>`;
-        await preloadStudioImages();
+        // Carga silenciosa paralela (No bloquea la interacción del usuario)
+        if (Object.keys(STUDIO_BG_IMAGES).length === 0 && !isStudioPreloading) {
+            preloadStudioImages().then(() => {
+                // Refrescar canvas una vez que las imágenes base estén listas
+                if (document.getElementById('studio-preview-canvas')) renderStudioPage();
+            });
+        }
 
         el.innerHTML = `
             <div class="glass-card" style="padding:1.5rem; margin-bottom:1.5rem;">
@@ -1219,7 +1223,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                     <div>
                         <h4 style="color:var(--text-primary); font-size:0.7rem; margin-bottom:4px;">TAMAÑO LETRA</h4>
-                        <input type="range" id="studio-size-picker" min="0.7" max="1.4" step="0.1" value="${studioState.textSize}" style="width:100%; cursor:pointer;">
+                        <input type="range" id="studio-size-picker" min="0.5" max="2.5" step="0.1" value="${studioState.textSize}" style="width:100%; cursor:pointer;">
                     </div>
                 </div>
             </div>
@@ -1319,8 +1323,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const palette = [
             { c:'theme', l:'AUTO', bg:'linear-gradient(45deg, #00ff88, #00d2ff)' },
             { c:'#ffffff', bg:'#ffffff' },
+            { c:'#d3d3d3', bg:'#d3d3d3' }, // Gris claro
+            { c:'#808080', bg:'#808080' }, // Gris oxford medio
+            { c:'#36454F', bg:'#36454F' }, // Gris oxford oscuro
             { c:'#ffb6c1', bg:'#ffb6c1' }, // Rosa pastel
             { c:'#ff00ff', bg:'#ff00ff' }, // Magenta neon
+            { c:'#800080', bg:'#800080' }, // Purpura fuerte
+            { c:'#ff0000', bg:'#ff0000' }, // Rojo vibrante
             { c:'#00e5ff', bg:'#00e5ff' }, // Cyan neon
             { c:'#00ff66', bg:'#00ff66' }, // Verde toxic
             { c:'#ffcc00', bg:'#ffcc00' }, // Oro
@@ -1345,26 +1354,6 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.onclick = () => { studioState.textColor = p.c; renderStudioPage(); };
             swatchesContainer.appendChild(btn);
         });
-        
-        const customColorPicker = document.createElement('input');
-        customColorPicker.type = 'color';
-        customColorPicker.value = (studioState.textColor!=='theme' && !palette.find(x=>x.c===studioState.textColor)) ? studioState.textColor : '#ffffff';
-        customColorPicker.style.width = '30px'; customColorPicker.style.height = '30px'; 
-        customColorPicker.style.border = '1px solid rgba(255,255,255,0.2)'; customColorPicker.style.borderRadius = '8px';
-        customColorPicker.style.background = 'transparent'; customColorPicker.style.cursor = 'pointer';
-        customColorPicker.title = 'Color Libre';
-        customColorPicker.oninput = (e) => {
-            studioState.textColor = e.target.value; 
-            renderStudioCard(previewCanvas, studioState.tpl, studioState.fmt, studioState.metrics, true);
-            // Optional: reset outlines on preset buttons
-            Array.from(swatchesContainer.children).forEach(child => { 
-                if(child.tagName === 'BUTTON') {
-                    child.style.outline = 'none';
-                    child.style.transform = 'scale(1)';
-                }
-            });
-        };
-        swatchesContainer.appendChild(customColorPicker);
 
         const sizePicker = document.getElementById('studio-size-picker');
         sizePicker.oninput = (e) => { 
