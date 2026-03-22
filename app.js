@@ -29,6 +29,27 @@ document.addEventListener('DOMContentLoaded', () => {
     const sensationFeedback = document.getElementById('sensation-feedback');
     const btnAskAiSensation = document.getElementById('btn-ask-ai-sensation');
 
+    // --- INSTALACIÓN PWA ---
+    let deferredPrompt = null;
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        const installBtn = document.getElementById('btn-install-app');
+        if (installBtn) installBtn.style.display = 'block';
+    });
+    document.addEventListener('click', (e) => {
+        if (e.target && e.target.id === 'btn-install-app' && deferredPrompt) {
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then(result => {
+                if (result.outcome === 'accepted') {
+                    const btn = document.getElementById('btn-install-app');
+                    if (btn) btn.style.display = 'none';
+                }
+                deferredPrompt = null;
+            });
+        }
+    });
+
     // --- ESTADO Y PERSISTENCIA ---
     let sessionActive = false;
     let currentUser = localStorage.getItem('arthur_current_user') || null;
@@ -999,30 +1020,45 @@ document.addEventListener('DOMContentLoaded', () => {
     let _studioLoadPromise = null;
 
     async function preloadStudioImages() {
-        // Si ya cargaron, retornar inmediatamente
         if (Object.keys(STUDIO_BG_IMAGES).length > 0 && STUDIO_LOGO_IMG) return;
-        // Si ya hay una carga en progreso, esperar esa misma promesa
         if (_studioLoadPromise) return _studioLoadPromise;
 
         _studioLoadPromise = (async () => {
             // Carga del logo
             await new Promise((r) => {
                 const l = new Image(); l.crossOrigin = 'anonymous';
-                l.onload = () => { STUDIO_LOGO_IMG = l; r(); };
+                l.onload = () => { STUDIO_LOGO_IMG = l; _studioTryRedraw(); r(); };
                 l.onerror = () => { r(); };
                 l.src = 'logo.png';
             });
-            // Carga paralela de fondos
+            // Carga paralela de fondos — cada imagen redibuja al cargar
             await Promise.all(STUDIO_TEMPLATES.map(tpl => new Promise((r) => {
                 const img = new Image();
                 img.crossOrigin = 'anonymous';
-                img.onload = () => { STUDIO_BG_IMAGES[tpl.id] = img; r(); };
+                img.onload = () => { STUDIO_BG_IMAGES[tpl.id] = img; _studioTryRedraw(tpl.id); r(); };
                 img.onerror = () => { r(); };
                 img.src = tpl.bg;
             })));
         })();
 
         return _studioLoadPromise;
+    }
+
+    // Redibujar la preview cuando una imagen carga en background
+    function _studioTryRedraw(tplId) {
+        // 1. Redibujar la vista previa grande
+        const canvas = document.getElementById('studio-preview-canvas');
+        if (canvas) {
+            renderStudioCard(canvas, studioState.tpl, studioState.fmt, studioState.metrics, true);
+        }
+        // 2. Redibujar el thumbnail (miniatura) si ya existe en el DOM
+        if (tplId) {
+            const mini = document.getElementById('studio-mini-' + tplId);
+            if (mini) {
+                const tplDef = STUDIO_TEMPLATES.find(t => t.id === tplId);
+                if (tplDef) drawStudioBg(mini.getContext('2d'), 100, 140, tplDef);
+            }
+        }
     }
 
     function drawStudioBg(ctx, W, H, tpl) {
@@ -1098,13 +1134,15 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.moveTo(px+cl, py+ph); ctx.lineTo(px, py+ph); ctx.lineTo(px, py+ph-cl);
         ctx.stroke();
 
-        // LOGO INDEPENDIENTE (Aislado arriba, más grande)
+        // LOGO INDEPENDIENTE (Aislado arriba, sin fondo negro)
         const logoTargetY = py + 30;
         if (STUDIO_LOGO_IMG) {
             const logoW = 280;
+            ctx.globalCompositeOperation = 'screen';
             ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 30;
             ctx.drawImage(STUDIO_LOGO_IMG, cx - logoW/2, logoTargetY, logoW, logoW);
             ctx.shadowBlur = 0;
+            ctx.globalCompositeOperation = 'source-over';
         }
 
         // MOTOR DE EFECTO AUTO
@@ -1290,6 +1328,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const card = document.createElement('div');
             card.className = 'studio-tpl-card' + (studioState.tpl===tpl.id ? ' selected' : '');
             const miniCanvas = document.createElement('canvas');
+            miniCanvas.id = 'studio-mini-' + tpl.id; // Asignar un ID para redibujarlo asincronamente
             miniCanvas.width=100; miniCanvas.height=140;
             drawStudioBg(miniCanvas.getContext('2d'), 100, 140, tpl);
             card.appendChild(miniCanvas);

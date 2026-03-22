@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>AX-CORE | COACH TERMINAL VIP</title>
+    <!-- PWA Support -->
+    <link rel="manifest" href="manifest_vip.json">
+    <meta name="theme-color" content="#d4af37">
+    <link rel="icon" href="logo_coach.png" type="image/png">
     <!-- Fuentes premium -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="index.css">
@@ -196,14 +200,14 @@
             backdrop-filter: blur(16px);
             border: 1px solid rgba(255,255,255,0.06);
             border-left: 4px solid #00ff88;
-            border-radius: 16px;
-            padding: 1.8rem;
+            border-radius: 14px;
+            padding: 1rem 1.2rem;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             position: relative;
-            box-shadow: 0 6px 24px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.3);
         }
         .client-card:hover {
             transform: translateY(-6px);
@@ -220,17 +224,17 @@
         }
 
         .client-card h3 {
-            margin: 0 0 12px 0;
+            margin: 0 0 6px 0;
             font-family: 'Oswald', sans-serif;
-            font-size: 1.4rem;
+            font-size: 1.1rem;
             color: #fff;
             padding-right: 24px;
             letter-spacing: 0.5px;
         }
         .client-card p {
-            margin: 0 0 6px 0;
+            margin: 0 0 4px 0;
             color: rgba(255,255,255,0.5);
-            font-size: 0.88rem;
+            font-size: 0.78rem;
         }
 
         .btn-delete-x {
@@ -345,19 +349,22 @@
 
         /* Responsive */
         @media (max-width: 600px) {
-            .header-brand h1 { font-size: 2.6rem; }
-            .dashboard-header { padding: 1.2rem; }
+            .header-brand h1 { font-size: 2.2rem; }
+            .dashboard-header { padding: 0.8rem; gap: 8px; }
+            .dashboard-header h2 { font-size: 1rem !important; }
             .client-grid { grid-template-columns: 1fr; }
-            .client-card { padding: 1.2rem; }
+            .client-card { padding: 0.9rem; }
+            .stats-badge { font-size: 0.7rem; padding: 0.4rem 0.8rem; }
         }
     </style>
 </head>
 <body data-theme="dark">
 
 <div class="coach-container pb-transition" id="main-container">
-    <div class="header-brand">
-        <h1><span class="gradient-text">AX-CORE</span></h1>
-        <p style="font-family: 'Oswald'; font-size: 1.5rem; color:#fff; letter-spacing: 2px; margin-top:5px;">COACH TERMINAL VIP</p>
+    <div class="header-brand" style="position:relative;">
+        <h1 style="background: linear-gradient(135deg, #d4af37, #ffd700, #f0c040); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; text-shadow: none;"><span>AX-CORE</span></h1>
+        <p style="font-family: 'Oswald'; font-size: 1.3rem; color:#fff; letter-spacing: 2px; margin-top:5px;">COACH TERMINAL VIP</p>
+        <a id="btn-install-coach" href="#" style="position:absolute; right:16px; top:16px; font-size:1.5rem; color:#d4af37; text-decoration:none; cursor:pointer;" title="Instalar App">⬇</a>
     </div>
 
     <!-- Login -->
@@ -378,15 +385,17 @@
     <!-- Dashboard -->
     <div id="dashboard" class="dashboard-container">
         
-        <div class="dashboard-header" style="flex-wrap: wrap;">
+        <div class="dashboard-header" style="flex-wrap: wrap; gap:8px;">
             <div>
-                <h2 style="font-family: 'Oswald'; color:#fff; margin:0;" id="gym-name-display">GIMNASIO...</h2>
-                <p style="margin:5px 0 0 0; color:#aaa; font-size:0.85rem;" id="gym-code-display">CÓDIGO: ---</p>
+                <h2 style="font-family: 'Oswald'; color:#fff; margin:0; font-size:1.1rem;" id="gym-name-display">GIMNASIO...</h2>
+                <p style="margin:3px 0 0 0; color:#aaa; font-size:0.7rem;" id="gym-code-display">CÓDIGO: ---</p>
             </div>
-            <div style="display:flex; gap: 10px; align-items:center; flex-wrap: wrap;">
-                <div id="stats-users" class="stats-badge">CARGANDO...</div>
-                <button class="btn-premium" style="margin:0; font-size:0.85rem; padding:0.7rem 1.2rem;" id="btn-new-code">+ PASE NUEVO</button>
-                <button class="btn-cancel" style="padding: 0.7rem 1rem; color:#ff4757; border-color: rgba(255,71,87,0.3); font-size:0.75rem;" onclick="logout()">CERRAR SESIÓN</button>
+            <div style="display:flex; flex-direction:column; gap:6px; align-items:flex-end;">
+                <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
+                    <div id="stats-users" class="stats-badge" style="font-size:0.7rem; padding:0.4rem 0.8rem;">CARGANDO...</div>
+                    <button class="btn-premium" style="margin:0; font-size:0.7rem; padding:0.5rem 0.9rem;" id="btn-new-code">+ PASE NUEVO</button>
+                </div>
+                <button class="btn-cancel" style="padding:0.4rem 0.8rem; color:#ff4757; border-color:rgba(255,71,87,0.3); font-size:0.65rem;" onclick="logout()">CERRAR SESIÓN</button>
             </div>
         </div>
         
@@ -608,6 +617,31 @@
             btnLogin.click();
         }
     })();
+
+    // --- INSTALACI�N PWA ---
+    let deferredPrompt = null;
+    const btnInstallCoach = document.getElementById('btn-install-coach');
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        if (btnInstallCoach) btnInstallCoach.style.display = 'block';
+    });
+    if (btnInstallCoach) {
+        btnInstallCoach.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then(result => {
+                if (result.outcome === 'accepted') btnInstallCoach.style.display = 'none';
+                deferredPrompt = null;
+            });
+        });
+    }
+
+    // Registrar Service Worker
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js').catch(() => {});
+    }
 </script>
 
 </body>

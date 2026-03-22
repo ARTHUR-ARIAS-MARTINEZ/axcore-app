@@ -1,0 +1,22 @@
+{
+  "name": "AX-CORE Coach Terminal VIP",
+  "short_name": "Coach VIP",
+  "description": "Terminal Élite para entrenadores de la franquicia AX-CORE",
+  "start_url": "./coach.html",
+  "display": "standalone",
+  "background_color": "#060610",
+  "theme_color": "#d4af37",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "logo_coach.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "logo_coach.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
