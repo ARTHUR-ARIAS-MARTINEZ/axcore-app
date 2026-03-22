@@ -29,27 +29,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const sensationFeedback = document.getElementById('sensation-feedback');
     const btnAskAiSensation = document.getElementById('btn-ask-ai-sensation');
 
-    // --- INSTALAR PWA ---
-    let deferredPrompt;
-    const installBtn = document.getElementById('btn-install-app');
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-        if(installBtn) installBtn.style.display = 'block';
-    });
-
-    if (installBtn) {
-        installBtn.addEventListener('click', async () => {
-            if (!deferredPrompt) return;
-            deferredPrompt.prompt();
-            const { outcome } = await deferredPrompt.userChoice;
-            if (outcome === 'accepted') {
-                installBtn.style.display = 'none';
-            }
-            deferredPrompt = null;
-        });
-    }
-
     // --- ESTADO Y PERSISTENCIA ---
     let sessionActive = false;
     let currentUser = localStorage.getItem('arthur_current_user') || null;
@@ -1020,15 +999,16 @@ document.addEventListener('DOMContentLoaded', () => {
     let _studioLoadPromise = null;
 
     async function preloadStudioImages() {
-        // Carga silente en el background, sin bloquear
+        // Si ya cargaron, retornar inmediatamente
         if (Object.keys(STUDIO_BG_IMAGES).length > 0 && STUDIO_LOGO_IMG) return;
+        // Si ya hay una carga en progreso, esperar esa misma promesa
         if (_studioLoadPromise) return _studioLoadPromise;
 
         _studioLoadPromise = (async () => {
             // Carga del logo
             await new Promise((r) => {
                 const l = new Image(); l.crossOrigin = 'anonymous';
-                l.onload = () => { STUDIO_LOGO_IMG = l; if(activePage==='studio' && typeof _debouncedUpdateStudioPreview === 'function') _debouncedUpdateStudioPreview(); r(); };
+                l.onload = () => { STUDIO_LOGO_IMG = l; r(); };
                 l.onerror = () => { r(); };
                 l.src = 'logo.png';
             });
@@ -1036,7 +1016,7 @@ document.addEventListener('DOMContentLoaded', () => {
             await Promise.all(STUDIO_TEMPLATES.map(tpl => new Promise((r) => {
                 const img = new Image();
                 img.crossOrigin = 'anonymous';
-                img.onload = () => { STUDIO_BG_IMAGES[tpl.id] = img; if(activePage==='studio' && typeof _debouncedUpdateStudioPreview === 'function') _debouncedUpdateStudioPreview(); r(); };
+                img.onload = () => { STUDIO_BG_IMAGES[tpl.id] = img; r(); };
                 img.onerror = () => { r(); };
                 img.src = tpl.bg;
             })));
@@ -1118,8 +1098,8 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.moveTo(px+cl, py+ph); ctx.lineTo(px, py+ph); ctx.lineTo(px, py+ph-cl);
         ctx.stroke();
 
-        // LOGO INDEPENDIENTE (Aislado arriba)
-        const logoTargetY = py + 30;
+        // LOGO INDEPENDIENTE (Aislado arriba, más grande)
+        const logoTargetY = py + 70;
         if (STUDIO_LOGO_IMG) {
             const logoW = 280;
             ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 30;
@@ -1163,7 +1143,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.letterSpacing = '0px'; ctx.shadowBlur = 0;
 
         // NOMBRE DEL ATLETA
-        const nameY = textStartY + 85 * tScale; // Separado hacia abajo respecto al título
+        const nameY = textStartY + 64 * tScale;
         const atletaName = (userData.username||'ATLETA').toUpperCase();
         drawAutoText(atletaName, cx, nameY, 70 * tScale, 900, true);
         drawAutoText(atletaName, cx, nameY, 70 * tScale, 900, false);
@@ -1230,9 +1210,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const el = document.getElementById('page-studio');
         if (!el) return;
 
-        // Inicia petición de assets pero NO bloquea la pantalla con await.
-        // Las imágenes irán brotando orgánicamente, dando impresión de carga instantánea de 0ms en pantalla.
-        preloadStudioImages();
+        // Esperar a que las imágenes carguen (solo la 1a vez, el resto es instantáneo)
+        if (!isStudioPreloading && Object.keys(STUDIO_BG_IMAGES).length === 0) {
+            // Mostrar esqueleto mientras carga la primera vez
+            el.innerHTML = `<div style="text-align:center; padding:3rem; color:var(--text-dim);">
+                <div style="font-size:2rem; margin-bottom:12px;">🏆</div>
+                <div>Preparando Estudio...</div>
+            </div>`;
+        }
+        await preloadStudioImages();
 
         el.innerHTML = `
             <div class="glass-card" style="padding:1.5rem; margin-bottom:1.5rem;">
