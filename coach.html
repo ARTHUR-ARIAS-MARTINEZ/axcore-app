@@ -356,7 +356,7 @@
 
 <div class="coach-container pb-transition" id="main-container">
     <div class="header-brand">
-        <h1><span class="gradient-text">AX-CORE</span></h1>
+        <img src="logo_coach.png" alt="AX-CORE VIP" style="width: 180px; filter: drop-shadow(0 0 15px rgba(212,175,55,0.4)); margin-bottom: 5px;">
         <p style="font-family: 'Oswald'; font-size: 1.5rem; color:#fff; letter-spacing: 2px; margin-top:5px;">COACH TERMINAL VIP</p>
     </div>
 
@@ -378,14 +378,16 @@
     <!-- Dashboard -->
     <div id="dashboard" class="dashboard-container">
         
-        <div class="dashboard-header">
+        <div class="dashboard-header" style="flex-wrap: wrap;">
             <div>
                 <h2 style="font-family: 'Oswald'; color:#fff; margin:0;" id="gym-name-display">GIMNASIO...</h2>
                 <p style="margin:5px 0 0 0; color:#aaa; font-size:0.85rem;" id="gym-code-display">CÓDIGO: ---</p>
             </div>
-            <div style="display:flex; gap: 10px; align-items:center;">
+            <div style="display:flex; gap: 10px; align-items:center; flex-wrap: wrap;">
+                <button class="btn-cancel" style="padding: 0.8rem 1rem; color:#fff; border-color: rgba(255,255,255,0.2);" id="btn-install" style="display:none;">↓ INSTALAR APP</button>
                 <div id="stats-users" class="stats-badge">CARGANDO...</div>
-                <button class="btn-premium" style="margin:0; font-size:0.9rem; padding:0.8rem 1.5rem;" id="btn-new-code">+ GENERAR PASE NUEVO</button>
+                <button class="btn-premium" style="margin:0; font-size:0.9rem; padding:0.8rem 1.5rem;" id="btn-new-code">+ PASE NUEVO</button>
+                <button class="btn-cancel" style="padding: 0.8rem 1rem; color:#ff4757; border-color: rgba(255,71,87,0.3);" onclick="logout()">CERRAR SESIÓN</button>
             </div>
         </div>
         
@@ -432,9 +434,13 @@
                 gymData = data.gym;
                 gymData.currentUsers = data.currentUsers;
 
+                // GUARDAR SESIÓN
+                localStorage.setItem('coach_vip_gym', gid);
+                localStorage.setItem('coach_vip_pass', psw);
+
                 loginSection.style.display = 'none';
                 dashboard.style.display = 'block';
-                gymContainer.style.justifyContent = 'flex-start'; // Quitamos el centro vertical al entrar
+                gymContainer.style.justifyContent = 'flex-start';
 
                 document.getElementById('gym-name-display').textContent = gymData.name.toUpperCase();
                 document.getElementById('gym-code-display').textContent = `ID SUCURSAL: ${gymData.gymCode}`;
@@ -586,6 +592,44 @@
     document.getElementById('gym-pass').addEventListener('keypress', function(e) {
         if (e.key === 'Enter') btnLogin.click();
     });
+
+    // CERRAR SESION Y AUTO-LOGIN
+    window.logout = () => {
+        localStorage.removeItem('coach_vip_gym');
+        localStorage.removeItem('coach_vip_pass');
+        location.reload();
+    };
+
+    window.onload = () => {
+        const storedGym = localStorage.getItem('coach_vip_gym');
+        const storedPass = localStorage.getItem('coach_vip_pass');
+        if (storedGym && storedPass) {
+            document.getElementById('gym-id').value = storedGym;
+            document.getElementById('gym-pass').value = storedPass;
+            btnLogin.click();
+        }
+    };
+
+    // INSTALACION Y DESCARGA (PWA)
+    let deferredPrompt;
+    const btnInstall = document.getElementById('btn-install');
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        if(btnInstall) btnInstall.style.display = 'block';
+    });
+
+    if(btnInstall) {
+        btnInstall.addEventListener('click', async () => {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                btnInstall.style.display = 'none';
+            }
+            deferredPrompt = null;
+        });
+    }
 </script>
 
 </body>
