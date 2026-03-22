@@ -1118,14 +1118,13 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.moveTo(px+cl, py+ph); ctx.lineTo(px, py+ph); ctx.lineTo(px, py+ph-cl);
         ctx.stroke();
 
-        // LOGO INDEPENDIENTE (Aislado arriba, más grande)
-        const logoTargetY = py + 30; // Subido más a tope de encuadre
+        // LOGO INDEPENDIENTE (Aislado arriba)
+        const logoTargetY = py + 30;
         if (STUDIO_LOGO_IMG) {
             const logoW = 280;
-            ctx.globalCompositeOperation = 'screen'; // Esto elimina el fondo negro de la imagen de logo generada por AI
             ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 30;
             ctx.drawImage(STUDIO_LOGO_IMG, cx - logoW/2, logoTargetY, logoW, logoW);
-            ctx.shadowBlur = 0; ctx.globalCompositeOperation = 'source-over';
+            ctx.shadowBlur = 0;
         }
 
         // MOTOR DE EFECTO AUTO
