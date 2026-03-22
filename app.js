@@ -1045,11 +1045,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Redibujar la preview cuando una imagen carga en background
+    let _studioRedrawTimer = null;
     function _studioTryRedraw(tplId) {
-        // 1. Redibujar la vista previa grande
+        // 1. Redibujar la vista previa grande con debounce (evita freezear si cargan 19 juntas)
         const canvas = document.getElementById('studio-preview-canvas');
         if (canvas) {
-            renderStudioCard(canvas, studioState.tpl, studioState.fmt, studioState.metrics, true);
+            clearTimeout(_studioRedrawTimer);
+            _studioRedrawTimer = setTimeout(() => {
+                renderStudioCard(canvas, studioState.tpl, studioState.fmt, studioState.metrics, true);
+            }, 100);
         }
         // 2. Redibujar el thumbnail (miniatura) si ya existe en el DOM
         if (tplId) {
