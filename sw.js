@@ -1,4 +1,4 @@
-const CACHE_NAME = 'axcore-v2';
+const CACHE_NAME = 'axcore-v2.1';
 const urlsToCache = [
   './',
   './index.html',
@@ -7,7 +7,8 @@ const urlsToCache = [
   './knowledge.js',
   './logo.png',
   './logo_coach.png',
-  './manifest_vip.json'
+  './manifest_vip.json',
+  './coach.html'
 ];
 
 self.addEventListener('install', event => {
