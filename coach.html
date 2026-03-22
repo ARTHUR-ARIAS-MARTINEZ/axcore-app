@@ -175,10 +175,9 @@
             50% { box-shadow: 0 0 28px rgba(255,50,70,0.3); }
         }
 
-        /* CLIENT GRID */
         .client-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
             gap: 18px;
             max-height: calc(100vh - 240px);
             overflow-y: auto;

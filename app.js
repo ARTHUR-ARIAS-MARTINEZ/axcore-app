@@ -1076,7 +1076,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const accent = accentMap[tpl.id] || '#8aff7a';
 
         // Escala global dinámica
-        const tScale = Math.max(0.5, Math.min(2.5, studioState.textSize));
+        const tScale = Math.max(0.5, Math.min(3.0, studioState.textSize));
         const customColor = studioState.textColor === 'theme' ? '#ffffff' : studioState.textColor;
         const isAuto = studioState.textColor === 'theme';
 
@@ -1090,34 +1090,33 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.lineWidth = 1.5; ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)'; ctx.stroke();
         
         // Esquinas HUD deportivas
-        ctx.beginPath(); ctx.lineWidth = isPreview ? 2 : 4; ctx.strokeStyle = accent;
-        const cl = isPreview ? 15 : 45; // longitud del corte
+        ctx.beginPath(); ctx.lineWidth = 4; ctx.strokeStyle = accent;
+        const cl = 45; // longitud del corte
         ctx.moveTo(px, py+cl); ctx.lineTo(px, py); ctx.lineTo(px+cl, py);
         ctx.moveTo(px+pw-cl, py); ctx.lineTo(px+pw, py); ctx.lineTo(px+pw, py+cl);
         ctx.moveTo(px+pw, py+ph-cl); ctx.lineTo(px+pw, py+ph); ctx.lineTo(px+pw-cl, py+ph);
         ctx.moveTo(px+cl, py+ph); ctx.lineTo(px, py+ph); ctx.lineTo(px, py+ph-cl);
         ctx.stroke();
 
-        // LOGO INDEPENDIENTE (Aislado arriba, no colisiona jamás con texto)
-        const logoTargetY = py + (isPreview ? 25 : 60);
+        // LOGO INDEPENDIENTE (Aislado arriba, más grande)
+        const logoTargetY = py + 70;
         if (STUDIO_LOGO_IMG) {
-            const logoW = isPreview ? 85 : 220;
-            ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = isPreview ? 10 : 30;
+            const logoW = 280;
+            ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 30;
             ctx.drawImage(STUDIO_LOGO_IMG, cx - logoW/2, logoTargetY, logoW, logoW);
             ctx.shadowBlur = 0;
         }
 
-        // MOTOR DE EFECTO AUTO (Glow Mágico Híbrido)
+        // MOTOR DE EFECTO AUTO
         const drawAutoText = (txt, x, y, size, weight, shadowPass) => {
             ctx.font = `${weight} ${Math.floor(size)}px Inter,sans-serif`;
             ctx.textAlign = 'center';
             if (isAuto) {
                 ctx.fillStyle = shadowPass ? accent : '#ffffff';
                 ctx.shadowColor = shadowPass ? accent : 'rgba(0,0,0,0.95)';
-                ctx.shadowBlur = isPreview ? (shadowPass ? 12 : 5) : (shadowPass ? 35 : 15);
+                ctx.shadowBlur = shadowPass ? 35 : 15;
                 ctx.globalCompositeOperation = shadowPass ? 'screen' : 'source-over';
                 ctx.fillText(txt, x, y);
-                // La capa que chupa el color del fondo (Efecto cristal)
                 if (!shadowPass) {
                     ctx.globalCompositeOperation = 'overlay';
                     ctx.fillStyle = 'rgba(255,255,255,0.6)';
@@ -1126,88 +1125,85 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } else {
                 ctx.fillStyle = customColor;
-                ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = isPreview ? 6 : 18;
+                ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = 18;
                 ctx.fillText(txt, x, y);
             }
             ctx.shadowBlur = 0; ctx.globalCompositeOperation = 'source-over';
         };
 
         // El texto inicia debajo del logo
-        const textStartY = logoTargetY + (STUDIO_LOGO_IMG ? (isPreview ? 100 : 250) : (isPreview ? 20 : 40));
+        const textStartY = logoTargetY + (STUDIO_LOGO_IMG ? 340 : 80);
 
         // TÍTULO OFICIAL
         ctx.fillStyle = accent; ctx.textAlign = 'center';
-        // El título estático se escala ligéramente menos para dar jerarquía
-        ctx.font = `800 ${Math.floor((isPreview?13:30)*(1 + (tScale-1)*0.5))}px Inter,sans-serif`;
+        ctx.font = `800 ${Math.floor(30*(1 + (tScale-1)*0.5))}px Inter,sans-serif`;
         ctx.letterSpacing = '4px';
-        ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = isPreview?4:15;
+        ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = 15;
         ctx.fillText('RESULTADOS OFICIALES', cx, textStartY);
         ctx.letterSpacing = '0px'; ctx.shadowBlur = 0;
 
-        // NOMBRE DEL ATLETA (Escala Completa Y Proporcional)
-        const nameY = textStartY + (isPreview?22:64) * tScale;
+        // NOMBRE DEL ATLETA
+        const nameY = textStartY + 64 * tScale;
         const atletaName = (userData.username||'ATLETA').toUpperCase();
-        drawAutoText(atletaName, cx, nameY, (isPreview?24:70) * tScale, 900, true);
-        drawAutoText(atletaName, cx, nameY, (isPreview?24:70) * tScale, 900, false);
+        drawAutoText(atletaName, cx, nameY, 70 * tScale, 900, true);
+        drawAutoText(atletaName, cx, nameY, 70 * tScale, 900, false);
 
         // SEPARADOR DINÁMICO
-        const divY = nameY + (isPreview?16:45) * tScale;
+        const divY = nameY + 45 * tScale;
         const gradLine = ctx.createLinearGradient(cx - (pw*0.35), 0, cx + (pw*0.35), 0);
         gradLine.addColorStop(0, 'rgba(255,255,255,0)');
         gradLine.addColorStop(0.5, accent);
         gradLine.addColorStop(1, 'rgba(255,255,255,0)');
-        ctx.fillStyle = gradLine; ctx.fillRect(cx - (pw*0.35), divY, pw*0.7, isPreview ? 2 : 4);
+        ctx.fillStyle = gradLine; ctx.fillRect(cx - (pw*0.35), divY, pw*0.7, 4);
 
-        // =======================================================
-        // MÉTRICAS (PROPORCIÓN Y PERFECTA SIN COLISIONES VERTICALES)
-        // =======================================================
+        // MÉTRICAS
         const mets = STUDIO_METRICS.filter(m => activeMetrics.includes(m.key));
-        const metStartY = divY + (isPreview?35:90) * tScale;
+        const metStartY = divY + 90 * tScale;
 
         if (mets.length === 0) {
-            ctx.fillStyle = 'rgba(255,255,255,0.2)'; ctx.font = `600 ${isPreview?12:28}px Inter,sans-serif`;
-            ctx.fillText('SELECCIONE MÉTRICAS', cx, metStartY + (isPreview?30:80));
+            ctx.fillStyle = 'rgba(255,255,255,0.2)'; ctx.font = `600 28px Inter,sans-serif`;
+            ctx.fillText('SELECCIONE MÉTRICAS', cx, metStartY + 80);
         } else if (isLandscape && mets.length > 1) {
             const colW = pw / Math.min(mets.length, 8);
             mets.forEach((m, i) => {
                 const mx = px + colW/2 + i * colW;
-                ctx.fillStyle = 'rgba(255,255,255,0.6)'; ctx.font = `600 ${Math.floor((isPreview?9:22)*tScale)}px Inter,sans-serif`;
+                ctx.fillStyle = 'rgba(255,255,255,0.6)'; ctx.font = `600 ${Math.floor(22*tScale)}px Inter,sans-serif`;
                 ctx.fillText(m.label.toUpperCase(), mx, metStartY);
-                drawAutoText(m.val(), mx, metStartY + (isPreview?24:65)*tScale, (isPreview?18:55)*tScale, 900, true);
-                drawAutoText(m.val(), mx, metStartY + (isPreview?24:65)*tScale, (isPreview?18:55)*tScale, 900, false);
+                drawAutoText(m.val(), mx, metStartY + 65*tScale, 55*tScale, 900, true);
+                drawAutoText(m.val(), mx, metStartY + 65*tScale, 55*tScale, 900, false);
             });
         } else if (mets.length > 4) {
             const colW = pw / 2;
-            const rowSpacing = (isPreview ? 45 : 125) * tScale;
+            const rowSpacing = 125 * tScale;
             mets.forEach((m, i) => {
                 const mx = px + colW/2 + ((i % 2) * colW);
                 const my = metStartY + (Math.floor(i / 2) * rowSpacing);
-                ctx.fillStyle = 'rgba(255,255,255,0.6)'; ctx.font = `600 ${Math.floor((isPreview?8:20)*tScale)}px Inter,sans-serif`;
+                ctx.fillStyle = 'rgba(255,255,255,0.6)'; ctx.font = `600 ${Math.floor(20*tScale)}px Inter,sans-serif`;
                 ctx.fillText(m.label.toUpperCase(), mx, my);
-                drawAutoText(m.val(), mx, my + (isPreview?22:60)*tScale, (isPreview?18:52)*tScale, 900, true);
-                drawAutoText(m.val(), mx, my + (isPreview?22:60)*tScale, (isPreview?18:52)*tScale, 900, false);
+                drawAutoText(m.val(), mx, my + 60*tScale, 52*tScale, 900, true);
+                drawAutoText(m.val(), mx, my + 60*tScale, 52*tScale, 900, false);
             });
         } else {
-            const rowSpacing = (isPreview ? 60 : 160) * tScale;
+            const rowSpacing = 160 * tScale;
             mets.forEach((m, i) => {
                 const my = metStartY + i * rowSpacing;
-                ctx.fillStyle = 'rgba(255,255,255,0.6)'; ctx.font = `600 ${Math.floor((isPreview?10:26)*tScale)}px Inter,sans-serif`;
+                ctx.fillStyle = 'rgba(255,255,255,0.6)'; ctx.font = `600 ${Math.floor(26*tScale)}px Inter,sans-serif`;
                 ctx.fillText(m.label.toUpperCase(), cx, my);
-                drawAutoText(m.val(), cx, my + (isPreview?28:80)*tScale, (isPreview?26:80)*tScale, 900, true);
-                drawAutoText(m.val(), cx, my + (isPreview?28:80)*tScale, (isPreview?26:80)*tScale, 900, false);
+                drawAutoText(m.val(), cx, my + 80*tScale, 80*tScale, 900, true);
+                drawAutoText(m.val(), cx, my + 80*tScale, 80*tScale, 900, false);
             });
         }
 
         // FOOTER / DISTINTIVO
-        const badgeY = py + ph - (isPreview?26:70);
+        const badgeY = py + ph - 70;
         ctx.fillStyle = accent;
-        if(ctx.roundRect) { ctx.beginPath(); ctx.roundRect(cx-110*(isPreview?0.6:1), badgeY, 220*(isPreview?0.6:1), isPreview?18:40, 20); ctx.fill(); }
+        if(ctx.roundRect) { ctx.beginPath(); ctx.roundRect(cx-110, badgeY, 220, 40, 20); ctx.fill(); }
         else { ctx.fillRect(cx-110, badgeY, 220, 40); }
-        ctx.fillStyle = '#000'; ctx.font = `800 ${isPreview?8:17}px Inter,sans-serif`;
-        ctx.fillText('SISTEMA AX-CORE', cx, badgeY + (isPreview?12:26));
+        ctx.fillStyle = '#000'; ctx.font = `800 17px Inter,sans-serif`;
+        ctx.fillText('SISTEMA AX-CORE', cx, badgeY + 26);
         
-        ctx.fillStyle = 'rgba(255,255,255,0.3)'; ctx.font = `500 ${isPreview?7:16}px Inter,sans-serif`;
-        ctx.fillText('OPTIMIZACIÓN BIOLÓGICA BY ARTHUR', cx, H-(isPreview?12:30));
+        ctx.fillStyle = 'rgba(255,255,255,0.3)'; ctx.font = `500 16px Inter,sans-serif`;
+        ctx.fillText('OPTIMIZACIÓN BIOLÓGICA BY ARTHUR', cx, H-30);
     }
 
     async function renderStudioPage() {
