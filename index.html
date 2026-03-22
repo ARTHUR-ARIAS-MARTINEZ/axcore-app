@@ -62,16 +62,18 @@
     <main id="app-container" class="hidden">
         <nav class="side-nav">
             <!-- Logo solo en desktop (sidebar) -->
-            <div class="nav-logo-container" style="text-align:center; margin-bottom:2.5rem; padding: 10px;">
-                <div style="background:#000; border-radius:16px; display:inline-block; overflow:hidden;">
-                    <img src="logo.png" alt="AX-CORE" style="width:100px; height:auto; display:block; mix-blend-mode:screen;">
+            <div class="nav-logo-container" style="text-align:center; margin-bottom:2rem; padding: 10px;">
+                <div style="width:90px; height:90px; border-radius:50%; overflow:hidden; margin:0 auto 8px; border:2px solid var(--accent-main); box-shadow: 0 0 20px rgba(0,255,136,0.3); background:#000;">
+                    <img src="logo.png" alt="AX-CORE" style="width:100%; height:100%; object-fit:cover;">
                 </div>
+                <div style="font-family:var(--font-accent); font-size:0.85rem; color:var(--accent-main); line-height:1.2; letter-spacing:2px; font-weight:900;">AX-CORE<br><span style="color:white; font-size:0.55rem; letter-spacing:3px; font-weight:400;">BY ARTHUR</span></div>
             </div>
             <!-- Logo solo en móvil (barra superior) -->
             <div class="nav-logo-mobile">
-                <div style="background:#000; border-radius:8px; display:inline-block; overflow:hidden;">
-                    <img src="logo.png" alt="AX-CORE" style="width:36px; height:36px; display:block; mix-blend-mode:screen;">
+                <div style="width:32px; height:32px; border-radius:50%; overflow:hidden; border:1px solid var(--accent-main); background:#000; flex-shrink:0;">
+                    <img src="logo.png" alt="AX-CORE" style="width:100%; height:100%; object-fit:cover;">
                 </div>
+                <span style="font-family:var(--font-accent); font-size:0.7rem; color:var(--accent-main); letter-spacing:1px; font-weight:900; line-height:1;">AX-CORE</span>
             </div>
             <ul class="nav-links">
                 <li class="active" data-page="dashboard"><span class="nav-icon">🏠</span><span class="nav-label">Tablero</span></li>
