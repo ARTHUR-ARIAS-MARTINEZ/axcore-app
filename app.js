@@ -1060,141 +1060,154 @@ document.addEventListener('DOMContentLoaded', () => {
         // 1. Fondo temático
         drawStudioBg(ctx, W, H, tpl);
 
-        // 2. Overlay oscuro degradado
-        const ov = ctx.createLinearGradient(0,0,0,H);
-        ov.addColorStop(0,'rgba(0,0,0,0.25)'); ov.addColorStop(1,'rgba(0,0,0,0.75)');
-        ctx.fillStyle=ov; ctx.fillRect(0,0,W,H);
-
-        // 3. Panel central glassmorphism
-        const pw=W*0.88, ph=H*0.82, px=(W-pw)/2, py=(H-ph)/2;
-        ctx.beginPath();
-        if(ctx.roundRect) ctx.roundRect(px,py,pw,ph,30); else ctx.rect(px,py,pw,ph);
-        ctx.fillStyle='rgba(10,12,18,0.55)'; ctx.fill();
-        ctx.lineWidth=1.5; ctx.strokeStyle='rgba(255,255,255,0.1)'; ctx.stroke();
+        // 2. Overlay cinemático de contraste
+        const ov = ctx.createLinearGradient(0, 0, 0, H);
+        ov.addColorStop(0, 'rgba(0, 0, 0, 0.4)');
+        ov.addColorStop(1, 'rgba(0, 0, 0, 0.85)');
+        ctx.fillStyle = ov; ctx.fillRect(0, 0, W, H);
 
         const cx = W/2;
-        // Accent inteligente por plantilla
         const accentMap = {
             'hielo':'#0099cc','carbono':'#d4af37','neon':'#00e5ff','fuego':'#ffcc00',
-            'blood':'#ff3333','militar':'#8aff7a','custom':'#00e5ff',
-            'fem1':'#ffcccc','fem2':'#d4a0a8','fem3':'#ffb347','fem4':'#00ced1',
-            'gay_m1':'#ff00ff','gay_m2':'#add8e6','gay_m3':'#ffd700',
-            'gay_f1':'#ff4500','gay_f2':'#8a2be2','gay_f3':'#8fbc8f'
+            'blood':'#ff3333','militar':'#8aff7a','custom':'#00e5ff','fem1':'#ffcccc',
+            'fem2':'#d4a0a8','fem3':'#ffb347','fem4':'#00ced1','gay_m1':'#ff00ff',
+            'gay_m2':'#add8e6','gay_m3':'#ffd700','gay_f1':'#ff4500','gay_f2':'#8a2be2','gay_f3':'#8fbc8f'
         };
         const accent = accentMap[tpl.id] || '#8aff7a';
 
-        // TEXT SIZING HELPER
-        const tScale = Math.max(0.7, Math.min(2.5, studioState.textSize));
+        // Escala global dinámica
+        const tScale = Math.max(0.5, Math.min(2.5, studioState.textSize));
         const customColor = studioState.textColor === 'theme' ? '#ffffff' : studioState.textColor;
+        const isAuto = studioState.textColor === 'theme';
 
-        // 3.5 LOGOTIPO (Armónico y visible con sombra suave)
+        // 3. Panel central HUD / Trading Card style
+        const pw = W*0.90, ph = H*0.86, px = (W-pw)/2, py = (H-ph)/2;
+        
+        ctx.beginPath();
+        if(ctx.roundRect) ctx.roundRect(px, py, pw, ph, 24); else ctx.rect(px, py, pw, ph);
+        ctx.fillStyle = 'rgba(10, 12, 18, 0.45)';
+        ctx.fill();
+        ctx.lineWidth = 1.5; ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)'; ctx.stroke();
+        
+        // Esquinas HUD deportivas
+        ctx.beginPath(); ctx.lineWidth = isPreview ? 2 : 4; ctx.strokeStyle = accent;
+        const cl = isPreview ? 15 : 45; // longitud del corte
+        ctx.moveTo(px, py+cl); ctx.lineTo(px, py); ctx.lineTo(px+cl, py);
+        ctx.moveTo(px+pw-cl, py); ctx.lineTo(px+pw, py); ctx.lineTo(px+pw, py+cl);
+        ctx.moveTo(px+pw, py+ph-cl); ctx.lineTo(px+pw, py+ph); ctx.lineTo(px+pw-cl, py+ph);
+        ctx.moveTo(px+cl, py+ph); ctx.lineTo(px, py+ph); ctx.lineTo(px, py+ph-cl);
+        ctx.stroke();
+
+        // LOGO INDEPENDIENTE (Aislado arriba, no colisiona jamás con texto)
+        const logoTargetY = py + (isPreview ? 25 : 60);
         if (STUDIO_LOGO_IMG) {
-            const logoW = isPreview ? 100 : 250;
-            ctx.globalAlpha = 0.9;
-            ctx.shadowColor = 'rgba(0,0,0,0.6)'; ctx.shadowBlur = isPreview ? 8 : 25;
-            ctx.drawImage(STUDIO_LOGO_IMG, cx - logoW/2, py + (isPreview ? 25 : 55), logoW, logoW);
-            ctx.shadowBlur = 0; ctx.globalAlpha = 1.0;
+            const logoW = isPreview ? 85 : 220;
+            ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = isPreview ? 10 : 30;
+            ctx.drawImage(STUDIO_LOGO_IMG, cx - logoW/2, logoTargetY, logoW, logoW);
+            ctx.shadowBlur = 0;
         }
 
-        // 4. Título superior
-        const logoOffset = STUDIO_LOGO_IMG ? (isPreview ? 140 : 340) : (isPreview ? 25 : 80);
-        const titleY = py + (isLandscape ? (STUDIO_LOGO_IMG ? 150 : 80) : logoOffset);
-        
-        ctx.fillStyle=accent; ctx.font=`800 ${Math.floor((isPreview?14:28)*tScale)}px Inter,sans-serif`;
-        ctx.textAlign='center';
-        
-        ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = isPreview?6:18;
-        ctx.fillText('RESULTADOS OFICIALES', cx, titleY);
-        ctx.shadowColor = accent; ctx.shadowBlur = isPreview?8:20;
-        ctx.fillText('RESULTADOS OFICIALES', cx, titleY);
-        ctx.shadowBlur=0;
+        // MOTOR DE EFECTO AUTO (Glow Mágico Híbrido)
+        const drawAutoText = (txt, x, y, size, weight, shadowPass) => {
+            ctx.font = `${weight} ${Math.floor(size)}px Inter,sans-serif`;
+            ctx.textAlign = 'center';
+            if (isAuto) {
+                ctx.fillStyle = shadowPass ? accent : '#ffffff';
+                ctx.shadowColor = shadowPass ? accent : 'rgba(0,0,0,0.95)';
+                ctx.shadowBlur = isPreview ? (shadowPass ? 12 : 5) : (shadowPass ? 35 : 15);
+                ctx.globalCompositeOperation = shadowPass ? 'screen' : 'source-over';
+                ctx.fillText(txt, x, y);
+                // La capa que chupa el color del fondo (Efecto cristal)
+                if (!shadowPass) {
+                    ctx.globalCompositeOperation = 'overlay';
+                    ctx.fillStyle = 'rgba(255,255,255,0.6)';
+                    ctx.fillText(txt, x, y);
+                    ctx.globalCompositeOperation = 'source-over';
+                }
+            } else {
+                ctx.fillStyle = customColor;
+                ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = isPreview ? 6 : 18;
+                ctx.fillText(txt, x, y);
+            }
+            ctx.shadowBlur = 0; ctx.globalCompositeOperation = 'source-over';
+        };
 
-        // 5. Nombre grande
-        const nameY = titleY + (isPreview?20:55);
+        // El texto inicia debajo del logo
+        const textStartY = logoTargetY + (STUDIO_LOGO_IMG ? (isPreview ? 100 : 250) : (isPreview ? 20 : 40));
+
+        // TÍTULO OFICIAL
+        ctx.fillStyle = accent; ctx.textAlign = 'center';
+        // El título estático se escala ligéramente menos para dar jerarquía
+        ctx.font = `800 ${Math.floor((isPreview?13:30)*(1 + (tScale-1)*0.5))}px Inter,sans-serif`;
+        ctx.letterSpacing = '4px';
+        ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = isPreview?4:15;
+        ctx.fillText('RESULTADOS OFICIALES', cx, textStartY);
+        ctx.letterSpacing = '0px'; ctx.shadowBlur = 0;
+
+        // NOMBRE DEL ATLETA (Escala Completa Y Proporcional)
+        const nameY = textStartY + (isPreview?22:64) * tScale;
         const atletaName = (userData.username||'ATLETA').toUpperCase();
-        ctx.font=`900 ${Math.floor((isPreview?22:60)*tScale)}px Inter,sans-serif`;
-        ctx.shadowColor='rgba(0,0,0,0.9)'; ctx.shadowBlur=isPreview?8:20;
-        ctx.fillStyle=customColor;
-        ctx.fillText(atletaName, cx, nameY);
-        ctx.shadowBlur=0;
+        drawAutoText(atletaName, cx, nameY, (isPreview?24:70) * tScale, 900, true);
+        drawAutoText(atletaName, cx, nameY, (isPreview?24:70) * tScale, 900, false);
 
-        // 6. Divider
-        const divY = nameY + (isPreview?12:35);
-        const gradientLine = ctx.createLinearGradient(px, 0, px+pw, 0);
-        gradientLine.addColorStop(0, 'rgba(255,255,255,0)');
-        gradientLine.addColorStop(0.5, accent);
-        gradientLine.addColorStop(1, 'rgba(255,255,255,0)');
-        ctx.fillStyle = gradientLine;
-        ctx.fillRect(px+40, divY, pw-80, isPreview?2:3);
+        // SEPARADOR DINÁMICO
+        const divY = nameY + (isPreview?16:45) * tScale;
+        const gradLine = ctx.createLinearGradient(cx - (pw*0.35), 0, cx + (pw*0.35), 0);
+        gradLine.addColorStop(0, 'rgba(255,255,255,0)');
+        gradLine.addColorStop(0.5, accent);
+        gradLine.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.fillStyle = gradLine; ctx.fillRect(cx - (pw*0.35), divY, pw*0.7, isPreview ? 2 : 4);
 
-        // 7. Métricas dinámicas (Smart Columns)
+        // =======================================================
+        // MÉTRICAS (PROPORCIÓN Y PERFECTA SIN COLISIONES VERTICALES)
+        // =======================================================
         const mets = STUDIO_METRICS.filter(m => activeMetrics.includes(m.key));
-        const metStartY = divY + (isPreview?22:55);
+        const metStartY = divY + (isPreview?35:90) * tScale;
 
         if (mets.length === 0) {
-            ctx.fillStyle='rgba(255,255,255,0.3)'; ctx.font=`600 ${isPreview?10:22}px Inter,sans-serif`;
-            ctx.fillText('Selecciona métricas para mostrar', cx, metStartY + 20);
+            ctx.fillStyle = 'rgba(255,255,255,0.2)'; ctx.font = `600 ${isPreview?12:28}px Inter,sans-serif`;
+            ctx.fillText('SELECCIONE MÉTRICAS', cx, metStartY + (isPreview?30:80));
         } else if (isLandscape && mets.length > 1) {
-            // LANDSCAPE: fila horizontal
             const colW = pw / Math.min(mets.length, 8);
             mets.forEach((m, i) => {
                 const mx = px + colW/2 + i * colW;
-                ctx.fillStyle='rgba(255,255,255,0.5)'; ctx.font=`600 ${Math.floor((isPreview?8:18)*tScale)}px Inter,sans-serif`;
+                ctx.fillStyle = 'rgba(255,255,255,0.6)'; ctx.font = `600 ${Math.floor((isPreview?9:22)*tScale)}px Inter,sans-serif`;
                 ctx.fillText(m.label.toUpperCase(), mx, metStartY);
-                ctx.fillStyle=customColor; ctx.font=`900 ${Math.floor((isPreview?16:50)*tScale)}px Inter,sans-serif`;
-                ctx.shadowColor=accent; ctx.shadowBlur=isPreview?6:16;
-                ctx.fillText(m.val(), mx, metStartY + (isPreview?20:55));
-                ctx.shadowBlur=0;
+                drawAutoText(m.val(), mx, metStartY + (isPreview?24:65)*tScale, (isPreview?18:55)*tScale, 900, true);
+                drawAutoText(m.val(), mx, metStartY + (isPreview?24:65)*tScale, (isPreview?18:55)*tScale, 900, false);
             });
         } else if (mets.length > 4) {
-            // 2 COLUMNAS
             const colW = pw / 2;
-            const spacing = isPreview ? 38 : 100;
+            const rowSpacing = (isPreview ? 45 : 125) * tScale;
             mets.forEach((m, i) => {
-                const col = i % 2;
-                const row = Math.floor(i / 2);
-                const mx = px + colW/2 + (col * colW);
-                const my = metStartY + (row * spacing);
-                
-                ctx.fillStyle='rgba(255,255,255,0.5)'; ctx.font=`600 ${Math.floor((isPreview?8:18)*tScale)}px Inter,sans-serif`;
+                const mx = px + colW/2 + ((i % 2) * colW);
+                const my = metStartY + (Math.floor(i / 2) * rowSpacing);
+                ctx.fillStyle = 'rgba(255,255,255,0.6)'; ctx.font = `600 ${Math.floor((isPreview?8:20)*tScale)}px Inter,sans-serif`;
                 ctx.fillText(m.label.toUpperCase(), mx, my);
-                
-                ctx.fillStyle=customColor; ctx.font=`900 ${Math.floor((isPreview?16:48)*tScale)}px Inter,sans-serif`;
-                ctx.shadowColor='rgba(0,0,0,0.8)'; ctx.shadowBlur=isPreview?4:12;
-                ctx.fillText(m.val(), mx, my + (isPreview?18:48));
-                ctx.shadowColor = accent; ctx.shadowBlur=isPreview?6:16;
-                ctx.fillText(m.val(), mx, my + (isPreview?18:48));
-                ctx.shadowBlur=0;
+                drawAutoText(m.val(), mx, my + (isPreview?22:60)*tScale, (isPreview?18:52)*tScale, 900, true);
+                drawAutoText(m.val(), mx, my + (isPreview?22:60)*tScale, (isPreview?18:52)*tScale, 900, false);
             });
         } else {
-            // 1 COLUMNA NORMAL
-            const spacing = isPreview ? 50 : 125;
+            const rowSpacing = (isPreview ? 60 : 160) * tScale;
             mets.forEach((m, i) => {
-                const my = metStartY + i * spacing;
-                ctx.fillStyle='rgba(255,255,255,0.5)'; ctx.font=`600 ${Math.floor((isPreview?9:22)*tScale)}px Inter,sans-serif`;
+                const my = metStartY + i * rowSpacing;
+                ctx.fillStyle = 'rgba(255,255,255,0.6)'; ctx.font = `600 ${Math.floor((isPreview?10:26)*tScale)}px Inter,sans-serif`;
                 ctx.fillText(m.label.toUpperCase(), cx, my);
-                ctx.fillStyle=customColor; ctx.font=`900 ${Math.floor((isPreview?22:75)*tScale)}px Inter,sans-serif`;
-                
-                ctx.shadowColor='rgba(0,0,0,0.8)'; ctx.shadowBlur=isPreview?5:15;
-                ctx.fillText(m.val(), cx, my + (isPreview?24:65));
-                ctx.shadowColor=accent; ctx.shadowBlur=isPreview?8:20;
-                ctx.fillText(m.val(), cx, my + (isPreview?24:65));
-                ctx.shadowBlur=0;
+                drawAutoText(m.val(), cx, my + (isPreview?28:80)*tScale, (isPreview?26:80)*tScale, 900, true);
+                drawAutoText(m.val(), cx, my + (isPreview?28:80)*tScale, (isPreview?26:80)*tScale, 900, false);
             });
         }
 
-        // 8. Badge inferior
-        const badgeY = py + ph - (isPreview?26:65);
-        ctx.fillStyle=accent;
-        if(ctx.roundRect){ ctx.beginPath(); ctx.roundRect(cx-110*(isPreview?0.6:1), badgeY, 220*(isPreview?0.6:1), isPreview?20:42, 20); ctx.fill(); }
-        else { ctx.fillRect(cx-110, badgeY, 220, 42); }
-        ctx.fillStyle='#000'; ctx.font=`800 ${isPreview?8:18}px Inter,sans-serif`;
-        ctx.fillText('SISTEMA AX-CORE', cx, badgeY + (isPreview?14:28));
-
-        // 9. Footer
-        ctx.fillStyle='rgba(255,255,255,0.35)'; ctx.font=`500 ${isPreview?7:16}px Inter,sans-serif`;
-        ctx.textAlign='center';
-        ctx.fillText('OPTIMIZACIÓN BIOLÓGICA BY ARTHUR', cx, H-(isPreview?8:25));
+        // FOOTER / DISTINTIVO
+        const badgeY = py + ph - (isPreview?26:70);
+        ctx.fillStyle = accent;
+        if(ctx.roundRect) { ctx.beginPath(); ctx.roundRect(cx-110*(isPreview?0.6:1), badgeY, 220*(isPreview?0.6:1), isPreview?18:40, 20); ctx.fill(); }
+        else { ctx.fillRect(cx-110, badgeY, 220, 40); }
+        ctx.fillStyle = '#000'; ctx.font = `800 ${isPreview?8:17}px Inter,sans-serif`;
+        ctx.fillText('SISTEMA AX-CORE', cx, badgeY + (isPreview?12:26));
+        
+        ctx.fillStyle = 'rgba(255,255,255,0.3)'; ctx.font = `500 ${isPreview?7:16}px Inter,sans-serif`;
+        ctx.fillText('OPTIMIZACIÓN BIOLÓGICA BY ARTHUR', cx, H-(isPreview?12:30));
     }
 
     async function renderStudioPage() {
