@@ -1046,6 +1046,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         const fmt = STUDIO_FORMATS.find(f=>f.id===fmtId) || STUDIO_FORMATS[0];
         const W = fmt.w, H = fmt.h;
+        const isLandscape = fmtId === 'landscape';
         canvas.width = W; canvas.height = H;
         const ctx = canvas.getContext('2d');
 
@@ -1054,143 +1055,139 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 2. Overlay oscuro degradado
         const ov = ctx.createLinearGradient(0,0,0,H);
-        ov.addColorStop(0,'rgba(0,0,0,0.2)'); ov.addColorStop(1,'rgba(0,0,0,0.7)');
+        ov.addColorStop(0,'rgba(0,0,0,0.25)'); ov.addColorStop(1,'rgba(0,0,0,0.75)');
         ctx.fillStyle=ov; ctx.fillRect(0,0,W,H);
 
         // 3. Panel central glassmorphism
         const pw=W*0.88, ph=H*0.82, px=(W-pw)/2, py=(H-ph)/2;
-        ctx.save();
         ctx.beginPath();
         if(ctx.roundRect) ctx.roundRect(px,py,pw,ph,30); else ctx.rect(px,py,pw,ph);
         ctx.fillStyle='rgba(10,12,18,0.55)'; ctx.fill();
         ctx.lineWidth=1.5; ctx.strokeStyle='rgba(255,255,255,0.1)'; ctx.stroke();
 
         const cx = W/2;
-        const accent = tpl.id==='hielo' ? tpl.colors[2] : (tpl.id==='carbono' ? tpl.colors[2] : tpl.id==='neon' ? tpl.colors[2] : tpl.id==='fuego' ? '#ffcc00' : tpl.id==='blood' ? '#ff3333' : '#8aff7a');
+        // Accent inteligente por plantilla
+        const accentMap = {
+            'hielo':'#0099cc','carbono':'#d4af37','neon':'#00e5ff','fuego':'#ffcc00',
+            'blood':'#ff3333','militar':'#8aff7a','custom':'#00e5ff',
+            'fem1':'#ffcccc','fem2':'#d4a0a8','fem3':'#ffb347','fem4':'#00ced1',
+            'gay_m1':'#ff00ff','gay_m2':'#add8e6','gay_m3':'#ffd700',
+            'gay_f1':'#ff4500','gay_f2':'#8a2be2','gay_f3':'#8fbc8f'
+        };
+        const accent = accentMap[tpl.id] || '#8aff7a';
 
         // TEXT SIZING HELPER
         const tScale = Math.max(0.7, Math.min(1.5, studioState.textSize));
         const customColor = studioState.textColor === 'theme' ? '#ffffff' : studioState.textColor;
 
-        // 3.5 LOGOTIPO (Armónico, centrado y más visible)
+        // 3.5 LOGOTIPO (Armónico y visible con sombra suave)
         if (STUDIO_LOGO_IMG) {
-            const logoW = isPreview ? 60 : 180;
-            ctx.shadowColor = 'rgba(0,0,0,0.5)'; ctx.shadowBlur = isPreview ? 10 : 30;
-            ctx.drawImage(STUDIO_LOGO_IMG, cx - logoW/2, py + (isPreview ? 15 : 40), logoW, logoW);
-            ctx.shadowBlur = 0;
+            const logoW = isPreview ? 50 : 140;
+            ctx.globalAlpha = 0.9;
+            ctx.shadowColor = 'rgba(0,0,0,0.6)'; ctx.shadowBlur = isPreview ? 8 : 25;
+            ctx.drawImage(STUDIO_LOGO_IMG, cx - logoW/2, py + (isPreview ? 12 : 35), logoW, logoW);
+            ctx.shadowBlur = 0; ctx.globalAlpha = 1.0;
         }
 
         // 4. Título superior
-        const baseTitleOffset = STUDIO_LOGO_IMG ? (isPreview ? 85 : 240) : (isPreview ? 25 : 80);
-        const titleY = py + (fmtId==='landscape' ? (STUDIO_LOGO_IMG ? 120 : 80) : baseTitleOffset);
+        const logoOffset = STUDIO_LOGO_IMG ? (isPreview ? 70 : 190) : (isPreview ? 25 : 80);
+        const titleY = py + (isLandscape ? (STUDIO_LOGO_IMG ? 100 : 80) : logoOffset);
         
-        ctx.fillStyle=accent; ctx.font=`800 ${Math.floor((isPreview?16:30)*tScale)}px Inter,sans-serif`;
+        ctx.fillStyle=accent; ctx.font=`800 ${Math.floor((isPreview?14:28)*tScale)}px Inter,sans-serif`;
         ctx.textAlign='center';
         
-        ctx.globalCompositeOperation = 'source-over';
-        ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = isPreview?4:15;
+        ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = isPreview?6:18;
         ctx.fillText('RESULTADOS OFICIALES', cx, titleY);
-        
-        ctx.shadowColor = accent; ctx.shadowBlur = isPreview?10:25;
-        ctx.globalCompositeOperation = 'screen';
+        ctx.shadowColor = accent; ctx.shadowBlur = isPreview?8:20;
         ctx.fillText('RESULTADOS OFICIALES', cx, titleY);
-        ctx.globalCompositeOperation = 'source-over';
         ctx.shadowBlur=0;
 
         // 5. Nombre grande
-        const nameY = titleY + (isPreview?22:60);
+        const nameY = titleY + (isPreview?20:55);
         const atletaName = (userData.username||'ATLETA').toUpperCase();
-        ctx.font=`900 ${Math.floor((isPreview?24:65)*tScale)}px Inter,sans-serif`;
+        ctx.font=`900 ${Math.floor((isPreview?22:60)*tScale)}px Inter,sans-serif`;
         ctx.shadowColor='rgba(0,0,0,0.9)'; ctx.shadowBlur=isPreview?8:20;
         ctx.fillStyle=customColor;
         ctx.fillText(atletaName, cx, nameY);
         ctx.shadowBlur=0;
-        
-        ctx.globalCompositeOperation = 'overlay';
-        ctx.fillStyle = 'rgba(255,255,255,0.4)';
-        ctx.fillText(atletaName, cx, nameY);
-        ctx.globalCompositeOperation = 'source-over';
 
         // 6. Divider
-        const divY = nameY + (isPreview?14:40);
+        const divY = nameY + (isPreview?12:35);
         const gradientLine = ctx.createLinearGradient(px, 0, px+pw, 0);
         gradientLine.addColorStop(0, 'rgba(255,255,255,0)');
         gradientLine.addColorStop(0.5, accent);
         gradientLine.addColorStop(1, 'rgba(255,255,255,0)');
         ctx.fillStyle = gradientLine;
-        ctx.fillRect(px+40, divY, pw-80, 3);
+        ctx.fillRect(px+40, divY, pw-80, isPreview?2:3);
 
-        // 7. Métricas dinámicas (Estilo cinemático con Smart Columns)
+        // 7. Métricas dinámicas (Smart Columns)
         const mets = STUDIO_METRICS.filter(m => activeMetrics.includes(m.key));
-        const metStartY = divY + (isPreview?30:70);
+        const metStartY = divY + (isPreview?22:55);
 
-        if (isLandscape && mets.length > 1) {
-            const colW = pw / Math.min(mets.length, 4);
+        if (mets.length === 0) {
+            ctx.fillStyle='rgba(255,255,255,0.3)'; ctx.font=`600 ${isPreview?10:22}px Inter,sans-serif`;
+            ctx.fillText('Selecciona métricas para mostrar', cx, metStartY + 20);
+        } else if (isLandscape && mets.length > 1) {
+            // LANDSCAPE: fila horizontal
+            const colW = pw / Math.min(mets.length, 8);
             mets.forEach((m, i) => {
                 const mx = px + colW/2 + i * colW;
-                ctx.fillStyle='rgba(255,255,255,0.6)'; ctx.font=`600 ${Math.floor((isPreview?10:22)*tScale)}px Inter,sans-serif`;
+                ctx.fillStyle='rgba(255,255,255,0.5)'; ctx.font=`600 ${Math.floor((isPreview?8:18)*tScale)}px Inter,sans-serif`;
                 ctx.fillText(m.label.toUpperCase(), mx, metStartY);
-                ctx.fillStyle=customColor; ctx.font=`900 ${Math.floor((isPreview?22:65)*tScale)}px Inter,sans-serif`;
-                ctx.shadowColor=accent; ctx.shadowBlur=isPreview?8:20;
-                ctx.fillText(m.val(), mx, metStartY + (isPreview?26:65));
+                ctx.fillStyle=customColor; ctx.font=`900 ${Math.floor((isPreview?16:50)*tScale)}px Inter,sans-serif`;
+                ctx.shadowColor=accent; ctx.shadowBlur=isPreview?6:16;
+                ctx.fillText(m.val(), mx, metStartY + (isPreview?20:55));
                 ctx.shadowBlur=0;
             });
         } else if (mets.length > 4) {
-            // MÁS DE 4 MÉTRICAS -> VISTA DE 2 COLUMNAS AUTOMÁTICA
+            // 2 COLUMNAS
             const colW = pw / 2;
-            const mySpacing = isPreview ? 42 : 110;
+            const spacing = isPreview ? 38 : 100;
             mets.forEach((m, i) => {
                 const col = i % 2;
                 const row = Math.floor(i / 2);
                 const mx = px + colW/2 + (col * colW);
-                const my = metStartY + (row * mySpacing);
+                const my = metStartY + (row * spacing);
                 
-                ctx.fillStyle='rgba(255,255,255,0.6)'; ctx.font=`600 ${Math.floor((isPreview?9:20)*tScale)}px Inter,sans-serif`;
+                ctx.fillStyle='rgba(255,255,255,0.5)'; ctx.font=`600 ${Math.floor((isPreview?8:18)*tScale)}px Inter,sans-serif`;
                 ctx.fillText(m.label.toUpperCase(), mx, my);
                 
-                ctx.fillStyle=customColor; ctx.font=`900 ${Math.floor((isPreview?18:55)*tScale)}px Inter,sans-serif`;
-                ctx.shadowColor='rgba(0,0,0,0.8)'; ctx.shadowBlur=isPreview?4:15;
-                ctx.fillText(m.val(), mx, my + (isPreview?22:55));
-                
-                ctx.globalCompositeOperation = 'screen';
-                ctx.shadowColor = accent; ctx.shadowBlur=isPreview?8:20;
-                ctx.fillText(m.val(), mx, my + (isPreview?22:55));
-                ctx.globalCompositeOperation = 'source-over';
+                ctx.fillStyle=customColor; ctx.font=`900 ${Math.floor((isPreview?16:48)*tScale)}px Inter,sans-serif`;
+                ctx.shadowColor='rgba(0,0,0,0.8)'; ctx.shadowBlur=isPreview?4:12;
+                ctx.fillText(m.val(), mx, my + (isPreview?18:48));
+                ctx.shadowColor = accent; ctx.shadowBlur=isPreview?6:16;
+                ctx.fillText(m.val(), mx, my + (isPreview?18:48));
                 ctx.shadowBlur=0;
             });
         } else {
-            // NORMAL 1 COLUMNA
-            const metSpacing = isPreview ? 60 : 140;
+            // 1 COLUMNA NORMAL
+            const spacing = isPreview ? 50 : 125;
             mets.forEach((m, i) => {
-                const my = metStartY + i * metSpacing;
-                ctx.fillStyle='rgba(255,255,255,0.6)'; ctx.font=`600 ${Math.floor((isPreview?10:24)*tScale)}px Inter,sans-serif`;
+                const my = metStartY + i * spacing;
+                ctx.fillStyle='rgba(255,255,255,0.5)'; ctx.font=`600 ${Math.floor((isPreview?9:22)*tScale)}px Inter,sans-serif`;
                 ctx.fillText(m.label.toUpperCase(), cx, my);
-                ctx.fillStyle=customColor; ctx.font=`900 ${Math.floor((isPreview?26:85)*tScale)}px Inter,sans-serif`;
+                ctx.fillStyle=customColor; ctx.font=`900 ${Math.floor((isPreview?22:75)*tScale)}px Inter,sans-serif`;
                 
                 ctx.shadowColor='rgba(0,0,0,0.8)'; ctx.shadowBlur=isPreview?5:15;
-                ctx.fillText(m.val(), cx, my + (isPreview?28:75));
-                
-                ctx.globalCompositeOperation = 'screen';
-                ctx.shadowColor=accent; ctx.shadowBlur=isPreview?10:25;
-                ctx.fillText(m.val(), cx, my + (isPreview?28:75));
-                ctx.globalCompositeOperation = 'source-over';
+                ctx.fillText(m.val(), cx, my + (isPreview?24:65));
+                ctx.shadowColor=accent; ctx.shadowBlur=isPreview?8:20;
+                ctx.fillText(m.val(), cx, my + (isPreview?24:65));
                 ctx.shadowBlur=0;
             });
         }
 
         // 8. Badge inferior
-        const badgeY = py + ph - (isPreview?28:70);
+        const badgeY = py + ph - (isPreview?26:65);
         ctx.fillStyle=accent;
-        if(ctx.roundRect){ ctx.beginPath(); ctx.roundRect(cx-120*(isPreview?0.6:1), badgeY, 240*(isPreview?0.6:1), isPreview?22:45, 20); ctx.fill(); }
-        else { ctx.fillRect(cx-120, badgeY, 240, 45); }
-        ctx.fillStyle='#000'; ctx.font=`800 ${isPreview?9:20}px Inter,sans-serif`;
-        ctx.fillText('SISTEMA AX-CORE', cx, badgeY + (isPreview?15:30));
-        ctx.restore();
+        if(ctx.roundRect){ ctx.beginPath(); ctx.roundRect(cx-110*(isPreview?0.6:1), badgeY, 220*(isPreview?0.6:1), isPreview?20:42, 20); ctx.fill(); }
+        else { ctx.fillRect(cx-110, badgeY, 220, 42); }
+        ctx.fillStyle='#000'; ctx.font=`800 ${isPreview?8:18}px Inter,sans-serif`;
+        ctx.fillText('SISTEMA AX-CORE', cx, badgeY + (isPreview?14:28));
 
         // 9. Footer
         ctx.fillStyle='rgba(255,255,255,0.35)'; ctx.font=`500 ${isPreview?7:16}px Inter,sans-serif`;
         ctx.textAlign='center';
-        ctx.fillText('OPTIMIZACIÓN BIOLÓGICA BY ARTHUR', cx, H-(isPreview?10:30));
+        ctx.fillText('OPTIMIZACIÓN BIOLÓGICA BY ARTHUR', cx, H-(isPreview?8:25));
     }
 
     async function renderStudioPage() {
