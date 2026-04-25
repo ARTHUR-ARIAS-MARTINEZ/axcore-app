@@ -1,24 +1,33 @@
 const express = require('express');
 const cors = require('cors');
 const fetch = require('node-fetch');
+const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
 // ============================================================
-// BASE DE DATOS EN LA NUBE (npoint.io - 100% gratis, sin cuenta)
-// Persiste para siempre. Lectura y escritura via JSON REST.
+// CONFIGURACIÓN — variables de entorno (Render)
 // ============================================================
-const DB_URL = "https://api.npoint.io/3540867fff5ccdedc4d6";
+// ADMIN_TOKEN — clave del panel maestro. DEBE definirse en Render.
+// DB_URL      — endpoint de la base de datos en la nube.
+// ============================================================
+const ADMIN_TOKEN = process.env.ADMIN_TOKEN || '';
+const DB_URL = process.env.DB_URL || 'https://api.npoint.io/3540867fff5ccdedc4d6';
 
-// Memoria RAM activa (espejo de la nube)
+if (!ADMIN_TOKEN) {
+    console.warn('⚠️  ADMIN_TOKEN no está definido. Los endpoints de admin estarán bloqueados hasta que lo configures en Render.');
+}
+
+// ============================================================
+// MEMORIA RAM (espejo de la nube)
+// ============================================================
 let db = {
     gyms: [],
     clientCodes: []
 };
-
-// --- SINCRONIZACIÓN CON LA NUBE ---
 
 async function saveToCloud() {
     try {
@@ -30,10 +39,10 @@ async function saveToCloud() {
         if (res.ok) {
             console.log(`☁️ GUARDADO → Gyms: ${db.gyms.length}, Codes: ${db.clientCodes.length}`);
         } else {
-            console.error("❌ Error al guardar:", res.status, await res.text());
+            console.error('❌ Error al guardar:', res.status);
         }
     } catch(e) {
-        console.error("❌ Error de red al guardar:", e.message);
+        console.error('❌ Error de red al guardar:', e.message);
     }
 }
 
@@ -48,46 +57,112 @@ async function loadFromCloud() {
         }
         console.log(`✅ CARGADO → Gyms: ${db.gyms.length}, Codes: ${db.clientCodes.length}`);
     } catch(e) {
-        console.error("⚠️ No se pudo cargar desde nube:", e.message);
+        console.error('⚠️ No se pudo cargar desde nube:', e.message);
     }
 }
 
 // ============================================================
-// RUTAS DEL PANEL MAESTRO (admin.html / admin.js)
+// HELPERS DE SEGURIDAD
 // ============================================================
 
-app.get('/api/admin/gyms', (req, res) => {
+// Comparación segura contra timing attacks
+function safeCompare(a, b) {
+    if (typeof a !== 'string' || typeof b !== 'string') return false;
+    const bufA = Buffer.from(a);
+    const bufB = Buffer.from(b);
+    if (bufA.length !== bufB.length) return false;
+    return crypto.timingSafeEqual(bufA, bufB);
+}
+
+// Middleware: solo deja pasar requests con header X-Admin-Token correcto
+function requireAdminAuth(req, res, next) {
+    if (!ADMIN_TOKEN) {
+        return res.status(503).json({ success: false, message: 'Servidor sin ADMIN_TOKEN configurado.' });
+    }
+    const provided = req.header('X-Admin-Token') || '';
+    if (!safeCompare(provided, ADMIN_TOKEN)) {
+        return res.status(401).json({ success: false, message: 'No autorizado.' });
+    }
+    next();
+}
+
+// Hash bcrypt para contraseñas de gym
+async function hashPassword(plain) {
+    if (!plain) return '';
+    if (typeof plain === 'string' && plain.startsWith('$2')) return plain; // ya hasheada
+    return await bcrypt.hash(String(plain), 10);
+}
+
+// Compara plain con hash O con plaintext legacy (compatibilidad retro mientras migra DB)
+async function comparePassword(plain, stored) {
+    if (!plain || !stored) return false;
+    if (typeof stored === 'string' && stored.startsWith('$2')) {
+        return await bcrypt.compare(String(plain), stored);
+    }
+    // Compat con DB vieja (texto plano). Después del primer login exitoso se rehashea.
+    return safeCompare(String(plain), String(stored));
+}
+
+// Devuelve una copia del gym sin el campo password
+function stripPassword(gym) {
+    const { password, ...safe } = gym;
+    return safe;
+}
+
+// ============================================================
+// LOGIN ADMIN — verifica token sin exponer info
+// ============================================================
+app.post('/api/admin/login', (req, res) => {
+    const { token } = req.body || {};
+    if (!ADMIN_TOKEN) {
+        return res.status(503).json({ success: false, message: 'Servidor sin ADMIN_TOKEN configurado.' });
+    }
+    if (!safeCompare(String(token || ''), ADMIN_TOKEN)) {
+        return res.status(401).json({ success: false, message: 'Clave maestra incorrecta.' });
+    }
+    res.json({ success: true });
+});
+
+// ============================================================
+// RUTAS DEL PANEL MAESTRO (admin) — TODAS PROTEGIDAS
+// ============================================================
+
+app.get('/api/admin/gyms', requireAdminAuth, (req, res) => {
     const formatted = db.gyms.map(g => {
         const count = db.clientCodes.filter(c => c.gymCode === g.gymCode).length;
-        return { ...g, currentUsers: count };
+        return { ...stripPassword(g), currentUsers: count };
     });
     res.json({ success: true, gyms: formatted });
 });
 
-app.post('/api/admin/gyms', async (req, res) => {
+app.post('/api/admin/gyms', requireAdminAuth, async (req, res) => {
     const data = req.body;
+    if (!data || !data.gymCode) {
+        return res.status(400).json({ success: false, message: 'gymCode requerido.' });
+    }
     data.active = true;
-    data.password = data.password || '1234';
     data.createdAt = new Date().toISOString();
+    // Hashear password antes de guardar
+    data.password = await hashPassword(data.password || '1234');
 
     if (!db.gyms.find(g => g.gymCode === data.gymCode)) {
         db.gyms.push(data);
         await saveToCloud();
     }
-    res.json({ success: true, gym: data });
+    res.json({ success: true, gym: stripPassword(data) });
 });
 
-app.post('/api/admin/toggle', async (req, res) => {
-    const { gymCode, status } = req.body;
+app.post('/api/admin/toggle', requireAdminAuth, async (req, res) => {
+    const { gymCode, status } = req.body || {};
     const gym = db.gyms.find(g => g.gymCode === gymCode);
     if (gym) {
-        gym.active = status;
+        gym.active = !!status;
         await saveToCloud();
     }
     res.json({ success: true, message: `Gimnasio ${gymCode} actualizado` });
 });
 
-app.delete('/api/admin/gyms/:gymCode', async (req, res) => {
+app.delete('/api/admin/gyms/:gymCode', requireAdminAuth, async (req, res) => {
     db.gyms = db.gyms.filter(g => g.gymCode !== req.params.gymCode);
     db.clientCodes = db.clientCodes.filter(c => c.gymCode !== req.params.gymCode);
     await saveToCloud();
@@ -95,27 +170,29 @@ app.delete('/api/admin/gyms/:gymCode', async (req, res) => {
 });
 
 // ============================================================
-// RUTAS DEL PANEL COACH (coach.html)
+// RUTAS DEL PANEL COACH (coach) — auth con código + contraseña
 // ============================================================
 
-app.post('/api/coach/login', (req, res) => {
-    const { gymCode, password } = req.body;
+app.post('/api/coach/login', async (req, res) => {
+    const { gymCode, password } = req.body || {};
+    if (!gymCode || !password) {
+        return res.json({ success: false, message: 'Faltan credenciales.' });
+    }
+    const gym = db.gyms.find(g => g.gymCode === gymCode);
+    if (!gym) return res.json({ success: false, message: 'CÓDIGO DE FRANQUICIA INEXISTENTE' });
+    if (!gym.active) return res.json({ success: false, message: 'SISTEMA CONGELADO. CONTACTA AX-CORE MÁSTER.' });
 
-    if (gymCode === "GYM-MASTER" && password === "1234") {
-        return res.json({
-            success: true,
-            gym: { name: "Máquina Principal", maxUsers: 9999, active: true, gymCode: "GYM-MASTER" },
-            currentUsers: db.clientCodes.filter(c => c.gymCode === "GYM-MASTER").length
-        });
+    const ok = await comparePassword(password, gym.password);
+    if (!ok) return res.json({ success: false, message: 'CONTRASEÑA INCORRECTA' });
+
+    // Si la password venía en plaintext (legacy), la rehasheamos en este login
+    if (gym.password && !String(gym.password).startsWith('$2')) {
+        gym.password = await hashPassword(password);
+        await saveToCloud();
     }
 
-    const gym = db.gyms.find(g => g.gymCode === gymCode);
-    if (!gym) return res.json({ success: false, message: "CÓDIGO DE FRANQUICIA INEXISTENTE" });
-    if (!gym.active) return res.json({ success: false, message: "SISTEMA CONGELADO. CONTACTA AX-CORE MÁSTER." });
-    if (gym.password !== password) return res.json({ success: false, message: "CONTRASEÑA INCORRECTA" });
-
     const usageCount = db.clientCodes.filter(c => c.gymCode === gymCode).length;
-    res.json({ success: true, gym, currentUsers: usageCount });
+    res.json({ success: true, gym: stripPassword(gym), currentUsers: usageCount });
 });
 
 app.get('/api/coach/codes/:gymCode', (req, res) => {
@@ -123,17 +200,11 @@ app.get('/api/coach/codes/:gymCode', (req, res) => {
 });
 
 app.post('/api/coach/generate', async (req, res) => {
-    const { gymId, user } = req.body;
-
-    let limit = 50;
-    if (gymId !== "GYM-MASTER") {
-        const gym = db.gyms.find(g => g.gymCode === gymId);
-        if (!gym) return res.json({ success: false, message: "Franquicia no encontrada." });
-        if (!gym.active) return res.json({ success: false, message: "SISTEMA PAUSADO POR AX-CORE." });
-        limit = gym.maxUsers || 50;
-    } else {
-        limit = 9999;
-    }
+    const { gymId, user } = req.body || {};
+    const gym = db.gyms.find(g => g.gymCode === gymId);
+    if (!gym) return res.json({ success: false, message: 'Franquicia no encontrada.' });
+    if (!gym.active) return res.json({ success: false, message: 'SISTEMA PAUSADO POR AX-CORE.' });
+    const limit = gym.maxUsers || 50;
 
     const currentCount = db.clientCodes.filter(c => c.gymCode === gymId).length;
     if (currentCount >= limit) {
@@ -145,7 +216,7 @@ app.post('/api/coach/generate', async (req, res) => {
         code: newCode,
         gymCode: gymId,
         active: true,
-        user: user || "Atleta",
+        user: user || 'Atleta',
         createdAt: new Date().toISOString()
     });
     await saveToCloud();
@@ -154,10 +225,10 @@ app.post('/api/coach/generate', async (req, res) => {
 });
 
 app.post('/api/coach/toggle', async (req, res) => {
-    const { code, status } = req.body;
+    const { code, status } = req.body || {};
     const cc = db.clientCodes.find(c => c.code === code);
     if (cc) {
-        cc.active = status;
+        cc.active = !!status;
         await saveToCloud();
     }
     res.json({ success: true });
@@ -167,60 +238,53 @@ app.delete('/api/coach/users/:code', async (req, res) => {
     const code = req.params.code;
     const initialLen = db.clientCodes.length;
     db.clientCodes = db.clientCodes.filter(c => c.code !== code);
-    
+
     if (db.clientCodes.length < initialLen) {
         await saveToCloud();
-        res.json({ success: true, message: "Usuario eliminado definitivamente." });
+        res.json({ success: true, message: 'Usuario eliminado definitivamente.' });
     } else {
-        res.status(404).json({ success: false, message: "Usuario no encontrado." });
+        res.status(404).json({ success: false, message: 'Usuario no encontrado.' });
     }
 });
 
 // ============================================================
-// VALIDACIÓN PARA LA APP DEL USUARIO (app.js)
+// VALIDACIÓN PARA LA APP DEL USUARIO (atleta)
 // ============================================================
 
 app.post('/api/validate', (req, res) => {
-    const { code } = req.body;
+    const { code } = req.body || {};
+    if (!code) return res.json({ success: false, message: 'Código requerido.' });
 
-    // Códigos maestros
-    if (code === "AXV-DEMO" || code === "GYM-MASTER" || code === "AXV-ADMIN") {
-        return res.json({ success: true, message: "ACCESO ALFA OTORGADO." });
+    // Solo AXV-DEMO queda como código de prueba abierto
+    if (code === 'AXV-DEMO') {
+        return res.json({ success: true, message: 'ACCESO DEMO OTORGADO.' });
     }
 
-    // Buscar código generado por un coach
     const pass = db.clientCodes.find(c => c.code === code);
     if (pass) {
         if (!pass.active) {
-            return res.json({ success: false, message: "ACCESO DENEGADO POR TU RECEPCIÓN. CORTADO TEMPORALMENTE." });
+            return res.json({ success: false, message: 'ACCESO DENEGADO POR TU RECEPCIÓN. CORTADO TEMPORALMENTE.' });
         }
-        if (pass.gymCode !== "GYM-MASTER") {
-            const gym = db.gyms.find(g => g.gymCode === pass.gymCode);
-            if (gym && !gym.active) {
-                return res.json({ success: false, message: "FRANQUICIA SIN PAGO ACTIVO. COMUNÍCATE CON EL DUEÑO." });
-            }
-            return res.json({ success: true, message: "ACCESO ÉLITE CONCEDIDO.", apiKey: gym ? gym.apiKey : "" });
+        const gym = db.gyms.find(g => g.gymCode === pass.gymCode);
+        if (gym && !gym.active) {
+            return res.json({ success: false, message: 'FRANQUICIA SIN PAGO ACTIVO. COMUNÍCATE CON EL DUEÑO.' });
         }
-        return res.json({ success: true, message: "ACCESO ALFA CONCEDIDO." });
+        return res.json({ success: true, message: 'ACCESO ÉLITE CONCEDIDO.' });
     }
 
-    res.json({ success: false, message: "CÓDIGO INEXISTENTE. Pide uno en la recepción del gimnasio." });
+    res.json({ success: false, message: 'CÓDIGO INEXISTENTE. Pide uno en la recepción del gimnasio.' });
 });
 
 // ============================================================
-// HEALTH & DEBUG
+// HEALTH (sin info sensible)
 // ============================================================
 
 app.get('/health', (req, res) => {
     res.json({
-        status: "AX-CORE BACKEND ONLINE",
+        status: 'AX-CORE BACKEND ONLINE',
         gyms: db.gyms.length,
         codes: db.clientCodes.length
     });
-});
-
-app.get('/api/debug/all', (req, res) => {
-    res.json(db);
 });
 
 // ============================================================

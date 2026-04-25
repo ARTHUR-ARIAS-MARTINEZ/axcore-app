@@ -259,13 +259,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert(data.message);
             }
         } catch(e) {
-            // Si el backend duerme o falla, permitimos modo offline si usan pase maestro
-            if (gc === "AXV-DEMO" || gc === "GYM-MASTER") {
+            // Modo offline solo con código de prueba pública
+            if (gc === "AXV-DEMO") {
                 currentUser = u;
                 userData.username = u;
                 userData.password = p;
                 userData.gymCode = gc;
-                userData.apiKey = 'validated_offline';
                 saveData();
                 localStorage.setItem('arthur_current_user', u);
                 alert("Modo Fuera de Línea Activado (Servidor reiniciando).");

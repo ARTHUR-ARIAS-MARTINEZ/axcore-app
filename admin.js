@@ -1,10 +1,17 @@
 document.addEventListener('DOMContentLoaded', () => {
     // --- ESTADO ADMIN ---
-    const ADMIN_PASSWORD = "ARTHUR2026";
+    // La clave maestra ya NO vive en el cliente. Se valida contra el backend
+    // que la lee de la variable de entorno ADMIN_TOKEN configurada en Render.
     let adminData = {
         blocks: [],
         gyms: []
     };
+
+    // Helper: arma headers con el token de sesión para endpoints protegidos
+    function adminHeaders(extra = {}) {
+        const tok = sessionStorage.getItem('admin_token') || '';
+        return { 'X-Admin-Token': tok, ...extra };
+    }
 
     const loginOverlay = document.getElementById('admin-login');
     const adminContainer = document.getElementById('admin-container');
@@ -17,23 +24,39 @@ document.addEventListener('DOMContentLoaded', () => {
     const gymBlockSelect = document.getElementById('gym-block-select');
 
     // --- SESIÓN ---
-    if (sessionStorage.getItem('admin_active')) {
+    if (sessionStorage.getItem('admin_token')) {
         showAdmin();
     }
 
-    btnLogin.onclick = () => {
-        if (adminPassInput.value === ADMIN_PASSWORD) {
-            sessionStorage.setItem('admin_active', 'true');
-            showAdmin();
-        } else {
-            alert("ACCESO DENEGADO: Clave Maestra Incorrecta.");
+    btnLogin.onclick = async () => {
+        const token = adminPassInput.value.trim();
+        if (!token) return alert("Ingresa la clave maestra.");
+        btnLogin.disabled = true;
+        btnLogin.textContent = "VERIFICANDO...";
+        try {
+            const res = await fetch(`${API_URL}/api/admin/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ token })
+            });
+            const data = await res.json();
+            if (data.success) {
+                sessionStorage.setItem('admin_token', token);
+                showAdmin();
+            } else {
+                alert("ACCESO DENEGADO: " + (data.message || 'Clave incorrecta.'));
+            }
+        } catch (e) {
+            alert("Error de conexión con el servidor. Espera unos segundos a que despierte (Render cold start) e intenta otra vez.");
         }
+        btnLogin.disabled = false;
+        btnLogin.textContent = "AUTENTICAR SISTEMA";
     };
 
     adminPassInput.onkeypress = (e) => { if (e.key === 'Enter') btnLogin.click(); };
 
     btnLogout.onclick = () => {
-        sessionStorage.removeItem('admin_active');
+        sessionStorage.removeItem('admin_token');
         location.reload();
     };
 
@@ -56,10 +79,16 @@ document.addEventListener('DOMContentLoaded', () => {
         if (saved) {
             adminData = JSON.parse(saved);
         }
-        
+
         // Sincronizar gimnasios desde el servidor en la nube
         try {
-            const res = await fetch(`${API_URL}/api/admin/gyms`);
+            const res = await fetch(`${API_URL}/api/admin/gyms`, { headers: adminHeaders() });
+            if (res.status === 401) {
+                sessionStorage.removeItem('admin_token');
+                alert('Sesión expirada. Vuelve a entrar.');
+                location.reload();
+                return;
+            }
             const data = await res.json();
             if(data.success && data.gyms) {
                 // Fusionar datos del servidor con datos locales (para mantener blockId)
@@ -82,7 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (orphanedGyms.length > 0) {
                     // Borrar de la nube
                     for (const g of orphanedGyms) {
-                        try { await fetch(`${API_URL}/api/admin/gyms/${g.gymCode}`, { method: 'DELETE' }); } catch(e){}
+                        try { await fetch(`${API_URL}/api/admin/gyms/${g.gymCode}`, { method: 'DELETE', headers: adminHeaders() }); } catch(e){}
                     }
                     // Borrar de memoria y guardar
                     adminData.gyms = adminData.gyms.filter(g => validBlockIds.has(g.blockId));
@@ -176,7 +205,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const gymsToDelete = adminData.gyms.filter(g => g.blockId === id);
             for (const gym of gymsToDelete) {
                 try {
-                    await fetch(`${API_URL}/api/admin/gyms/${gym.gymCode}`, { method: 'DELETE' });
+                    await fetch(`${API_URL}/api/admin/gyms/${gym.gymCode}`, { method: 'DELETE', headers: adminHeaders() });
                 } catch(e) { console.error("Error borrando gym en nube", e); }
             }
             
@@ -281,7 +310,7 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const res = await fetch(`${API_URL}/api/admin/gyms`, {
                 method: 'POST',
-                headers:{'Content-Type': 'application/json'},
+                headers: adminHeaders({'Content-Type': 'application/json'}),
                 body: JSON.stringify(newGym)
             });
             const data = await res.json();
@@ -412,7 +441,7 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 await fetch(`${API_URL}/api/admin/toggle`, {
                     method: 'POST',
-                    headers:{'Content-Type': 'application/json'},
+                    headers: adminHeaders({'Content-Type': 'application/json'}),
                     body: JSON.stringify({ gymCode: gym.gymCode, status: gym.active })
                 });
             } catch(e) { console.error('Conexion fallida, guardado en local', e); }
@@ -433,7 +462,7 @@ document.addEventListener('DOMContentLoaded', () => {
             adminData.gyms = adminData.gyms.filter(g => g.gymCode !== gymCode);
             
             try {
-                await fetch(`${API_URL}/api/admin/gyms/${gymCode}`, { method: 'DELETE' });
+                await fetch(`${API_URL}/api/admin/gyms/${gymCode}`, { method: 'DELETE', headers: adminHeaders() });
             } catch(e) {}
 
             saveAdminData();

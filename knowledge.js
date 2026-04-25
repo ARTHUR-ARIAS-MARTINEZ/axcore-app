@@ -124,12 +124,8 @@ const AX_PLANS = {
     premium:  { name: "PREMIUM",  price: 3000, maxUsers: 200, color: "#ffd700" }
 };
 
-// La API Key ofuscada (Arthur la configura desde el Admin)
-const _AX_K = [112,112,108,120,45,56,79,104,53,103,72,77,70,49,70,55,104,54,79,57,97,52,80,74,80,113,70,87,73,116,120,49,76,65,57,106,57,78,109,76,51,97,122,56,115,89,71,49,88,113,111,99,48];
-function _axDecode() { return _AX_K.map(c => String.fromCharCode(c)).join(''); }
-
 /**
- * GYM_CODES ahora se carga DINÁMICAMENTE desde localStorage (admin genera los códigos).
+ * GYM_CODES se carga DINÁMICAMENTE desde localStorage (admin genera los códigos).
  * Se mantiene AXV-DEMO como código de prueba manual.
  */
 const GYM_CODES_STATIC = {
@@ -179,26 +175,6 @@ function countUsersWithCode(code) {
     return count;
 }
 
-// Función para obtener la API Key real desde un código válido
-function getApiKeyFromCode(code) {
-    const allCodes = loadGymCodes();
-    const codeInfo = allCodes[code];
-    
-    if (!codeInfo) return null;
-    if (codeInfo.active === false) return null;
-    
-    // Verificar límite de usuarios según el plan
-    const planKey = codeInfo.plan || "basico";
-    const plan = AX_PLANS[planKey];
-    const maxUsers = codeInfo.maxUsers || (plan ? plan.maxUsers : 50);
-    const currentUsers = countUsersWithCode(code);
-    
-    if (currentUsers >= maxUsers) {
-        return { error: "LÍMITE_USUARIOS", message: `Este código ya alcanzó su límite de ${maxUsers} usuarios (Plan ${plan ? plan.name : 'BÁSICO'}). El dueño del gimnasio debe contactar a AX-CORE para ampliar su plan.` };
-    }
-    
-    return _axDecode();
-}
 
 
 
