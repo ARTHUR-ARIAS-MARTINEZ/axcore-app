@@ -80,7 +80,7 @@
                 <li data-page="diet"><span class="nav-icon">🥗</span><span class="nav-label">Dieta</span></li>
                 <li data-page="workout"><span class="nav-icon">💪</span><span class="nav-label">Workouts</span></li>
                 <li data-page="evolution"><span class="nav-icon">📈</span><span class="nav-label">Evolución</span></li>
-                <li data-page="assistant"><span class="nav-icon">🤖</span><span class="nav-label">Asistente AI</span></li>
+                <li data-page="assistant"><span class="nav-icon">🧮</span><span class="nav-label">Calculadora</span></li>
                 <li data-page="studio"><span class="nav-icon">🏆</span><span class="nav-label">Estudio</span></li>
                 <li data-page="settings"><span class="nav-icon">⚙️</span><span class="nav-label">Ajustes</span></li>
                 <li id="nav-logout"><span class="nav-icon">🚪</span><span class="nav-label" style="color:var(--accent-alert)">Salir</span></li>
@@ -188,8 +188,9 @@
                         <input type="text" id="sensation-input" placeholder="..." style="background:var(--glass-bg, rgba(0,0,0,0.5)); border:1px solid var(--accent-secondary); padding:0.8rem; border-radius:8px; color:var(--text-primary); width:100%; font-family:var(--font-main);">
                         <div style="display:flex; gap:10px; justify-content: flex-end;">
                             <button class="btn-premium" style="font-size:0.6rem; padding:0.4rem 0.8rem;" id="btn-just-record">SÓLO REGISTRAR</button>
-                            <button class="btn-premium" style="font-size:0.6rem; padding:0.4rem 0.8rem; background:var(--accent-main); border:1px solid var(--accent-main); color:#000; font-weight:bold;" id="btn-ask-ai-sensation">CONSULTAR A LA IA</button>
+                            <button class="btn-premium" style="font-size:0.6rem; padding:0.4rem 0.8rem; background:var(--accent-main); border:1px solid var(--accent-main); color:#000; font-weight:bold;" id="btn-ask-ai-sensation">VER ANÁLISIS</button>
                         </div>
+                        <div id="sensation-analysis" style="margin-top:0.8rem; padding:0.8rem; background:rgba(0,0,0,0.3); border-radius:8px; font-size:0.8rem; line-height:1.5; display:none;"></div>
                     </div>
                 </div>
             </div>
@@ -316,22 +317,76 @@
             <div id="page-diet" class="page"></div>
             <div id="page-workout" class="page"></div>
             <div id="page-assistant" class="page">
-                <div class="chat-container glass-card" style="border-left:5px solid var(--accent-secondary);">
-                    <div class="chat-messages" id="chat-box">
-                        <div class="msg system">Sincronización completa. Soy AX-CORE. ¿En qué optimizamos tu biología hoy?</div>
+                <!-- Resumen del día (auto-actualizado por código) -->
+                <div class="glass-card" style="padding:1.5rem; margin-bottom:1.5rem; border-left:5px solid var(--accent-main);">
+                    <h2 style="color:var(--accent-main); font-family:var(--font-accent); font-size:1.1rem; margin-bottom:0.5rem;">🧮 CALCULADORA INTELIGENTE</h2>
+                    <p id="calc-status-line" style="font-size:0.85rem; color:var(--text-dim); line-height:1.5;">--</p>
+                </div>
+
+                <!-- 1. COMPENSAR CALORÍAS EXTRA -->
+                <div class="glass-card" style="padding:1.5rem; margin-bottom:1.5rem;">
+                    <h3 style="color:var(--accent-main); font-family:var(--font-accent); font-size:0.95rem; margin-bottom:0.3rem;">🔥 COMPENSAR EXTRA</h3>
+                    <p style="font-size:0.75rem; color:var(--text-dim); margin-bottom:1rem;">Te pasaste de calorías o vas a comer algo extra. Te digo cuánto ejercicio compensa.</p>
+                    <div style="display:flex; gap:10px;">
+                        <input type="number" id="calc-extra-cal" placeholder="kcal extra (ej. 300)" style="flex:3; background:rgba(0,0,0,0.3); border:1px solid var(--accent-main); padding:0.9rem; color:#fff; border-radius:10px; font-size:1rem;">
+                        <button class="btn-premium" id="btn-calc-compensate" style="flex:1; padding:0.9rem; font-weight:bold;">CALCULAR</button>
                     </div>
-                    <div class="chat-input-area">
-                        <input type="text" id="ai-input" placeholder="Pregunta sobre nutrición, entrenamientos o antojos...">
-                        <button id="btn-mic" class="btn-mic" title="Dictar por voz (Requiere Chrome/Edge)">🎤</button>
-                        <button id="send-ai" class="btn-ai">ENVIAR</button>
+                    <div id="calc-compensate-result" style="margin-top:1rem;"></div>
+                </div>
+
+                <!-- 2. INTERCAMBIAR ALIMENTO -->
+                <div class="glass-card" style="padding:1.5rem; margin-bottom:1.5rem;">
+                    <h3 style="color:var(--accent-secondary); font-family:var(--font-accent); font-size:0.95rem; margin-bottom:0.3rem;">🔄 INTERCAMBIAR ALIMENTO</h3>
+                    <p style="font-size:0.75rem; color:var(--text-dim); margin-bottom:1rem;">Te dice qué comer en lugar de algo. Busca alternativas con calorías similares.</p>
+                    <div style="display:flex; gap:10px;">
+                        <input type="text" id="calc-swap-food" placeholder="Ej. pizza, taco al pastor, hamburguesa..." style="flex:3; background:rgba(0,0,0,0.3); border:1px solid var(--accent-secondary); padding:0.9rem; color:#fff; border-radius:10px; font-size:1rem;">
+                        <button class="btn-premium" id="btn-calc-swap" style="flex:1; padding:0.9rem; font-weight:bold;">BUSCAR</button>
                     </div>
+                    <div id="calc-swap-result" style="margin-top:1rem;"></div>
+                </div>
+
+                <!-- 3. AJUSTAR LÍMITE DIARIO (BMR/TDEE) -->
+                <div class="glass-card" style="padding:1.5rem; margin-bottom:1.5rem;">
+                    <h3 style="color:#ffd700; font-family:var(--font-accent); font-size:0.95rem; margin-bottom:0.3rem;">⚖️ CALCULAR LÍMITE DIARIO IDEAL</h3>
+                    <p style="font-size:0.75rem; color:var(--text-dim); margin-bottom:1rem;">Te calcula cuántas kcal comer al día según tu peso, altura, edad y actividad para llegar a tu meta.</p>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:10px;">
+                        <input type="number" id="calc-age" placeholder="Edad" style="background:rgba(0,0,0,0.3); border:1px solid #ffd70066; padding:0.8rem; color:#fff; border-radius:10px;">
+                        <select id="calc-sex" style="background:rgba(0,0,0,0.3); border:1px solid #ffd70066; padding:0.8rem; color:#fff; border-radius:10px;">
+                            <option value="m">Hombre</option>
+                            <option value="f">Mujer</option>
+                        </select>
+                    </div>
+                    <select id="calc-activity" style="width:100%; background:rgba(0,0,0,0.3); border:1px solid #ffd70066; padding:0.8rem; color:#fff; border-radius:10px; margin-bottom:10px;">
+                        <option value="1.2">Sedentario (oficina, sin ejercicio)</option>
+                        <option value="1.375">Ligero (1-3 días/semana)</option>
+                        <option value="1.55" selected>Moderado (3-5 días/semana)</option>
+                        <option value="1.725">Intenso (6-7 días/semana)</option>
+                        <option value="1.9">Atleta (2 sesiones/día)</option>
+                    </select>
+                    <button class="btn-premium" id="btn-calc-tdee" style="width:100%; padding:0.9rem; font-weight:bold;">CALCULAR LÍMITE</button>
+                    <div id="calc-tdee-result" style="margin-top:1rem;"></div>
+                </div>
+
+                <!-- 4. PROYECCIÓN A META -->
+                <div class="glass-card" style="padding:1.5rem; margin-bottom:1.5rem;">
+                    <h3 style="color:#00d4ff; font-family:var(--font-accent); font-size:0.95rem; margin-bottom:0.3rem;">🎯 PROYECCIÓN A TU META</h3>
+                    <p style="font-size:0.75rem; color:var(--text-dim); margin-bottom:1rem;">Calcula cuándo llegarás a tu meta según tu déficit acumulado.</p>
+                    <button class="btn-premium" id="btn-calc-projection" style="width:100%; padding:0.9rem; font-weight:bold;">VER PROYECCIÓN</button>
+                    <div id="calc-projection-result" style="margin-top:1rem;"></div>
+                </div>
+
+                <!-- 5. REGLAS DEL DÍA -->
+                <div class="glass-card" style="padding:1.5rem;">
+                    <h3 style="color:var(--accent-main); font-family:var(--font-accent); font-size:0.95rem; margin-bottom:0.3rem;">📋 REGLAS DE TU PROTOCOLO</h3>
+                    <p style="font-size:0.75rem; color:var(--text-dim); margin-bottom:1rem;">Tu lista fija de reglas duras. Síguelas todos los días sin excepción.</p>
+                    <ul id="calc-rules-list" style="list-style:none; padding:0; margin:0;"></ul>
                 </div>
             </div>
             <div id="page-studio" class="page"></div>
             <div id="page-settings" class="page">
                 <div class="grid-stats">
                     <div class="glass-card settings-panel">
-                        <h2 id="elite-title" style="cursor:default; transition:0.3s;">SISTEMA ÉLITE</h2>
+                        <h2 style="cursor:default; transition:0.3s;">SISTEMA ÉLITE</h2>
                         <div class="input-group">
                             <label>NOMBRE DE USUARIO</label>
                             <input type="text" id="input-username" placeholder="Tu nombre o alias">
@@ -346,11 +401,6 @@
                                 <button class="theme-btn" data-theme="pride">PRIDE VIBRANT</button>
                                 <button class="theme-btn" data-theme="natural">NATURAL ZEN</button>
                             </div>
-                        </div>
-                        <!-- API Key: solo visible con toque secreto (5x en SISTEMA ÉLITE) -->
-                        <div class="input-group" id="api-key-container" style="display:none; transition:0.3s;">
-                            <label>API LLAVE (Solo Arthur)</label>
-                            <input type="password" id="api-key" style="background:rgba(255,51,102,0.1); border-color:var(--accent-alert);" placeholder="Llave oculta">
                         </div>
                         <button id="save-settings" class="btn-premium" style="width:100%">GUARDAR SISTEMA</button>
                     </div>

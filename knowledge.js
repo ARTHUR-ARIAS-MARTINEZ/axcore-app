@@ -564,3 +564,158 @@ const FOOD_DATABASE = [
   { name: "zinc picolinato 1 capsula", cal: 0, p: 0, c: 0, f: 0 },
   { name: "omega-3 1 capsula", cal: 10, p: 0, c: 0, f: 1 }
 ];
+
+/**
+ * ================================================================
+ * MOTOR DE CÁLCULO 100% LOCAL (reemplaza la IA)
+ * ================================================================
+ */
+
+// Buscar alimento por matching del nombre más largo (igual que en app.js)
+function findFood(query) {
+    const ldesc = (query || '').toLowerCase().trim();
+    if (!ldesc) return null;
+    let best = null, bestLen = 0;
+    const customFoods = (typeof loadCustomFoods === 'function') ? loadCustomFoods() : [];
+    const allFoods = [...FOOD_DATABASE, ...customFoods];
+    for (const food of allFoods) {
+        if (ldesc.includes(food.name) || food.name.includes(ldesc)) {
+            if (food.name.length > bestLen) {
+                bestLen = food.name.length;
+                best = food;
+            }
+        }
+    }
+    return best;
+}
+
+// Cargar alimentos personalizados que el usuario fue agregando
+function loadCustomFoods() {
+    const user = localStorage.getItem('arthur_current_user');
+    if (!user) return [];
+    try {
+        const raw = localStorage.getItem(`arthur_data_${user}`);
+        if (!raw) return [];
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed.customFoods) ? parsed.customFoods : [];
+    } catch (e) { return []; }
+}
+
+// Top N alternativas con kcal similares (±tolerance, default 15%)
+function findFoodSwaps(targetCal, tolerance = 0.15, max = 6) {
+    if (!targetCal || targetCal <= 0) return [];
+    const lo = targetCal * (1 - tolerance);
+    const hi = targetCal * (1 + tolerance);
+    return FOOD_DATABASE
+        .filter(f => f.cal >= lo && f.cal <= hi)
+        .sort((a, b) => Math.abs(a.cal - targetCal) - Math.abs(b.cal - targetCal))
+        .slice(0, max);
+}
+
+// Top N ejercicios para compensar X kcal extra
+function findCompensationOptions(extraCal, max = 5) {
+    if (!extraCal || extraCal <= 0) return [];
+    return ARTHUR_KNOWLEDGE.exercises_catalog
+        .filter(ex => ex.cal > 0)
+        .map(ex => {
+            const ratio = extraCal / ex.cal;
+            const baseVal = ex.baseVal || 1;
+            return {
+                name: ex.name,
+                type: ex.type,
+                unit: ex.unit,
+                amount: Math.ceil(baseVal * ratio),
+                desc: ex.desc
+            };
+        })
+        .filter(opt => opt.amount > 0 && opt.amount <= 200)
+        .sort((a, b) => a.amount - b.amount)
+        .slice(0, max);
+}
+
+// BMR — Mifflin-St Jeor
+function calculateBMR(sex, weight, heightM, age) {
+    if (!weight || !heightM || !age) return 0;
+    const heightCm = heightM * 100;
+    if (sex === 'm') return Math.round(10 * weight + 6.25 * heightCm - 5 * age + 5);
+    return Math.round(10 * weight + 6.25 * heightCm - 5 * age - 161);
+}
+
+// TDEE = BMR × factor de actividad
+function calculateTDEE(bmr, activityFactor) {
+    return Math.round(bmr * (activityFactor || 1.55));
+}
+
+// Recomendación de límite calórico para perder peso
+function recommendCalorieLimit(tdee, weightCurrent, weightTarget) {
+    if (!tdee || !weightCurrent) return tdee;
+    if (weightCurrent <= weightTarget) return tdee; // mantener
+    // Déficit moderado: ~500 kcal/día = 0.5 kg/sem (recomendado por OMS)
+    const limit = tdee - 500;
+    // Mínimo de seguridad: 1200 mujer, 1500 hombre
+    return Math.max(1200, limit);
+}
+
+// Días para llegar a meta según déficit promedio diario
+function projectGoalDays(currentWeight, targetWeight, avgDailyDeficit) {
+    if (!currentWeight || !targetWeight || !avgDailyDeficit || avgDailyDeficit <= 0) return null;
+    const kgToLose = currentWeight - targetWeight;
+    if (kgToLose <= 0) return 0;
+    // 7700 kcal ≈ 1 kg de grasa
+    const totalKcalToLose = kgToLose * 7700;
+    return Math.ceil(totalKcalToLose / avgDailyDeficit);
+}
+
+// Análisis algorítmico de sensaciones según contexto
+function analyzeSensation(type, detail, ctx) {
+    // ctx = { caloriesConsumedToday, caloriesBurnedToday, dailyCalLimit, foodLogToday, weight }
+    const consumed = ctx.caloriesConsumedToday || 0;
+    const burned = ctx.caloriesBurnedToday || 0;
+    const limit = ctx.dailyCalLimit || 1600;
+    const remaining = limit - consumed + burned;
+    const isOverLimit = remaining < 0;
+    const hour = new Date().getHours();
+    const meals = (ctx.foodLogToday || []).length;
+
+    if (type === 'hunger') {
+        if (isOverLimit) {
+            return `⛔ Ya superaste tu límite diario por ${Math.abs(remaining)} kcal. NO comas nada. Protocolo:\n• Bebe 500 ml agua fría con limón\n• 5 min plancha + 30 sentadillas\n• Té verde sin azúcar\n• Distrae con actividad 20 min — el antojo pasa en 18-20 min real`;
+        }
+        if (remaining > 400) {
+            return `✅ Te quedan ${remaining} kcal disponibles hoy. Opciones bajas en kcal:\n• Zanahoria rallada con limón y chile (40 kcal/100g)\n• Pepino con tajín (16 kcal/100g)\n• 2 claras de huevo cocidas (34 kcal)\n• Té verde caliente sin azúcar\n• Si tienes hambre real, come tu siguiente comida programada`;
+        }
+        return `⚠️ Solo te quedan ${remaining} kcal. Aguanta con:\n• 500 ml agua + sal de mar (electrolitos suprimen hambre)\n• Café negro o té verde sin azúcar\n• Goma de mascar sin azúcar\n• Cepilla los dientes (corta el deseo)`;
+    }
+
+    if (type === 'symptom') {
+        const txt = (detail || '').toLowerCase();
+        if (txt.includes('mareo') || txt.includes('debil')) {
+            return `⚠️ Mareo o debilidad — probable bajo nivel de glucosa o electrolitos:\n• Bebe 500 ml agua con 1 pizca sal y ½ limón\n• 1 fruta pequeña (plátano, manzana)\n• Siéntate 10 min, levanta piernas\n• Si persiste >30 min: come, no entrenes hoy`;
+        }
+        if (txt.includes('dolor') && (txt.includes('cabeza') || txt.includes('migraña'))) {
+            return `⚠️ Dolor de cabeza — usual por deshidratación o cafeína:\n• 750 ml agua YA\n• Café negro o té (si no tomaste hoy)\n• 5 min respiración profunda\n• Aplica frío en nuca\n• Si es dolor agudo en pecho/brazo: VE AL DOCTOR`;
+        }
+        if (txt.includes('calambre') || txt.includes('musc')) {
+            return `⚠️ Calambre muscular — falta de magnesio/sodio/agua:\n• Estira lento 30 seg\n• 500 ml agua con sal de mar y limón\n• 1 plátano o aguacate\n• Si fue durante ejercicio: para hoy, retoma mañana`;
+        }
+        if (txt.includes('cansado') || txt.includes('cansa') || txt.includes('fatig')) {
+            return `⚠️ Fatiga — revisa:\n• ¿Dormiste >7h ayer?\n• ¿Comiste suficiente proteína hoy? (debes llevar ~${Math.round(ctx.weight * 1.5)}g)\n• 5 min caminata al sol\n• 1 vaso agua + electrolitos\n• Si llevas <3 comidas hoy, come ya`;
+        }
+        return `⚠️ Síntoma registrado: "${detail}". Protocolo general:\n• Hidrátate (500 ml agua)\n• Descansa 10 min\n• Si dolor agudo, mareo fuerte o pulso >100 en reposo: VE AL DOCTOR\n• Anota cuándo y con qué comida apareció (para detectar patrón)`;
+    }
+
+    if (type === 'mood') {
+        if (hour < 11 && meals === 0) {
+            return `🧠 Aún no desayunaste. La energía mental requiere glucosa estable:\n• Desayuna ya: 3 huevos + 1 tortilla + café negro\n• 5 min sol directo (regula cortisol)\n• 10 respiraciones diafragmáticas\n• Hidrátate (1 vaso agua antes de cualquier cosa)`;
+        }
+        if (hour >= 14 && hour <= 17) {
+            return `🧠 Bajón de tarde — normal por insulina post-comida:\n• Caminata corta 10 min (mejor que café)\n• Té verde sin azúcar\n• Si llevas <60g proteína, agrega 1 huevo o atún\n• 5 min frío en cara (activa nervio vago)`;
+        }
+        if (isOverLimit) {
+            return `🧠 Si te sientes mal por haber excedido kcal: NO te castigues con dieta extrema mañana — eso rompe el ciclo. Compensa con 30 min HIIT hoy y vuelve al protocolo mañana sin cambios.`;
+        }
+        return `🧠 Estado mental: "${detail}". Reseteo rápido:\n• 10 respiraciones lentas (4 seg in / 6 seg out)\n• Caminata 10 min (cualquier dirección)\n• Bebe agua\n• Anota 1 cosa que sí saliste bien hoy\n• Vuelve al plan, no al hábito viejo`;
+    }
+    return `Sensación registrada: "${detail}".`;
+}
+

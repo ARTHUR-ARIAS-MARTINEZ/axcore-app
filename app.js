@@ -15,12 +15,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const navLinks = document.querySelectorAll('.nav-links li');
     const pages = document.querySelectorAll('.page');
     
-    const aiInput = document.getElementById('ai-input');
-    const sendAiBtn = document.getElementById('send-ai');
-    const btnMic = document.getElementById('btn-mic');
-    const chatBox = document.getElementById('chat-box');
-    
-    const apiKeyInput = document.getElementById('api-key');
     const themeBtns = document.querySelectorAll('.theme-btn');
     const saveSettingsBtn = document.getElementById('save-settings');
     const saveMeasurementsBtn = document.getElementById('save-measurements');
@@ -179,8 +173,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('input-weight').value = userData.weight || '';
         document.getElementById('input-waist').value = userData.waist || '';
         document.getElementById('input-target-weight').value = userData.target_weight || '';
-        const ap2 = document.getElementById('api-key');
-        if (ap2) ap2.value = userData.apiKey || '';
         const cw = document.getElementById('current-waist');
         if (cw) cw.textContent = userData.waist || 0;
 
@@ -537,6 +529,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (pageId === 'workout') renderWorkoutPage();
             if (pageId === 'evolution') renderEvolutionPage('all');
             if (pageId === 'studio') renderStudioPage();
+            if (pageId === 'assistant' && typeof window._activateCalculator === 'function') window._activateCalculator();
 
             // Mostrar mini-cronómetro cuando NO estamos en workout y está corriendo
             const miniContainer = document.getElementById('sw-mini-container');
@@ -653,37 +646,30 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="glass-card diet-plan" style="max-width:800px; margin: 0 auto;">
                 <h2 style="font-family:var(--font-accent); color:var(--accent-main); margin-bottom:1.5rem; text-align:center;">PLAN ALIMENTICIO VANGUARDIA</h2>
                 
-                <!-- AUTO-COMPLETAR CON IA -->
-                <div class="meal-item glass-card" style="padding:2rem; border-color:var(--accent-main); margin-bottom:2rem;">
-                    <h3 style="color:var(--accent-main); font-size:1.1rem; margin-bottom:1rem;">IMPORTACIÓN INTELIGENTE (IA)</h3>
-                    <p style="font-size:0.8rem; color:var(--text-dim); margin-bottom:1rem;">Pega aquí el plan que te dio tu nutriólogo. AX-CORE lo procesará y acomodará en las casillas correspondientes.</p>
-                    <textarea id="diet-raw-text" placeholder="Ej: Lunes: Desayuno 2 huevos con jamón, comida pechuga asada, cena ensalada, snacks cacahuates..." style="width:100%; min-height:80px; background:var(--glass-bg, rgba(0,0,0,0.2)); color:var(--text-primary); border:1px dashed var(--accent-main); border-radius:8px; padding:0.8rem; margin-bottom:1rem;"></textarea>
-                    <button class="btn-premium" id="btn-parse-diet" style="width:100%;">⚙️ PROCESAR CON IA</button>
-                    <button class="btn-premium" id="btn-reset-diet" style="width:100%; margin-top:10px; background:transparent; border:1px solid var(--accent-alert); color:var(--accent-alert);">🗑️ REINICIAR DIETA Y REGLAS</button>
-                </div>
-
-                <!-- DIETA RECOMENDADA: SOLO LECTURA -->
+                <!-- DIETA EDITABLE MANUAL -->
                 <div class="meal-item glass-card" style="padding:2rem; border-color:var(--accent-secondary); margin-bottom:2rem;">
-                    <h3 style="color:var(--accent-secondary); font-size:1.1rem; margin-bottom:1.5rem; border-bottom:1px solid var(--accent-secondary); padding-bottom:0.5rem;">DIETA DETALLADA</h3>
+                    <h3 style="color:var(--accent-secondary); font-size:1.1rem; margin-bottom:0.5rem; border-bottom:1px solid var(--accent-secondary); padding-bottom:0.5rem;">DIETA DETALLADA</h3>
+                    <p style="font-size:0.8rem; color:var(--text-dim); margin-bottom:1rem;">Escribe en cada casilla lo que comerás. Cuando termines, presiona <strong>GUARDAR DIETA</strong>.</p>
                     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;" class="diet-grid-mobile">
                         <div style="display:flex; flex-direction:column;">
                             <label style="color:var(--accent-main); font-weight:bold; display:block; font-size:0.85rem; margin-bottom:0.5rem;">DESAYUNO</label>
-                            <div style="flex:1; background:var(--glass-bg, rgba(0,0,0,0.2)); border:1px solid var(--glass-border); border-radius:8px; padding:0.8rem; color:var(--text-primary); line-height:1.5; font-size:0.9rem;">${diet.breakfast || '<span style="color:var(--text-dim); font-style:italic;">Sin definir. Usa la importación inteligente.</span>'}</div>
+                            <textarea id="diet-edit-breakfast" style="flex:1; min-height:90px; background:var(--glass-bg, rgba(0,0,0,0.2)); border:1px solid var(--glass-border); border-radius:8px; padding:0.8rem; color:var(--text-primary); line-height:1.5; font-size:0.9rem; font-family:var(--font-main); resize:vertical;" placeholder="Ej. 3 huevos revueltos + 1 tortilla">${diet.breakfast || ''}</textarea>
                         </div>
                         <div style="display:flex; flex-direction:column;">
                             <label style="color:var(--accent-main); font-weight:bold; display:block; font-size:0.85rem; margin-bottom:0.5rem;">COMIDA</label>
-                            <div style="flex:1; background:var(--glass-bg, rgba(0,0,0,0.2)); border:1px solid var(--glass-border); border-radius:8px; padding:0.8rem; color:var(--text-primary); line-height:1.5; font-size:0.9rem;">${diet.lunch || '<span style="color:var(--text-dim); font-style:italic;">Sin definir.</span>'}</div>
+                            <textarea id="diet-edit-lunch" style="flex:1; min-height:90px; background:var(--glass-bg, rgba(0,0,0,0.2)); border:1px solid var(--glass-border); border-radius:8px; padding:0.8rem; color:var(--text-primary); line-height:1.5; font-size:0.9rem; font-family:var(--font-main); resize:vertical;" placeholder="Ej. Pechuga asada 200g + arroz integral 1 taza + ensalada">${diet.lunch || ''}</textarea>
                         </div>
                         <div style="display:flex; flex-direction:column;">
                             <label style="color:var(--accent-main); font-weight:bold; display:block; font-size:0.85rem; margin-bottom:0.5rem;">CENA</label>
-                            <div style="flex:1; background:var(--glass-bg, rgba(0,0,0,0.2)); border:1px solid var(--glass-border); border-radius:8px; padding:0.8rem; color:var(--text-primary); line-height:1.5; font-size:0.9rem;">${diet.dinner || '<span style="color:var(--text-dim); font-style:italic;">Sin definir.</span>'}</div>
+                            <textarea id="diet-edit-dinner" style="flex:1; min-height:90px; background:var(--glass-bg, rgba(0,0,0,0.2)); border:1px solid var(--glass-border); border-radius:8px; padding:0.8rem; color:var(--text-primary); line-height:1.5; font-size:0.9rem; font-family:var(--font-main); resize:vertical;" placeholder="Ej. 2 tortillas con 2 huevos + ensalada">${diet.dinner || ''}</textarea>
                         </div>
                         <div style="display:flex; flex-direction:column;">
                             <label style="color:var(--accent-main); font-weight:bold; display:block; font-size:0.85rem; margin-bottom:0.5rem;">SNACKS / ADICIONALES</label>
-                            <div style="flex:1; background:var(--glass-bg, rgba(0,0,0,0.2)); border:1px solid var(--glass-border); border-radius:8px; padding:0.8rem; color:var(--text-primary); line-height:1.5; font-size:0.9rem;">${diet.snacks || '<span style="color:var(--text-dim); font-style:italic;">Sin definir.</span>'}</div>
+                            <textarea id="diet-edit-snacks" style="flex:1; min-height:90px; background:var(--glass-bg, rgba(0,0,0,0.2)); border:1px solid var(--glass-border); border-radius:8px; padding:0.8rem; color:var(--text-primary); line-height:1.5; font-size:0.9rem; font-family:var(--font-main); resize:vertical;" placeholder="Ej. Zanahoria con limón, té verde">${diet.snacks || ''}</textarea>
                         </div>
                     </div>
-                    <p style="margin-top:1rem; font-size:0.7rem; color:var(--text-dim); text-align:center;">Para actualizar, usa la sección de Importación Inteligente arriba.</p>
+                    <button class="btn-premium" id="btn-save-diet" style="width:100%; margin-top:1.2rem;">💾 GUARDAR DIETA</button>
+                    <button class="btn-premium" id="btn-reset-diet" style="width:100%; margin-top:10px; background:transparent; border:1px solid var(--accent-alert); color:var(--accent-alert);">🗑️ REINICIAR DIETA</button>
                 </div>
 
                 <!-- REGLAS ESTRUCTURALES -->
@@ -707,58 +693,16 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
         `;
 
-        // La dieta es solo lectura: no hay btn-save-diet-text
-        // El procesamiento de IA actualiza los campos directamente
-        document.getElementById('btn-parse-diet').onclick = async () => {
-            const raw = document.getElementById('diet-raw-text').value.trim();
-            if(!raw) return alert("Pega el texto original del nutricionista primero.");
-            if(!userData.apiKey) return alert("Esta función requiere la API Key conectada.");
-            
-            const btn = document.getElementById('btn-parse-diet');
-            btn.textContent = "⚙️ PROCESANDO DIETA Y REGLAS...";
-            btn.disabled = true;
-            
-            // PASO 1: Extraer comidas organizadas e integrarlas con el contexto histórico
-            const promptComidas = `Eres AX-CORE. Esta es la dieta actual del atleta: Desayuno: ${userData.recommendedDiet.breakfast}. Comida: ${userData.recommendedDiet.lunch}. Cena: ${userData.recommendedDiet.dinner}. Snacks: ${userData.recommendedDiet.snacks}. Integra e incorpora de manera inteligente el siguiente nuevo texto/alimentos a la dieta actual: "${raw}". No borres lo anterior, combínalo. Responde SOLO en JSON válido con claves: "breakfast", "lunch", "dinner", "snacks". Usa textos extremadamente cortos y concretos.`;
-            
-            try {
-                const res = await callPerplexity(promptComidas, 'json');
-                const jsonStr = res.substring(res.indexOf('{'), res.lastIndexOf('}') + 1);
-                const parsed = JSON.parse(jsonStr);
-                
-                userData.recommendedDiet = {
-                    breakfast: parsed.breakfast || userData.recommendedDiet.breakfast || '',
-                    lunch: parsed.lunch || userData.recommendedDiet.lunch || '',
-                    dinner: parsed.dinner || userData.recommendedDiet.dinner || '',
-                    snacks: parsed.snacks || userData.recommendedDiet.snacks || ''
-                };
-                
-                btn.textContent = "⚙️ GENERANDO REGLAS PERSONALIZADAS...";
-                
-                // PASO 2: Generar reglas estructurales ultra cortas basadas en la nueva dieta completa
-                const promptReglas = `Genera de 5 a 8 reglas basadas en la dieta actual. Deben ser EXTREMADAMENTE directas, cortas y al grano, sin explicaciones ni rollo motivacional. Máximo 10 palabras por regla. Responde SOLO un JSON: {"rules":["regla 1", ...]}. Dieta actual: Desayuno: ${userData.recommendedDiet.breakfast}. Comida: ${userData.recommendedDiet.lunch}. Snacks: ${userData.recommendedDiet.snacks}.`;
-                
-                try {
-                    const resReglas = await callPerplexity(promptReglas, 'json');
-                    const jsonReglas = resReglas.substring(resReglas.indexOf('{'), resReglas.lastIndexOf('}') + 1);
-                    const parsedReglas = JSON.parse(jsonReglas);
-                    
-                    if (parsedReglas.rules && Array.isArray(parsedReglas.rules) && parsedReglas.rules.length > 0) {
-                        userData.customDietRules = parsedReglas.rules;
-                    }
-                } catch(e2) {
-                    console.warn("No se pudieron generar reglas personalizadas, se mantienen las base.", e2);
-                }
-                
-                saveData();
-                renderDietPage(); // Refrescar vista con dieta Y reglas actualizadas
-                alert('✅ ¡Dieta Y reglas actualizadas! Las reglas estructurales ahora están basadas en tu dieta del nutriólogo.');
-            } catch(e) {
-                console.error(e);
-                alert("Hubo un error al procesar. Revisa la conexión.");
-            }
-            btn.textContent = "⚙️ PROCESAR CON IA";
-            btn.disabled = false;
+        // Guardar dieta editada manualmente
+        document.getElementById('btn-save-diet').onclick = () => {
+            const breakfast = document.getElementById('diet-edit-breakfast').value.trim();
+            const lunch = document.getElementById('diet-edit-lunch').value.trim();
+            const dinner = document.getElementById('diet-edit-dinner').value.trim();
+            const snacks = document.getElementById('diet-edit-snacks').value.trim();
+
+            userData.recommendedDiet = { breakfast, lunch, dinner, snacks };
+            saveData();
+            alert('✅ Dieta guardada correctamente.');
         };
 
         const btnResetDiet = document.getElementById('btn-reset-diet');
@@ -773,23 +717,20 @@ document.addEventListener('DOMContentLoaded', () => {
             };
         }
 
-        document.getElementById('btn-add-food').onclick = async () => {
+        document.getElementById('btn-add-food').onclick = () => {
             const desc = document.getElementById('food-desc').value.trim();
             if (!desc) return;
-            
+
             const btn = document.getElementById('btn-add-food');
-            btn.textContent = "Consultando IA...";
-            btn.disabled = true;
-            
             const calUsed = userData.caloriesConsumedToday;
             const calLimit = userData.dailyCalLimit;
 
             const ldesc = desc.toLowerCase().trim();
-            let estimatedCal = 200;
+            let estimatedCal = null;
             let dbMatch = null;
             let longestMatchLen = 0;
 
-            // 70% OFFLINE DATA INTERCEPTER
+            // Buscar en FOOD_DATABASE base
             if (typeof FOOD_DATABASE !== 'undefined') {
                 for (const food of FOOD_DATABASE) {
                     if (ldesc.includes(food.name) || food.name.includes(ldesc)) {
@@ -801,32 +742,55 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            if (dbMatch) {
-                console.log(`[LOCAL DB HIT] Bypass IA: ${dbMatch.name} = ${dbMatch.cal} kcal`);
-                estimatedCal = dbMatch.cal;
-                
-                // Efecto visual rápido ya que no hay latencia IA
-                btn.textContent = "¡Añadido al instante!";
-                setTimeout(() => { btn.textContent = "+ AÑADIR (IA)"; btn.disabled = false; }, 1000);
-            } else if (userData.apiKey) {
-                // 30% IA TAREAS COMPLEJAS
-                const prompt = `Calorías exactas de: "${desc}". Responde SOLAMENTE con un número entero. Cero texto adicional.`;
-                try {
-                    const res = await callPerplexity(prompt, 'number');
-                    const parsed = parseInt(res.replace(/[^0-9]/g, ""));
-                    if (!isNaN(parsed) && parsed > 0 && parsed < 5000) estimatedCal = parsed;
-                } catch(e) { console.error(e); }
+            // Buscar también en alimentos personalizados del usuario
+            if (!dbMatch && Array.isArray(userData.customFoods)) {
+                for (const food of userData.customFoods) {
+                    if (ldesc.includes(food.name) || food.name.includes(ldesc)) {
+                        if (food.name.length > longestMatchLen) {
+                            longestMatchLen = food.name.length;
+                            dbMatch = food;
+                        }
+                    }
+                }
             }
 
+            if (dbMatch) {
+                estimatedCal = dbMatch.cal;
+                registerFood(desc, estimatedCal, calLimit, calUsed);
+            } else {
+                // Sin match: pedir kcal al usuario y persistirlo en su DB personal
+                const input = prompt(`No tengo "${desc}" en mi base de alimentos.\n\n¿Cuántas kcal aproximadas tiene?\n(Lo guardaré para que la próxima vez lo encuentre solo)`);
+                if (input === null) {
+                    btn.textContent = "REGISTRAR";
+                    btn.disabled = false;
+                    return;
+                }
+                const manualCal = parseInt(String(input).replace(/[^0-9]/g, ""));
+                if (isNaN(manualCal) || manualCal <= 0 || manualCal > 5000) {
+                    alert("Valor inválido. Escribe un número entre 1 y 5000.");
+                    return;
+                }
+                estimatedCal = manualCal;
+                // Guardar en customFoods del usuario para futuros hits
+                if (!Array.isArray(userData.customFoods)) userData.customFoods = [];
+                userData.customFoods.push({ name: ldesc, cal: estimatedCal, p: 0, c: 0, f: 0 });
+                registerFood(desc, estimatedCal, calLimit, calUsed);
+            }
+        };
+
+        function registerFood(desc, estimatedCal, calLimit, calUsed) {
             const newTotal = calUsed + estimatedCal;
             const remaining = calLimit - newTotal;
-            
+
             userData.caloriesConsumedToday += estimatedCal;
             userData.totalNetDeficit -= Math.round(estimatedCal * 0.15);
-            userData.foodLogToday.push({ time: new Date().toLocaleTimeString('es-MX', {hour: '2-digit', minute:'2-digit'}), desc, cal: estimatedCal });
+            userData.foodLogToday.push({
+                time: new Date().toLocaleTimeString('es-MX', {hour: '2-digit', minute:'2-digit'}),
+                desc, cal: estimatedCal
+            });
             saveData();
             updateDashboard();
-            
+
             let msg = `✅ Registrado: "${desc}"\n📊 Calorías: +${estimatedCal} kcal\n`;
             if (remaining > 0) {
                 msg += `💚 Te quedan ${remaining} kcal disponibles hoy.`;
@@ -834,10 +798,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 msg += `⚠️ SUPERASTE tu límite diario por ${Math.abs(remaining)} kcal. Compensa con ejercicio.`;
             }
             alert(msg);
-            document.getElementById('food-desc').value = "";
-            btn.textContent = "REGISTRAR";
-            btn.disabled = false;
-        };
+            const descEl = document.getElementById('food-desc');
+            const btn = document.getElementById('btn-add-food');
+            if (descEl) descEl.value = "";
+            if (btn) { btn.textContent = "REGISTRAR"; btn.disabled = false; }
+        }
     }
 
     // --- CRONÓMETRO GLOBAL (vive fuera del renderWorkoutPage) ---
@@ -1004,25 +969,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('btn-ask-ai-sensation').onclick = () => {
         const type = document.getElementById('btn-ask-ai-sensation').dataset.type;
-        const userInput = document.getElementById('sensation-input').value.trim() || "Siento esta emoción o síntoma ahora mismo.";
-        
-        let query = "";
-        if (type === 'hunger') query = `Reporte de Hambre/Antojo: "${userInput}". ¿Por qué me pasa esto hoy (basado en lo que he comido o mis calorías) y cómo lo controlo con ciencia?`;
-        if (type === 'symptom') query = `Reporte de Síntoma físico: "${userInput}". Relaciona esto metabólicamente con mis registros nutricionales de hoy y dame un protocolo rápido.`;
-        if (type === 'mood') query = `Reporte de Estado mental / Energía: "${userInput}". Dame un reseteo psicológico, biológico o de mentalidad para optimizarme basado en mi dieta de hoy.`;
-        
-        document.getElementById('sensation-feedback').classList.add('hidden');
-        switchPageToAi(query);
-    };
+        const userInput = document.getElementById('sensation-input').value.trim() || "Sin detalle adicional.";
+        const out = document.getElementById('sensation-analysis');
 
-    function switchPageToAi(q) {
-        pages.forEach(p => p.classList.remove('active'));
-        document.getElementById('page-assistant').classList.add('active');
-        navLinks.forEach(l => {
-            l.classList.toggle('active', l.dataset.page === 'assistant');
-        });
-        handleAiQueryStr(q);
-    }
+        const ctx = {
+            caloriesConsumedToday: userData.caloriesConsumedToday,
+            caloriesBurnedToday: userData.caloriesBurnedToday,
+            dailyCalLimit: userData.dailyCalLimit,
+            foodLogToday: userData.foodLogToday,
+            weight: userData.weight
+        };
+        const analysis = (typeof analyzeSensation === 'function')
+            ? analyzeSensation(type, userInput, ctx)
+            : `Sensación registrada: "${userInput}".`;
+
+        if (out) {
+            out.style.display = 'block';
+            out.innerHTML = analysis.replace(/\n/g, '<br>');
+            out.style.color = 'var(--text-primary)';
+        }
+    };
 
     // (applySettings duplicado eliminado — la versión completa está en la línea 108)
 
@@ -1542,11 +1508,6 @@ document.addEventListener('DOMContentLoaded', () => {
             userData.username = unInput.value.trim();
             document.getElementById('display-username').textContent = userData.username.toUpperCase();
         }
-        // API Key: solo si fue revelada por el toque secreto
-        const apiInput = document.getElementById('api-key');
-        if (apiInput && apiInput.value.trim()) {
-            userData.apiKey = apiInput.value.trim();
-        }
         saveData();
         alert("Configuración guardada.");
     };
@@ -1601,21 +1562,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // El botón toggle-api-pro fue eliminado del UI. La API Key solo se revela
     // con 5 toques rápidos en el título "SISTEMA ÉLITE" (toque secreto Arthur).
 
-    let tapCount = 0;
-    let tapTimer;
-    document.getElementById('elite-title').onclick = () => {
-        tapCount++;
-        clearTimeout(tapTimer);
-        tapTimer = setTimeout(() => { tapCount = 0; }, 2000);
-        if (tapCount >= 5) { // 5 toques para ver la API (toque secreto Arthur)
-            const container = document.getElementById('api-key-container');
-            container.style.display = 'block';
-            document.getElementById('api-key').type = 'text'; // Ver la clave real
-            tapCount = 0;
-            document.getElementById('elite-title').style.color = "var(--accent-alert)";
-            setTimeout(() => { document.getElementById('elite-title').style.color = ""; }, 1000);
-        }
-    };
 
     document.getElementById('btn-reset-all').onclick = () => {
         if (confirm("ESTO ELIMINARÁ TODA TU CUENTA Y DATOS. ¿ESTÁS SEGURO?")) {
@@ -1624,110 +1570,203 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // --- AI LOGIC ---
-    sendAiBtn.onclick = handleAiQuery;
-    aiInput.onkeypress = (e) => { if (e.key === 'Enter') handleAiQuery(); };
-
-    async function handleAiQuery() {
-        const q = aiInput.value.trim();
-        if (!q) return;
-        aiInput.value = "";
-        handleAiQueryStr(q);
+    // --- CALCULADORA INTELIGENTE 100% CÓDIGO (sin IA) ---
+    function renderCalculatorPage() {
+        const consumed = userData.caloriesConsumedToday || 0;
+        const burned = userData.caloriesBurnedToday || 0;
+        const limit = userData.dailyCalLimit || 0;
+        const remaining = limit - consumed + burned;
+        const status = document.getElementById('calc-status-line');
+        if (status) {
+            const tone = remaining < 0 ? '⛔' : remaining < 200 ? '⚠️' : '✅';
+            status.innerHTML = `${tone} Hoy llevas <strong style="color:var(--accent-main)">${consumed} kcal</strong> ingeridas / <strong>${limit} kcal</strong> límite. Quemaste ${burned} kcal con ejercicio. Te quedan <strong style="color:${remaining < 0 ? '#ff3366' : '#00ff88'};">${remaining} kcal</strong> hoy.`;
+        }
+        const rulesList = document.getElementById('calc-rules-list');
+        if (rulesList) {
+            const customRules = (userData.customDietRules && userData.customDietRules.length > 0) ? userData.customDietRules : [];
+            const baseRules = (typeof ARTHUR_KNOWLEDGE !== 'undefined' && ARTHUR_KNOWLEDGE.diet_rules) ? ARTHUR_KNOWLEDGE.diet_rules : [];
+            const allRules = [...customRules, ...baseRules];
+            rulesList.innerHTML = allRules.map(r =>
+                `<li style="padding:0.6rem 0.8rem; margin-bottom:0.4rem; background:rgba(0,255,136,0.05); border-left:3px solid var(--accent-main); border-radius:6px; font-size:0.85rem;">▸ ${r}</li>`
+            ).join('');
+        }
+        const ageEl = document.getElementById('calc-age');
+        if (ageEl && userData.age && !ageEl.value) ageEl.value = userData.age;
     }
 
-    async function handleAiQueryStr(query) {
-        addMessage('user', query);
-        const thinking = addMessage('system', 'Conectando con Redes de Vanguardia Científica...');
-        
-        if (!userData.apiKey) {
-            setTimeout(() => {
-                thinking.remove();
-                addMessage('system', "Hola. Registra una API Key en Ajustes para activar los descubrimientos científicos en tiempo real. Por ahora, enfócate en tus reglas de oro: 3 huevos al desayuno y ejercicio diario.");
-            }, 1000);
-            return;
-        }
-
-        try {
-            const result = await callPerplexity(query);
-            thinking.remove();
-            addMessage('system', result);
-        } catch(e) {
-            thinking.remove();
-            addMessage('system', "Error de enlace. Verifica tu conexión o API Key.");
-        }
-    }
-
-    async function callPerplexity(query, mode = 'chat') {
-        // Prompt optimizado: EXPERTO NATURAL, SIN ASTERISCOS, SIN LISTAS NUMERADAS, CON CONTEXTO
-        const foodStr = userData.foodLogToday && userData.foodLogToday.length > 0 
-            ? userData.foodLogToday.map(f => `${f.time}: ${f.desc} (~${f.cal} cal)`).join(', ')
-            : 'Nada registrado aún hoy';
-
-        const dietContext = userData.recommendedDiet ? 
-            `DIETA RECOMENDADA: Desayuno: ${userData.recommendedDiet.breakfast}, Comida: ${userData.recommendedDiet.lunch}, Cena: ${userData.recommendedDiet.dinner}, Snacks: ${userData.recommendedDiet.snacks}.` : '';
-
-        const sysPrompt = 
-            mode === 'json' ? `Eres un asistente JSON. Devuelve ÚNICAMENTE un JSON válido sin texto extra.` :
-            mode === 'number' ? `Contador de calorías. Responde ÚNICAMENTE con el número entero. Cero texto.` :
-            `Eres AX-CORE, IA táctica. Usuario: ${userData.weight}kg ${userData.height}m. Hoy: ${userData.caloriesConsumedToday}/${userData.dailyCalLimit}cal. Gasto: ${userData.caloriesBurnedToday}cal. Déficit neto histórico: ${userData.totalNetDeficit}cal.
-             ${dietContext} Alimentos hoy: ${foodStr}.
-             Reglas: 1. NO uses asteriscos jamás. 2. NO numeres listas, usa bullets cortos. 3. Sé extremadamente directo, frío, analítico, cero adornos ni motivación vacía. 4. Exige acciones tomando en cuenta las métricas del usuario que acabo de pasarte.`;
-
-        // Validar que el pase del atleta siga activo antes de consumir IA
-        if (userData.gymCode && userData.gymCode !== "GYM-MASTER" && userData.gymCode !== "AXV-DEMO") {
-            try {
-                // userData.gymCode almacena el pase (ej. AX-TRL0E) asignado por la franquicia
-                const check = await fetch(`${API_URL}/api/validate`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ code: userData.gymCode })
-                });
-                const checkData = await check.json();
-                if (!checkData.success) {
-                    return `⛔ SERVICIO CORTADO.\n\n${checkData.message}`;
-                }
-            } catch(e) {
-                // Ignorar si no hay internet temporalmente para validar
+    function setupCalcCompensate() {
+        const btn = document.getElementById('btn-calc-compensate');
+        if (!btn) return;
+        btn.onclick = () => {
+            const extra = parseInt(document.getElementById('calc-extra-cal').value);
+            const out = document.getElementById('calc-compensate-result');
+            if (!extra || extra <= 0) {
+                out.innerHTML = `<p style="color:var(--accent-alert); font-size:0.85rem;">Escribe un número válido de kcal.</p>`;
+                return;
             }
-        }
-
-        try {
-            const response = await fetch('https://api.perplexity.ai/chat/completions', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${userData.apiKey}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    model: 'sonar',
-                    messages: [
-                        { role: 'system', content: sysPrompt },
-                        { role: 'user', content: query }
-                    ]
-                })
-            });
-            const data = await response.json();
-            let result = data.choices[0].message.content;
-            
-            // Limpieza extra por si la IA ignora el prompt
-            result = result.replace(/\*/g, "").replace(/^\d+\.\s/gm, "• "); 
-            
-            return result;
-        } catch (error) {
-            console.error("API Error:", error);
-            if (mode === 'number') return "200";
-            return "Error de conexión. Verifica tu llave en Ajustes.";
-        }
+            const opts = (typeof findCompensationOptions === 'function') ? findCompensationOptions(extra, 6) : [];
+            if (opts.length === 0) {
+                out.innerHTML = `<p style="color:var(--text-dim); font-size:0.85rem;">No encontré ejercicios óptimos. Prueba con un valor menor.</p>`;
+                return;
+            }
+            out.innerHTML = `
+                <p style="font-size:0.8rem; color:var(--text-dim); margin-bottom:0.6rem;">Para quemar <strong style="color:var(--accent-main)">${extra} kcal</strong>, haz cualquiera:</p>
+                <div style="display:grid; gap:0.5rem;">
+                    ${opts.map(o => `
+                        <div style="padding:0.7rem 1rem; background:rgba(0,255,136,0.08); border-radius:8px; border-left:3px solid var(--accent-main);">
+                            <div style="font-weight:bold; color:#fff; font-size:0.9rem;">${o.name}</div>
+                            <div style="font-size:0.75rem; color:var(--accent-main);">${o.amount} ${o.unit.toLowerCase()}</div>
+                            <div style="font-size:0.7rem; color:var(--text-dim); margin-top:0.2rem;">${o.desc}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        };
     }
 
-    function addMessage(sender, text) {
-        const div = document.createElement('div');
-        div.className = `msg ${sender}`;
-        div.textContent = text;
-        chatBox.appendChild(div);
-        chatBox.scrollTop = chatBox.scrollHeight;
-        return div;
+    function setupCalcSwap() {
+        const btn = document.getElementById('btn-calc-swap');
+        if (!btn) return;
+        btn.onclick = () => {
+            const food = document.getElementById('calc-swap-food').value.trim();
+            const out = document.getElementById('calc-swap-result');
+            if (!food) {
+                out.innerHTML = `<p style="color:var(--accent-alert); font-size:0.85rem;">Escribe un alimento.</p>`;
+                return;
+            }
+            const found = (typeof findFood === 'function') ? findFood(food) : null;
+            if (!found) {
+                out.innerHTML = `<p style="color:var(--accent-alert); font-size:0.85rem;">No tengo "${food}" en mi base. Prueba con palabras más comunes (ej. "pizza", "taco", "hamburguesa").</p>`;
+                return;
+            }
+            const swaps = (typeof findFoodSwaps === 'function') ? findFoodSwaps(found.cal, 0.15, 6) : [];
+            const filtered = swaps.filter(s => s.name !== found.name);
+            out.innerHTML = `
+                <p style="font-size:0.8rem; color:var(--text-dim); margin-bottom:0.6rem;">
+                    <strong style="color:var(--accent-secondary)">${found.name}</strong> = <strong>${found.cal} kcal</strong>${found.p ? ` · ${found.p}g proteína` : ''}.
+                </p>
+                <p style="font-size:0.8rem; color:var(--text-dim); margin-bottom:0.5rem;">En su lugar puedes comer:</p>
+                <div style="display:grid; gap:0.4rem;">
+                    ${filtered.length === 0
+                        ? '<p style="color:var(--text-dim); font-size:0.8rem;">No hay alternativas con kcal similares en mi base.</p>'
+                        : filtered.map(s => `
+                            <div style="padding:0.6rem 0.9rem; background:rgba(0,212,255,0.06); border-radius:8px; border-left:3px solid var(--accent-secondary); display:flex; justify-content:space-between; align-items:center;">
+                                <span style="color:#fff; font-size:0.85rem;">${s.name}</span>
+                                <span style="color:var(--accent-secondary); font-weight:bold; font-size:0.85rem;">${s.cal} kcal</span>
+                            </div>
+                        `).join('')}
+                </div>
+            `;
+        };
     }
+
+    function setupCalcTDEE() {
+        const btn = document.getElementById('btn-calc-tdee');
+        if (!btn) return;
+        btn.onclick = () => {
+            const age = parseInt(document.getElementById('calc-age').value);
+            const sex = document.getElementById('calc-sex').value;
+            const activity = parseFloat(document.getElementById('calc-activity').value);
+            const out = document.getElementById('calc-tdee-result');
+            if (!age || !userData.weight || !userData.height) {
+                out.innerHTML = `<p style="color:var(--accent-alert); font-size:0.85rem;">Necesito tu edad, peso y altura. Escribe edad arriba y completa peso/altura en Ajustes o Evolución.</p>`;
+                return;
+            }
+            const bmr = calculateBMR(sex, userData.weight, userData.height, age);
+            const tdee = calculateTDEE(bmr, activity);
+            const limit = recommendCalorieLimit(tdee, userData.weight, userData.target_weight || userData.weight);
+            const deficit = tdee - limit;
+            userData.age = age;
+            saveData();
+            out.innerHTML = `
+                <div style="padding:1rem; background:rgba(255,215,0,0.05); border-radius:10px; border:1px solid rgba(255,215,0,0.3);">
+                    <div style="display:flex; justify-content:space-between; padding:0.4rem 0; border-bottom:1px solid rgba(255,255,255,0.05);">
+                        <span style="color:var(--text-dim); font-size:0.8rem;">BMR (metabolismo basal)</span>
+                        <strong style="color:#fff;">${bmr} kcal</strong>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; padding:0.4rem 0; border-bottom:1px solid rgba(255,255,255,0.05);">
+                        <span style="color:var(--text-dim); font-size:0.8rem;">TDEE (gasto total diario)</span>
+                        <strong style="color:#fff;">${tdee} kcal</strong>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; margin-top:0.3rem; background:rgba(0,255,136,0.08); border-radius:6px; padding:0.6rem 0.8rem;">
+                        <span style="color:var(--accent-main); font-size:0.85rem; font-weight:bold;">LÍMITE RECOMENDADO</span>
+                        <strong style="color:var(--accent-main); font-size:1.1rem;">${limit} kcal/día</strong>
+                    </div>
+                    <p style="font-size:0.75rem; color:var(--text-dim); margin-top:0.6rem; line-height:1.5;">
+                        Déficit diario: <strong style="color:var(--accent-secondary)">${deficit} kcal</strong> (≈ ${(deficit * 7 / 7700).toFixed(2)} kg/semana).
+                    </p>
+                    <button class="btn-premium" id="btn-apply-limit" style="width:100%; margin-top:0.8rem; padding:0.7rem; font-size:0.8rem;">APLICAR ESTE LÍMITE A MI APP</button>
+                </div>
+            `;
+            const apply = document.getElementById('btn-apply-limit');
+            if (apply) apply.onclick = () => {
+                userData.dailyCalLimit = limit;
+                saveData();
+                if (typeof updateDashboard === 'function') updateDashboard();
+                renderCalculatorPage();
+                alert(`✅ Límite diario actualizado: ${limit} kcal/día`);
+            };
+        };
+    }
+
+    function setupCalcProjection() {
+        const btn = document.getElementById('btn-calc-projection');
+        if (!btn) return;
+        btn.onclick = () => {
+            const out = document.getElementById('calc-projection-result');
+            if (!userData.weight || !userData.target_weight || userData.weight <= userData.target_weight) {
+                out.innerHTML = `<p style="color:var(--accent-alert); font-size:0.85rem;">Necesito tu peso actual y meta. Configúralos en Ajustes.</p>`;
+                return;
+            }
+            const history = userData.history || [];
+            let avgDailyDeficit = 500;
+            if (userData.totalNetDeficit > 0 && history.length > 1) {
+                const firstDate = new Date(history[0].date);
+                const today = new Date();
+                const daysElapsed = Math.max(1, Math.floor((today - firstDate) / (1000 * 60 * 60 * 24)));
+                avgDailyDeficit = Math.round(userData.totalNetDeficit / daysElapsed);
+            }
+            const days = projectGoalDays(userData.weight, userData.target_weight, avgDailyDeficit);
+            const kgToLose = (userData.weight - userData.target_weight).toFixed(1);
+            if (!days) {
+                out.innerHTML = `<p style="color:var(--text-dim); font-size:0.85rem;">No puedo proyectar todavía. Necesitas registrar al menos un mes de actividad.</p>`;
+                return;
+            }
+            const goalDate = new Date();
+            goalDate.setDate(goalDate.getDate() + days);
+            out.innerHTML = `
+                <div style="padding:1rem; background:rgba(0,212,255,0.05); border-radius:10px; border:1px solid rgba(0,212,255,0.3);">
+                    <div style="text-align:center; margin-bottom:1rem;">
+                        <div style="font-size:0.75rem; color:var(--text-dim);">FALTAN</div>
+                        <div style="font-size:2rem; font-family:var(--font-accent); color:#00d4ff; font-weight:bold;">${days}</div>
+                        <div style="font-size:0.75rem; color:var(--text-dim);">DÍAS PARA TU META</div>
+                    </div>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.6rem;">
+                        <div style="text-align:center; padding:0.6rem; background:rgba(0,0,0,0.2); border-radius:8px;">
+                            <div style="font-size:0.7rem; color:var(--text-dim);">A BAJAR</div>
+                            <strong style="color:#fff;">${kgToLose} kg</strong>
+                        </div>
+                        <div style="text-align:center; padding:0.6rem; background:rgba(0,0,0,0.2); border-radius:8px;">
+                            <div style="font-size:0.7rem; color:var(--text-dim);">DÉFICIT/DÍA</div>
+                            <strong style="color:#fff;">${avgDailyDeficit} kcal</strong>
+                        </div>
+                    </div>
+                    <p style="text-align:center; font-size:0.8rem; color:var(--accent-main); margin-top:0.8rem;">
+                        Fecha estimada: <strong>${goalDate.toLocaleDateString('es-MX', { day:'numeric', month:'long', year:'numeric' })}</strong>
+                    </p>
+                </div>
+            `;
+        };
+    }
+
+    function activateCalculator() {
+        renderCalculatorPage();
+        setupCalcCompensate();
+        setupCalcSwap();
+        setupCalcTDEE();
+        setupCalcProjection();
+    }
+    window._activateCalculator = activateCalculator;
 
     function startClock() {
         setInterval(() => {
@@ -1751,21 +1790,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 1000);
     }
 
-    // --- MIC / SPEECH ---
-    if (btnMic) {
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (SpeechRecognition) {
-            const rec = new SpeechRecognition();
-            rec.lang = 'es-MX';
-            rec.onstart = () => btnMic.classList.add('recording');
-            rec.onresult = (e) => {
-                aiInput.value = e.results[0][0].transcript;
-                handleAiQuery();
-            };
-            rec.onend = () => btnMic.classList.remove('recording');
-            btnMic.onclick = () => rec.start();
-        } else { btnMic.style.display = 'none'; }
-    }
 });
 
 // --- PWA: REGISTRAR SERVICE WORKER ---
