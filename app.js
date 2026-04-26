@@ -121,7 +121,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!userData.foodLogToday) userData.foodLogToday = [];
             if (!userData.forearm) userData.forearm = 0;
             if (!userData.back) userData.back = 0;
-            
+            if (!userData.achievements) userData.achievements = [];
+
             // Reset diario de calorías
             const today = new Date().toDateString();
             if (userData.lastUpdateDate !== today) {
@@ -136,6 +137,33 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         applySettings();
         updateDashboard();
+
+        // Pull remoto en background — sobreescribe local si remote es más reciente
+        if (apiToken()) {
+            pullRemoteData().then(remote => {
+                if (!remote) return;
+                const remoteSync = remote.lastSync ? new Date(remote.lastSync).getTime() : 0;
+                const localSync  = userData.lastSync ? new Date(userData.lastSync).getTime() : 0;
+                if (remoteSync > localSync && remote.data && Object.keys(remote.data).length > 0) {
+                    userData = { ...userData, ...remote.data };
+                    userData.lastSync = remote.lastSync;
+                    if (Array.isArray(remote.achievements)) userData.achievements = remote.achievements;
+                    localStorage.setItem(getStorageKey(), JSON.stringify(userData));
+                    applySettings();
+                    updateDashboard();
+                    console.log('[sync] datos restaurados desde la nube.');
+                }
+            });
+        }
+
+        // Lanzar onboarding tour si es primer login
+        if (localStorage.getItem('axcore_first_run') === '1') {
+            localStorage.removeItem('axcore_first_run');
+            setTimeout(() => { if (typeof launchOnboardingTour === 'function') launchOnboardingTour(); }, 800);
+        }
+
+        // Verificar logros tras cargar
+        if (typeof checkAchievements === 'function') checkAchievements();
     }
 
     function applySettings() {
@@ -185,9 +213,64 @@ document.addEventListener('DOMContentLoaded', () => {
         if (achWaist) achWaist.textContent = userData.waist || 0;
     }
 
+    // ============================================================
+    // SYNC CON BACKEND — capa de persistencia remota
+    // ============================================================
+    function apiToken()        { return localStorage.getItem('axcore_token') || ''; }
+    function setApiToken(t)    { localStorage.setItem('axcore_token', t || ''); }
+    function clearApiToken()   { localStorage.removeItem('axcore_token'); }
+    function apiAuthHeaders()  {
+        const t = apiToken();
+        return t ? { 'Authorization': `Bearer ${t}`, 'Content-Type': 'application/json' }
+                 : { 'Content-Type': 'application/json' };
+    }
+
+    let _syncTimer = null;
+    let _syncing = false;
+    function pushSync(immediate = false) {
+        if (!apiToken() || !currentUser) return;
+        clearTimeout(_syncTimer);
+        const run = async () => {
+            if (_syncing) return;
+            _syncing = true;
+            try {
+                const res = await fetch(`${API_URL}/api/user/sync`, {
+                    method: 'POST',
+                    headers: apiAuthHeaders(),
+                    body: JSON.stringify({
+                        data: userData,
+                        achievements: userData.achievements || []
+                    })
+                });
+                if (res.status === 401) {
+                    // Token inválido — limpiar pero NO cerrar sesión local
+                    clearApiToken();
+                    console.warn('[sync] sesión remota expirada, datos solo en local.');
+                }
+            } catch (e) {
+                console.warn('[sync] sin conexión, reintento luego:', e.message);
+            } finally {
+                _syncing = false;
+            }
+        };
+        if (immediate) run();
+        else _syncTimer = setTimeout(run, 1500);  // debounce
+    }
+
+    async function pullRemoteData() {
+        if (!apiToken()) return null;
+        try {
+            const res = await fetch(`${API_URL}/api/user/data`, { headers: apiAuthHeaders() });
+            if (!res.ok) return null;
+            const j = await res.json();
+            return j.success ? j : null;
+        } catch { return null; }
+    }
+
     function saveData() {
         if (currentUser) {
             localStorage.setItem(getStorageKey(), JSON.stringify(userData));
+            pushSync(); // debounced — solo si hay token
         }
     }
 
@@ -216,13 +299,19 @@ document.addEventListener('DOMContentLoaded', () => {
         const p = regPass.value.trim();
         const gcc = document.getElementById('reg-gym-code');
         const gc = gcc ? gcc.value.trim().toUpperCase() : '';
-        
+        const privacyChk = document.getElementById('reg-privacy');
+        const privacyAccepted = !!(privacyChk && privacyChk.checked);
+
         if (u.length < 3 || p.length < 4) {
             alert("Usuario min 3 caracteres, Clave min 4.");
             return;
         }
         if (!gc) {
             alert("CÓDIGO AX REQUERIDO: Pídelo en tu gimnasio para crear tu cuenta.");
+            return;
+        }
+        if (!privacyAccepted) {
+            alert("Debes aceptar el Aviso de Privacidad y los Términos y Condiciones.");
             return;
         }
         if (localStorage.getItem(`arthur_data_${u}`)) {
@@ -236,43 +325,60 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.textContent = "VERIFICANDO...";
         btn.disabled = true;
 
+        // Caso DEMO: solo local, no se persiste en servidor
+        if (gc === "AXV-DEMO") {
+            currentUser = u;
+            userData.username = u;
+            userData.password = p;
+            userData.gymCode = gc;
+            userData.privacyAccepted = true;
+            userData.achievements = userData.achievements || [];
+            clearApiToken();
+            saveData();
+            localStorage.setItem('arthur_current_user', u);
+            localStorage.setItem('axcore_first_run', '1');
+            alert("Modo DEMO activado. Tus datos viven solo en este dispositivo. Pide código a tu coach para sync en la nube.");
+            location.reload();
+            return;
+        }
+
         try {
-            // Validar Código con Backend
-            const res = await fetch(`${API_URL}/api/validate`, {
+            // Registro real en backend
+            const res = await fetch(`${API_URL}/api/user/register`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ code: gc })
+                body: JSON.stringify({
+                    code: gc,
+                    username: u,
+                    password: p,
+                    privacyAccepted: true,
+                    data: { username: u, gymCode: gc, privacyAccepted: true, privacyDate: new Date().toISOString() }
+                })
             });
             const data = await res.json();
-            
+
             if (data.success) {
+                setApiToken(data.token);
                 currentUser = u;
                 userData.username = u;
                 userData.password = p;
                 userData.gymCode = gc;
+                userData.privacyAccepted = true;
+                userData.privacyDate = new Date().toISOString();
+                userData.achievements = [];
                 saveData();
                 localStorage.setItem('arthur_current_user', u);
-                alert(data.message);
+                localStorage.setItem('axcore_first_run', '1');
+                alert(`✅ Cuenta creada en AX-CORE.\nGimnasio: ${data.gymName || 'AX-CORE'}\nTus datos están respaldados en la nube.`);
                 location.reload();
             } else {
-                alert(data.message);
+                alert(data.message || "No se pudo registrar. Verifica el código.");
             }
         } catch(e) {
-            // Modo offline solo con código de prueba pública
-            if (gc === "AXV-DEMO") {
-                currentUser = u;
-                userData.username = u;
-                userData.password = p;
-                userData.gymCode = gc;
-                saveData();
-                localStorage.setItem('arthur_current_user', u);
-                alert("Modo Fuera de Línea Activado (Servidor reiniciando).");
-                location.reload();
-            } else {
-                alert("Error contactando la Base de Datos Central. Verifica tu conexión o espera 1 minuto a que despierte el servidor.");
-            }
+            alert("Error contactando AX-CORE. Verifica tu conexión o espera 1 minuto a que despierte el servidor.");
+            console.error(e);
         }
-        
+
         btn.textContent = originalText;
         btn.disabled = false;
     };
@@ -280,52 +386,70 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btn-login-access').onclick = async () => {
         const u = loginUser.value.trim();
         const p = loginPass.value.trim();
-        const savedRaw = localStorage.getItem(`arthur_data_${u}`);
-        if (!savedRaw) {
-            alert("Usuario no encontrado en este dispositivo.");
-            return;
-        }
-        const saved = JSON.parse(savedRaw);
-        if (saved.password !== p) {
-            alert("Contraseña incorrecta.");
+        if (u.length < 3 || p.length < 4) {
+            alert("Usuario y contraseña requeridos.");
             return;
         }
 
-        const gc = saved.gymCode || "AXV-DEMO"; // Fallback por si era usuario viejo
         const btn = document.getElementById('btn-login-access');
         const originalText = btn.textContent;
         btn.textContent = "CONECTANDO...";
         btn.disabled = true;
 
-        try {
-            // Cada que el usuario entra, validamos su membresía en tiempo real
-            const res = await fetch(`${API_URL}/api/validate`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ code: gc })
-            });
-            const data = await res.json();
-            
-            if (data.success) {
-                // ACTUALIZAR API KEY PARA USUARIOS VIEJOS O RECURRENTES
-                saved.apiKey = data.apiKey || saved.apiKey;
-                localStorage.setItem(`arthur_data_${u}`, JSON.stringify(saved));
-                
-                currentUser = u;
-                localStorage.setItem('arthur_current_user', u);
-                location.reload();
-            } else {
-                alert("ACCESO DENEGADO POR TU GIMNASIO: " + data.message);
+        // 1. Intentar primero login local (necesario para casos DEMO/offline)
+        const savedRaw = localStorage.getItem(`arthur_data_${u}`);
+        const savedLocal = savedRaw ? JSON.parse(savedRaw) : null;
+        const localCode = savedLocal?.gymCode || '';
+
+        // 2. Si tenemos código (no DEMO), intentar login remoto con ese código
+        if (localCode && localCode !== 'AXV-DEMO') {
+            try {
+                const res = await fetch(`${API_URL}/api/user/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ code: localCode, password: p })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    setApiToken(data.token);
+                    // Merge: priorizar data remota si es más nueva
+                    const merged = { ...(savedLocal || {}), ...(data.data || {}) };
+                    merged.username = u;
+                    merged.password = p;
+                    merged.gymCode = localCode;
+                    merged.achievements = data.achievements || merged.achievements || [];
+                    localStorage.setItem(`arthur_data_${u}`, JSON.stringify(merged));
+                    currentUser = u;
+                    localStorage.setItem('arthur_current_user', u);
+                    location.reload();
+                    return;
+                } else {
+                    // Mensaje del backend (ej. franquicia sin pago)
+                    alert(data.message || "Credenciales incorrectas.");
+                    btn.textContent = originalText;
+                    btn.disabled = false;
+                    return;
+                }
+            } catch (e) {
+                // Sin conexión: caer a login local si las credenciales coinciden
+                console.warn('[login] backend no responde, modo offline');
             }
-        } catch(e) {
-            // Modo offline permitido para entrar rápido si el servidor se está levantando
-            currentUser = u;
-            localStorage.setItem('arthur_current_user', u);
-            location.reload();
         }
 
-        btn.textContent = originalText;
-        btn.disabled = false;
+        // 3. Login local (DEMO o fallback offline)
+        if (!savedLocal) {
+            alert("Usuario no encontrado en este dispositivo.\nUsa NUEVO ATLETA para crear cuenta.");
+            btn.textContent = originalText; btn.disabled = false;
+            return;
+        }
+        if (savedLocal.password !== p) {
+            alert("Contraseña incorrecta.");
+            btn.textContent = originalText; btn.disabled = false;
+            return;
+        }
+        currentUser = u;
+        localStorage.setItem('arthur_current_user', u);
+        location.reload();
     };
 
     // Enter para hacer login rápido
@@ -509,6 +633,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (link.id === 'nav-logout') {
                 if (confirm("¿Cerrar sesión táctica en AX-CORE?")) {
                     localStorage.removeItem('arthur_current_user');
+                    clearApiToken();
                     location.reload();
                 }
                 return;
@@ -1784,9 +1909,207 @@ document.addEventListener('DOMContentLoaded', () => {
                 return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
             });
             liveDateEl.textContent = words.join(' ');
-            
+
         }, 1000);
     }
+
+    // ============================================================
+    // SISTEMA DE LOGROS / MEDALLAS
+    // ============================================================
+    const ACHIEVEMENTS_DEF = [
+        { id: 'first_login',   icon: '🎯', title: 'PRIMER ACCESO',     desc: 'Bienvenido a AX-CORE.',                      check: () => !!userData.username },
+        { id: 'first_weigh',   icon: '⚖️', title: 'PRIMER REGISTRO',  desc: 'Registraste tu peso por primera vez.',       check: () => (userData.history || []).length >= 1 },
+        { id: 'streak_3',      icon: '🔥', title: 'RACHA DE 3 DÍAS',  desc: '3 días consecutivos registrando peso.',      check: () => streakDays() >= 3 },
+        { id: 'streak_7',      icon: '🔥', title: 'RACHA DE 7 DÍAS',  desc: 'Una semana completa de constancia.',         check: () => streakDays() >= 7 },
+        { id: 'streak_30',     icon: '👑', title: 'RACHA DE 30 DÍAS', desc: 'Un mes entero sin fallar. Élite.',           check: () => streakDays() >= 30 },
+        { id: 'lose_1kg',      icon: '🔻', title: 'PRIMER KG ABAJO',  desc: 'Bajaste tu primer kilo. ¡Vamos!',            check: () => kilosLost() >= 1 },
+        { id: 'lose_5kg',      icon: '💪', title: '5 KG MENOS',       desc: 'Cinco kilos menos. Estás transformándote.',  check: () => kilosLost() >= 5 },
+        { id: 'lose_10kg',     icon: '🏆', title: '10 KG MENOS',      desc: 'Diez kilos menos. Otro nivel.',              check: () => kilosLost() >= 10 },
+        { id: 'goal_reached',  icon: '🌟', title: 'META ALCANZADA',   desc: 'Llegaste a tu peso objetivo.',               check: () => userData.weight > 0 && userData.target_weight > 0 && userData.weight <= userData.target_weight },
+        { id: 'food_log_50',   icon: '🥗', title: '50 ALIMENTOS',     desc: 'Registraste 50 alimentos en tu historial.',  check: () => (userData.totalFoodLogs || 0) >= 50 },
+        { id: 'deficit_3500',  icon: '⚡', title: 'DÉFICIT DE 3500',  desc: 'Acumulaste un déficit de 3500 kcal (~½ kg).', check: () => (userData.totalNetDeficit || 0) >= 3500 },
+        { id: 'deficit_7700',  icon: '🚀', title: 'DÉFICIT DE 7700',  desc: 'Déficit equivalente a 1 kg quemado.',         check: () => (userData.totalNetDeficit || 0) >= 7700 }
+    ];
+
+    function streakDays() {
+        const h = userData.history || [];
+        if (h.length === 0) return 0;
+        // h debe estar ordenado por fecha; buscar último registro y contar consecutivos
+        const dates = h.map(r => new Date(r.date).toDateString());
+        const unique = [...new Set(dates)].map(d => new Date(d)).sort((a,b) => b-a);
+        let streak = 1;
+        for (let i = 1; i < unique.length; i++) {
+            const diff = (unique[i-1] - unique[i]) / (1000 * 60 * 60 * 24);
+            if (Math.round(diff) === 1) streak++;
+            else break;
+        }
+        // Validar que el último sea hoy o ayer
+        const lastDiff = (new Date() - unique[0]) / (1000 * 60 * 60 * 24);
+        return lastDiff <= 1.5 ? streak : 0;
+    }
+
+    function kilosLost() {
+        const h = userData.history || [];
+        if (h.length < 2) return 0;
+        const start = h[0].weight;
+        const cur = userData.weight || h[h.length - 1].weight;
+        return Math.max(0, start - cur);
+    }
+
+    function checkAchievements() {
+        if (!userData.achievements) userData.achievements = [];
+        const earned = new Set(userData.achievements);
+        const newOnes = [];
+        for (const a of ACHIEVEMENTS_DEF) {
+            if (!earned.has(a.id) && a.check()) {
+                earned.add(a.id);
+                newOnes.push(a);
+            }
+        }
+        if (newOnes.length > 0) {
+            userData.achievements = [...earned];
+            saveData();
+            newOnes.forEach((a, i) => setTimeout(() => showAchievementToast(a), i * 2500));
+        }
+        renderAchievementsPanel();
+    }
+    window.checkAchievements = checkAchievements;
+
+    function showAchievementToast(a) {
+        const t = document.createElement('div');
+        t.style.cssText = `
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            background: linear-gradient(135deg, #00ff88, #00cc6a); color: #000;
+            padding: 14px 22px; border-radius: 14px; z-index: 5000;
+            font-family: 'Oswald', sans-serif; letter-spacing: 1px;
+            box-shadow: 0 12px 40px rgba(0,255,136,0.5);
+            display: flex; align-items: center; gap: 12px; max-width: 90vw;
+            animation: achPop 0.4s ease-out;
+        `;
+        t.innerHTML = `<span style="font-size:32px;">${a.icon}</span>
+                       <div><div style="font-size:11px; opacity:0.7;">¡LOGRO DESBLOQUEADO!</div>
+                       <div style="font-size:16px; font-weight:700;">${a.title}</div>
+                       <div style="font-size:11px; font-weight:400; max-width:240px;">${a.desc}</div></div>`;
+        document.body.appendChild(t);
+        setTimeout(() => { t.style.transition = 'opacity 0.5s'; t.style.opacity = '0'; }, 4500);
+        setTimeout(() => t.remove(), 5200);
+    }
+
+    function renderAchievementsPanel() {
+        const panel = document.getElementById('achievements-panel');
+        if (!panel) return;
+        const earned = new Set(userData.achievements || []);
+        panel.innerHTML = ACHIEVEMENTS_DEF.map(a => {
+            const got = earned.has(a.id);
+            return `<div style="background:${got ? 'rgba(0,255,136,0.08)' : 'rgba(255,255,255,0.02)'};
+                         border:1px solid ${got ? 'rgba(0,255,136,0.4)' : 'rgba(255,255,255,0.06)'};
+                         border-radius:10px; padding:10px; text-align:center;
+                         opacity:${got ? '1' : '0.45'};">
+                <div style="font-size:28px;">${a.icon}</div>
+                <div style="font-family:'Oswald'; font-size:12px; letter-spacing:0.5px; color:${got ? '#00ff88' : '#888'};">${a.title}</div>
+                <div style="font-size:9px; color:#888; margin-top:2px;">${a.desc}</div>
+            </div>`;
+        }).join('');
+    }
+
+    // ============================================================
+    // ONBOARDING TOUR (primera vez)
+    // ============================================================
+    // ============================================================
+    // PUSH NOTIFICATIONS — suscripción del atleta
+    // ============================================================
+    async function subscribeToPush() {
+        if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+        if (!apiToken()) return; // necesita sesión
+        try {
+            const reg = await navigator.serviceWorker.ready;
+            // ¿Ya suscrito?
+            const existing = await reg.pushManager.getSubscription();
+            if (existing) return;
+
+            // Pedir VAPID al backend
+            const r = await fetch(`${API_URL}/api/push/vapid`);
+            if (!r.ok) return; // no hay push configurado
+            const { key } = await r.json();
+            if (!key) return;
+
+            // Pedir permiso al usuario
+            const perm = await Notification.requestPermission();
+            if (perm !== 'granted') return;
+
+            const sub = await reg.pushManager.subscribe({
+                userVisibleOnly: true,
+                applicationServerKey: urlB64ToUint8Array(key)
+            });
+
+            await fetch(`${API_URL}/api/push/subscribe`, {
+                method: 'POST',
+                headers: apiAuthHeaders(),
+                body: JSON.stringify({ subscription: sub })
+            });
+            console.log('[push] suscrito a notificaciones.');
+        } catch (e) {
+            console.warn('[push] error:', e.message);
+        }
+    }
+    function urlB64ToUint8Array(b64) {
+        const padding = '='.repeat((4 - b64.length % 4) % 4);
+        const base64 = (b64 + padding).replace(/-/g, '+').replace(/_/g, '/');
+        const raw = atob(base64);
+        const out = new Uint8Array(raw.length);
+        for (let i = 0; i < raw.length; ++i) out[i] = raw.charCodeAt(i);
+        return out;
+    }
+    // Intentar suscripción 5s después de cargar (no bloquea UX)
+    setTimeout(() => subscribeToPush(), 5000);
+
+    function launchOnboardingTour() {
+        if (document.getElementById('onb-overlay')) return;
+        const steps = [
+            { title: '👋 Bienvenido', body: 'Esta app te ayuda a controlar tu peso y calorías de forma inteligente. Te toma 30 segundos aprenderla.' },
+            { title: '⚖️ Registra tu peso', body: 'Ve a la sección PESO y escribe tu peso del día. Hazlo siempre en las mismas condiciones (al despertar, sin zapatos).' },
+            { title: '🥗 Registra lo que comes', body: 'En ALIMENTOS escribe lo que comiste. Tenemos +677 alimentos mexicanos en la base. Si no aparece, te pedimos las kcal una vez y se queda guardado.' },
+            { title: '🧮 Usa la calculadora', body: 'En CALCULADORA puedes: compensar excesos, sustituir alimentos, calcular tu gasto diario y proyectar cuándo llegarás a tu meta.' },
+            { title: '🏆 Gana logros', body: 'Cada constancia se reconoce: rachas, kilos abajo, hitos. Verás medallas conforme avances. ¡Empezamos!' }
+        ];
+        let idx = 0;
+        const ov = document.createElement('div');
+        ov.id = 'onb-overlay';
+        ov.style.cssText = `
+            position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(8px); z-index: 9000;
+            display: flex; align-items: center; justify-content: center; padding: 20px;
+        `;
+        document.body.appendChild(ov);
+
+        function render() {
+            const s = steps[idx];
+            ov.innerHTML = `
+                <div style="background:linear-gradient(135deg,#0a1f12,#0d1a18); max-width:420px; width:100%;
+                            border:2px solid #00ff88; border-radius:20px; padding:28px;
+                            box-shadow:0 0 60px rgba(0,255,136,0.3);">
+                    <div style="display:flex; gap:6px; margin-bottom:20px;">
+                        ${steps.map((_, i) => `<div style="flex:1; height:4px; border-radius:2px; background:${i <= idx ? '#00ff88' : 'rgba(255,255,255,0.1)'};"></div>`).join('')}
+                    </div>
+                    <h2 style="font-family:'Oswald'; color:#00ff88; letter-spacing:1px; margin:0 0 12px;">${s.title}</h2>
+                    <p style="color:#cce8d0; line-height:1.6; font-size:14px; margin:0 0 24px;">${s.body}</p>
+                    <div style="display:flex; gap:10px; justify-content:flex-end;">
+                        ${idx > 0 ? '<button id="onb-prev" style="background:transparent; border:1px solid rgba(255,255,255,0.2); color:#aaa; padding:10px 18px; border-radius:10px; cursor:pointer; font-family:Inter; font-weight:600;">ATRÁS</button>' : ''}
+                        <button id="onb-skip" style="background:transparent; border:none; color:#666; padding:10px 16px; cursor:pointer; font-family:Inter; font-size:12px;">SALTAR</button>
+                        <button id="onb-next" style="background:linear-gradient(135deg,#00ff88,#00cc6a); border:none; color:#000; padding:10px 22px; border-radius:10px; cursor:pointer; font-family:Inter; font-weight:700; letter-spacing:0.5px;">${idx === steps.length - 1 ? 'EMPEZAR' : 'SIGUIENTE'}</button>
+                    </div>
+                </div>`;
+            const next = document.getElementById('onb-next');
+            const prev = document.getElementById('onb-prev');
+            const skip = document.getElementById('onb-skip');
+            if (next) next.onclick = () => { if (idx === steps.length - 1) close(); else { idx++; render(); } };
+            if (prev) prev.onclick = () => { idx--; render(); };
+            if (skip) skip.onclick = close;
+        }
+        function close() { ov.remove(); }
+        render();
+    }
+    window.launchOnboardingTour = launchOnboardingTour;
 
 });
 
