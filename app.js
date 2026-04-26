@@ -250,7 +250,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 userData.username = u;
                 userData.password = p;
                 userData.gymCode = gc;
-                userData.apiKey = data.apiKey; // Recibir API Key real del servidor
                 saveData();
                 localStorage.setItem('arthur_current_user', u);
                 alert(data.message);
