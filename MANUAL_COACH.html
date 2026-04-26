@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AX-CORE — Manual del Coach</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0f1a;
+    --surface: #111827;
+    --card: #1a2333;
+    --border: #2a3a55;
+    --primary: #00c3ff;
+    --accent: #00ff88;
+    --warn: #ff9f43;
+    --danger: #ff4757;
+    --text: #e8eaf6;
+    --muted: #8896b0;
+    --gradient: linear-gradient(135deg, #00c3ff 0%, #0066cc 100%);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.65;
+    font-size: 15px;
+  }
+
+  /* HERO */
+  .hero {
+    background: linear-gradient(135deg, #001a33 0%, #003366 50%, #001a33 100%);
+    border-bottom: 3px solid var(--primary);
+    padding: 60px 24px 50px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 50% 0%, rgba(0,195,255,0.15) 0%, transparent 70%);
+  }
+  .hero-badge {
+    display: inline-block;
+    background: rgba(0,195,255,0.15);
+    border: 1px solid var(--primary);
+    color: var(--primary);
+    font-family: 'Oswald', sans-serif;
+    font-size: 11px;
+    letter-spacing: 3px;
+    padding: 6px 18px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+  }
+  .hero h1 {
+    font-family: 'Oswald', sans-serif;
+    font-size: clamp(38px, 7vw, 72px);
+    font-weight: 700;
+    letter-spacing: 4px;
+    color: #fff;
+    text-shadow: 0 0 40px rgba(0,195,255,0.4);
+    line-height: 1;
+  }
+  .hero h1 span { color: var(--primary); }
+  .hero-sub {
+    font-family: 'Oswald', sans-serif;
+    font-size: 20px;
+    color: var(--accent);
+    letter-spacing: 6px;
+    margin: 12px 0 16px;
+  }
+  .hero p {
+    color: var(--muted);
+    font-size: 15px;
+    max-width: 520px;
+    margin: 0 auto;
+  }
+
+  /* NAV */
+  .toc {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 24px;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .toc-inner {
+    max-width: 960px;
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+  }
+  .toc a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    transition: all 0.2s;
+  }
+  .toc a:hover { color: var(--primary); border-color: var(--primary); background: rgba(0,195,255,0.08); }
+
+  /* LAYOUT */
+  .content { max-width: 960px; margin: 0 auto; padding: 40px 24px 80px; }
+
+  /* SECTIONS */
+  .section { margin-bottom: 56px; }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 28px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid var(--border);
+  }
+  .section-icon {
+    width: 52px; height: 52px;
+    background: var(--gradient);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    flex-shrink: 0;
+  }
+  .section-header h2 {
+    font-family: 'Oswald', sans-serif;
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    color: #fff;
+  }
+  .section-header h2 span { color: var(--primary); }
+
+  /* CARDS */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px;
+    margin-bottom: 16px;
+  }
+  .card-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    color: var(--primary);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  /* GRID */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  @media(max-width: 680px) {
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  }
+
+  /* STEPS */
+  .steps { counter-reset: step; display: flex; flex-direction: column; gap: 16px; }
+  .step {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 20px 20px 72px;
+    position: relative;
+    counter-increment: step;
+  }
+  .step::before {
+    content: counter(step);
+    position: absolute;
+    left: 20px; top: 50%;
+    transform: translateY(-50%);
+    width: 36px; height: 36px;
+    background: var(--gradient);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Oswald', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+  }
+  .step h4 {
+    font-family: 'Oswald', sans-serif;
+    font-size: 15px;
+    letter-spacing: 1px;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+  .step p { color: var(--muted); font-size: 14px; }
+
+  /* CALLOUT */
+  .callout {
+    border-radius: 12px;
+    padding: 18px 20px;
+    margin: 16px 0;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+  .callout.info { background: rgba(0,195,255,0.08); border-left: 4px solid var(--primary); }
+  .callout.success { background: rgba(0,255,136,0.08); border-left: 4px solid var(--accent); }
+  .callout.warn { background: rgba(255,159,67,0.08); border-left: 4px solid var(--warn); }
+  .callout.danger { background: rgba(255,71,87,0.08); border-left: 4px solid var(--danger); }
+  .callout-icon { font-size: 20px; flex-shrink: 0; margin-top: 2px; }
+  .callout-body strong { display: block; margin-bottom: 4px; color: var(--text); }
+  .callout-body { font-size: 14px; color: var(--muted); }
+
+  /* CODE */
+  .code-block {
+    background: #060d1a;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    color: var(--accent);
+    overflow-x: auto;
+    white-space: pre;
+    margin: 12px 0;
+  }
+
+  /* TABLE */
+  .table-wrap { overflow-x: auto; margin: 16px 0; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th {
+    background: rgba(0,195,255,0.12);
+    color: var(--primary);
+    font-family: 'Oswald', sans-serif;
+    font-size: 13px;
+    letter-spacing: 1px;
+    text-align: left;
+    padding: 12px 16px;
+    border-bottom: 2px solid var(--border);
+  }
+  td {
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--muted);
+    vertical-align: top;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+
+  /* HIGHLIGHT PILL */
+  .pill {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  .pill-blue { background: rgba(0,195,255,0.15); color: var(--primary); }
+  .pill-green { background: rgba(0,255,136,0.15); color: var(--accent); }
+  .pill-orange { background: rgba(255,159,67,0.15); color: var(--warn); }
+  .pill-red { background: rgba(255,71,87,0.15); color: var(--danger); }
+
+  /* STAT */
+  .stat-row { display: flex; flex-wrap: wrap; gap: 16px; margin: 20px 0; }
+  .stat {
+    flex: 1; min-width: 160px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+  }
+  .stat-num {
+    font-family: 'Oswald', sans-serif;
+    font-size: 32px;
+    color: var(--primary);
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .stat-label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+
+  /* FLOW */
+  .flow {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0;
+    margin: 20px 0;
+  }
+  .flow-node {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 18px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    white-space: nowrap;
+  }
+  .flow-arrow {
+    color: var(--primary);
+    font-size: 20px;
+    padding: 0 8px;
+  }
+
+  /* WHATSAPP BUBBLE */
+  .wa-bubble {
+    background: #1a3a2a;
+    border: 1px solid #2a5a3a;
+    border-radius: 12px;
+    padding: 16px 20px;
+    font-size: 14px;
+    color: #cce8d0;
+    font-style: italic;
+    margin: 12px 0;
+    position: relative;
+  }
+  .wa-bubble::before {
+    content: '📱';
+    position: absolute;
+    top: -12px; left: 16px;
+    font-size: 20px;
+  }
+
+  /* ROLE BADGE */
+  .role-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0,195,255,0.1);
+    border: 1px solid var(--primary);
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-family: 'Oswald', sans-serif;
+    font-size: 14px;
+    letter-spacing: 1px;
+    color: var(--primary);
+  }
+
+  /* TIMELINE */
+  .timeline { position: relative; padding-left: 32px; }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 10px; top: 0; bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--primary), var(--accent));
+  }
+  .tl-item {
+    position: relative;
+    margin-bottom: 24px;
+  }
+  .tl-item::before {
+    content: '';
+    position: absolute;
+    left: -26px; top: 4px;
+    width: 12px; height: 12px;
+    background: var(--primary);
+    border-radius: 50%;
+    border: 2px solid var(--bg);
+  }
+  .tl-item h4 {
+    font-family: 'Oswald', sans-serif;
+    font-size: 15px;
+    color: var(--accent);
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+  }
+  .tl-item p { font-size: 14px; color: var(--muted); }
+
+  /* FOOTER */
+  .footer {
+    text-align: center;
+    padding: 40px 24px;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 13px;
+  }
+  .footer strong { color: var(--primary); }
+
+  /* RESPONSIVE */
+  @media (max-width: 500px) {
+    .hero h1 { font-size: 38px; }
+    .step { padding-left: 60px; }
+    .step::before { width: 30px; height: 30px; font-size: 14px; left: 14px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════ HERO -->
+<div class="hero">
+  <div class="hero-badge">MANUAL DE OPERACIÓN</div>
+  <h1>AX<span>-</span>CORE</h1>
+  <div class="hero-sub">ROL: COACH / FRANQUICIATARIO</div>
+  <p>Todo lo que necesitas para registrar tu gimnasio, activar atletas y gestionar tu franquicia AX-CORE desde el primer día.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ NAV -->
+<nav class="toc">
+  <div class="toc-inner">
+    <a href="#rol">Tu Rol</a>
+    <a href="#acceso">Primer Acceso</a>
+    <a href="#codigos">Tus Códigos</a>
+    <a href="#atletas">Activar Atletas</a>
+    <a href="#app">Usar la App</a>
+    <a href="#planes">Tu Plan</a>
+    <a href="#flujo">Flujo Diario</a>
+    <a href="#faq">FAQ</a>
+  </div>
+</nav>
+
+<div class="content">
+
+<!-- ═══════════════════════════════════════════════════════ 1. ROL -->
+<div class="section" id="rol">
+  <div class="section-header">
+    <div class="section-icon">🏋️</div>
+    <h2>TU <span>ROL</span> EN AX-CORE</h2>
+  </div>
+
+  <div class="callout success">
+    <div class="callout-icon">✅</div>
+    <div class="callout-body">
+      <strong>Eres un Coach / Franquiciatario</strong>
+      Tienes acceso a la plataforma AX-CORE para tu gimnasio. Puedes registrar atletas, consultar tu historial de pagos y usar todas las herramientas nutricionales de la app.
+    </div>
+  </div>
+
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-title">🎯 Tu Misión</div>
+      <p style="color: var(--muted); font-size: 14px;">Usar AX-CORE como herramienta de retención y diferenciación en tu gimnasio. Tus atletas tendrán acceso a control nutricional y seguimiento de peso profesional.</p>
+    </div>
+    <div class="card">
+      <div class="card-title">🔑 Tus Herramientas</div>
+      <ul style="color: var(--muted); font-size: 14px; padding-left: 16px; list-style: disc;">
+        <li>Código de Franquicia único</li>
+        <li>Lote de Códigos de Atleta</li>
+        <li>Panel de Coach (próximamente)</li>
+        <li>App completa como Atleta</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-title">📊 Tu Jerarquía</div>
+      <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 4px;">
+        <div style="display: flex; align-items: center; gap: 8px; font-size: 13px;">
+          <span style="color: var(--warn);">👑</span>
+          <span style="color: var(--muted);">Maestro (Arthur)</span>
+          <span class="pill pill-orange">Encima de ti</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px; font-size: 13px;">
+          <span style="color: var(--primary);">🏋️</span>
+          <span style="color: var(--text);">Coach (TÚ)</span>
+          <span class="pill pill-blue">Tu nivel</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px; font-size: 13px;">
+          <span style="color: var(--accent);">💪</span>
+          <span style="color: var(--muted);">Atletas</span>
+          <span class="pill pill-green">Bajo tu cargo</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-num">1</div>
+      <div class="stat-label">Código de Franquicia</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">∞</div>
+      <div class="stat-label">Atletas (según plan)</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">24/7</div>
+      <div class="stat-label">Acceso a la App</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">0</div>
+      <div class="stat-label">Instalaciones requeridas</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ 2. PRIMER ACCESO -->
+<div class="section" id="acceso">
+  <div class="section-header">
+    <div class="section-icon">🚀</div>
+    <h2>PRIMER <span>ACCESO</span></h2>
+  </div>
+
+  <div class="callout info">
+    <div class="callout-icon">ℹ️</div>
+    <div class="callout-body">
+      <strong>¿Qué recibes del Maestro?</strong>
+      Cuando contratas AX-CORE para tu gimnasio, el Maestro te entrega por WhatsApp: tu <strong>Código de Franquicia</strong> (ej. <code style="color: var(--accent);">GYM-NORTE-01</code>) y un lote de <strong>Códigos de Atleta</strong>.
+    </div>
+  </div>
+
+  <div class="steps">
+    <div class="step">
+      <h4>Abre la App en tu teléfono</h4>
+      <p>Ve a <strong>https://arthur-arias-martinez.github.io/axcore-app/</strong> desde cualquier navegador. Se recomienda Chrome en Android o Safari en iPhone. No necesitas descargar nada.</p>
+    </div>
+    <div class="step">
+      <h4>Instala como PWA (opcional pero recomendado)</h4>
+      <p>En Chrome: toca los 3 puntos ⋮ → <strong>"Añadir a pantalla de inicio"</strong>. Así AX-CORE aparece como app nativa en tu celular, sin usar datos extra.</p>
+    </div>
+    <div class="step">
+      <h4>Regístrate con tu Código de Franquicia</h4>
+      <p>En la pantalla de registro, ingresa tu nombre y en el campo <strong>"CÓDIGO DE ATLETA"</strong> escribe tu <strong>Código de Franquicia</strong> (el que te dio el Maestro). Este código te da acceso completo.</p>
+    </div>
+    <div class="step">
+      <h4>Completa tu perfil</h4>
+      <p>Llena tus datos: sexo, edad, peso actual, peso meta, altura. La app calculará automáticamente tus calorías recomendadas.</p>
+    </div>
+    <div class="step">
+      <h4>Explora todas las secciones</h4>
+      <p>Peso, Alimentos, Historial, Calculadora y Sensaciones. Conoce bien la app antes de enseñarla a tus atletas.</p>
+    </div>
+  </div>
+
+  <div class="callout warn">
+    <div class="callout-icon">⚠️</div>
+    <div class="callout-body">
+      <strong>Tu Código de Franquicia ≠ Códigos de Atleta</strong>
+      El código de franquicia es TUYO. Los códigos de atleta son para distribuir a tus clientes. Son diferentes y no son intercambiables.
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ 3. CÓDIGOS -->
+<div class="section" id="codigos">
+  <div class="section-header">
+    <div class="section-icon">🔑</div>
+    <h2>TUS <span>CÓDIGOS</span></h2>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <tr>
+        <th>TIPO DE CÓDIGO</th>
+        <th>FORMATO EJEMPLO</th>
+        <th>PARA QUIÉN</th>
+        <th>QUÉ PERMITE</th>
+      </tr>
+      <tr>
+        <td><span class="pill pill-orange">Franquicia</span></td>
+        <td><code style="color: var(--warn);">GYM-NORTE-01</code></td>
+        <td>TÚ (Coach)</td>
+        <td>Acceso completo a la app como Coach/Atleta avanzado</td>
+      </tr>
+      <tr>
+        <td><span class="pill pill-blue">Atleta</span></td>
+        <td><code style="color: var(--primary);">AXV-2024-001</code></td>
+        <td>Tus clientes</td>
+        <td>Acceso completo a la app como Atleta</td>
+      </tr>
+      <tr>
+        <td><span class="pill pill-green">Demo</span></td>
+        <td><code style="color: var(--accent);">AXV-DEMO</code></td>
+        <td>Cualquiera</td>
+        <td>Acceso de demostración sin límite de tiempo</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📦 Tu Lote de Códigos</div>
+    <p style="color: var(--muted); font-size: 14px; margin-bottom: 16px;">El Maestro te entrega un lote de códigos según tu plan. Cada código es de un solo uso — una vez que un atleta lo registra, queda vinculado a él.</p>
+    <div class="grid-2">
+      <div>
+        <p style="font-size: 13px; color: var(--muted); margin-bottom: 8px;"><strong style="color: var(--text);">Plan Básico</strong> — hasta 25 atletas activos</p>
+        <p style="font-size: 13px; color: var(--muted);"><strong style="color: var(--text);">Plan Pro</strong> — hasta 75 atletas activos</p>
+      </div>
+      <div>
+        <p style="font-size: 13px; color: var(--muted); margin-bottom: 8px;"><strong style="color: var(--text);">Plan Elite</strong> — atletas ilimitados</p>
+        <p style="font-size: 13px; color: var(--muted);">Solicita más códigos al Maestro cuando se agoten.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout success">
+    <div class="callout-icon">💡</div>
+    <div class="callout-body">
+      <strong>Consejo Pro: Guarda tus códigos en una hoja de cálculo</strong>
+      Lleva un registro de qué código le diste a qué atleta. Así puedes hacer seguimiento y saber quién falta por registrarse.
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ 4. ACTIVAR ATLETAS -->
+<div class="section" id="atletas">
+  <div class="section-header">
+    <div class="section-icon">💪</div>
+    <h2>ACTIVAR <span>ATLETAS</span></h2>
+  </div>
+
+  <p style="color: var(--muted); margin-bottom: 24px;">El proceso para que un atleta use AX-CORE es simple. Tú le das el código, ellos se registran solos.</p>
+
+  <div class="steps">
+    <div class="step">
+      <h4>Entrégale un código disponible</h4>
+      <p>De tu lote de códigos, elige uno que no hayas usado. Envíalo por WhatsApp o escríbelo en papel. Ejemplo: <strong style="color: var(--accent);">AXV-2024-007</strong></p>
+    </div>
+    <div class="step">
+      <h4>Dile que abra la app</h4>
+      <p>Comparte el link: <strong style="color: var(--primary);">https://arthur-arias-martinez.github.io/axcore-app/</strong>. También puedes mostrarle cómo instalarla como PWA.</p>
+    </div>
+    <div class="step">
+      <h4>El atleta se registra solo</h4>
+      <p>En la pantalla de inicio, toca <strong>"NUEVO ATLETA"</strong>, llena nombre y datos físicos, escribe su código AXV. La app verifica el código con el servidor.</p>
+    </div>
+    <div class="step">
+      <h4>Listo — código activado</h4>
+      <p>El código queda vinculado a ese atleta. Ya tiene acceso completo: control de peso, alimentos, calculadora nutricional y sensaciones.</p>
+    </div>
+  </div>
+
+  <div class="callout warn">
+    <div class="callout-icon">⚠️</div>
+    <div class="callout-body">
+      <strong>Un código = un atleta</strong>
+      Si un atleta pierde su teléfono o borra la app, sus datos se pierden (se guardan localmente). Puede usar el mismo código para re-registrarse, pero empezará desde cero. Recomiéndales tomar fotos de su historial periódicamente.
+    </div>
+  </div>
+
+  <div class="wa-bubble">
+    "Hola [Nombre], te comparto tu acceso a AX-CORE, la app de nutrición de nuestro gimnasio 💪<br><br>
+    🔗 Link: https://arthur-arias-martinez.github.io/axcore-app/<br>
+    🔑 Tu código: <strong>AXV-2024-007</strong><br><br>
+    Entra, regístrate con ese código y llena tus datos. Cualquier duda me avisas."
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ 5. LA APP -->
+<div class="section" id="app">
+  <div class="section-header">
+    <div class="section-icon">📱</div>
+    <h2>USANDO <span>LA APP</span></h2>
+  </div>
+
+  <p style="color: var(--muted); margin-bottom: 24px;">Como Coach tienes acceso a las mismas funciones que los atletas, más la visión completa del ecosistema.</p>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">⚖️ Pestaña: Peso</div>
+      <ul style="color: var(--muted); font-size: 14px; padding-left: 16px; list-style: disc; line-height: 2;">
+        <li>Registra tu peso diario</li>
+        <li>Ve el historial en tabla</li>
+        <li>Observa la tendencia visual</li>
+        <li>Checa tu % de avance hacia la meta</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-title">🥗 Pestaña: Alimentos</div>
+      <ul style="color: var(--muted); font-size: 14px; padding-left: 16px; list-style: disc; line-height: 2;">
+        <li>Registra qué comiste en el día</li>
+        <li>Busca en la base de +677 alimentos</li>
+        <li>Ve tus calorías totales del día</li>
+        <li>Lleva registro de desayuno/comida/cena</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-title">📈 Pestaña: Historial</div>
+      <ul style="color: var(--muted); font-size: 14px; padding-left: 16px; list-style: disc; line-height: 2;">
+        <li>Gráfica de peso vs tiempo</li>
+        <li>Tabla detallada de registros</li>
+        <li>Filtros por período</li>
+        <li>Progreso hacia la meta</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-title">🧮 Pestaña: Calculadora</div>
+      <ul style="color: var(--muted); font-size: 14px; padding-left: 16px; list-style: disc; line-height: 2;">
+        <li><strong style="color: var(--text);">Compensar:</strong> calcula ejercicio para quemar exceso</li>
+        <li><strong style="color: var(--text);">Sustituir:</strong> swaps por alimentos más ligeros</li>
+        <li><strong style="color: var(--text);">TDEE:</strong> gasto calórico total del día</li>
+        <li><strong style="color: var(--text);">Proyección:</strong> días para llegar a tu meta</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-title">💬 Pestaña: Sensaciones</div>
+      <ul style="color: var(--muted); font-size: 14px; padding-left: 16px; list-style: disc; line-height: 2;">
+        <li>Reporta cómo te sientes</li>
+        <li>Análisis contextual instantáneo</li>
+        <li>Consejos personalizados según tu estado</li>
+        <li>Categorías: hambre, síntomas, estado de ánimo</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-title">⚙️ Configuración</div>
+      <ul style="color: var(--muted); font-size: 14px; padding-left: 16px; list-style: disc; line-height: 2;">
+        <li>Actualiza tu peso y altura</li>
+        <li>Cambia tu meta de peso</li>
+        <li>Ajusta tu nivel de actividad</li>
+        <li>Guarda tu dieta recomendada</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout info">
+    <div class="callout-icon">💡</div>
+    <div class="callout-body">
+      <strong>Tip: Úsala contigo primero</strong>
+      Antes de recomendar AX-CORE a tus atletas, úsala durante 2 semanas en tu propia rutina. Tu experiencia personal es la mejor venta.
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ 6. PLANES -->
+<div class="section" id="planes">
+  <div class="section-header">
+    <div class="section-icon">💎</div>
+    <h2>TU <span>PLAN</span></h2>
+  </div>
+
+  <div class="grid-3">
+    <div class="card" style="border-color: #4a5568;">
+      <div style="text-align: center; margin-bottom: 16px;">
+        <div style="font-family: 'Oswald', sans-serif; font-size: 22px; color: var(--muted); letter-spacing: 2px;">BÁSICO</div>
+        <div style="font-family: 'Oswald', sans-serif; font-size: 36px; color: var(--text);">$1,500</div>
+        <div style="font-size: 12px; color: var(--muted);">MXN / mes</div>
+      </div>
+      <ul style="color: var(--muted); font-size: 13px; padding-left: 16px; list-style: disc; line-height: 2.2;">
+        <li>Hasta <strong style="color: var(--text);">25 atletas</strong></li>
+        <li>Soporte por WhatsApp</li>
+        <li>App completa</li>
+        <li>Actualizaciones incluidas</li>
+      </ul>
+    </div>
+    <div class="card" style="border-color: var(--primary); box-shadow: 0 0 20px rgba(0,195,255,0.1);">
+      <div style="text-align: center; margin-bottom: 16px;">
+        <div style="background: var(--primary); color: #000; font-size: 11px; font-weight: 700; letter-spacing: 2px; padding: 3px 10px; border-radius: 10px; display: inline-block; margin-bottom: 8px;">MÁS POPULAR</div>
+        <div style="font-family: 'Oswald', sans-serif; font-size: 22px; color: var(--primary); letter-spacing: 2px;">PRO</div>
+        <div style="font-family: 'Oswald', sans-serif; font-size: 36px; color: var(--text);">$2,200</div>
+        <div style="font-size: 12px; color: var(--muted);">MXN / mes</div>
+      </div>
+      <ul style="color: var(--muted); font-size: 13px; padding-left: 16px; list-style: disc; line-height: 2.2;">
+        <li>Hasta <strong style="color: var(--text);">75 atletas</strong></li>
+        <li>Soporte prioritario</li>
+        <li>App completa</li>
+        <li>Actualizaciones incluidas</li>
+        <li>Capacitación inicial</li>
+      </ul>
+    </div>
+    <div class="card" style="border-color: #ffd700;">
+      <div style="text-align: center; margin-bottom: 16px;">
+        <div style="font-family: 'Oswald', sans-serif; font-size: 22px; color: #ffd700; letter-spacing: 2px;">ELITE</div>
+        <div style="font-family: 'Oswald', sans-serif; font-size: 36px; color: var(--text);">$3,000</div>
+        <div style="font-size: 12px; color: var(--muted);">MXN / mes</div>
+      </div>
+      <ul style="color: var(--muted); font-size: 13px; padding-left: 16px; list-style: disc; line-height: 2.2;">
+        <li><strong style="color: var(--text);">Atletas ilimitados</strong></li>
+        <li>Soporte 24/7</li>
+        <li>App completa</li>
+        <li>Actualizaciones incluidas</li>
+        <li>Capacitación inicial</li>
+        <li>Branding personalizado (roadmap)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout warn">
+    <div class="callout-icon">📅</div>
+    <div class="callout-body">
+      <strong>Fecha de Pago</strong>
+      Tu renta se paga mensualmente. El Maestro te enviará recordatorio por WhatsApp antes de la fecha de corte. Si no se recibe el pago, el acceso se pausa automáticamente hasta regularizar.
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ 7. FLUJO DIARIO -->
+<div class="section" id="flujo">
+  <div class="section-header">
+    <div class="section-icon">🔄</div>
+    <h2>FLUJO <span>DIARIO</span></h2>
+  </div>
+
+  <p style="color: var(--muted); margin-bottom: 24px;">Así se ve una semana típica de operación con AX-CORE en tu gimnasio:</p>
+
+  <div class="timeline">
+    <div class="tl-item">
+      <h4>LUNES — Nuevos Atletas</h4>
+      <p>Revisa si tienes nuevos inscritos en el gimnasio. Entrégales su código AXV por WhatsApp y acompáñalos en el primer registro (5 minutos).</p>
+    </div>
+    <div class="tl-item">
+      <h4>MARTES / JUEVES — Check-in de Peso</h4>
+      <p>Recuerda a tus atletas que registren su peso. Puedes hacer dinámicas de grupo: "¿quién bajó esta semana?" para gamificar el proceso.</p>
+    </div>
+    <div class="tl-item">
+      <h4>MIÉRCOLES — Revisión Nutricional</h4>
+      <p>Dedica 10 minutos a revisar con tus atletas sus alimentos del día. La calculadora de compensación es ideal para ayudar a quien se salió de su plan.</p>
+    </div>
+    <div class="tl-item">
+      <h4>VIERNES — Cierre de Semana</h4>
+      <p>Reconoce públicamente a quien logró su meta calórica o de peso. La constancia es lo que más impulsa los resultados.</p>
+    </div>
+    <div class="tl-item">
+      <h4>FIN DE MES — Reporte</h4>
+      <p>Pide a tus atletas que te compartan su historial de la app. Con esos datos puedes hacer un reporte de resultados de tu gimnasio y compartirlo como social proof.</p>
+    </div>
+  </div>
+
+  <div class="callout success">
+    <div class="callout-icon">🏆</div>
+    <div class="callout-body">
+      <strong>Gymificación: el secreto del engagement</strong>
+      Los gimnasios que mejor usan AX-CORE no solo la dan como herramienta — crean rituales alrededor de ella. Tablero de lideres, retos semanales, premios por constancia. Eso sí fideliza atletas.
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ 8. FAQ -->
+<div class="section" id="faq">
+  <div class="section-header">
+    <div class="section-icon">❓</div>
+    <h2><span>PREGUNTAS</span> FRECUENTES</h2>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <tr>
+        <th>PREGUNTA</th>
+        <th>RESPUESTA</th>
+      </tr>
+      <tr>
+        <td style="color: var(--text); font-weight: 500;">¿Los atletas pagan algo?</td>
+        <td>No. La app es parte del servicio que tú ofreces como gimnasio. Solo tú pagas la renta mensual al Maestro.</td>
+      </tr>
+      <tr>
+        <td style="color: var(--text); font-weight: 500;">¿Qué pasa si un atleta ya no viene?</td>
+        <td>Nada, su código sigue activo. Si quieres liberar ese espacio, pide al Maestro que desactive ese código y te dé uno nuevo.</td>
+      </tr>
+      <tr>
+        <td style="color: var(--text); font-weight: 500;">¿Puedo ver los datos de mis atletas?</td>
+        <td>Actualmente los datos son privados de cada atleta (guardados en su teléfono). El panel de Coach con visión grupal está en el roadmap.</td>
+      </tr>
+      <tr>
+        <td style="color: var(--text); font-weight: 500;">¿La app funciona sin internet?</td>
+        <td>Parcialmente. El registro inicial requiere internet para validar el código. Después, la app funciona offline para registrar peso y alimentos. Se sincroniza al reconectarse.</td>
+      </tr>
+      <tr>
+        <td style="color: var(--text); font-weight: 500;">¿Mis atletas necesitan crear una cuenta?</td>
+        <td>No. Solo necesitan el código AXV que tú les das. No hay email ni contraseña que recordar.</td>
+      </tr>
+      <tr>
+        <td style="color: var(--text); font-weight: 500;">¿Puedo cambiar de plan?</td>
+        <td>Sí. Contacta al Maestro por WhatsApp para hacer el upgrade o downgrade. El ajuste aplica en el siguiente ciclo de pago.</td>
+      </tr>
+      <tr>
+        <td style="color: var(--text); font-weight: 500;">¿Qué hago si la app no abre?</td>
+        <td>1) Verifica conexión a internet. 2) Limpia caché del navegador. 3) Prueba en otro navegador. 4) Avisa al Maestro si persiste.</td>
+      </tr>
+      <tr>
+        <td style="color: var(--text); font-weight: 500;">¿Se pueden dar de alta atletas sin código?</td>
+        <td>Solo con el código AXV-DEMO, que da acceso de demostración. Para acceso permanente necesitan código del lote de tu franquicia.</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="card" style="margin-top: 24px;">
+    <div class="card-title">📞 Contacto Directo con el Maestro</div>
+    <p style="color: var(--muted); font-size: 14px; margin-bottom: 16px;">Para cualquier situación fuera de este manual, el canal es WhatsApp directo con Arthur (Maestro del sistema).</p>
+
+    <div class="wa-bubble">
+      "Hola Arthur, soy [Tu Nombre] del gimnasio [Tu Gym]. Tengo un problema/consulta con AX-CORE: [descripción]. ¿Me puedes apoyar?"
+    </div>
+  </div>
+</div>
+
+</div><!-- /content -->
+
+<footer class="footer">
+  <p><strong>AX-CORE</strong> · Manual del Coach · Versión 2.0</p>
+  <p style="margin-top: 8px;">Sistema desarrollado y operado por <strong>Arthur Arias Martínez</strong></p>
+  <p style="margin-top: 4px; font-size: 12px;">Para soporte técnico contacta al Maestro directamente por WhatsApp</p>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AX-CORE — Manual del Atleta</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080f0a;
+    --surface: #0d1a10;
+    --card: #111f14;
+    --border: #1e3a22;
+    --primary: #00ff88;
+    --accent: #00e5ff;
+    --warn: #ffcc02;
+    --danger: #ff4757;
+    --text: #e8f5ec;
+    --muted: #7a9b80;
+    --gradient: linear-gradient(135deg, #00ff88 0%, #00cc66 100%);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.65;
+    font-size: 15px;
+  }
+
+  /* HERO */
+  .hero {
+    background: linear-gradient(135deg, #050f07 0%, #0a2010 50%, #050f07 100%);
+    border-bottom: 3px solid var(--primary);
+    padding: 60px 24px 50px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 50% 0%, rgba(0,255,136,0.12) 0%, transparent 70%);
+  }
+  .hero-badge {
+    display: inline-block;
+    background: rgba(0,255,136,0.1);
+    border: 1px solid var(--primary);
+    color: var(--primary);
+    font-family: 'Oswald', sans-serif;
+    font-size: 11px;
+    letter-spacing: 3px;
+    padding: 6px 18px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+  }
+  .hero h1 {
+    font-family: 'Oswald', sans-serif;
+    font-size: clamp(38px, 7vw, 72px);
+    font-weight: 700;
+    letter-spacing: 4px;
+    color: #fff;
+    text-shadow: 0 0 40px rgba(0,255,136,0.3);
+    line-height: 1;
+  }
+  .hero h1 span { color: var(--primary); }
+  .hero-sub {
+    font-family: 'Oswald', sans-serif;
+    font-size: 20px;
+    color: var(--accent);
+    letter-spacing: 6px;
+    margin: 12px 0 16px;
+  }
+  .hero p {
+    color: var(--muted);
+    font-size: 15px;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  /* NAV */
+  .toc {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 24px;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .toc-inner {
+    max-width: 960px;
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+  }
+  .toc a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    transition: all 0.2s;
+  }
+  .toc a:hover { color: var(--primary); border-color: var(--primary); background: rgba(0,255,136,0.07); }
+
+  /* LAYOUT */
+  .content { max-width: 960px; margin: 0 auto; padding: 40px 24px 80px; }
+
+  /* SECTIONS */
+  .section { margin-bottom: 56px; }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 28px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid var(--border);
+  }
+  .section-icon {
+    width: 52px; height: 52px;
+    background: var(--gradient);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    flex-shrink: 0;
+  }
+  .section-header h2 {
+    font-family: 'Oswald', sans-serif;
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    color: #fff;
+  }
+  .section-header h2 span { color: var(--primary); }
+
+  /* CARDS */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px;
+    margin-bottom: 16px;
+  }
+  .card-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    color: var(--primary);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  /* GRID */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  @media(max-width: 680px) {
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  }
+
+  /* STEPS */
+  .steps { counter-reset: step; display: flex; flex-direction: column; gap: 16px; }
+  .step {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 20px 20px 72px;
+    position: relative;
+    counter-increment: step;
+  }
+  .step::before {
+    content: counter(step);
+    position: absolute;
+    left: 20px; top: 50%;
+    transform: translateY(-50%);
+    width: 36px; height: 36px;
+    background: var(--gradient);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Oswald', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: #000;
+  }
+  .step h4 {
+    font-family: 'Oswald', sans-serif;
+    font-size: 15px;
+    letter-spacing: 1px;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+  .step p { color: var(--muted); font-size: 14px; }
+
+  /* CALLOUT */
+  .callout {
+    border-radius: 12px;
+    padding: 18px 20px;
+    margin: 16px 0;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+  .callout.info { background: rgba(0,229,255,0.07); border-left: 4px solid var(--accent); }
+  .callout.success { background: rgba(0,255,136,0.07); border-left: 4px solid var(--primary); }
+  .callout.warn { background: rgba(255,204,2,0.07); border-left: 4px solid var(--warn); }
+  .callout.danger { background: rgba(255,71,87,0.07); border-left: 4px solid var(--danger); }
+  .callout-icon { font-size: 20px; flex-shrink: 0; margin-top: 2px; }
+  .callout-body strong { display: block; margin-bottom: 4px; color: var(--text); }
+  .callout-body { font-size: 14px; color: var(--muted); }
+
+  /* TABLE */
+  .table-wrap { overflow-x: auto; margin: 16px 0; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th {
+    background: rgba(0,255,136,0.1);
+    color: var(--primary);
+    font-family: 'Oswald', sans-serif;
+    font-size: 13px;
+    letter-spacing: 1px;
+    text-align: left;
+    padding: 12px 16px;
+    border-bottom: 2px solid var(--border);
+  }
+  td {
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--muted);
+    vertical-align: top;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+
+  /* BIG FEATURE */
+  .feature-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  .feature-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--gradient);
+  }
+  .feature-num {
+    font-family: 'Oswald', sans-serif;
+    font-size: 56px;
+    color: rgba(0,255,136,0.1);
+    position: absolute;
+    right: 20px; top: 10px;
+    line-height: 1;
+  }
+  .feature-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: 20px;
+    letter-spacing: 2px;
+    color: var(--primary);
+    margin-bottom: 10px;
+  }
+  .feature-sub { font-size: 13px; color: var(--muted); }
+  .feature-list {
+    list-style: none;
+    margin-top: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .feature-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .feature-list li::before {
+    content: '→';
+    color: var(--primary);
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* PILL */
+  .pill {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  .pill-green { background: rgba(0,255,136,0.12); color: var(--primary); }
+  .pill-blue { background: rgba(0,229,255,0.12); color: var(--accent); }
+  .pill-yellow { background: rgba(255,204,2,0.12); color: var(--warn); }
+
+  /* CALORIE BOX */
+  .kcal-box {
+    background: linear-gradient(135deg, #0d2a15, #0a1f12);
+    border: 2px solid var(--primary);
+    border-radius: 16px;
+    padding: 28px;
+    text-align: center;
+    margin: 20px 0;
+  }
+  .kcal-num {
+    font-family: 'Oswald', sans-serif;
+    font-size: 64px;
+    color: var(--primary);
+    line-height: 1;
+    text-shadow: 0 0 30px rgba(0,255,136,0.3);
+  }
+  .kcal-label { color: var(--muted); font-size: 14px; letter-spacing: 2px; text-transform: uppercase; margin-top: 8px; }
+
+  /* FOOD EXAMPLE */
+  .food-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 8px;
+  }
+  .food-name { font-size: 14px; color: var(--text); }
+  .food-kcal {
+    font-family: 'Oswald', sans-serif;
+    font-size: 18px;
+    color: var(--primary);
+  }
+  .food-portion { font-size: 12px; color: var(--muted); }
+
+  /* FOOTER */
+  .footer {
+    text-align: center;
+    padding: 40px 24px;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 13px;
+  }
+  .footer strong { color: var(--primary); }
+
+  @media (max-width: 500px) {
+    .hero h1 { font-size: 38px; }
+    .step { padding-left: 60px; }
+    .step::before { width: 30px; height: 30px; font-size: 14px; left: 14px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge">MANUAL DE USUARIO</div>
+  <h1>AX<span>-</span>CORE</h1>
+  <div class="hero-sub">ROL: ATLETA</div>
+  <p>Tu guía completa para usar AX-CORE: registrar peso, controlar tus calorías y alcanzar tu meta más rápido.</p>
+</div>
+
+<!-- NAV -->
+<nav class="toc">
+  <div class="toc-inner">
+    <a href="#registro">Registro</a>
+    <a href="#peso">Peso</a>
+    <a href="#alimentos">Alimentos</a>
+    <a href="#historial">Historial</a>
+    <a href="#calculadora">Calculadora</a>
+    <a href="#sensaciones">Sensaciones</a>
+    <a href="#tips">Tips</a>
+    <a href="#faq">FAQ</a>
+  </div>
+</nav>
+
+<div class="content">
+
+<!-- ═══════════════════════════════════════════════════════ BIENVENIDA -->
+<div class="section" id="bienvenida">
+  <div class="callout success">
+    <div class="callout-icon">💪</div>
+    <div class="callout-body">
+      <strong>Bienvenido a AX-CORE</strong>
+      AX-CORE es tu herramienta de control nutricional y seguimiento de peso. No necesitas saber de nutrición ni de tecnología para usarla. Este manual te explica todo paso a paso.
+    </div>
+  </div>
+
+  <div class="grid-3" style="margin-top: 20px;">
+    <div class="card" style="text-align: center;">
+      <div style="font-size: 36px; margin-bottom: 8px;">📱</div>
+      <div style="font-family: 'Oswald', sans-serif; font-size: 14px; letter-spacing: 1px; color: var(--primary); margin-bottom: 6px;">SIN DESCARGA</div>
+      <p style="font-size: 13px; color: var(--muted);">Funciona en cualquier navegador. Sin App Store ni Play Store.</p>
+    </div>
+    <div class="card" style="text-align: center;">
+      <div style="font-size: 36px; margin-bottom: 8px;">🔒</div>
+      <div style="font-family: 'Oswald', sans-serif; font-size: 14px; letter-spacing: 1px; color: var(--primary); margin-bottom: 6px;">SIN CUENTA</div>
+      <p style="font-size: 13px; color: var(--muted);">No necesitas email ni contraseña. Solo tu código AXV.</p>
+    </div>
+    <div class="card" style="text-align: center;">
+      <div style="font-size: 36px; margin-bottom: 8px;">📡</div>
+      <div style="font-family: 'Oswald', sans-serif; font-size: 14px; letter-spacing: 1px; color: var(--primary); margin-bottom: 6px;">OFFLINE</div>
+      <p style="font-size: 13px; color: var(--muted);">Una vez instalada, funciona sin internet para lo esencial.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ 1. REGISTRO -->
+<div class="section" id="registro">
+  <div class="section-header">
+    <div class="section-icon">🚀</div>
+    <h2>PRIMER <span>REGISTRO</span></h2>
+  </div>
+
+  <div class="callout info">
+    <div class="callout-icon">ℹ️</div>
+    <div class="callout-body">
+      <strong>Antes de empezar, necesitas un código AXV</strong>
+      Tu coach o gimnasio te entregó un código que empieza con <code style="color: var(--primary);">AXV-</code> (ejemplo: <code style="color: var(--primary);">AXV-2024-007</code>). Si no tienes uno, pídelo. También puedes usar <code style="color: var(--accent);">AXV-DEMO</code> para probar la app.
+    </div>
+  </div>
+
+  <div class="steps">
+    <div class="step">
+      <h4>Abre la app en tu teléfono</h4>
+      <p>Ve a <strong style="color: var(--primary);">https://arthur-arias-martinez.github.io/axcore-app/</strong> en Chrome (Android) o Safari (iPhone). Es una página web — no necesitas descargar nada de la tienda.</p>
+    </div>
+    <div class="step">
+      <h4>Instálala en tu pantalla de inicio (recomendado)</h4>
+      <p><strong>Android Chrome:</strong> toca los 3 puntos ⋮ → "Añadir a pantalla de inicio" → "Instalar". <strong>iPhone Safari:</strong> toca el ícono de compartir ↑ → "Añadir a pantalla de inicio". Así la app queda como ícono y abre más rápido.</p>
+    </div>
+    <div class="step">
+      <h4>Toca "NUEVO ATLETA"</h4>
+      <p>En la pantalla de inicio verás esta opción. Si ya estás registrado (volviste a abrir la app), toca "YA SOY ATLETA".</p>
+    </div>
+    <div class="step">
+      <h4>Llena tus datos</h4>
+      <p>Nombre completo · Sexo · Edad · Peso actual (kg) · Estatura (cm) · Peso meta (kg). Sé honesto — la app calcula tus calorías con base en estos datos.</p>
+    </div>
+    <div class="step">
+      <h4>Escribe tu código AXV</h4>
+      <p>En el campo "CÓDIGO DE ATLETA" escribe tu código. Ejemplo: <strong style="color: var(--primary);">AXV-2024-007</strong>. Si quieres probar primero, escribe <strong style="color: var(--accent);">AXV-DEMO</strong> (o toca el botón azul que lo pone automáticamente).</p>
+    </div>
+    <div class="step">
+      <h4>Listo — bienvenido a AX-CORE</h4>
+      <p>La app verifica tu código y te da acceso completo. Verás tu panel con las calorías recomendadas ya calculadas para ti.</p>
+    </div>
+  </div>
+
+  <div class="callout warn">
+    <div class="callout-icon">⚠️</div>
+    <div class="callout-body">
+      <strong>Guarda el link favorito</strong>
+      Si borras la app o cambias de teléfono, tus datos se pierden (se guardan en tu teléfono). Regresa al mismo link y regístrate de nuevo con el mismo código. Los datos históricos no se recuperan — toma capturas de pantalla periódicamente como respaldo.
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ 2. PESO -->
+<div class="section" id="peso">
+  <div class="section-header">
+    <div class="section-icon">⚖️</div>
+    <h2>REGISTRAR <span>PESO</span></h2>
+  </div>
+
+  <p style="color: var(--muted); margin-bottom: 20px;">Registrar tu peso es lo más importante. La app construye tu historial automáticamente.</p>
+
+  <div class="steps">
+    <div class="step">
+      <h4>Abre la pestaña "Peso"</h4>
+      <p>Es la primera pestaña en la barra de navegación inferior. Verás tu peso actual y tu meta.</p>
+    </div>
+    <div class="step">
+      <h4>Escribe tu peso del día</h4>
+      <p>En el campo "Peso de hoy (kg)" escribe tu peso. Hazlo en las mismas condiciones siempre: en ayunas, sin zapatos, por la mañana. Eso elimina variaciones de agua y comida.</p>
+    </div>
+    <div class="step">
+      <h4>Toca "REGISTRAR"</h4>
+      <p>El peso queda guardado con la fecha del día. No puedes registrar dos veces el mismo día — si te equivocaste, el último registro sobreescribe el anterior.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📊 Lo que verás después de registrar</div>
+    <div class="grid-2" style="margin-top: 8px;">
+      <div>
+        <p style="font-size: 14px; color: var(--muted); margin-bottom: 8px;"><strong style="color: var(--text);">Peso actual:</strong> el último que registraste</p>
+        <p style="font-size: 14px; color: var(--muted); margin-bottom: 8px;"><strong style="color: var(--text);">Peso meta:</strong> el que pusiste al registrarte</p>
+        <p style="font-size: 14px; color: var(--muted);"><strong style="color: var(--text);">Diferencia:</strong> cuánto te falta (o cuánto ya bajaste)</p>
+      </div>
+      <div>
+        <p style="font-size: 14px; color: var(--muted); margin-bottom: 8px;"><strong style="color: var(--text);">% de avance:</strong> qué tan cerca estás de tu meta</p>
+        <p style="font-size: 14px; color: var(--muted); margin-bottom: 8px;"><strong style="color: var(--text);">Calorías recomendadas:</strong> tu límite diario</p>
+        <p style="font-size: 14px; color: var(--muted);"><strong style="color: var(--text);">Historial:</strong> tabla con todos tus registros</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout success">
+    <div class="callout-icon">💡</div>
+    <div class="callout-body">
+      <strong>Consistencia > Frecuencia</strong>
+      No tienes que pesarte todos los días. 2-3 veces por semana es suficiente. Lo importante es que sea en las mismas condiciones cada vez para comparar bien.
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ 3. ALIMENTOS -->
+<div class="section" id="alimentos">
+  <div class="section-header">
+    <div class="section-icon">🥗</div>
+    <h2>REGISTRAR <span>ALIMENTOS</span></h2>
+  </div>
+
+  <p style="color: var(--muted); margin-bottom: 20px;">Registra lo que comes para saber si estás dentro de tus calorías del día. Tienes una base de datos con +677 alimentos mexicanos.</p>
+
+  <div class="steps">
+    <div class="step">
+      <h4>Abre la pestaña "Alimentos"</h4>
+      <p>Verás el total de calorías del día, los alimentos que ya añadiste y el buscador.</p>
+    </div>
+    <div class="step">
+      <h4>Escribe el alimento que comiste</h4>
+      <p>En el buscador, escribe el nombre. Ejemplo: "taco de bistec", "agua de jamaica", "manzana". La app busca en su base de datos de +677 alimentos.</p>
+    </div>
+    <div class="step">
+      <h4>Toca "AÑADIR"</h4>
+      <p>Si encuentra el alimento, lo añade con sus calorías. Si no lo encuentra, te pregunta cuántas calorías tenía — puedes escribirlo manualmente. Ese alimento se guarda para la próxima vez.</p>
+    </div>
+    <div class="step">
+      <h4>Repite para cada comida del día</h4>
+      <p>Añade todos los alimentos del día: desayuno, comida, cena y snacks. El total se va sumando en tiempo real.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🔍 Ejemplos de búsqueda</div>
+    <div style="margin-top: 4px;">
+      <div class="food-item">
+        <div>
+          <div class="food-name">Taco de bistec</div>
+          <div class="food-portion">1 taco con tortilla</div>
+        </div>
+        <div class="food-kcal">~280 kcal</div>
+      </div>
+      <div class="food-item">
+        <div>
+          <div class="food-name">Agua de jamaica</div>
+          <div class="food-portion">240ml sin azúcar</div>
+        </div>
+        <div class="food-kcal">~5 kcal</div>
+      </div>
+      <div class="food-item">
+        <div>
+          <div class="food-name">Gordita de chicharrón</div>
+          <div class="food-portion">1 gordita mediana</div>
+        </div>
+        <div class="food-kcal">~380 kcal</div>
+      </div>
+      <div class="food-item">
+        <div>
+          <div class="food-name">Pollo a la plancha</div>
+          <div class="food-portion">150g filete</div>
+        </div>
+        <div class="food-kcal">~232 kcal</div>
+      </div>
+      <div class="food-item">
+        <div>
+          <div class="food-name">Coca-Cola regular</div>
+          <div class="food-portion">355ml lata</div>
+        </div>
+        <div class="food-kcal">~150 kcal</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="kcal-box">
+    <div class="kcal-num">1,800</div>
+    <div class="kcal-label">calorías típicas recomendadas por día</div>
+    <p style="color: var(--muted); font-size: 13px; margin-top: 12px;">Tu número exacto depende de tu peso, estatura, edad y nivel de actividad. AX-CORE lo calcula con la fórmula Mifflin-St Jeor.</p>
+  </div>
+
+  <div class="callout info">
+    <div class="callout-icon">📝</div>
+    <div class="callout-body">
+      <strong>Sección "Mi Dieta"</strong>
+      En la parte inferior de Alimentos hay una sección donde puedes escribir tu dieta recomendada para cada tiempo de comida (desayuno, comida, cena, snacks). Úsala para planear con anticipación qué vas a comer.
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ 4. HISTORIAL -->
+<div class="section" id="historial">
+  <div class="section-header">
+    <div class="section-icon">📈</div>
+    <h2><span>HISTORIAL</span> Y GRÁFICAS</h2>
+  </div>
+
+  <div class="grid-2">
+    <div class="feature-card">
+      <div class="feature-num">📊</div>
+      <div class="feature-title">GRÁFICA DE PESO</div>
+      <div class="feature-sub">Visualiza tu progreso a lo largo del tiempo</div>
+      <ul class="feature-list">
+        <li>Línea de progresión de tu peso</li>
+        <li>Línea punteada de tu meta</li>
+        <li>Cada punto = un día de registro</li>
+        <li>Verás claramente si vas en la dirección correcta</li>
+      </ul>
+    </div>
+    <div class="feature-card">
+      <div class="feature-num">📋</div>
+      <div class="feature-title">TABLA DE REGISTROS</div>
+      <div class="feature-sub">Todos tus datos organizados</div>
+      <ul class="feature-list">
+        <li>Fecha de cada registro</li>
+        <li>Peso del día</li>
+        <li>Diferencia vs registro anterior (+ o -)</li>
+        <li>Ordena por fecha (más reciente primero)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout success">
+    <div class="callout-icon">💡</div>
+    <div class="callout-body">
+      <strong>No te obsesiones con el número diario</strong>
+      El peso puede variar 0.5–2 kg en un día por agua, sal, o digestión. Lo que importa es la tendencia a lo largo de 2–4 semanas. Si la gráfica va hacia abajo, vas bien.
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ 5. CALCULADORA -->
+<div class="section" id="calculadora">
+  <div class="section-header">
+    <div class="section-icon">🧮</div>
+    <h2><span>CALCULADORA</span> INTELIGENTE</h2>
+  </div>
+
+  <p style="color: var(--muted); margin-bottom: 24px;">La Calculadora tiene 5 módulos que te ayudan a tomar decisiones inteligentes sobre tu alimentación y ejercicio.</p>
+
+  <div class="feature-card">
+    <div class="feature-num">1</div>
+    <div class="feature-title">COMPENSAR EXCESO</div>
+    <div class="feature-sub">¿Comiste de más? La app te dice qué ejercicio hacer para "quemar" esas calorías extra.</div>
+    <ul class="feature-list">
+      <li>Escribe cuántas calorías extra comiste hoy</li>
+      <li>La app muestra opciones: minutos de caminata, bici, natación, etc.</li>
+      <li>Tú eliges cuál actividad se adapta mejor a ti</li>
+      <li>Perfecta para los días que "pecas" pero quieres compensar</li>
+    </ul>
+  </div>
+
+  <div class="feature-card">
+    <div class="feature-num">2</div>
+    <div class="feature-title">SUSTITUIR ALIMENTO</div>
+    <div class="feature-sub">¿Quieres comer algo rico pero más ligero? La app busca alternativas similares con menos calorías.</div>
+    <ul class="feature-list">
+      <li>Escribe el alimento que quieres sustituir (ej. "taco de carnitas")</li>
+      <li>La app encuentra opciones con calorías similares o menores</li>
+      <li>Compara precios calóricos side-by-side</li>
+      <li>Útil cuando quieres comer diferente sin salirte del plan</li>
+    </ul>
+  </div>
+
+  <div class="feature-card">
+    <div class="feature-num">3</div>
+    <div class="feature-title">CALCULAR TDEE</div>
+    <div class="feature-sub">TDEE = Total Daily Energy Expenditure. Cuántas calorías quemas en total en un día normal.</div>
+    <ul class="feature-list">
+      <li>Selecciona tu nivel de actividad física</li>
+      <li>La app calcula tu gasto calórico total del día</li>
+      <li>Verás la diferencia entre tu límite y tu gasto real</li>
+      <li>Entre más activo seas, más puedes comer manteniendo el déficit</li>
+    </ul>
+    <div class="table-wrap" style="margin-top: 16px;">
+      <table>
+        <tr><th>NIVEL DE ACTIVIDAD</th><th>DESCRIPCIÓN</th><th>FACTOR</th></tr>
+        <tr><td>Sedentario</td><td>Trabajo de escritorio, sin ejercicio</td><td>x 1.2</td></tr>
+        <tr><td>Ligero</td><td>Caminar, 1-2 días de ejercicio/semana</td><td>x 1.375</td></tr>
+        <tr><td>Moderado</td><td>3-5 días de ejercicio/semana</td><td>x 1.55</td></tr>
+        <tr><td>Activo</td><td>6-7 días de ejercicio intenso</td><td>x 1.725</td></tr>
+        <tr><td>Muy activo</td><td>Atleta de alto rendimiento</td><td>x 1.9</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="feature-card">
+    <div class="feature-num">4</div>
+    <div class="feature-title">PROYECCIÓN DE META</div>
+    <div class="feature-sub">¿Cuándo llegarás a tu peso ideal? La app te da una fecha estimada basada en tu progreso actual.</div>
+    <ul class="feature-list">
+      <li>Ingresa tu peso actual, meta y déficit calórico diario promedio</li>
+      <li>La app calcula en cuántos días alcanzarás tu meta</li>
+      <li>Ve también el equivalente en semanas y meses</li>
+      <li>Ajusta el déficit para ver cómo cambia el tiempo estimado</li>
+    </ul>
+  </div>
+
+  <div class="feature-card">
+    <div class="feature-num">5</div>
+    <div class="feature-title">REGLAS DE ORO</div>
+    <div class="feature-sub">Principios nutricionales básicos para guiar tus decisiones del día a día.</div>
+    <ul class="feature-list">
+      <li>Los fundamentos de la pérdida/ganancia de peso</li>
+      <li>Mitos comunes desmentidos</li>
+      <li>Hábitos que aceleran tu progreso</li>
+      <li>Sin ciencia compleja — directo y aplicable</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ 6. SENSACIONES -->
+<div class="section" id="sensaciones">
+  <div class="section-header">
+    <div class="section-icon">💬</div>
+    <h2><span>SENSACIONES</span></h2>
+  </div>
+
+  <p style="color: var(--muted); margin-bottom: 20px;">¿No te sientes bien? ¿Hambre inusual? ¿Poca energía? La app analiza tus síntomas y te da una orientación contextual.</p>
+
+  <div class="steps">
+    <div class="step">
+      <h4>Abre la pestaña "Sensaciones"</h4>
+      <p>Verás un selector de tipo de sensación y un campo para describir lo que sientes.</p>
+    </div>
+    <div class="step">
+      <h4>Selecciona el tipo</h4>
+      <p>Elige entre: <span class="pill pill-blue">Hambre</span> <span class="pill pill-yellow">Síntoma físico</span> <span class="pill pill-green">Estado de ánimo</span>. Esto ayuda a la app a contextualizar mejor tu situación.</p>
+    </div>
+    <div class="step">
+      <h4>Describe brevemente cómo te sientes</h4>
+      <p>Escribe con tus palabras. Ejemplo: "siento mucha hambre aunque ya comí", "me duele la cabeza y estoy cansado", "me siento sin energía para entrenar".</p>
+    </div>
+    <div class="step">
+      <h4>Toca "VER ANÁLISIS"</h4>
+      <p>La app procesa tu sensación con base en tus datos (calorías del día, peso, déficit) y te da una respuesta personalizada con sugerencias concretas.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">⚡ Ejemplos de lo que responde la app</div>
+    <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 4px;">
+      <div style="background: #0a1f12; border: 1px solid var(--border); border-radius: 10px; padding: 14px;">
+        <div style="font-size: 12px; color: var(--primary); letter-spacing: 1px; margin-bottom: 6px;">HAMBRE A LAS 3PM</div>
+        <p style="font-size: 13px; color: var(--muted);">Si llevas pocas calorías del día: "Tienes margen calórico — considera un snack proteico o una fruta. Aguacate, nueces o un yogurt griego son buenas opciones."</p>
+      </div>
+      <div style="background: #0a1f12; border: 1px solid var(--border); border-radius: 10px; padding: 14px;">
+        <div style="font-size: 12px; color: var(--warn); letter-spacing: 1px; margin-bottom: 6px;">DOLOR DE CABEZA Y CANSANCIO</div>
+        <p style="font-size: 13px; color: var(--muted);">Si llevas déficit severo: "Es posible que sea por déficit calórico alto. Asegúrate de consumir al menos 1,200 kcal y tomar mínimo 2L de agua. Si persiste, consulta a un médico."</p>
+      </div>
+      <div style="background: #0a1f12; border: 1px solid var(--border); border-radius: 10px; padding: 14px;">
+        <div style="font-size: 12px; color: var(--accent); letter-spacing: 1px; margin-bottom: 6px;">SIN ENERGÍA PARA ENTRENAR</div>
+        <p style="font-size: 13px; color: var(--muted);">Si entrenaste ayer: "Tu cuerpo puede necesitar recuperación. Considera un día activo ligero — caminata o estiramiento. Come algo con carbohidratos 1-2 horas antes del siguiente entrenamiento."</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout danger">
+    <div class="callout-icon">⚕️</div>
+    <div class="callout-body">
+      <strong>AX-CORE no reemplaza al médico</strong>
+      Los análisis de sensaciones son orientación general. Si tienes síntomas persistentes, intensos o que empeoran, consulta a un profesional de salud. La app es una herramienta de apoyo, no un diagnóstico médico.
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ 7. TIPS -->
+<div class="section" id="tips">
+  <div class="section-header">
+    <div class="section-icon">🏆</div>
+    <h2>TIPS PARA <span>AVANZAR</span></h2>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">📅 Rutina que funciona</div>
+      <ul style="color: var(--muted); font-size: 14px; padding-left: 16px; list-style: none; line-height: 2.2;">
+        <li>🌅 <strong style="color: var(--text);">Mañana:</strong> regístra tu peso en ayunas</li>
+        <li>🍳 <strong style="color: var(--text);">Desayuno:</strong> anota lo que comiste</li>
+        <li>🌮 <strong style="color: var(--text);">Comida:</strong> anota y revisa el total</li>
+        <li>🌙 <strong style="color: var(--text);">Noche:</strong> revisa si quedaste dentro del límite</li>
+        <li>💊 <strong style="color: var(--text);">Si te pasaste:</strong> usa "Compensar" en la calculadora</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-title">❌ Errores comunes</div>
+      <ul style="color: var(--muted); font-size: 14px; padding-left: 16px; list-style: none; line-height: 2.2;">
+        <li>❌ Pesarte a distintas horas del día</li>
+        <li>❌ Esperar resultados en 1 semana</li>
+        <li>❌ Olvidar registrar bebidas (refrescos, jugos)</li>
+        <li>❌ No registrar salsas ni aderezos</li>
+        <li>❌ Saltarse días en el registro</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top: 0;">
+    <div class="card-title">💧 Lo que más afecta tu progreso</div>
+    <div class="table-wrap">
+      <table>
+        <tr><th>HÁBITO</th><th>IMPACTO EN TU META</th></tr>
+        <tr><td>Tomar 2L de agua al día</td><td style="color: var(--primary);">Alto — reduce falso apetito y mejora metabolismo</td></tr>
+        <tr><td>Dormir 7-8 horas</td><td style="color: var(--primary);">Alto — regula cortisol y hormona del hambre</td></tr>
+        <tr><td>Comer despacio y sin pantallas</td><td style="color: var(--accent);">Medio — el cerebro tarda 20 min en registrar saciedad</td></tr>
+        <tr><td>Caminar 7,000+ pasos al día</td><td style="color: var(--primary);">Alto — agrega ~200-350 kcal de gasto extra sin esfuerzo</td></tr>
+        <tr><td>Evitar refrescos y jugos</td><td style="color: var(--primary);">Alto — 1 refresco = hasta 200 kcal vacías</td></tr>
+        <tr><td>Cenar ligero 2h antes de dormir</td><td style="color: var(--accent);">Medio — facilita mejor sueño y recuperación</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ 8. FAQ -->
+<div class="section" id="faq">
+  <div class="section-header">
+    <div class="section-icon">❓</div>
+    <h2><span>PREGUNTAS</span> FRECUENTES</h2>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <tr>
+        <th>PREGUNTA</th>
+        <th>RESPUESTA</th>
+      </tr>
+      <tr>
+        <td style="color: var(--text); font-weight: 500;">¿Necesito internet para usar la app?</td>
+        <td>Para el registro inicial sí. Después, puedes registrar peso y alimentos sin internet. Los datos se sincronizan al reconectarte.</td>
+      </tr>
+      <tr>
+        <td style="color: var(--text); font-weight: 500;">¿Qué pasa si borro la app?</td>
+        <td>Pierdes tus datos locales. Regístrate de nuevo con el mismo código AXV y empieza desde cero. Por eso se recomiendan capturas periódicas.</td>
+      </tr>
+      <tr>
+        <td style="color: var(--text); font-weight: 500;">¿Mis datos son privados?</td>
+        <td>Sí. Tus datos se guardan en tu propio teléfono, no en un servidor. Nadie más puede verlos.</td>
+      </tr>
+      <tr>
+        <td style="color: var(--text); font-weight: 500;">No encuentro el alimento que busco</td>
+        <td>Prueba con palabras diferentes. Si definitivamente no está, la app te pide el número de calorías manualmente — lo guarda para la próxima vez.</td>
+      </tr>
+      <tr>
+        <td style="color: var(--text); font-weight: 500;">¿Puedo cambiar mi meta de peso?</td>
+        <td>Sí. Ve a Configuración (ícono ⚙️) y actualiza tu peso meta. Las calorías recomendadas se recalculan automáticamente.</td>
+      </tr>
+      <tr>
+        <td style="color: var(--text); font-weight: 500;">¿Qué es el código AXV-DEMO?</td>
+        <td>Es un código de demostración que cualquiera puede usar para probar la app sin restricciones. No expira pero es compartido por muchos usuarios — no uses datos reales con él.</td>
+      </tr>
+      <tr>
+        <td style="color: var(--text); font-weight: 500;">¿Qué hago si la app no carga?</td>
+        <td>1) Verifica tu conexión. 2) Recarga la página. 3) Limpia el caché del navegador. 4) Intenta en otro navegador o dispositivo. 5) Si persiste, avísale a tu coach.</td>
+      </tr>
+      <tr>
+        <td style="color: var(--text); font-weight: 500;">¿Puedo usar la app en computadora?</td>
+        <td>Sí. Abre el mismo link en el navegador de tu computadora. La interfaz se adapta a pantalla grande.</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+</div><!-- /content -->
+
+<footer class="footer">
+  <p><strong>AX-CORE</strong> · Manual del Atleta · Versión 2.0</p>
+  <p style="margin-top: 8px;">Tu progreso importa. Registra, analiza, mejora.</p>
+  <p style="margin-top: 4px; font-size: 12px; color: #4a6a50;">Para soporte, contacta a tu coach del gimnasio</p>
+</footer>
+
+</body>
+</html>

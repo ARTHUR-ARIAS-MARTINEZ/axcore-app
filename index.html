@@ -39,18 +39,24 @@
     <div id="register-overlay" class="overlay hidden">
         <div class="glass-card luxury-modal">
             <h1 class="glitch-text">NUEVO PERFIL</h1>
+            <p class="tagline">REGISTRO DE ATLETA</p>
             <div class="disclaimer-content">
                 <div class="input-group">
-                    <label>CREAR USUARIO</label>
-                    <input type="text" id="reg-user" placeholder="Ej. Arthur_Fit">
+                    <label>NOMBRE DE USUARIO</label>
+                    <input type="text" id="reg-user" placeholder="Ej. Arthur_Fit (mín. 3 letras)">
                 </div>
                 <div class="input-group">
                     <label>CONTRASEÑA</label>
                     <input type="password" id="reg-pass" placeholder="Mínimo 4 caracteres">
                 </div>
                 <div class="input-group">
-                    <label>CÓDIGO GIMNASIO (AX-V)</label>
-                    <input type="text" id="reg-gym-code" placeholder="Pídelo a tu entrenador o dueño" style="border-color:var(--accent-secondary);">
+                    <label>CÓDIGO DE ATLETA</label>
+                    <input type="text" id="reg-gym-code" placeholder="Ej. AX-XXXXX  (te lo da tu coach)" style="border-color:var(--accent-secondary); text-transform:uppercase;">
+                    <p style="margin-top:0.5rem; font-size:0.75rem; color:var(--text-dim); line-height:1.4;">
+                        ¿Sin coach? Usa el código demo público:<br>
+                        <strong style="color:var(--accent-main); font-family:monospace; cursor:pointer; user-select:all;" onclick="document.getElementById('reg-gym-code').value='AXV-DEMO'">AXV-DEMO</strong>
+                        <span style="color:var(--text-dim); font-size:0.7rem;">(clic para auto-llenar)</span>
+                    </p>
                 </div>
             </div>
             <button id="btn-register-confirm" class="btn-premium">CREAR CUENTA ÉLITE</button>

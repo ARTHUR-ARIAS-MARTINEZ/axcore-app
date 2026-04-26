@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manual del MAESTRO — AX-CORE</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Oswald:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --gold: #d4af37;
+  --gold-soft: rgba(212, 175, 55, 0.15);
+  --green: #00ff88;
+  --green-soft: rgba(0, 255, 136, 0.1);
+  --red: #ff3366;
+  --red-soft: rgba(255, 51, 102, 0.1);
+  --blue: #00d4ff;
+  --blue-soft: rgba(0, 212, 255, 0.1);
+  --purple: #b388ff;
+  --purple-soft: rgba(179, 136, 255, 0.1);
+  --bg: #0a0e14;
+  --card: rgba(255,255,255,0.03);
+  --border: rgba(212, 175, 55, 0.25);
+  --text: #e8e8e8;
+  --text-dim: #888;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  background-image:
+    radial-gradient(circle at 20% 10%, rgba(212,175,55,0.08), transparent 40%),
+    radial-gradient(circle at 80% 90%, rgba(0,255,136,0.05), transparent 40%);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  line-height: 1.6;
+  padding: 0;
+}
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 40px 24px;
+}
+.header {
+  text-align: center;
+  padding: 60px 20px 40px;
+  border-bottom: 2px solid var(--border);
+  margin-bottom: 40px;
+  position: relative;
+}
+.header::before {
+  content: "👑";
+  font-size: 4rem;
+  display: block;
+  margin-bottom: 1rem;
+}
+.header h1 {
+  font-family: 'Oswald', sans-serif;
+  font-size: clamp(2.2rem, 6vw, 4rem);
+  color: var(--gold);
+  letter-spacing: 4px;
+  text-shadow: 0 0 20px rgba(212,175,55,0.5);
+  margin-bottom: 10px;
+  text-transform: uppercase;
+}
+.header .subtitle {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1rem;
+  color: var(--green);
+  letter-spacing: 6px;
+  margin-bottom: 20px;
+}
+.header .role {
+  display: inline-block;
+  background: var(--gold);
+  color: #000;
+  padding: 8px 28px;
+  border-radius: 999px;
+  font-family: 'Oswald', sans-serif;
+  font-weight: 900;
+  letter-spacing: 3px;
+  font-size: 0.85rem;
+}
+.toc {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 30px;
+  margin-bottom: 50px;
+}
+.toc h3 {
+  font-family: 'Oswald', sans-serif;
+  color: var(--gold);
+  letter-spacing: 2px;
+  margin-bottom: 20px;
+  font-size: 1.1rem;
+}
+.toc ol { padding-left: 0; list-style: none; counter-reset: toc; }
+.toc li {
+  counter-increment: toc;
+  padding: 8px 0;
+  border-bottom: 1px dashed rgba(255,255,255,0.05);
+  position: relative;
+  padding-left: 50px;
+}
+.toc li::before {
+  content: counter(toc, decimal-leading-zero);
+  position: absolute;
+  left: 0;
+  top: 8px;
+  font-family: 'Oswald', sans-serif;
+  color: var(--gold);
+  font-weight: 700;
+  background: var(--gold-soft);
+  padding: 2px 10px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+}
+.toc a {
+  color: var(--text);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.toc a:hover { color: var(--gold); }
+section {
+  margin-bottom: 50px;
+  background: var(--card);
+  border-left: 4px solid var(--gold);
+  border-radius: 12px;
+  padding: 30px;
+}
+section h2 {
+  font-family: 'Oswald', sans-serif;
+  color: var(--gold);
+  font-size: 1.6rem;
+  letter-spacing: 2px;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+section h2 .num {
+  background: var(--gold);
+  color: #000;
+  padding: 4px 14px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 900;
+}
+section h3 {
+  color: var(--green);
+  font-family: 'Oswald', sans-serif;
+  margin: 30px 0 15px;
+  font-size: 1.2rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+p { margin-bottom: 15px; }
+.url-box {
+  background: rgba(0,0,0,0.4);
+  border: 1px solid var(--green);
+  border-radius: 10px;
+  padding: 16px 20px;
+  font-family: 'Courier New', monospace;
+  color: var(--green);
+  word-break: break-all;
+  margin: 15px 0;
+  display: block;
+  user-select: all;
+  cursor: text;
+}
+.steps {
+  list-style: none;
+  counter-reset: step;
+  padding: 0;
+}
+.steps li {
+  counter-increment: step;
+  padding: 16px 20px 16px 70px;
+  margin-bottom: 12px;
+  background: rgba(0,0,0,0.2);
+  border-radius: 10px;
+  position: relative;
+  border-left: 3px solid var(--green);
+}
+.steps li::before {
+  content: counter(step);
+  position: absolute;
+  left: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--green);
+  color: #000;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Oswald', sans-serif;
+  font-weight: 900;
+  font-size: 1.1rem;
+}
+.alert {
+  background: var(--red-soft);
+  border-left: 4px solid var(--red);
+  padding: 18px 22px;
+  border-radius: 8px;
+  margin: 20px 0;
+}
+.alert::before { content: "⚠️ "; font-size: 1.2rem; }
+.alert strong { color: var(--red); }
+.tip {
+  background: var(--blue-soft);
+  border-left: 4px solid var(--blue);
+  padding: 18px 22px;
+  border-radius: 8px;
+  margin: 20px 0;
+}
+.tip::before { content: "💡 "; font-size: 1.2rem; }
+.tip strong { color: var(--blue); }
+.success {
+  background: var(--green-soft);
+  border-left: 4px solid var(--green);
+  padding: 18px 22px;
+  border-radius: 8px;
+  margin: 20px 0;
+}
+.success::before { content: "✅ "; font-size: 1.2rem; }
+.success strong { color: var(--green); }
+.note {
+  background: var(--purple-soft);
+  border-left: 4px solid var(--purple);
+  padding: 18px 22px;
+  border-radius: 8px;
+  margin: 20px 0;
+}
+.note::before { content: "📌 "; font-size: 1.2rem; }
+.note strong { color: var(--purple); }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  background: rgba(0,0,0,0.2);
+  border-radius: 10px;
+  overflow: hidden;
+}
+th {
+  background: var(--gold);
+  color: #000;
+  padding: 14px;
+  font-family: 'Oswald', sans-serif;
+  letter-spacing: 1px;
+  text-align: left;
+  font-size: 0.85rem;
+}
+td {
+  padding: 14px;
+  border-top: 1px solid rgba(255,255,255,0.05);
+  font-size: 0.9rem;
+}
+tr:hover td { background: rgba(212,175,55,0.05); }
+code, .kbd {
+  background: rgba(212,175,55,0.15);
+  color: var(--gold);
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.9em;
+  border: 1px solid rgba(212,175,55,0.3);
+}
+.flow {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  margin: 25px 0;
+}
+.flow-step {
+  background: rgba(0,0,0,0.3);
+  padding: 20px;
+  border-radius: 10px;
+  border-top: 3px solid var(--gold);
+  position: relative;
+}
+.flow-step h4 {
+  color: var(--gold);
+  font-family: 'Oswald', sans-serif;
+  margin-bottom: 8px;
+  font-size: 1rem;
+  letter-spacing: 1px;
+}
+.flow-step::after {
+  content: "↓";
+  display: block;
+  text-align: center;
+  font-size: 1.5rem;
+  color: var(--gold);
+  margin-top: 14px;
+}
+.flow-step:last-child::after { content: ""; }
+.plans {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin: 25px 0;
+}
+.plan {
+  background: rgba(0,0,0,0.3);
+  border-radius: 14px;
+  padding: 24px;
+  border-top: 4px solid;
+  text-align: center;
+}
+.plan.basico { border-color: var(--green); }
+.plan.estandar { border-color: var(--blue); }
+.plan.premium { border-color: var(--gold); }
+.plan h4 {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.2rem;
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+}
+.plan.basico h4 { color: var(--green); }
+.plan.estandar h4 { color: var(--blue); }
+.plan.premium h4 { color: var(--gold); }
+.plan .price {
+  font-size: 1.8rem;
+  font-weight: 800;
+  margin: 10px 0;
+}
+.plan .users { color: var(--text-dim); font-size: 0.9rem; }
+.footer {
+  text-align: center;
+  padding: 60px 20px 30px;
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  border-top: 1px solid var(--border);
+  margin-top: 40px;
+}
+.footer .logo {
+  font-family: 'Oswald', sans-serif;
+  color: var(--gold);
+  font-size: 1.4rem;
+  letter-spacing: 4px;
+  margin-bottom: 10px;
+}
+@media (min-width: 768px) {
+  .flow { grid-template-columns: repeat(2, 1fr); }
+  .flow-step::after { content: "→"; position: absolute; right: -25px; top: 50%; transform: translateY(-50%); margin: 0; }
+  .flow-step:nth-child(2n)::after { content: ""; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+  <h1>Manual del Maestro</h1>
+  <div class="subtitle">AX-CORE BY ARTHUR</div>
+  <div class="role">JEFE / DUEÑO DEL ECOSISTEMA</div>
+</div>
+
+<div class="toc">
+  <h3>📚 Contenido</h3>
+  <ol>
+    <li><a href="#vision">Visión general del sistema</a></li>
+    <li><a href="#acceso">Cómo entrar al panel maestro</a></li>
+    <li><a href="#bloques">Crear bloques (zonas geográficas)</a></li>
+    <li><a href="#asignar">Asignar gimnasios a un bloque</a></li>
+    <li><a href="#planes">Los 3 planes de venta</a></li>
+    <li><a href="#codigos">Cómo funcionan los códigos</a></li>
+    <li><a href="#enviar">Enviar acceso al dueño del gym (WhatsApp)</a></li>
+    <li><a href="#pausar">Pausar / activar / eliminar gyms</a></li>
+    <li><a href="#ganancias">Reporte de ganancias (MRR)</a></li>
+    <li><a href="#flujo">Flujo completo (paso a paso real)</a></li>
+    <li><a href="#problemas">Solución de problemas</a></li>
+  </ol>
+</div>
+
+<section id="vision">
+<h2><span class="num">01</span> Visión general</h2>
+<p>AX-CORE es un <strong>SaaS B2B</strong>: tú vendes el servicio a gimnasios, ellos pagan una mensualidad y reciben acceso para sus atletas. Hay tres niveles de uso:</p>
+
+<div class="flow">
+  <div class="flow-step">
+    <h4>👑 Tú (Maestro)</h4>
+    <p>Creas <strong>bloques</strong>, asignas gimnasios y generas códigos. Cobras la renta mensual a cada gym.</p>
+  </div>
+  <div class="flow-step">
+    <h4>🏋️ Dueño del Gym (Coach)</h4>
+    <p>Entra con el código que tú le diste y genera <strong>pases individuales</strong> para sus atletas.</p>
+  </div>
+  <div class="flow-step">
+    <h4>💪 Atleta</h4>
+    <p>Se registra con el código del coach y usa la PWA: dieta, ejercicios, calculadora.</p>
+  </div>
+</div>
+
+<div class="tip"><strong>Importante:</strong> los gyms no pagan a la app. Te pagan a ti directo (efectivo, transferencia, lo que acuerden). La app solo controla quién tiene acceso.</div>
+</section>
+
+<section id="acceso">
+<h2><span class="num">02</span> Acceso al panel maestro</h2>
+
+<p>Tu URL exclusiva:</p>
+<div class="url-box">https://arthur-arias-martinez.github.io/axcore-app/admin.html</div>
+
+<ol class="steps">
+  <li>Abre la URL en cualquier navegador (Chrome, Safari, móvil o PC).</li>
+  <li>Ingresa tu <strong>clave maestra</strong> (la que configuraste en Render como <code>ADMIN_TOKEN</code>).</li>
+  <li>Clic en <strong>AUTENTICAR SISTEMA</strong>.</li>
+</ol>
+
+<div class="alert"><strong>NUNCA compartas tu clave maestra.</strong> Quien la tenga puede ver todos tus gyms, ingresos y crear códigos gratis. Si crees que se filtró: ve a Render → Environment → cambia <code>ADMIN_TOKEN</code> por uno nuevo y redeploya.</div>
+
+<p>Una vez dentro verás 4 pestañas:</p>
+<table>
+<tr><th>Pestaña</th><th>Para qué sirve</th></tr>
+<tr><td>🧱 <strong>Gestión de Bloques</strong></td><td>Crear/borrar agrupaciones de gimnasios</td></tr>
+<tr><td>🏢 <strong>Asignación de Gimnasios</strong></td><td>Tabla con todos los gyms (estado, plan, usuarios)</td></tr>
+<tr><td>🔑 <strong>Códigos Activos</strong></td><td>Tarjetas listas para enviar a cada dueño por WhatsApp</td></tr>
+<tr><td>💰 <strong>Reporte de Ganancias</strong></td><td>MRR mensual, proyección anual, gyms activos</td></tr>
+</table>
+</section>
+
+<section id="bloques">
+<h2><span class="num">03</span> Crear bloques</h2>
+
+<p>Un <strong>bloque</strong> es una agrupación de hasta <strong>20 gimnasios</strong>. Sirve para organizar geográficamente o por equipo de ventas. Ejemplo: "Norte CDMX", "Bajío", "Monterrey".</p>
+
+<ol class="steps">
+  <li>En la pestaña <strong>Gestión de Bloques</strong>, clic en <strong>+ NUEVO BLOQUE</strong>.</li>
+  <li>Nombre: cualquier identificador (ej. <em>Norte CDMX</em>).</li>
+  <li>API Key: deja cualquier texto (ya no se usa para IA, pero es campo obligatorio).</li>
+  <li>Clic en <strong>GUARDAR</strong>.</li>
+</ol>
+
+<div class="success"><strong>¿Para qué sirven los bloques?</strong> Cuando tengas 50+ gimnasios, necesitas agruparlos. Cada bloque tiene capacidad de 20 gyms. Al borrar un bloque, se borran todos sus gyms (con confirmación).</div>
+</section>
+
+<section id="asignar">
+<h2><span class="num">04</span> Asignar un gimnasio</h2>
+
+<p>Cada vez que un gym te paga, vas a esta pestaña y lo "vinculas":</p>
+
+<ol class="steps">
+  <li>Pestaña <strong>Asignación de Gimnasios</strong> → clic en <strong>+ AGREGAR GIMNASIO</strong>.</li>
+  <li>Bloque asignado: elige uno de tus bloques creados.</li>
+  <li>Plan de pago: elige <strong>BÁSICO / ESTÁNDAR / PREMIUM</strong> (según lo que el cliente pagó).</li>
+  <li>Llena los datos: nombre del gym, dueño, gerente, coach.</li>
+  <li>Clic en <strong>VINCULAR GIMNASIO</strong>.</li>
+</ol>
+
+<p>Aparecerá un <strong>modal verde</strong> con dos datos importantes:</p>
+
+<div class="success">
+<strong>CÓDIGO DE FRANQUICIA:</strong> algo como <code>AXB-K8M2</code>, <code>AXE-T7N9</code> o <code>AXP-Z4R6</code>.<br>
+<strong>CONTRASEÑA:</strong> 4 dígitos numéricos (ej. <code>3847</code>).<br><br>
+Estos son los datos que el dueño del gym usará para entrar a su panel coach.
+</div>
+
+<div class="alert"><strong>Apunta esos datos.</strong> Si pierdes la contraseña, tendrás que regenerar el gym (y sus atletas perderán acceso).</div>
+</section>
+
+<section id="planes">
+<h2><span class="num">05</span> Los 3 planes</h2>
+
+<div class="plans">
+  <div class="plan basico">
+    <h4>BÁSICO</h4>
+    <div class="price">$1,500</div>
+    <p>MXN al mes</p>
+    <p class="users">Hasta <strong>50 usuarios</strong></p>
+    <p style="font-size:0.7rem; color:var(--text-dim); margin-top:10px;">Código: AXB-XXXX</p>
+  </div>
+  <div class="plan estandar">
+    <h4>ESTÁNDAR</h4>
+    <div class="price">$2,000</div>
+    <p>MXN al mes</p>
+    <p class="users">Hasta <strong>100 usuarios</strong></p>
+    <p style="font-size:0.7rem; color:var(--text-dim); margin-top:10px;">Código: AXE-XXXX</p>
+  </div>
+  <div class="plan premium">
+    <h4>PREMIUM</h4>
+    <div class="price">$3,000</div>
+    <p>MXN al mes</p>
+    <p class="users">Hasta <strong>200 usuarios</strong></p>
+    <p style="font-size:0.7rem; color:var(--text-dim); margin-top:10px;">Código: AXP-XXXX</p>
+  </div>
+</div>
+
+<div class="tip"><strong>Tip de ventas:</strong> el plan PREMIUM tiene mejor margen ($15/usuario vs $30/usuario del Básico). Conviene empujarlo a gyms con 100+ atletas.</div>
+</section>
+
+<section id="codigos">
+<h2><span class="num">06</span> Cómo funcionan los códigos</h2>
+
+<p>Hay <strong>dos tipos de códigos</strong> y es vital no confundirlos:</p>
+
+<table>
+<tr><th>Tipo</th><th>Formato</th><th>Quién lo usa</th><th>Para qué</th></tr>
+<tr><td>🏢 <strong>Gym</strong></td><td><code>AXB-XXXX</code><br><code>AXE-XXXX</code><br><code>AXP-XXXX</code></td><td>Dueño/coach del gym</td><td>Entrar al panel coach.html</td></tr>
+<tr><td>💪 <strong>Atleta</strong></td><td><code>AX-XXXXX</code></td><td>Atletas del gym</td><td>Registrarse en la PWA atleta</td></tr>
+</table>
+
+<div class="alert"><strong>Confusión común:</strong> el código <code>AXB-XXXX</code> NO sirve para que un atleta se registre. El coach debe generar uno tipo <code>AX-XXXXX</code> desde su panel y dárselo al atleta.</div>
+</section>
+
+<section id="enviar">
+<h2><span class="num">07</span> Enviar acceso por WhatsApp</h2>
+
+<p>Después de vincular un gym, ve a la pestaña <strong>Códigos Activos</strong>. Verás una tarjeta por cada gym:</p>
+
+<ol class="steps">
+  <li>Identifica la tarjeta del gym recién creado.</li>
+  <li>Clic en el botón <strong>📋 COPIAR TODO (Código + Contraseña + Link)</strong>.</li>
+  <li>Pega el contenido en WhatsApp del dueño. Verá algo así:</li>
+</ol>
+
+<div class="url-box" style="color: var(--text); border-color: var(--border);">
+DATOS DE ACCESO AX-CORE<br><br>
+Código de Franquicia: <span style="color: var(--green)">AXB-K8M2</span><br>
+Contraseña: <span style="color: var(--green)">3847</span><br><br>
+Entra aquí: https://arthur-arias-martinez.github.io/axcore-app/coach.html
+</div>
+
+<div class="success"><strong>Listo.</strong> El dueño entra al link, mete sus credenciales y ya puede generar pases para sus atletas. Tú no tienes que hacer nada más por ese gym (mientras siga pagando).</div>
+</section>
+
+<section id="pausar">
+<h2><span class="num">08</span> Pausar / activar / eliminar</h2>
+
+<h3>⏸️ Pausar (no pagó)</h3>
+<p>Si un gym no pagó la mensualidad, vas a <strong>Asignación de Gimnasios</strong>, encuentra ese gym y clic en <strong>PAUSAR</strong>:</p>
+<ul style="padding-left:20px; margin: 10px 0;">
+  <li>El dueño NO podrá entrar al panel coach.</li>
+  <li>Los atletas existentes verán "FRANQUICIA SIN PAGO ACTIVO" al intentar usar la app.</li>
+  <li>Sus datos no se borran. Cuando vuelva a pagar, clic en <strong>ACTIVAR</strong> y todo regresa.</li>
+</ul>
+
+<h3>🗑️ Eliminar (cancelación definitiva)</h3>
+<p>Si el gym cancela permanentemente, clic en <strong>QUITAR</strong>:</p>
+<ul style="padding-left:20px; margin: 10px 0;">
+  <li>El gym desaparece de la base de datos.</li>
+  <li>Todos sus pases de atleta también se eliminan.</li>
+  <li><strong>Acción irreversible.</strong></li>
+</ul>
+
+<div class="tip"><strong>Recomendación:</strong> nunca elimines de inmediato. Pausa primero por 30 días, luego elimina si no hay respuesta.</div>
+</section>
+
+<section id="ganancias">
+<h2><span class="num">09</span> Reporte de ganancias</h2>
+
+<p>Pestaña <strong>💰 Reporte de Ganancias</strong>. Verás 4 métricas clave:</p>
+
+<table>
+<tr><th>Métrica</th><th>Significado</th></tr>
+<tr><td><strong>TOTAL MENSUAL RECURRENTE</strong></td><td>MRR — suma de las rentas activas (gyms NO pausados). Es tu ingreso garantizado del mes.</td></tr>
+<tr><td><strong>PROYECCIÓN ANUAL (LTM)</strong></td><td>MRR × 12. Lo que ganarías si la base se mantiene 12 meses.</td></tr>
+<tr><td><strong>GIMNASIOS ACTIVOS</strong></td><td>Cuántos gyms están pagando (excluye pausados).</td></tr>
+<tr><td><strong>USUARIOS REGISTRADOS</strong></td><td>Total de atletas usando la app en todos tus gyms.</td></tr>
+</table>
+
+<p>Abajo verás <strong>desglose por plan</strong>: cuánto te genera cada nivel (Básico, Estándar, Premium).</p>
+
+<div class="tip"><strong>Tip:</strong> revisa este panel cada lunes. Si la métrica de "Usuarios" baja drásticamente, algo está mal con un gym (revisa logs).</div>
+</section>
+
+<section id="flujo">
+<h2><span class="num">10</span> Flujo completo (real)</h2>
+
+<p>Esto es lo que pasa cuando vendes a un nuevo gimnasio "FitZone Polanco":</p>
+
+<div class="flow">
+  <div class="flow-step">
+    <h4>1. Vendes</h4>
+    <p>El dueño te paga $2,000 MXN por el plan ESTÁNDAR (100 atletas).</p>
+  </div>
+  <div class="flow-step">
+    <h4>2. Vinculas</h4>
+    <p>En tu panel: + AGREGAR GIMNASIO → eliges Estándar → llenas datos → vinculas.</p>
+  </div>
+  <div class="flow-step">
+    <h4>3. Le mandas accesos</h4>
+    <p>Copias el código (ej. AXE-K8M2) + contraseña (3847) + link, le mandas todo por WhatsApp.</p>
+  </div>
+  <div class="flow-step">
+    <h4>4. El gym se conecta</h4>
+    <p>El dueño entra a coach.html con sus credenciales. Ve su panel de pases vacío.</p>
+  </div>
+  <div class="flow-step">
+    <h4>5. Genera pases</h4>
+    <p>El coach hace clic en "Generar Pase" cada vez que llega un atleta nuevo. Le da el código AX-XXXXX al atleta.</p>
+  </div>
+  <div class="flow-step">
+    <h4>6. Atletas registrados</h4>
+    <p>Cada atleta entra a la PWA, se registra con el código AX-XXXXX y usa la app.</p>
+  </div>
+  <div class="flow-step">
+    <h4>7. Mes 2</h4>
+    <p>El gym te paga otra vez los $2,000. No haces nada — sigue activo.</p>
+  </div>
+  <div class="flow-step">
+    <h4>8. Si no paga</h4>
+    <p>Pausas el gym. Atletas pierden acceso. Cuando paga, lo reactivas.</p>
+  </div>
+</div>
+</section>
+
+<section id="problemas">
+<h2><span class="num">11</span> Solución de problemas</h2>
+
+<table>
+<tr><th>Problema</th><th>Solución</th></tr>
+<tr><td>"Clave maestra incorrecta"</td><td>Revisa que estás escribiendo el <code>ADMIN_TOKEN</code> que pusiste en Render (no <code>ARTHUR2026</code>, esa ya no funciona).</td></tr>
+<tr><td>"Sesión expirada"</td><td>Cierra sesión y vuelve a entrar. La sesión se guarda en sessionStorage y se borra al cerrar el navegador.</td></tr>
+<tr><td>El gym dice que su código no funciona</td><td>Verifica que el gym esté ACTIVO (no pausado). Verifica que le diste código <code>AXB/AXE/AXP-XXXX</code>, NO <code>AX-XXXXX</code>.</td></tr>
+<tr><td>"Servidor no responde"</td><td>Render duerme tras 15 min de inactividad (plan free). Espera 30 segundos y reintenta — está despertando.</td></tr>
+<tr><td>Quiero ver atletas de un gym</td><td>Esa visibilidad la tiene el coach, no tú. Si quieres ver, entra al panel coach con su código (solo en emergencia).</td></tr>
+<tr><td>Olvidé la contraseña de un gym</td><td>Tienes que ELIMINAR ese gym y crear uno nuevo. Sus atletas tendrán que registrarse de nuevo. <strong>Por eso siempre apunta las credenciales.</strong></td></tr>
+</table>
+</section>
+
+<div class="footer">
+  <div class="logo">AX-CORE</div>
+  <p>Manual del Maestro · Versión 3.0 · 2026</p>
+  <p style="margin-top:8px; font-size:0.75rem;">Documento privado. No compartir fuera del rol Maestro.</p>
+</div>
+
+</div>
+</body>
+</html>
