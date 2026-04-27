@@ -738,6 +738,7 @@ document.addEventListener('DOMContentLoaded', () => {
             saveData();
             updateDashboard();
             renderEvolutionPage(filter);
+            if (typeof checkAchievements === 'function') checkAchievements();
             // Limpiar inputs
             ['log-weight','log-waist','log-bicep','log-tricep','log-leg','log-chest','log-hip','log-calf','log-glute','log-neck','log-forearm','log-back'].forEach(id => {
                 const el = document.getElementById(id);
@@ -907,12 +908,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             userData.caloriesConsumedToday += estimatedCal;
             userData.totalNetDeficit -= Math.round(estimatedCal * 0.15);
+            userData.totalFoodLogs = (userData.totalFoodLogs || 0) + 1;
             userData.foodLogToday.push({
                 time: new Date().toLocaleTimeString('es-MX', {hour: '2-digit', minute:'2-digit'}),
                 desc, cal: estimatedCal
             });
             saveData();
             updateDashboard();
+            if (typeof checkAchievements === 'function') checkAchievements();
 
             let msg = `✅ Registrado: "${desc}"\n📊 Calorías: +${estimatedCal} kcal\n`;
             if (remaining > 0) {
@@ -1422,7 +1425,15 @@ document.addEventListener('DOMContentLoaded', () => {
         // Cargar imágenes en segundo plano SIN bloquear la interfaz
         preloadStudioImages();
 
+        // Renderizar medallas primero, luego el studio
+        const earned = new Set(userData.achievements || []);
+        const earnedCount = [...earned].filter(id => ACHIEVEMENTS_DEF.find(a => a.id === id)).length;
         el.innerHTML = `
+            <div class="glass-card" style="padding:1.5rem; margin-bottom:1.5rem;">
+                <h2 style="color:var(--accent-main); margin-bottom:0.3rem; font-size:1.2rem;">🎖 MIS MEDALLAS</h2>
+                <p style="font-size:0.72rem; color:var(--text-dim); margin-bottom:1rem;">${earnedCount} de ${ACHIEVEMENTS_DEF.length} desbloqueadas</p>
+                <div id="achievements-panel" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(90px,1fr)); gap:10px;"></div>
+            </div>
             <div class="glass-card" style="padding:1.5rem; margin-bottom:1.5rem;">
                 <h2 style="color:var(--accent-main); margin-bottom:0.5rem; font-size:1.2rem;">🏆 ESTUDIO DE LOGROS</h2>
                 <p style="font-size:0.75rem; color:var(--text-dim); margin-bottom:1rem;">Generador oficial en alta resolución.</p>
@@ -1457,6 +1468,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             <button class="btn-premium" id="btn-studio-share" style="width:100%; padding:16px; font-size:1rem;">📤 COMPARTIR TARJETA HD</button>
         `;
+
+        // Pintar medallas
+        if (typeof renderAchievementsPanel === 'function') renderAchievementsPanel();
 
         // --- Render template thumbnails ---
         const tplList = document.getElementById('studio-tpl-list');
