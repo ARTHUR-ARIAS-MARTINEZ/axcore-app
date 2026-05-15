@@ -10,7 +10,7 @@
     <link rel="icon" href="logo_coach.png" type="image/png">
     <!-- Fuentes -->
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="index.css?v=20260515d">
+    <link rel="stylesheet" href="index.css?v=20260515e">
     <style>
         /* ============================
            COACH TERMINAL VIP
@@ -55,15 +55,16 @@
             padding: 24px 16px 80px;
             display: flex;
             flex-direction: column;
-            justify-content: center;
-        }
-        /* Cuando hay dashboard visible, alinear arriba y permitir scroll natural */
-        body.dashboard-mode .coach-container {
-            min-height: auto;
             justify-content: flex-start;
-        }
-        body:not(.dashboard-mode) .coach-container {
             min-height: 100vh;
+        }
+        /* Login centrado verticalmente dentro del contenedor */
+        #login-wrapper {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            flex: 1;
+            min-height: calc(100vh - 200px);
         }
         .dashboard-container {
             align-items: flex-start;
@@ -373,6 +374,7 @@
     </div>
 
     <!-- Login -->
+    <div id="login-wrapper">
     <div id="login-section" class="glass-card" style="max-width: 500px; margin: 0 auto; width: 100%;">
         <h2 style="text-align: center; color: var(--accent-main); font-family: 'Orbitron', sans-serif; margin-bottom: 1.5rem; font-size:1rem; letter-spacing:3px;">ACCESO COACH</h2>
         <div class="input-group">
@@ -386,6 +388,7 @@
         </div>
         <button class="btn-premium" id="btn-login" style="width: 100%; margin-top: 1.5rem; padding: 1.2rem; font-size: 0.8rem;">INICIAR SESIÓN</button>
     </div>
+    </div><!-- /login-wrapper -->
 
     <!-- Dashboard -->
     <div id="dashboard" class="dashboard-container">
@@ -451,9 +454,8 @@
                 localStorage.setItem('coach_vip_gym', gid);
                 localStorage.setItem('coach_vip_pass', psw);
 
-                loginSection.style.display = 'none';
+                document.getElementById('login-wrapper').style.display = 'none';
                 dashboard.style.display = 'block';
-                document.body.classList.add('dashboard-mode');
 
                 document.getElementById('gym-name-display').textContent = gymData.name.toUpperCase();
                 document.getElementById('gym-code-display').textContent = `ID SUCURSAL: ${gymData.gymCode}`;
