@@ -15,6 +15,65 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
 </head>
 <body data-theme="neon">
+
+    <!-- DEBUG: muestra errores JS visibles en pantalla -->
+    <script>
+    window.onerror = function(msg, src, line) {
+        var d = document.getElementById('_js_err_banner');
+        if (!d) { d = document.createElement('div'); d.id='_js_err_banner'; d.style.cssText='position:fixed;top:0;left:0;right:0;background:#c00;color:#fff;padding:8px 12px;z-index:999999;font-size:13px;font-family:monospace;white-space:pre-wrap;'; document.body.appendChild(d); }
+        d.textContent = '⚠️ JS ERROR línea '+line+': '+msg;
+    };
+    </script>
+
+    <!-- LOGIN GLOBAL — funciona aunque app.js falle -->
+    <script>
+    window.axcoreLogin = async function() {
+        var u = (document.getElementById('login-user')?.value || '').trim();
+        var p = (document.getElementById('login-pass')?.value || '').trim();
+        if (u.length < 2 || p.length < 4) { alert('Usuario y contraseña requeridos.'); return; }
+
+        var btn = document.getElementById('btn-login-access');
+        if (btn) { btn.textContent = '⏳ CONECTANDO...'; btn.disabled = true; }
+
+        var API = 'https://axcore-appax-core-backend.onrender.com';
+        var savedRaw = localStorage.getItem('arthur_data_' + u);
+        var savedLocal = savedRaw ? JSON.parse(savedRaw) : null;
+        var localCode = (savedLocal && savedLocal.gymCode) || '';
+
+        // Intento remoto si tiene código real
+        if (localCode && localCode !== 'AXV-DEMO') {
+            try {
+                var ctrl = new AbortController();
+                setTimeout(function(){ ctrl.abort(); }, 60000);
+                var res = await fetch(API + '/api/user/login', {
+                    method:'POST', headers:{'Content-Type':'application/json'},
+                    body: JSON.stringify({code:localCode, password:p}), signal:ctrl.signal
+                });
+                var d = await res.json();
+                if (d.success) {
+                    localStorage.setItem('axcore_token', d.token || '');
+                    var merged = Object.assign({}, savedLocal || {}, d.data || {});
+                    merged.username = u; merged.password = p; merged.gymCode = localCode;
+                    merged.achievements = d.achievements || merged.achievements || [];
+                    localStorage.setItem('arthur_data_' + u, JSON.stringify(merged));
+                    localStorage.setItem('arthur_current_user', u);
+                    location.reload(); return;
+                } else {
+                    alert(d.message || 'Credenciales incorrectas.');
+                    if (btn) { btn.textContent = 'INGRESAR AL SISTEMA'; btn.disabled = false; }
+                    return;
+                }
+            } catch(e) { /* sin conexión — caer a local */ }
+        }
+
+        // Login local (DEMO o fallback offline)
+        if (!savedLocal) { alert('Usuario no encontrado. Usa "Regístrate aquí".'); if (btn) { btn.textContent = 'INGRESAR AL SISTEMA'; btn.disabled = false; } return; }
+        if (savedLocal.password !== p) { alert('Contraseña incorrecta.'); if (btn) { btn.textContent = 'INGRESAR AL SISTEMA'; btn.disabled = false; } return; }
+        localStorage.setItem('arthur_current_user', u);
+        location.reload();
+    };
+    </script>
+
     <!-- Pantalla de Login / Registro (Estilo App Inglés) -->
     <div id="login-overlay" class="overlay">
         <div class="glass-card luxury-modal">
@@ -30,7 +89,7 @@
                     <input type="password" id="login-pass" placeholder="Tu clave de acceso">
                 </div>
             </div>
-            <button id="btn-login-access" class="btn-premium">INGRESAR AL SISTEMA</button>
+            <button id="btn-login-access" class="btn-premium" onclick="axcoreLogin()">INGRESAR AL SISTEMA</button>
             <p style="margin-top:1rem; font-size:0.8rem; color:var(--accent-main); cursor:pointer;" id="toggle-to-register" onclick="document.getElementById('login-overlay').classList.add('hidden'); document.getElementById('register-overlay').classList.remove('hidden'); fetch('https://axcore-appax-core-backend.onrender.com/health').catch(()=>{});">¿No tienes cuenta? Regístrate aquí</p>
         </div>
     </div>
