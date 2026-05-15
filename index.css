@@ -1176,6 +1176,26 @@ body {
     color: #3a5a3c !important;
 }
 
+/* ===== LOGO NEON GLOW — LED reactiva al tema ===== */
+.logo-neon-glow {
+    filter:
+        drop-shadow(0 0 4px var(--accent-main))
+        drop-shadow(0 0 12px var(--accent-main))
+        drop-shadow(0 0 22px var(--accent-main));
+    transition: filter 0.5s ease;
+}
+.logo-neon-glow-sm {
+    filter:
+        drop-shadow(0 0 3px var(--accent-main))
+        drop-shadow(0 0 7px var(--accent-main));
+    transition: filter 0.5s ease;
+}
+/* Natural Zen: fondo claro — sin glow, logo opaco normal */
+[data-theme="natural"] .logo-neon-glow,
+[data-theme="natural"] .logo-neon-glow-sm {
+    filter: none !important;
+}
+
 /* ===== NATURAL ZEN — FIXES CONTRASTE ===== */
 
 /* Logo imagen: mix-blend-mode:screen lo hace invisible en fondo claro */

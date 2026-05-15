@@ -10,17 +10,24 @@
     <link rel="icon" href="logo_coach.png" type="image/png">
     <!-- Fuentes -->
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="index.css?v=20260515e">
+    <link rel="stylesheet" href="index.css?v=20260515g">
     <style>
         /* ============================
            COACH TERMINAL VIP
            ============================ */
         * { box-sizing: border-box; }
 
+        html {
+            overflow-y: auto !important;
+            height: auto !important;
+        }
         body {
             background: #0a0e14;
-            overflow-x: hidden;
+            overflow-x: hidden !important;
+            overflow-y: auto !important;
+            height: auto !important;
             min-height: 100vh;
+            position: static !important;
         }
         body::before {
             content: '';
