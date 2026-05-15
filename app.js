@@ -331,7 +331,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const btn = document.getElementById('btn-register-confirm');
         const originalText = btn.textContent;
-        btn.textContent = "VERIFICANDO...";
+        btn.textContent = "⏳ CONECTANDO CON SERVIDOR...";
+        btn.style.opacity = '0.7';
         btn.disabled = true;
 
         // Caso DEMO: solo local, no se persiste en servidor
@@ -346,13 +347,16 @@ document.addEventListener('DOMContentLoaded', () => {
             saveData();
             localStorage.setItem('arthur_current_user', u);
             localStorage.setItem('axcore_first_run', '1');
-            alert("✅ Modo DEMO activado. Tus datos viven solo en este dispositivo. Pide código a tu coach para sync en la nube.");
-            location.reload();
+            showErr("✅ Modo DEMO activado. Recarga la página para entrar.");
+            if (errDiv) errDiv.style.background = 'rgba(0,255,136,0.15)';
+            setTimeout(() => location.reload(), 1500);
             return;
         }
 
         try {
-            // Registro real en backend
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 20000);
+
             const res = await fetch(`${API_URL}/api/user/register`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -362,8 +366,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     password: p,
                     privacyAccepted: true,
                     data: { username: u, gymCode: gc, privacyAccepted: true, privacyDate: new Date().toISOString() }
-                })
+                }),
+                signal: controller.signal
             });
+            clearTimeout(timeout);
             const data = await res.json();
 
             if (data.success) {
@@ -378,17 +384,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 saveData();
                 localStorage.setItem('arthur_current_user', u);
                 localStorage.setItem('axcore_first_run', '1');
-                alert(`✅ Cuenta creada en AX-CORE.\nGimnasio: ${data.gymName || 'AX-CORE'}\nTus datos están respaldados en la nube.`);
-                location.reload();
+                showErr(`✅ Cuenta creada. Entrando a AX-CORE...`);
+                if (errDiv) errDiv.style.background = 'rgba(0,255,136,0.15)';
+                setTimeout(() => location.reload(), 1500);
             } else {
                 showErr(`❌ ${data.message || "No se pudo registrar. Verifica el código."}`);
+                if (errDiv) errDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
         } catch(e) {
-            showErr("❌ Error contactando AX-CORE. Verifica tu conexión o espera 1 minuto (el servidor puede estar iniciando).");
-            console.error(e);
+            if (e.name === 'AbortError') {
+                showErr("⏱️ El servidor tardó demasiado (puede estar iniciando). Espera 30 segundos e intenta de nuevo.");
+            } else {
+                showErr(`❌ Sin conexión al servidor. Revisa tu internet o intenta en 1 minuto.\n(${e.message})`);
+            }
+            if (errDiv) errDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            console.error('[registro]', e);
         }
 
         btn.textContent = originalText;
+        btn.style.opacity = '';
         btn.disabled = false;
     };
 
