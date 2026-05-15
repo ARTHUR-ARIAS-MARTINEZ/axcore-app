@@ -8,7 +8,7 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0a0e14">
     <link rel="apple-touch-icon" href="logo.png">
-    <link rel="stylesheet" href="index.css?v=20260515d">
+    <link rel="stylesheet" href="index.css?v=20260515f">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <!-- Fuentes: Inter para cuerpos de texto, Oswald (Heavy Gym) para titulares -->
@@ -208,17 +208,15 @@
         <nav class="side-nav">
             <!-- Logo solo en desktop (sidebar) -->
             <div class="nav-logo-container" style="text-align:center; margin-bottom:2rem; padding: 10px;">
-                <div style="width:90px; height:90px; margin:0 auto 8px; display:flex; justify-content:center; align-items:center;">
-                    <img src="logo.png" alt="AX-CORE" style="width:100%; height:100%; object-fit:cover; mix-blend-mode: screen; filter: drop-shadow(0 0 10px rgba(0,255,136,0.3));">
+                <div style="width:90px; height:90px; margin:0 auto; display:flex; justify-content:center; align-items:center;">
+                    <img src="logo.png" alt="AX-CORE" style="width:100%; height:100%; object-fit:cover; mix-blend-mode: screen; filter: drop-shadow(0 0 15px var(--accent-main));">
                 </div>
-                <div style="font-family:var(--font-accent); font-size:0.85rem; color:var(--accent-main); line-height:1.2; letter-spacing:2px; font-weight:900;">AX-CORE<br><span style="color:white; font-size:0.55rem; letter-spacing:3px; font-weight:400;">BY ARTHUR</span></div>
             </div>
             <!-- Logo solo en móvil (barra superior) -->
             <div class="nav-logo-mobile">
                 <div style="width:32px; height:32px; display:flex; justify-content:center; align-items:center; flex-shrink:0;">
-                    <img src="logo.png" alt="AX-CORE" style="width:100%; height:100%; object-fit:cover; mix-blend-mode: screen;">
+                    <img src="logo.png" alt="AX-CORE" style="width:100%; height:100%; object-fit:cover; mix-blend-mode: screen; filter: drop-shadow(0 0 5px var(--accent-main));">
                 </div>
-                <span style="font-family:var(--font-accent); font-size:0.7rem; color:var(--accent-main); letter-spacing:1px; font-weight:900; line-height:1;">AX-CORE</span>
             </div>
             <ul class="nav-links">
                 <li class="active" data-page="dashboard"><span class="nav-icon">🏠</span><span class="nav-label">Tablero</span></li>
@@ -566,7 +564,7 @@
     <!-- Gráficas (Al final para no bloquear inicio rápido) -->
     <script src="https://cdn.jsdelivr.net/npm/apexcharts" defer></script>
     <script src="knowledge.js?v=20260515d"></script>
-    <script src="app.js?v=20260515d"></script>
+    <script src="app.js?v=20260515f"></script>
 
     <!-- REGISTRO GLOBAL — funciona aunque app.js falle -->
     <script>

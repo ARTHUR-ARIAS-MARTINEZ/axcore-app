@@ -1311,7 +1311,14 @@ document.addEventListener('DOMContentLoaded', () => {
         { key:'back',    label:'Espalda',       val:() => (userData.back||0)+'cm', default:false }
     ];
 
-    let studioState = { tpl: 'neon', fmt: 'story', metrics: ['deficit','weight','waist'], textColor: 'theme', textSize: 1.0 };
+    let studioState = {
+        tpl: 'neon', fmt: 'story', metrics: ['deficit','weight','waist'],
+        textColor: 'theme', textSize: 1.0,
+        accentColor: 'neon',       // neon | cyan | gold | blood | fuchsia
+        hudStyle: 'tech-corners',  // tech-corners | scanner-lines | minimal | none
+        fontStyle: 'bold-impact',  // bold-impact | tech-mono | elegant-sans
+        overlayFilter: 'clear'     // clear | glitch | grain | vignette
+    };
 
     const STUDIO_BG_IMAGES = {};
     let isStudioPreloading = false;
@@ -1385,155 +1392,230 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderStudioCard(canvas, tplId, fmtId, activeMetrics, isPreview) {
-        let tpl = STUDIO_TEMPLATES.find(t=>t.id===tplId);
+        let tpl = STUDIO_TEMPLATES.find(t => t.id === tplId);
         if (tplId === 'custom') {
             tpl = { id: 'custom', colors: ['#ffffff','#111111','#00e5ff','#000000'] };
         } else if (!tpl) {
             tpl = STUDIO_TEMPLATES[0];
         }
-        const fmt = STUDIO_FORMATS.find(f=>f.id===fmtId) || STUDIO_FORMATS[0];
+        const fmt = STUDIO_FORMATS.find(f => f.id === fmtId) || STUDIO_FORMATS[0];
         const W = fmt.w, H = fmt.h;
         const isLandscape = fmtId === 'landscape';
         canvas.width = W; canvas.height = H;
         const ctx = canvas.getContext('2d');
 
-        // 1. Fondo temático
+        // ─── ACCENT COLOR ────────────────────────────────────────────────────
+        const ACCENT_PALETTE = { neon:'#00e5ff', cyan:'#00ffcc', gold:'#ffd700', blood:'#ff2222', fuchsia:'#ff00e5' };
+        const THEME_ACCENT   = {
+            hielo:'#0099cc', carbono:'#d4af37', neon:'#00e5ff', fuego:'#ffcc00', blood:'#ff3333',
+            militar:'#8aff7a', custom:'#00e5ff', fem1:'#ffcccc', fem2:'#d4a0a8', fem3:'#ffb347',
+            fem4:'#00ced1', gay_m1:'#ff00ff', gay_m2:'#add8e6', gay_m3:'#ffd700',
+            gay_f1:'#ff4500', gay_f2:'#8a2be2', gay_f3:'#8fbc8f'
+        };
+        const accent = studioState.accentColor === 'theme'
+            ? (THEME_ACCENT[tpl.id] || '#8aff7a')
+            : (ACCENT_PALETTE[studioState.accentColor] || '#00e5ff');
+
+        // ─── FONT STYLE ──────────────────────────────────────────────────────
+        const FONT_MAP = {
+            'bold-impact':  { fam: "Impact,'Arial Narrow',sans-serif",  wt: '900', itl: false },
+            'tech-mono':    { fam: "'Courier New',Courier,monospace",   wt: '700', itl: false },
+            'elegant-sans': { fam: "'Trebuchet MS',Arial,sans-serif",   wt: '600', itl: true  }
+        };
+        const fd = FONT_MAP[studioState.fontStyle] || FONT_MAP['bold-impact'];
+        const fStyle = fd.itl ? 'italic ' : '';
+
+        const tScale    = Math.max(0.5, Math.min(3.0, studioState.textSize));
+        const customColor = studioState.textColor === 'theme' ? '#ffffff' : studioState.textColor;
+        const isAuto    = studioState.textColor === 'theme';
+        const cx        = W / 2;
+
+        // ─── 1. BACKGROUND ───────────────────────────────────────────────────
         drawStudioBg(ctx, W, H, tpl);
 
-        // 2. Overlay cinemático de contraste
+        // ─── 2. CINEMATIC OVERLAY ────────────────────────────────────────────
         const ov = ctx.createLinearGradient(0, 0, 0, H);
-        ov.addColorStop(0, 'rgba(0, 0, 0, 0.4)');
-        ov.addColorStop(1, 'rgba(0, 0, 0, 0.85)');
+        ov.addColorStop(0, 'rgba(0,0,0,0.35)');
+        ov.addColorStop(1, 'rgba(0,0,0,0.82)');
         ctx.fillStyle = ov; ctx.fillRect(0, 0, W, H);
 
-        const cx = W/2;
-        const accentMap = {
-            'hielo':'#0099cc','carbono':'#d4af37','neon':'#00e5ff','fuego':'#ffcc00',
-            'blood':'#ff3333','militar':'#8aff7a','custom':'#00e5ff','fem1':'#ffcccc',
-            'fem2':'#d4a0a8','fem3':'#ffb347','fem4':'#00ced1','gay_m1':'#ff00ff',
-            'gay_m2':'#add8e6','gay_m3':'#ffd700','gay_f1':'#ff4500','gay_f2':'#8a2be2','gay_f3':'#8fbc8f'
-        };
-        const accent = accentMap[tpl.id] || '#8aff7a';
-
-        // Escala global dinámica
-        const tScale = Math.max(0.5, Math.min(3.0, studioState.textSize));
-        const customColor = studioState.textColor === 'theme' ? '#ffffff' : studioState.textColor;
-        const isAuto = studioState.textColor === 'theme';
-
-        // 3. Panel central HUD / Trading Card style
-        const pw = W*0.90, ph = H*0.86, px = (W-pw)/2, py = (H-ph)/2;
-        
+        // ─── 3. HUD PANEL ────────────────────────────────────────────────────
+        const pw = W * 0.90, ph = H * 0.88, px = (W - pw) / 2, py = (H - ph) / 2;
         ctx.beginPath();
-        if(ctx.roundRect) ctx.roundRect(px, py, pw, ph, 24); else ctx.rect(px, py, pw, ph);
-        ctx.fillStyle = 'rgba(10, 12, 18, 0.45)';
-        ctx.fill();
-        ctx.lineWidth = 1.5; ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)'; ctx.stroke();
-        
-        // Esquinas HUD deportivas
-        ctx.beginPath(); ctx.lineWidth = 4; ctx.strokeStyle = accent;
-        const cl = 45; // longitud del corte
-        ctx.moveTo(px, py+cl); ctx.lineTo(px, py); ctx.lineTo(px+cl, py);
-        ctx.moveTo(px+pw-cl, py); ctx.lineTo(px+pw, py); ctx.lineTo(px+pw, py+cl);
-        ctx.moveTo(px+pw, py+ph-cl); ctx.lineTo(px+pw, py+ph); ctx.lineTo(px+pw-cl, py+ph);
-        ctx.moveTo(px+cl, py+ph); ctx.lineTo(px, py+ph); ctx.lineTo(px, py+ph-cl);
-        ctx.stroke();
+        if (ctx.roundRect) ctx.roundRect(px, py, pw, ph, 22); else ctx.rect(px, py, pw, ph);
+        ctx.fillStyle = 'rgba(5,8,15,0.40)'; ctx.fill();
+        ctx.lineWidth = 1.2; ctx.strokeStyle = 'rgba(255,255,255,0.07)'; ctx.stroke();
 
-        // LOGO INDEPENDIENTE (Aislado arriba, sin fondo negro)
-        const logoTargetY = py + 30;
-        if (STUDIO_LOGO_IMG) {
-            const logoW = 280;
-            ctx.globalCompositeOperation = 'screen';
-            ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 30;
-            ctx.drawImage(STUDIO_LOGO_IMG, cx - logoW/2, logoTargetY, logoW, logoW);
-            ctx.shadowBlur = 0;
-            ctx.globalCompositeOperation = 'source-over';
+        // ─── 4. HUD STYLE DECORATIONS ────────────────────────────────────────
+        const hudStyle = studioState.hudStyle || 'tech-corners';
+        if (hudStyle === 'tech-corners' || hudStyle === 'scanner-lines') {
+            const cl = 50;
+            ctx.save();
+            ctx.beginPath(); ctx.lineWidth = 4; ctx.strokeStyle = accent;
+            ctx.moveTo(px, py + cl);      ctx.lineTo(px, py);           ctx.lineTo(px + cl, py);
+            ctx.moveTo(px + pw - cl, py); ctx.lineTo(px + pw, py);      ctx.lineTo(px + pw, py + cl);
+            ctx.moveTo(px + pw, py + ph - cl); ctx.lineTo(px + pw, py + ph); ctx.lineTo(px + pw - cl, py + ph);
+            ctx.moveTo(px + cl, py + ph); ctx.lineTo(px, py + ph);      ctx.lineTo(px, py + ph - cl);
+            ctx.stroke();
+            [[px+cl,py],[px+pw-cl,py],[px,py+cl],[px+pw,py+cl],[px,py+ph-cl],[px+pw,py+ph-cl],[px+cl,py+ph],[px+pw-cl,py+ph]]
+                .forEach(([xx, yy]) => { ctx.beginPath(); ctx.arc(xx, yy, 4, 0, Math.PI*2); ctx.fillStyle = accent; ctx.fill(); });
+            ctx.restore();
+        }
+        if (hudStyle === 'minimal') {
+            ctx.save();
+            ctx.beginPath();
+            if (ctx.roundRect) ctx.roundRect(px + 6, py + 6, pw - 12, ph - 12, 16); else ctx.rect(px + 6, py + 6, pw - 12, ph - 12);
+            ctx.lineWidth = 2; ctx.strokeStyle = accent + '99'; ctx.stroke();
+            ctx.restore();
+        }
+        if (hudStyle === 'scanner-lines') {
+            ctx.save();
+            ctx.beginPath();
+            if (ctx.roundRect) ctx.roundRect(px, py, pw, ph, 22); else ctx.rect(px, py, pw, ph);
+            ctx.clip();
+            ctx.lineWidth = 1; ctx.strokeStyle = accent + '18';
+            for (let yy = py; yy < py + ph; yy += 14) {
+                ctx.beginPath(); ctx.moveTo(px, yy); ctx.lineTo(px + pw, yy); ctx.stroke();
+            }
+            ctx.restore();
         }
 
-        // MOTOR DE EFECTO AUTO
-        const drawAutoText = (txt, x, y, size, weight, shadowPass) => {
-            ctx.font = `${weight} ${Math.floor(size)}px Inter,sans-serif`;
-            ctx.textAlign = 'center';
-            if (isAuto) {
-                ctx.fillStyle = shadowPass ? accent : '#ffffff';
-                ctx.shadowColor = shadowPass ? accent : 'rgba(0,0,0,0.95)';
-                ctx.shadowBlur = shadowPass ? 35 : 15;
-                ctx.globalCompositeOperation = shadowPass ? 'screen' : 'source-over';
-                ctx.fillText(txt, x, y);
-                if (!shadowPass) {
-                    ctx.globalCompositeOperation = 'overlay';
-                    ctx.fillStyle = 'rgba(255,255,255,0.6)';
-                    ctx.fillText(txt, x, y);
-                    ctx.globalCompositeOperation = 'source-over';
-                }
-            } else {
-                ctx.fillStyle = customColor;
-                ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = 18;
-                ctx.fillText(txt, x, y);
-            }
+        // ─── 5. HEADER ACCENT LINE ───────────────────────────────────────────
+        const headerLineY = py + 20;
+        const hg = ctx.createLinearGradient(px + pw * 0.05, 0, px + pw * 0.95, 0);
+        hg.addColorStop(0, 'rgba(255,255,255,0)'); hg.addColorStop(0.5, accent); hg.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.fillStyle = hg; ctx.fillRect(px + pw * 0.05, headerLineY, pw * 0.9, 2);
+
+        // ─── 6. LOGO (header, elegante) ──────────────────────────────────────
+        const logoAreaY = py + 32;
+        const logoH = Math.min(H * 0.09, 115);
+        if (STUDIO_LOGO_IMG) {
+            const ar   = STUDIO_LOGO_IMG.width / STUDIO_LOGO_IMG.height;
+            const logoW = Math.min(logoH * ar, pw * 0.55);
+            const lh   = logoW / ar;
+            ctx.globalCompositeOperation = 'screen';
+            ctx.shadowColor = accent; ctx.shadowBlur = 18;
+            ctx.drawImage(STUDIO_LOGO_IMG, cx - logoW / 2, logoAreaY, logoW, lh);
             ctx.shadowBlur = 0; ctx.globalCompositeOperation = 'source-over';
+        }
+
+        // ─── 7. TÍTULO "POWERING YOUR BIOLOGY" ───────────────────────────────
+        const titleY = logoAreaY + logoH + 28;
+        const titleSize = Math.floor((isLandscape ? 20 : 24) * tScale);
+        ctx.font = `${fStyle}${fd.wt} ${titleSize}px ${fd.fam}`;
+        ctx.textAlign = 'center';
+        ctx.fillStyle = accent; ctx.shadowColor = accent; ctx.shadowBlur = 14;
+        ctx.fillText('POWERING YOUR BIOLOGY', cx, titleY);
+        ctx.shadowBlur = 0;
+
+        const subSize = Math.floor((isLandscape ? 13 : 15) * tScale);
+        ctx.font = `${fStyle}600 ${subSize}px ${fd.fam}`;
+        ctx.fillStyle = 'rgba(255,255,255,0.45)';
+        ctx.fillText('RESULTADOS OFICIALES', cx, titleY + subSize * 2);
+
+        // ─── 8. DIVIDER ──────────────────────────────────────────────────────
+        const div1Y = titleY + subSize * 2 + 28 * tScale;
+        const gd = ctx.createLinearGradient(cx - pw * 0.35, 0, cx + pw * 0.35, 0);
+        gd.addColorStop(0, 'rgba(255,255,255,0)'); gd.addColorStop(0.5, accent); gd.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.fillStyle = gd; ctx.fillRect(cx - pw * 0.35, div1Y, pw * 0.7, 3);
+
+        // ─── 9. ATHLETE NAME ─────────────────────────────────────────────────
+        const nameY = div1Y + 52 * tScale;
+        const nameSize = Math.floor((isLandscape ? 50 : 68) * tScale);
+        const atletaName = (userData.username || 'ATLETA').toUpperCase();
+        ctx.font = `${fStyle}${fd.wt} ${nameSize}px ${fd.fam}`;
+        ctx.textAlign = 'center';
+        if (isAuto) {
+            ctx.fillStyle = accent; ctx.shadowColor = accent; ctx.shadowBlur = 40;
+            ctx.globalCompositeOperation = 'screen';
+            ctx.fillText(atletaName, cx, nameY);
+            ctx.globalCompositeOperation = 'source-over'; ctx.shadowBlur = 0;
+            ctx.fillStyle = '#ffffff'; ctx.shadowColor = 'rgba(0,0,0,0.95)'; ctx.shadowBlur = 14;
+            ctx.fillText(atletaName, cx, nameY);
+            ctx.globalCompositeOperation = 'overlay';
+            ctx.fillStyle = 'rgba(255,255,255,0.55)';
+            ctx.fillText(atletaName, cx, nameY);
+            ctx.globalCompositeOperation = 'source-over'; ctx.shadowBlur = 0;
+        } else {
+            ctx.fillStyle = customColor; ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = 18;
+            ctx.fillText(atletaName, cx, nameY); ctx.shadowBlur = 0;
+        }
+
+        // ─── 10. METRICS ─────────────────────────────────────────────────────
+        const mets = STUDIO_METRICS.filter(m => activeMetrics.includes(m.key));
+        const metStartY = nameY + 48 * tScale;
+
+        const drawMetric = (label, value, mx, my) => {
+            const lSize = Math.floor((isLandscape ? 18 : 22) * tScale);
+            ctx.font = `${fStyle}600 ${lSize}px ${fd.fam}`;
+            ctx.textAlign = 'center'; ctx.fillStyle = 'rgba(255,255,255,0.55)'; ctx.shadowBlur = 0;
+            ctx.fillText(label.toUpperCase(), mx, my);
+            const vSize = Math.floor((isLandscape ? 46 : 62) * tScale);
+            ctx.font = `${fStyle}${fd.wt} ${vSize}px ${fd.fam}`;
+            if (isAuto) {
+                ctx.fillStyle = accent; ctx.shadowColor = accent; ctx.shadowBlur = 28;
+                ctx.globalCompositeOperation = 'screen';
+                ctx.fillText(value, mx, my + vSize * 1.2);
+                ctx.globalCompositeOperation = 'source-over'; ctx.shadowBlur = 0;
+                ctx.fillStyle = '#ffffff'; ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = 10;
+                ctx.fillText(value, mx, my + vSize * 1.2); ctx.shadowBlur = 0;
+            } else {
+                ctx.fillStyle = customColor; ctx.shadowColor = 'rgba(0,0,0,0.85)'; ctx.shadowBlur = 14;
+                ctx.fillText(value, mx, my + vSize * 1.2); ctx.shadowBlur = 0;
+            }
         };
 
-        // El texto inicia debajo del logo
-        const textStartY = logoTargetY + (STUDIO_LOGO_IMG ? 340 : 80);
-
-        // TÍTULO OFICIAL
-        ctx.fillStyle = accent; ctx.textAlign = 'center';
-        ctx.font = `800 ${Math.floor(30*(1 + (tScale-1)*0.5))}px Inter,sans-serif`;
-        ctx.letterSpacing = '4px';
-        ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = 15;
-        ctx.fillText('RESULTADOS OFICIALES', cx, textStartY);
-        ctx.letterSpacing = '0px'; ctx.shadowBlur = 0;
-
-        // NOMBRE DEL ATLETA
-        const nameY = textStartY + 85 * tScale;
-        const atletaName = (userData.username||'ATLETA').toUpperCase();
-        drawAutoText(atletaName, cx, nameY, 70 * tScale, 900, true);
-        drawAutoText(atletaName, cx, nameY, 70 * tScale, 900, false);
-
-        // SEPARADOR DINÁMICO
-        const divY = nameY + 45 * tScale;
-        const gradLine = ctx.createLinearGradient(cx - (pw*0.35), 0, cx + (pw*0.35), 0);
-        gradLine.addColorStop(0, 'rgba(255,255,255,0)');
-        gradLine.addColorStop(0.5, accent);
-        gradLine.addColorStop(1, 'rgba(255,255,255,0)');
-        ctx.fillStyle = gradLine; ctx.fillRect(cx - (pw*0.35), divY, pw*0.7, 4);
-
-        // MÉTRICAS
-        const mets = STUDIO_METRICS.filter(m => activeMetrics.includes(m.key));
-        const metStartY = divY + 90 * tScale;
-
         if (mets.length === 0) {
-            ctx.fillStyle = 'rgba(255,255,255,0.2)'; ctx.font = `600 28px Inter,sans-serif`;
-            ctx.fillText('SELECCIONE MÉTRICAS', cx, metStartY + 80);
+            ctx.fillStyle = 'rgba(255,255,255,0.2)'; ctx.font = `600 ${Math.floor(24 * tScale)}px ${fd.fam}`;
+            ctx.textAlign = 'center'; ctx.fillText('SELECCIONE MÉTRICAS', cx, metStartY + 80);
         } else if (isLandscape && mets.length > 1) {
             const colW = pw / Math.min(mets.length, 8);
-            mets.forEach((m, i) => {
-                const mx = px + colW/2 + i * colW;
-                ctx.fillStyle = 'rgba(255,255,255,0.6)'; ctx.font = `600 ${Math.floor(22*tScale)}px Inter,sans-serif`;
-                ctx.fillText(m.label.toUpperCase(), mx, metStartY);
-                drawAutoText(m.val(), mx, metStartY + 65*tScale, 55*tScale, 900, true);
-                drawAutoText(m.val(), mx, metStartY + 65*tScale, 55*tScale, 900, false);
-            });
+            mets.forEach((m, i) => drawMetric(m.label, m.val(), px + colW / 2 + i * colW, metStartY));
         } else if (mets.length > 4) {
-            const colW = pw / 2;
-            const rowSpacing = 125 * tScale;
-            mets.forEach((m, i) => {
-                const mx = px + colW/2 + ((i % 2) * colW);
-                const my = metStartY + (Math.floor(i / 2) * rowSpacing);
-                ctx.fillStyle = 'rgba(255,255,255,0.6)'; ctx.font = `600 ${Math.floor(20*tScale)}px Inter,sans-serif`;
-                ctx.fillText(m.label.toUpperCase(), mx, my);
-                drawAutoText(m.val(), mx, my + 60*tScale, 52*tScale, 900, true);
-                drawAutoText(m.val(), mx, my + 60*tScale, 52*tScale, 900, false);
-            });
+            const colW = pw / 2, rowSpacing = 120 * tScale;
+            mets.forEach((m, i) => drawMetric(m.label, m.val(), px + colW / 2 + (i % 2) * colW, metStartY + Math.floor(i / 2) * rowSpacing));
         } else {
-            const rowSpacing = 160 * tScale;
-            mets.forEach((m, i) => {
-                const my = metStartY + i * rowSpacing;
-                ctx.fillStyle = 'rgba(255,255,255,0.6)'; ctx.font = `600 ${Math.floor(26*tScale)}px Inter,sans-serif`;
-                ctx.fillText(m.label.toUpperCase(), cx, my);
-                drawAutoText(m.val(), cx, my + 80*tScale, 80*tScale, 900, true);
-                drawAutoText(m.val(), cx, my + 80*tScale, 80*tScale, 900, false);
-            });
+            const rowSpacing = 145 * tScale;
+            mets.forEach((m, i) => drawMetric(m.label, m.val(), cx, metStartY + i * rowSpacing));
+        }
+
+        // ─── 11. FOOTER — AX-CORE BY ARTHUR ─────────────────────────────────
+        const footerY = py + ph - 32;
+        const fg = ctx.createLinearGradient(cx - pw * 0.25, 0, cx + pw * 0.25, 0);
+        fg.addColorStop(0, 'rgba(255,255,255,0)'); fg.addColorStop(0.5, accent + 'aa'); fg.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.fillStyle = fg; ctx.fillRect(cx - pw * 0.25, footerY - 22, pw * 0.5, 1.5);
+        const footerSize = Math.floor(16 * tScale);
+        ctx.font = `${fStyle}${fd.wt} ${footerSize}px ${fd.fam}`;
+        ctx.textAlign = 'center';
+        ctx.fillStyle = accent; ctx.shadowColor = accent; ctx.shadowBlur = 10;
+        ctx.fillText('AX-CORE BY ARTHUR', cx, footerY);
+        ctx.shadowBlur = 0;
+
+        // ─── 12. OVERLAY FILTER ──────────────────────────────────────────────
+        const filter = studioState.overlayFilter || 'clear';
+        if (filter === 'vignette') {
+            const vg = ctx.createRadialGradient(cx, H / 2, H * 0.28, cx, H / 2, H * 0.72);
+            vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(0,0,0,0.70)');
+            ctx.fillStyle = vg; ctx.fillRect(0, 0, W, H);
+        } else if (filter === 'grain') {
+            ctx.save();
+            for (let yy = 0; yy < H; yy += 2) {
+                ctx.fillStyle = `rgba(255,255,255,${Math.random() * 0.035})`;
+                ctx.fillRect(0, yy, W, 1);
+            }
+            ctx.restore();
+        } else if (filter === 'glitch') {
+            ctx.save();
+            ctx.lineWidth = 1; ctx.strokeStyle = 'rgba(0,0,0,0.18)';
+            for (let yy = 0; yy < H; yy += 4) {
+                ctx.beginPath(); ctx.moveTo(0, yy); ctx.lineTo(W, yy); ctx.stroke();
+            }
+            for (let i = 0; i < 6; i++) {
+                const by = Math.random() * H, bh = Math.random() * 5 + 1;
+                ctx.fillStyle = (i % 2 === 0 ? accent : '#ff2222') + '2a';
+                ctx.fillRect(0, by, W, bh);
+            }
+            ctx.restore();
         }
     }
 
@@ -1565,6 +1647,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 <h4 style="color:var(--text-primary); font-size:0.8rem; margin:16px 0 8px;">MÉTRICAS A MOSTRAR</h4>
                 <div class="studio-metrics" id="studio-met-list"></div>
+
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:18px 0 8px;">
+                    <div>
+                        <h4 style="color:var(--accent-main); font-size:0.68rem; margin-bottom:8px; letter-spacing:1px;">ACENTO DE COLOR</h4>
+                        <div id="studio-accent-btns" style="display:flex; flex-wrap:wrap; gap:5px;"></div>
+                    </div>
+                    <div>
+                        <h4 style="color:var(--accent-main); font-size:0.68rem; margin-bottom:8px; letter-spacing:1px;">ESTILO HUD</h4>
+                        <div id="studio-hud-btns" style="display:flex; flex-wrap:wrap; gap:5px;"></div>
+                    </div>
+                    <div>
+                        <h4 style="color:var(--accent-main); font-size:0.68rem; margin-bottom:8px; letter-spacing:1px;">TIPOGRAFÍA</h4>
+                        <div id="studio-font-btns" style="display:flex; flex-wrap:wrap; gap:5px;"></div>
+                    </div>
+                    <div>
+                        <h4 style="color:var(--accent-main); font-size:0.68rem; margin-bottom:8px; letter-spacing:1px;">FILTRO OVERLAY</h4>
+                        <div id="studio-filter-btns" style="display:flex; flex-wrap:wrap; gap:5px;"></div>
+                    </div>
+                </div>
 
                 <div style="display:flex; flex-direction:column; gap:12px; margin: 16px 0 8px;">
                     <div>
@@ -1718,10 +1819,71 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         const sizePicker = document.getElementById('studio-size-picker');
-        sizePicker.oninput = (e) => { 
-            studioState.textSize = parseFloat(e.target.value); 
-            renderStudioCard(previewCanvas, studioState.tpl, studioState.fmt, studioState.metrics, true); 
+        sizePicker.oninput = (e) => {
+            studioState.textSize = parseFloat(e.target.value);
+            renderStudioCard(previewCanvas, studioState.tpl, studioState.fmt, studioState.metrics, true);
         };
+
+        // --- Selectores de Estilo Avanzado ---
+        const _makeStyleBtns = (containerId, options, stateKey) => {
+            const cont = document.getElementById(containerId);
+            if (!cont) return;
+            const redraw = () => renderStudioCard(previewCanvas, studioState.tpl, studioState.fmt, studioState.metrics, true);
+            const refreshBtns = () => cont.querySelectorAll('.sx-btn').forEach(b => {
+                const active = b.dataset.val === studioState[stateKey];
+                b.style.background = active ? accent_css : 'rgba(255,255,255,0.06)';
+                b.style.color      = active ? '#000' : 'rgba(255,255,255,0.8)';
+                b.style.borderColor = active ? accent_css : 'rgba(255,255,255,0.15)';
+            });
+            const accent_css = 'var(--accent-main)';
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'sx-btn';
+                btn.dataset.val = opt.v;
+                btn.textContent = opt.l;
+                const isActive = studioState[stateKey] === opt.v;
+                btn.style.cssText = `padding:4px 9px; font-size:0.60rem; border-radius:8px; cursor:pointer;
+                    border:1px solid ${isActive ? accent_css : 'rgba(255,255,255,0.15)'};
+                    background:${isActive ? accent_css : 'rgba(255,255,255,0.06)'};
+                    color:${isActive ? '#000' : 'rgba(255,255,255,0.8)'};
+                    font-weight:800; letter-spacing:0.5px; transition:all .15s;`;
+                if (opt.dot) {
+                    const dot = document.createElement('span');
+                    dot.style.cssText = `display:inline-block; width:8px; height:8px; border-radius:50%; background:${opt.dot}; margin-right:4px; vertical-align:middle;`;
+                    btn.prepend(dot);
+                }
+                btn.onclick = () => { studioState[stateKey] = opt.v; refreshBtns(); redraw(); };
+                cont.appendChild(btn);
+            });
+        };
+
+        _makeStyleBtns('studio-accent-btns', [
+            { l:'NEON',    v:'neon',    dot:'#00e5ff' },
+            { l:'CYAN',    v:'cyan',    dot:'#00ffcc' },
+            { l:'GOLD',    v:'gold',    dot:'#ffd700' },
+            { l:'BLOOD',   v:'blood',   dot:'#ff2222' },
+            { l:'FUCHSIA', v:'fuchsia', dot:'#ff00e5' }
+        ], 'accentColor');
+
+        _makeStyleBtns('studio-hud-btns', [
+            { l:'CORNERS', v:'tech-corners'  },
+            { l:'SCANNER', v:'scanner-lines' },
+            { l:'MINIMAL', v:'minimal'       },
+            { l:'NONE',    v:'none'          }
+        ], 'hudStyle');
+
+        _makeStyleBtns('studio-font-btns', [
+            { l:'IMPACT',  v:'bold-impact'  },
+            { l:'MONO',    v:'tech-mono'    },
+            { l:'ELEGANT', v:'elegant-sans' }
+        ], 'fontStyle');
+
+        _makeStyleBtns('studio-filter-btns', [
+            { l:'LIMPIO', v:'clear'    },
+            { l:'GLITCH', v:'glitch'   },
+            { l:'GRAIN',  v:'grain'    },
+            { l:'VIÑETA', v:'vignette' }
+        ], 'overlayFilter');
 
         // --- Share button ---
         document.getElementById('btn-studio-share').onclick = async () => {
