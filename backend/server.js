@@ -636,6 +636,61 @@ app.post('/api/push/send', requireAdminAuth, async (req, res) => {
 });
 
 // ============================================================
+// POC SETUP (sin autenticación, solo para testing)
+// ============================================================
+app.post('/api/poc/setup', async (req, res) => {
+    try {
+        // Limpiar datos de PoC previos si existen
+        await Gym.deleteOne({ gymCode: 'POCGYM' });
+        await Code.deleteMany({ gymCode: 'POCGYM' });
+
+        // Crear gimnasio de PoC
+        const gym = new Gym({
+            gymCode: 'POCGYM',
+            name: 'Gym Test PoC',
+            owner: 'Admin Test',
+            manager: 'Manager Test',
+            coach: 'Coach Test',
+            plan: 'basico',
+            maxUsers: 50,
+            rent: 1500,
+            active: true,
+            blockId: 'POC',
+            password: 'COACHPASS123',
+            branding: {
+                logoUrl: '',
+                primaryColor: '#00ff88',
+                accentColor: '#d4af37'
+            }
+        });
+        await gym.save();
+
+        // Crear 3 códigos de prueba
+        const codes = [];
+        for (let i = 1; i <= 3; i++) {
+            const code = new Code({
+                code: `POC${i}TEST${i}`,
+                gymCode: 'POCGYM',
+                active: true,
+                user: `Atleta Prueba ${i}`,
+                registered: false
+            });
+            await code.save();
+            codes.push(code.code);
+        }
+
+        res.json({
+            success: true,
+            message: 'Setup PoC completado',
+            gym: { gymCode: 'POCGYM', password: 'COACHPASS123' },
+            codes: codes
+        });
+    } catch (e) {
+        res.status(500).json({ success: false, message: e.message });
+    }
+});
+
+// ============================================================
 // HEALTH
 // ============================================================
 app.get('/health', async (req, res) => {
