@@ -470,49 +470,135 @@
         btnLogin.textContent = "INICIAR SESIÓN";
     };
 
+    function renderClientCard(c) {
+        const div = document.createElement('div');
+        div.className = `client-card ${c.active ? '' : 'paused'}`;
+        div.innerHTML = `
+            <button class="btn-delete-x" style="width:20px; height:20px; font-size:0.65rem; top:10px; right:10px;" onclick="deleteClient('${c.code}', '${c.user}')">X</button>
+            <div>
+                <h3 style="font-size:1rem; margin-bottom:2px;">${c.user}</h3>
+                <p style="font-size:0.65rem; margin-bottom:2px;">PASE: <span class="code-box" style="font-size:0.75rem; padding:2px 6px;">${c.code}</span></p>
+                <p style="color:${c.active ? '#00ff88' : '#e8394a'}; font-weight:bold; margin-top: 5px; font-size:0.6rem;">
+                    ${c.active ? '✅ ACTIVO' : '❌ ADEUDO'}
+                </p>
+            </div>
+            <div style="margin-top: 8px; display:flex; gap:6px;">
+                <button class="btn-cancel" style="flex:1; padding: 0.4rem; font-size: 0.6rem; background: ${c.active ? 'rgba(232,57,74,0.1)' : 'rgba(0,255,136,0.1)'}; border-color: ${c.active ? '#e8394a' : '#00ff88'}; color: ${c.active ? '#e8394a' : '#00ff88'};" onclick="toggleStatus('${c.code}', ${!c.active})">
+                    ${c.active ? 'CORTAR' : 'RESTAURAR'}
+                </button>
+                <button class="btn-premium" style="flex:1; padding: 0.4rem; font-size: 0.6rem;" onclick="shareAthleteCode('${c.user}', '${c.code}')">📱 COMPARTIR</button>
+            </div>
+        `;
+        return div;
+    }
+
     async function loadClients() {
         try {
             const res = await fetch(`${API_URL}/api/coach/codes/${currentGym}`);
             const codes = await res.json();
-            
-            clientList.innerHTML = '';
+
             gymData.currentUsers = codes.length;
             updateStatsBadge();
-            
-            if(codes.length === 0) {
+
+            // El 1 extra es el código de regalo del coach (último de la lista cronológica)
+            const baseLimit = (gymData.maxUsers || 51) - 1;
+            const sorted = [...codes].sort((a,b) => new Date(a.createdAt||0) - new Date(b.createdAt||0));
+            const regularCodes = sorted.slice(0, baseLimit).reverse();
+            const giftCode = sorted.length > baseLimit ? sorted[sorted.length - 1] : null;
+
+            clientList.innerHTML = '';
+
+            if(regularCodes.length === 0 && !giftCode) {
                 clientList.innerHTML = `
                 <div class="glass-card" style="grid-column: 1/-1; text-align:center; padding: 3rem;">
-                    <p style="color:#aaa; font-size: 1.2rem;">No tienes atletas activos con tu membresía. Genera un pase nuevo arriba a la derecha.</p>
+                    <p style="color:#aaa; font-size: 1.2rem;">No tienes atletas activos. Genera un pase nuevo arriba a la derecha.</p>
                 </div>`;
-                return;
+            } else {
+                regularCodes.forEach(c => clientList.appendChild(renderClientCard(c)));
             }
 
-            codes.reverse().forEach(c => {
-                const div = document.createElement('div');
-                div.className = `client-card ${c.active ? '' : 'paused'}`;
-                
-                div.innerHTML = `
-                    <button class="btn-delete-x" style="width:20px; height:20px; font-size:0.65rem; top:10px; right:10px;" onclick="deleteClient('${c.code}', '${c.user}')">X</button>
-                    <div>
-                        <h3 style="font-size:1rem; margin-bottom:2px;">${c.user}</h3>
-                        <p style="font-size:0.65rem; margin-bottom:2px;">PASE: <span class="code-box" style="font-size:0.75rem; padding:2px 6px;">${c.code}</span></p>
-                        <p style="color:${c.active ? '#00ff88' : '#e8394a'}; font-weight:bold; margin-top: 5px; font-size:0.6rem;">
-                            ${c.active ? '✅ ACTIVO' : '❌ ADEUDO'}
-                        </p>
-                    </div>
-                    <div style="margin-top: 8px; display:flex; gap:6px;">
-                        <button class="btn-cancel" style="flex:1; padding: 0.4rem; font-size: 0.6rem; background: ${c.active ? 'rgba(232,57,74,0.1)' : 'rgba(0,255,136,0.1)'}; border-color: ${c.active ? '#e8394a' : '#00ff88'}; color: ${c.active ? '#e8394a' : '#00ff88'};" onclick="toggleStatus('${c.code}', ${!c.active})">
-                            ${c.active ? 'CORTAR' : 'RESTAURAR'}
-                        </button>
-                        <button class="btn-premium" style="flex:1; padding: 0.4rem; font-size: 0.6rem;" onclick="shareAthleteCode('${c.user}', '${c.code}')">📱 COMPARTIR</button>
-                    </div>
-                `;
-                clientList.appendChild(div);
-            });
+            // Sección regalo VIP (siempre visible al fondo)
+            renderGiftSection(giftCode);
+
         } catch(e) {
             clientList.innerHTML = '<p style="color:red; text-align:center;">Error conectando al servidor maestro.</p>';
         }
     }
+
+    function renderGiftSection(giftCode) {
+        // Quitar sección previa si existe
+        const prev = document.getElementById('gift-section');
+        if (prev) prev.remove();
+
+        const section = document.createElement('div');
+        section.id = 'gift-section';
+        section.style.cssText = 'grid-column: 1/-1; margin-top: 24px;';
+
+        if (giftCode) {
+            // Código ya generado — mostrar con estilo VIP
+            section.innerHTML = `
+                <div style="background: linear-gradient(135deg, rgba(0,255,136,0.08), rgba(0,212,255,0.06)); border: 1px solid rgba(0,255,136,0.35); border-radius: 18px; padding: 1.8rem 2rem; position: relative; overflow: hidden;">
+                    <div style="position:absolute; top:0; left:0; right:0; height:2px; background: linear-gradient(90deg, transparent, #00ff88, #00d4ff, transparent);"></div>
+                    <div style="display:flex; align-items:center; gap:12px; margin-bottom:1rem;">
+                        <span style="font-size:2rem;">🎁</span>
+                        <div>
+                            <div style="font-family:'Orbitron',sans-serif; font-size:0.9rem; color:#00ff88; font-weight:900; letter-spacing:2px;">CÓDIGO REGALO VIP — EXCLUSIVO PARA TI</div>
+                            <div style="font-size:0.72rem; color:rgba(255,255,255,0.5); margin-top:2px;">Incluido sin costo adicional en tu membresía</div>
+                        </div>
+                    </div>
+                    <p style="font-size:0.82rem; color:rgba(255,255,255,0.7); line-height:1.6; margin-bottom:1.2rem;">
+                        Este acceso es tuyo. Úsalo para vivir la experiencia que le das a tus atletas: registra tu propio peso, calorías y progreso en la app AX-CORE. Un servicio que vale <strong style="color:#00ff88;">$X/mes</strong> — totalmente de regalo por ser parte de la red.
+                    </p>
+                    <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
+                        <div>
+                            <div style="font-size:0.65rem; color:rgba(0,255,136,0.6); font-family:'Orbitron',sans-serif; letter-spacing:1px; margin-bottom:4px;">TU CÓDIGO PERSONAL</div>
+                            <span class="code-box" style="font-size:1.3rem; padding:8px 16px; letter-spacing:5px; box-shadow: 0 0 20px rgba(0,255,136,0.25);">${giftCode.code}</span>
+                        </div>
+                        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:4px;">
+                            <button class="btn-premium" style="padding:0.6rem 1.2rem; font-size:0.65rem;" onclick="shareAthleteCode('${giftCode.user}', '${giftCode.code}')">📱 COMPARTIR</button>
+                            <button class="btn-cancel" style="padding:0.6rem 1.2rem; font-size:0.65rem; color:#ff4757; border-color:rgba(255,71,87,0.3);" onclick="deleteClient('${giftCode.code}', '${giftCode.user}')">LIBERAR</button>
+                        </div>
+                    </div>
+                </div>`;
+        } else {
+            // Código aún no generado — invitar a crearlo
+            section.innerHTML = `
+                <div style="background: rgba(0,255,136,0.04); border: 1px dashed rgba(0,255,136,0.25); border-radius: 18px; padding: 1.8rem 2rem; text-align:center;">
+                    <div style="font-size:2.5rem; margin-bottom:0.8rem;">🎁</div>
+                    <div style="font-family:'Orbitron',sans-serif; font-size:0.85rem; color:#00ff88; font-weight:900; letter-spacing:2px; margin-bottom:0.6rem;">CÓDIGO REGALO VIP — PENDIENTE</div>
+                    <p style="font-size:0.82rem; color:rgba(255,255,255,0.55); line-height:1.6; max-width:480px; margin:0 auto 1.2rem;">
+                        Tu membresía incluye <strong style="color:#00ff88;">1 acceso de regalo</strong> para que tú mismo uses la app de tus atletas. Regístrate, vive su experiencia y demuéstrales que tú también lo haces.
+                    </p>
+                    <button class="btn-premium" style="padding:0.8rem 2rem; font-size:0.75rem;" onclick="generateGiftCode()">🎁 GENERAR MI CÓDIGO DE REGALO</button>
+                </div>`;
+        }
+        clientList.after(section);
+    }
+
+    window.generateGiftCode = async () => {
+        const btn = event.target;
+        btn.textContent = 'GENERANDO...';
+        btn.disabled = true;
+        try {
+            const res = await fetch(`${API_URL}/api/coach/generate`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ gymId: currentGym, user: `Coach ${gymData.name || ''}`.trim() })
+            });
+            const data = await res.json();
+            if (data.success) {
+                loadClients();
+            } else {
+                alert(data.message);
+                btn.textContent = '🎁 GENERAR MI CÓDIGO DE REGALO';
+                btn.disabled = false;
+            }
+        } catch(e) {
+            alert('Error de conexión.');
+            btn.textContent = '🎁 GENERAR MI CÓDIGO DE REGALO';
+            btn.disabled = false;
+        }
+    };
 
     function updateStatsBadge() {
         const badge = document.getElementById('stats-users');

@@ -1176,3 +1176,119 @@ body {
     color: #3a5a3c !important;
 }
 
+/* ===== NATURAL ZEN — FIXES CONTRASTE ===== */
+
+/* Logo imagen: mix-blend-mode:screen lo hace invisible en fondo claro */
+[data-theme="natural"] .nav-logo-container img,
+[data-theme="natural"] .nav-logo-mobile img {
+    mix-blend-mode: normal !important;
+    filter: none !important;
+    opacity: 0.85;
+}
+/* Texto "BY ARTHUR" (color:white hardcoded) */
+[data-theme="natural"] .nav-logo-container span,
+[data-theme="natural"] .nav-logo-mobile span {
+    color: #3a5a3c !important;
+}
+/* Nav links hover background */
+[data-theme="natural"] .nav-links li:hover,
+[data-theme="natural"] .nav-links li.active {
+    background: rgba(46, 125, 50, 0.1) !important;
+}
+/* Top bar texto e íconos */
+[data-theme="natural"] .top-bar * {
+    color: #1b2e1e;
+}
+[data-theme="natural"] .live-time,
+[data-theme="natural"] .separator {
+    color: #3a5a3c !important;
+}
+/* Avatar nombre usuario */
+[data-theme="natural"] .user-rank {
+    color: #1b2e1e !important;
+}
+/* Botones cancel/outline en fondo claro */
+[data-theme="natural"] .btn-cancel {
+    color: #415944 !important;
+    border-color: rgba(46,125,50,0.3) !important;
+    background: rgba(255,255,255,0.6) !important;
+}
+[data-theme="natural"] .btn-cancel:hover {
+    background: rgba(46,125,50,0.08) !important;
+}
+/* Texto en glass cards */
+[data-theme="natural"] p,
+[data-theme="natural"] span:not([style*="color"]),
+[data-theme="natural"] label {
+    color: #1b2e1e;
+}
+/* Food log / meal items */
+[data-theme="natural"] .food-log-item {
+    background: rgba(255,255,255,0.7) !important;
+    border-color: rgba(46,125,50,0.15) !important;
+    color: #1b2e1e !important;
+}
+/* Food log text */
+[data-theme="natural"] .food-log-item small,
+[data-theme="natural"] .food-log-item span {
+    color: #415944 !important;
+}
+/* Sensation feedback area */
+[data-theme="natural"] #sensation-feedback {
+    background: rgba(255,255,255,0.85) !important;
+    color: #1b2e1e !important;
+    border-color: rgba(46,125,50,0.2) !important;
+}
+[data-theme="natural"] #sensation-analysis {
+    background: rgba(255,255,255,0.7) !important;
+    color: #1b2e1e !important;
+}
+/* Studio section */
+[data-theme="natural"] .studio-format-btns button {
+    border-color: rgba(46,125,50,0.2) !important;
+    color: #415944 !important;
+    background: rgba(255,255,255,0.5) !important;
+}
+[data-theme="natural"] .studio-format-btns button.active {
+    border-color: var(--accent-main) !important;
+    color: var(--accent-main) !important;
+    background: rgba(46,125,50,0.08) !important;
+}
+[data-theme="natural"] .studio-metric-toggle {
+    background: rgba(255,255,255,0.5) !important;
+    color: #415944 !important;
+    border-color: rgba(46,125,50,0.15) !important;
+}
+/* Selects / dropdowns */
+[data-theme="natural"] select {
+    background: rgba(255,255,255,0.9) !important;
+    color: #1b2e1e !important;
+    border-color: rgba(46,125,50,0.3) !important;
+}
+/* Progress/chart text */
+[data-theme="natural"] .stat-goal,
+[data-theme="natural"] .weight-meta-text,
+[data-theme="natural"] .cal-rem-text {
+    color: #415944 !important;
+}
+/* Tags activos en evolución */
+[data-theme="natural"] .filter-btn {
+    background: rgba(255,255,255,0.7) !important;
+    color: #415944 !important;
+    border-color: rgba(46,125,50,0.2) !important;
+}
+[data-theme="natural"] .filter-btn.active {
+    background: var(--accent-main) !important;
+    color: #fff !important;
+}
+/* Reglas de protocolo en dieta */
+[data-theme="natural"] .diet-plan li {
+    background: rgba(46,125,50,0.06) !important;
+    border-left-color: var(--accent-main) !important;
+    color: #1b2e1e !important;
+}
+/* Navbar logo text fix (inline styles override) */
+[data-theme="natural"] .nav-logo-container > div:last-child {
+    color: var(--accent-main) !important;
+}
+

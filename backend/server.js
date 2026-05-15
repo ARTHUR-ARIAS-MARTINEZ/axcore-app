@@ -288,7 +288,9 @@ app.post('/api/coach/generate', async (req, res) => {
         if (!gym.active) return res.json({ success: false, message: 'SISTEMA PAUSADO POR AX-CORE.' });
 
         const currentCount = await Code.countDocuments({ gymCode });
-        const limit = Math.min(gym.maxUsers || MAX_ATHLETES_PER_GYM, MAX_ATHLETES_PER_GYM);
+        // Usar el límite del gimnasio directamente (sin cap global)
+        // El +1 extra es el código de regalo VIP incluido en cada plan
+        const limit = gym.maxUsers || MAX_ATHLETES_PER_GYM;
         if (currentCount >= limit) {
             return res.json({ success: false, message: `LÍMITE ALCANZADO (${limit} códigos). Contacta a AX-CORE para ampliar.` });
         }

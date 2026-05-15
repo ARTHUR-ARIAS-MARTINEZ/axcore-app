@@ -793,32 +793,58 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- DIET PAGE ---
+    function parseDietText(text) {
+        const result = { breakfast: '', lunch: '', dinner: '', snacks: '' };
+        const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+        let current = null;
+        for (const line of lines) {
+            const low = line.toLowerCase();
+            if (/desayuno|breakfast|mañana/i.test(low)) { current = 'breakfast'; result.breakfast += line.replace(/.*?[:：]\s*/,'') + '\n'; continue; }
+            if (/comida|almuerzo|lunch|mediod[ií]a/i.test(low)) { current = 'lunch'; result.lunch += line.replace(/.*?[:：]\s*/,'') + '\n'; continue; }
+            if (/cena|dinner|noche/i.test(low)) { current = 'dinner'; result.dinner += line.replace(/.*?[:：]\s*/,'') + '\n'; continue; }
+            if (/snack|merienda|colaci[oó]n|tentempié|refrigerio/i.test(low)) { current = 'snacks'; result.snacks += line.replace(/.*?[:：]\s*/,'') + '\n'; continue; }
+            if (current) result[current] += line + '\n';
+        }
+        return { breakfast: result.breakfast.trim(), lunch: result.lunch.trim(), dinner: result.dinner.trim(), snacks: result.snacks.trim() };
+    }
+
     function renderDietPage() {
         const diet = userData.recommendedDiet || { breakfast: '', lunch: '', dinner: '', snacks: '' };
+        const rules = userData.customDietRules && userData.customDietRules.length > 0
+            ? userData.customDietRules
+            : (typeof ARTHUR_KNOWLEDGE !== 'undefined' && ARTHUR_KNOWLEDGE.diet_rules ? ARTHUR_KNOWLEDGE.diet_rules : []);
         const dietEl = document.getElementById('page-diet');
         dietEl.innerHTML = `
             <div class="glass-card diet-plan" style="max-width:800px; margin: 0 auto;">
                 <h2 style="font-family:var(--font-accent); color:var(--accent-main); margin-bottom:1.5rem; text-align:center;">PLAN ALIMENTICIO VANGUARDIA</h2>
-                
+
+                <!-- IMPORTAR DIETA COMPLETA -->
+                <div class="meal-item glass-card" style="padding:2rem; border-color:var(--accent-main); margin-bottom:2rem; border-width:2px;">
+                    <h3 style="color:var(--accent-main); font-size:1rem; margin-bottom:0.4rem; font-family:var(--font-accent); letter-spacing:1px;">📋 IMPORTAR DIETA COMPLETA</h3>
+                    <p style="font-size:0.78rem; color:var(--text-dim); margin-bottom:1rem; line-height:1.5;">Pega aquí el plan de tu nutriólogo o toda tu dieta en texto libre. La app la distribuirá automáticamente en desayuno, comida, cena y snacks.</p>
+                    <textarea id="diet-full-import" style="width:100%; min-height:130px; background:var(--glass-bg, rgba(0,0,0,0.2)); border:1px solid var(--glass-border); border-radius:10px; padding:1rem; color:var(--text-primary); font-family:var(--font-main); font-size:0.9rem; line-height:1.6; resize:vertical;" placeholder="Ejemplo:&#10;Desayuno: 3 huevos revueltos, 1 taza de avena con fruta&#10;Comida: 200g pechuga a la plancha, 1 taza arroz integral, ensalada&#10;Cena: 2 tortillas con frijoles, 1 taza de sopa de verduras&#10;Snacks: 1 manzana, 30g nueces"></textarea>
+                    <button class="btn-premium" id="btn-distribute-diet" style="width:100%; margin-top:1rem;">⚡ DISTRIBUIR DIETA AUTOMÁTICAMENTE</button>
+                </div>
+
                 <!-- DIETA EDITABLE MANUAL -->
                 <div class="meal-item glass-card" style="padding:2rem; border-color:var(--accent-secondary); margin-bottom:2rem;">
-                    <h3 style="color:var(--accent-secondary); font-size:1.1rem; margin-bottom:0.5rem; border-bottom:1px solid var(--accent-secondary); padding-bottom:0.5rem;">DIETA DETALLADA</h3>
-                    <p style="font-size:0.8rem; color:var(--text-dim); margin-bottom:1rem;">Escribe en cada casilla lo que comerás. Cuando termines, presiona <strong>GUARDAR DIETA</strong>.</p>
+                    <h3 style="color:var(--accent-secondary); font-size:1rem; margin-bottom:0.5rem; font-family:var(--font-accent); letter-spacing:1px; border-bottom:1px solid var(--accent-secondary); padding-bottom:0.5rem;">DIETA DETALLADA POR TIEMPO</h3>
+                    <p style="font-size:0.78rem; color:var(--text-dim); margin-bottom:1rem;">Edita manualmente cada tiempo de comida. Pulsa <strong>GUARDAR DIETA</strong> cuando termines.</p>
                     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;" class="diet-grid-mobile">
                         <div style="display:flex; flex-direction:column;">
-                            <label style="color:var(--accent-main); font-weight:bold; display:block; font-size:0.85rem; margin-bottom:0.5rem;">DESAYUNO</label>
+                            <label style="color:var(--accent-main); font-weight:bold; display:block; font-size:0.85rem; margin-bottom:0.5rem;">🌅 DESAYUNO</label>
                             <textarea id="diet-edit-breakfast" style="flex:1; min-height:90px; background:var(--glass-bg, rgba(0,0,0,0.2)); border:1px solid var(--glass-border); border-radius:8px; padding:0.8rem; color:var(--text-primary); line-height:1.5; font-size:0.9rem; font-family:var(--font-main); resize:vertical;" placeholder="Ej. 3 huevos revueltos + 1 tortilla">${diet.breakfast || ''}</textarea>
                         </div>
                         <div style="display:flex; flex-direction:column;">
-                            <label style="color:var(--accent-main); font-weight:bold; display:block; font-size:0.85rem; margin-bottom:0.5rem;">COMIDA</label>
-                            <textarea id="diet-edit-lunch" style="flex:1; min-height:90px; background:var(--glass-bg, rgba(0,0,0,0.2)); border:1px solid var(--glass-border); border-radius:8px; padding:0.8rem; color:var(--text-primary); line-height:1.5; font-size:0.9rem; font-family:var(--font-main); resize:vertical;" placeholder="Ej. Pechuga asada 200g + arroz integral 1 taza + ensalada">${diet.lunch || ''}</textarea>
+                            <label style="color:var(--accent-main); font-weight:bold; display:block; font-size:0.85rem; margin-bottom:0.5rem;">☀️ COMIDA</label>
+                            <textarea id="diet-edit-lunch" style="flex:1; min-height:90px; background:var(--glass-bg, rgba(0,0,0,0.2)); border:1px solid var(--glass-border); border-radius:8px; padding:0.8rem; color:var(--text-primary); line-height:1.5; font-size:0.9rem; font-family:var(--font-main); resize:vertical;" placeholder="Ej. Pechuga asada 200g + arroz integral + ensalada">${diet.lunch || ''}</textarea>
                         </div>
                         <div style="display:flex; flex-direction:column;">
-                            <label style="color:var(--accent-main); font-weight:bold; display:block; font-size:0.85rem; margin-bottom:0.5rem;">CENA</label>
+                            <label style="color:var(--accent-main); font-weight:bold; display:block; font-size:0.85rem; margin-bottom:0.5rem;">🌙 CENA</label>
                             <textarea id="diet-edit-dinner" style="flex:1; min-height:90px; background:var(--glass-bg, rgba(0,0,0,0.2)); border:1px solid var(--glass-border); border-radius:8px; padding:0.8rem; color:var(--text-primary); line-height:1.5; font-size:0.9rem; font-family:var(--font-main); resize:vertical;" placeholder="Ej. 2 tortillas con 2 huevos + ensalada">${diet.dinner || ''}</textarea>
                         </div>
                         <div style="display:flex; flex-direction:column;">
-                            <label style="color:var(--accent-main); font-weight:bold; display:block; font-size:0.85rem; margin-bottom:0.5rem;">SNACKS / ADICIONALES</label>
+                            <label style="color:var(--accent-main); font-weight:bold; display:block; font-size:0.85rem; margin-bottom:0.5rem;">🍎 SNACKS / ADICIONALES</label>
                             <textarea id="diet-edit-snacks" style="flex:1; min-height:90px; background:var(--glass-bg, rgba(0,0,0,0.2)); border:1px solid var(--glass-border); border-radius:8px; padding:0.8rem; color:var(--text-primary); line-height:1.5; font-size:0.9rem; font-family:var(--font-main); resize:vertical;" placeholder="Ej. Zanahoria con limón, té verde">${diet.snacks || ''}</textarea>
                         </div>
                     </div>
@@ -826,13 +852,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     <button class="btn-premium" id="btn-reset-diet" style="width:100%; margin-top:10px; background:transparent; border:1px solid var(--accent-alert); color:var(--accent-alert);">🗑️ REINICIAR DIETA</button>
                 </div>
 
-                <!-- REGLAS ESTRUCTURALES -->
-                <div class="meal-item glass-card" style="padding:2rem; margin-bottom:2rem;">
-                    <h3 style="color:var(--accent-main); font-size:1rem; margin-bottom:1rem;">REGLAS ESTRUCTURADAS GLOBALES</h3>
-                    <ul style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; font-size:0.9rem;">
-                        ${(userData.customDietRules || ["Pendiente de importar plan de nutriólogo."]).map(r => `<li style="margin-bottom:5px; color:var(--text-dim);">• ${r}</li>`).join('')}
+                <!-- REGLAS DE PROTOCOLO -->
+                <div class="meal-item glass-card" style="padding:2rem; margin-bottom:2rem; border-color:var(--accent-main);">
+                    <h3 style="color:var(--accent-main); font-size:1rem; margin-bottom:1rem; font-family:var(--font-accent); letter-spacing:1px;">📋 REGLAS DE PROTOCOLO</h3>
+                    <ul style="list-style:none; padding:0; display:flex; flex-direction:column; gap:8px;">
+                        ${rules.length > 0 ? rules.map(r =>
+                            `<li style="padding:0.6rem 0.8rem; background:rgba(0,255,136,0.05); border-left:3px solid var(--accent-main); border-radius:6px; font-size:0.85rem; color:var(--text-dim);">▸ ${r}</li>`
+                        ).join('') : '<li style="color:var(--text-dim); font-style:italic; font-size:0.85rem;">Sin reglas definidas aún.</li>'}
                     </ul>
-                    <p style="margin-top:1rem; font-size:0.65rem; color:var(--text-dim); text-align:center; font-style:italic;">${userData.customDietRules ? '✅ Reglas personalizadas por tu nutriólogo (generadas por IA)' : 'Reglas base de AX-CORE. Se actualizarán automáticamente al procesar tu dieta del nutriólogo.'}</p>
                 </div>
 
                 <!-- REGISTRO DE CALORÍAS REALES -->
@@ -846,6 +873,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             </div>
         `;
+
+        // Distribuir dieta completa automáticamente
+        document.getElementById('btn-distribute-diet').onclick = () => {
+            const raw = document.getElementById('diet-full-import').value.trim();
+            if (!raw) { alert('Escribe o pega tu dieta primero.'); return; }
+            const parsed = parseDietText(raw);
+            const hasData = parsed.breakfast || parsed.lunch || parsed.dinner || parsed.snacks;
+            if (!hasData) {
+                alert('No se encontraron secciones reconocibles.\nUsa palabras como "Desayuno:", "Comida:", "Cena:", "Snacks:" para que la app las detecte.');
+                return;
+            }
+            if (parsed.breakfast) document.getElementById('diet-edit-breakfast').value = parsed.breakfast;
+            if (parsed.lunch)     document.getElementById('diet-edit-lunch').value = parsed.lunch;
+            if (parsed.dinner)    document.getElementById('diet-edit-dinner').value = parsed.dinner;
+            if (parsed.snacks)    document.getElementById('diet-edit-snacks').value = parsed.snacks;
+            document.getElementById('diet-full-import').value = '';
+            document.getElementById('diet-edit-breakfast').scrollIntoView({ behavior: 'smooth' });
+            alert('✅ Dieta distribuida. Revisa cada sección y pulsa GUARDAR DIETA cuando estés conforme.');
+        };
 
         // Guardar dieta editada manualmente
         document.getElementById('btn-save-diet').onclick = () => {
