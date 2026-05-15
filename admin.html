@@ -2,8 +2,12 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>MAESTRO AX-CORE | Control de Bloques</title>
+    <!-- PWA Support -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0a0e14">
+    <link rel="icon" href="logo.png" type="image/png">
     <link rel="stylesheet" href="admin.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -44,7 +48,7 @@
                 <!-- Tab Bloques -->
                 <div id="tab-blocks" class="admin-pane active">
                     <div class="pane-header">
-                        <h2>SISTEMA DE BLOQUES Y API KEYS</h2>
+                        <h2>GESTIÓN DE BLOQUES</h2>
                         <button class="btn-premium small" id="btn-new-block">+ NUEVO BLOQUE</button>
                     </div>
                     <div id="blocks-list" class="grid-container">
@@ -142,8 +146,8 @@
                 <input type="text" id="block-name" placeholder="Ej. Bloque Norte CDMX">
             </div>
             <div class="input-group">
-                <label>API KEY (Perplexity)</label>
-                <input type="text" id="block-key" placeholder="Pega la llave aquí">
+                <label>ZONA / CIUDAD</label>
+                <input type="text" id="block-key" placeholder="Ej. CDMX Norte, Guadalajara, Monterrey">
             </div>
             <div class="modal-actions">
                 <button id="btn-save-block" class="btn-premium">GUARDAR</button>
@@ -219,5 +223,10 @@
 
     <script src="knowledge.js"></script>
     <script src="admin.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').catch(() => {});
+        }
+    </script>
 </body>
 </html>

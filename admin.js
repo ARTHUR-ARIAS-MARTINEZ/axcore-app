@@ -163,12 +163,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const name = document.getElementById('block-name').value.trim();
         const key = document.getElementById('block-key').value.trim();
 
-        if (!name || !key) return alert("Completa todos los campos del bloque.");
+        if (!name) return alert("Escribe el nombre del bloque.");
 
         const newBlock = {
             id: Date.now().toString(),
             name: name,
-            apiKey: key,
+            zone: key,
             created: new Date().toLocaleDateString()
         };
 
@@ -186,7 +186,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return `
                 <div class="block-card">
                     <h4>${b.name.toUpperCase()}</h4>
-                    <div class="api-preview">API: ${b.apiKey.substring(0, 8)}...${b.apiKey.slice(-4)}</div>
+                    <div class="api-preview">ZONA: ${b.zone || b.apiKey || '—'}</div>
                     <div class="gym-count">Gimnasios: ${gymsInBlock} / 20</div>
                     <div class="block-actions">
                         <button class="btn-cancel" style="font-size:0.6rem;" onclick="deleteBlock('${b.id}')">ELIMINAR</button>
@@ -248,8 +248,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function generatePassword() {
-        // Genera contraseña de 4 dígitos fácil de comunicar por teléfono/WhatsApp
-        return Math.floor(1000 + Math.random() * 9000).toString();
+        // Genera contraseña de 6 dígitos fácil de comunicar por teléfono/WhatsApp
+        return Math.floor(100000 + Math.random() * 900000).toString();
     }
 
     // --- GESTIÓN DE GIMNASIOS ---
@@ -288,8 +288,6 @@ document.addEventListener('DOMContentLoaded', () => {
         // Encontrar el nombre del bloque
         const block = adminData.blocks.find(b => b.id === bid);
         const blockName = block ? block.name : "Sin bloque";
-        const apiKey = block ? block.apiKey : "";
-
         const newGym = {
             gymCode: gymCode,
             name: gname,
@@ -300,9 +298,8 @@ document.addEventListener('DOMContentLoaded', () => {
             maxUsers: planInfo.maxUsers,
             rent: rent,
             active: true,
-            blockId: bid,     // GUARDAR referencia al bloque
-            password: password, // GUARDAR contraseña generada
-            apiKey: apiKey    // GUARDAR api key para el app del usuario final
+            blockId: bid,
+            password: password
         };
 
         document.getElementById('btn-save-gym').textContent = 'Subiendo a la nube...';
