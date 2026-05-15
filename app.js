@@ -331,7 +331,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const btn = document.getElementById('btn-register-confirm');
         const originalText = btn.textContent;
-        btn.textContent = "⏳ CONECTANDO CON SERVIDOR...";
+        btn.textContent = "⏳ CONECTANDO (puede tardar 30-60s la 1a vez)...";
         btn.style.opacity = '0.7';
         btn.disabled = true;
 
@@ -355,7 +355,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             const controller = new AbortController();
-            const timeout = setTimeout(() => controller.abort(), 20000);
+            const timeout = setTimeout(() => controller.abort(), 60000);
 
             const res = await fetch(`${API_URL}/api/user/register`, {
                 method: 'POST',

@@ -31,7 +31,7 @@
                 </div>
             </div>
             <button id="btn-login-access" class="btn-premium">INGRESAR AL SISTEMA</button>
-            <p style="margin-top:1rem; font-size:0.8rem; color:var(--accent-main); cursor:pointer;" id="toggle-to-register" onclick="document.getElementById('login-overlay').classList.add('hidden'); document.getElementById('register-overlay').classList.remove('hidden');">¿No tienes cuenta? Regístrate aquí</p>
+            <p style="margin-top:1rem; font-size:0.8rem; color:var(--accent-main); cursor:pointer;" id="toggle-to-register" onclick="document.getElementById('login-overlay').classList.add('hidden'); document.getElementById('register-overlay').classList.remove('hidden'); fetch('https://axcore-appax-core-backend.onrender.com/health').catch(()=>{});">¿No tienes cuenta? Regístrate aquí</p>
         </div>
     </div>
 
