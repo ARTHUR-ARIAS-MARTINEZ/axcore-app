@@ -301,17 +301,26 @@ document.addEventListener('DOMContentLoaded', () => {
         const gc = gcc ? gcc.value.trim().toUpperCase() : '';
         const privacyChk = document.getElementById('reg-privacy');
         const privacyAccepted = !!(privacyChk && privacyChk.checked);
+        const errDiv = document.getElementById('reg-error');
+
+        const showErr = (msg) => {
+            if (errDiv) { errDiv.textContent = msg; errDiv.style.display = 'block'; }
+            else alert(msg);
+        };
+
+        if (errDiv) errDiv.style.display = 'none';
 
         if (u.length < 3 || p.length < 4) {
-            alert("Usuario min 3 caracteres, Clave min 4.");
+            showErr("⚠️ Usuario mínimo 3 caracteres y contraseña mínimo 4 caracteres.");
             return;
         }
         if (!gc) {
-            alert("CÓDIGO AX REQUERIDO: Pídelo en tu gimnasio para crear tu cuenta.");
+            showErr("⚠️ CÓDIGO DE ATLETA requerido. Pídelo a tu coach.");
             return;
         }
         if (!privacyAccepted) {
-            alert("Debes aceptar el Aviso de Privacidad y los Términos y Condiciones.");
+            showErr("⚠️ Debes marcar la casilla: He leído y acepto el Aviso de Privacidad y los Términos y Condiciones.");
+            if (privacyChk) privacyChk.focus();
             return;
         }
         if (localStorage.getItem(`arthur_data_${u}`)) {
@@ -337,7 +346,7 @@ document.addEventListener('DOMContentLoaded', () => {
             saveData();
             localStorage.setItem('arthur_current_user', u);
             localStorage.setItem('axcore_first_run', '1');
-            alert("Modo DEMO activado. Tus datos viven solo en este dispositivo. Pide código a tu coach para sync en la nube.");
+            alert("✅ Modo DEMO activado. Tus datos viven solo en este dispositivo. Pide código a tu coach para sync en la nube.");
             location.reload();
             return;
         }
@@ -372,10 +381,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert(`✅ Cuenta creada en AX-CORE.\nGimnasio: ${data.gymName || 'AX-CORE'}\nTus datos están respaldados en la nube.`);
                 location.reload();
             } else {
-                alert(data.message || "No se pudo registrar. Verifica el código.");
+                showErr(`❌ ${data.message || "No se pudo registrar. Verifica el código."}`);
             }
         } catch(e) {
-            alert("Error contactando AX-CORE. Verifica tu conexión o espera 1 minuto a que despierte el servidor.");
+            showErr("❌ Error contactando AX-CORE. Verifica tu conexión o espera 1 minuto (el servidor puede estar iniciando).");
             console.error(e);
         }
 

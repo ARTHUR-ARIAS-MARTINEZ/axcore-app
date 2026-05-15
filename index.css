@@ -181,7 +181,7 @@ body {
     font-family: var(--font-accent);
     font-size: 0.9rem;
 }
-.input-group input, .input-group select {
+.input-group input:not([type="checkbox"]), .input-group select {
     width: 100%;
     background: var(--glass-bg, rgba(0,0,0,0.5));
     border: 1px solid var(--accent-main);
@@ -191,7 +191,13 @@ body {
     font-family: var(--font-main);
     transition: 0.3s;
 }
-.input-group input:focus, .input-group select:focus {
+.input-group input[type="checkbox"] {
+    width: auto;
+    flex-shrink: 0;
+    margin-top: 3px;
+    accent-color: var(--accent-main);
+}
+.input-group input:not([type="checkbox"]):focus, .input-group select:focus {
     outline: none;
     box-shadow: var(--neon-glow);
     background: rgba(0,0,0,0.8);
@@ -1082,18 +1088,18 @@ body {
 [data-theme="natural"] .progress-bar-container {
     background: rgba(46, 125, 50, 0.1);
 }
-[data-theme="natural"] .input-group input,
+[data-theme="natural"] .input-group input:not([type="checkbox"]),
 [data-theme="natural"] .input-group select,
 [data-theme="natural"] textarea {
     background: rgba(255, 255, 255, 0.9) !important;
     color: #1b2e1e !important;
     border-color: rgba(46, 125, 50, 0.3) !important;
 }
-[data-theme="natural"] .input-group input::placeholder,
+[data-theme="natural"] .input-group input:not([type="checkbox"])::placeholder,
 [data-theme="natural"] textarea::placeholder {
     color: #8a9a8c !important;
 }
-[data-theme="natural"] .input-group input:focus {
+[data-theme="natural"] .input-group input:not([type="checkbox"]):focus {
     background: #ffffff !important;
     box-shadow: 0 0 0 2px rgba(46, 125, 50, 0.2) !important;
 }
