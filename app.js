@@ -2155,6 +2155,27 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     window.launchOnboardingTour = launchOnboardingTour;
 
+    // ============================================================
+    // axcoreEnterApp — llamado desde axcoreLogin/axcoreRegister para
+    // poblar el dashboard sin necesidad de reload de página.
+    // ============================================================
+    window.axcoreEnterApp = function(username) {
+        try {
+            currentUser = username;
+            localStorage.setItem('arthur_current_user', username);
+            try { loadUserData(); } catch(e) { console.error('[enterApp] loadUserData:', e); }
+            try { showApp(); } catch(e) { console.error('[enterApp] showApp:', e); }
+        } catch (e) {
+            console.error('[enterApp] fatal:', e);
+            // Último recurso: forzar visibilidad
+            try {
+                document.getElementById('login-overlay')?.classList.add('hidden');
+                document.getElementById('register-overlay')?.classList.add('hidden');
+                document.getElementById('app-container')?.classList.remove('hidden');
+            } catch(_) {}
+        }
+    };
+
 });
 
 // --- PWA: REGISTRAR SERVICE WORKER ---

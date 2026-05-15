@@ -51,52 +51,94 @@
     })();
     </script>
 
-    <!-- LOGIN GLOBAL — funciona aunque app.js falle -->
+    <!-- TRANSICIÓN A APP — única función, sin depender de app.js -->
     <script>
+    window.axcoreShowApp = function(username) {
+        try {
+            var lo = document.getElementById('login-overlay');
+            var ro = document.getElementById('register-overlay');
+            var ac = document.getElementById('app-container');
+            if (lo) lo.classList.add('hidden');
+            if (ro) ro.classList.add('hidden');
+            if (ac) ac.classList.remove('hidden');
+            // Mostrar nombre de usuario
+            var du = document.getElementById('display-username');
+            if (du && username) du.textContent = String(username).toUpperCase();
+            // Si app.js tiene función para poblar dashboard, llamarla
+            if (typeof window.axcoreEnterApp === 'function') {
+                try { window.axcoreEnterApp(username); } catch(e) {}
+            }
+        } catch(e) {}
+    };
+
+    // LOGIN GLOBAL — acepta usuario (con datos locales) o código AXV directo
     window.axcoreLogin = async function() {
-        var u = (document.getElementById('login-user')?.value || '').trim();
+        var input = (document.getElementById('login-user')?.value || '').trim();
         var p = (document.getElementById('login-pass')?.value || '').trim();
-        if (u.length < 2 || p.length < 4) { alert('Usuario y contraseña requeridos.'); return; }
+        if (input.length < 2 || p.length < 4) { alert('Usuario/código y contraseña (mín 4) requeridos.'); return; }
 
         var btn = document.getElementById('btn-login-access');
-        if (btn) { btn.textContent = '⏳ CONECTANDO...'; btn.disabled = true; }
+        if (btn) { btn.textContent = '⏳ CONECTANDO (30-60s la 1a vez)...'; btn.disabled = true; }
+        var resetBtn = function(){ if (btn) { btn.textContent = 'INGRESAR AL SISTEMA'; btn.disabled = false; } };
 
         var API = 'https://axcore-appax-core-backend.onrender.com';
-        var savedRaw = localStorage.getItem('arthur_data_' + u);
-        var savedLocal = savedRaw ? JSON.parse(savedRaw) : null;
-        var localCode = (savedLocal && savedLocal.gymCode) || '';
 
-        // Intento remoto si tiene código real
-        if (localCode && localCode !== 'AXV-DEMO') {
+        // Si el usuario escribió un código AXV directo, usarlo
+        var code = '';
+        var displayName = input;
+        if (/^AXV-/i.test(input)) {
+            code = input.toUpperCase();
+            displayName = code;
+        } else {
+            var savedRaw = localStorage.getItem('arthur_data_' + input);
+            var savedLocal = savedRaw ? JSON.parse(savedRaw) : null;
+            code = (savedLocal && savedLocal.gymCode) || '';
+            // Si no hay código local y no es AXV, no podemos hacer login remoto
+            if (!code) {
+                resetBtn();
+                alert('No tenemos datos de "' + input + '" en este dispositivo.\n\nOpciones:\n• Escribe tu CÓDIGO DE ATLETA (AXV-XXXXXX) en el campo Usuario\n• O usa "Regístrate aquí" si es tu primera vez');
+                return;
+            }
+        }
+
+        // Login remoto
+        if (code !== 'AXV-DEMO') {
             try {
                 var ctrl = new AbortController();
                 setTimeout(function(){ ctrl.abort(); }, 60000);
                 var res = await fetch(API + '/api/user/login', {
                     method:'POST', headers:{'Content-Type':'application/json'},
-                    body: JSON.stringify({code:localCode, password:p}), signal:ctrl.signal
+                    body: JSON.stringify({code:code, password:p}), signal:ctrl.signal
                 });
                 var d = await res.json();
                 if (d.success) {
                     localStorage.setItem('axcore_token', d.token || '');
-                    var merged = Object.assign({}, savedLocal || {}, d.data || {});
-                    merged.username = u; merged.password = p; merged.gymCode = localCode;
-                    merged.achievements = d.achievements || merged.achievements || [];
-                    localStorage.setItem('arthur_data_' + u, JSON.stringify(merged));
-                    localStorage.setItem('arthur_current_user', u);
-                    location.reload(); return;
+                    var finalName = d.username || displayName;
+                    var merged = Object.assign({}, d.data || {}, { username: finalName, password: p, gymCode: code, privacyAccepted: true });
+                    merged.achievements = d.achievements || [];
+                    localStorage.setItem('arthur_data_' + finalName, JSON.stringify(merged));
+                    localStorage.setItem('arthur_current_user', finalName);
+                    // Mostrar app directamente — sin reload
+                    window.axcoreShowApp(finalName);
+                    return;
                 } else {
-                    alert(d.message || 'Credenciales incorrectas.');
-                    if (btn) { btn.textContent = 'INGRESAR AL SISTEMA'; btn.disabled = false; }
+                    resetBtn();
+                    alert('❌ ' + (d.message || 'Credenciales incorrectas.'));
                     return;
                 }
-            } catch(e) { /* sin conexión — caer a local */ }
+            } catch(e) {
+                if (e.name === 'AbortError') { resetBtn(); alert('⏱️ Servidor tardó demasiado. Espera 30s e intenta de nuevo.'); return; }
+                // Sin conexión: caer a local
+            }
         }
 
         // Login local (DEMO o fallback offline)
-        if (!savedLocal) { alert('Usuario no encontrado. Usa "Regístrate aquí".'); if (btn) { btn.textContent = 'INGRESAR AL SISTEMA'; btn.disabled = false; } return; }
-        if (savedLocal.password !== p) { alert('Contraseña incorrecta.'); if (btn) { btn.textContent = 'INGRESAR AL SISTEMA'; btn.disabled = false; } return; }
-        localStorage.setItem('arthur_current_user', u);
-        location.reload();
+        var localRaw = localStorage.getItem('arthur_data_' + input);
+        var local = localRaw ? JSON.parse(localRaw) : null;
+        if (!local) { resetBtn(); alert('Sin conexión y sin datos locales para este usuario.'); return; }
+        if (local.password !== p) { resetBtn(); alert('Contraseña incorrecta.'); return; }
+        localStorage.setItem('arthur_current_user', input);
+        window.axcoreShowApp(input);
     };
     </script>
 
@@ -565,8 +607,8 @@
         if (gc === 'AXV-DEMO') {
             localStorage.setItem('arthur_current_user', u);
             localStorage.setItem('arthur_data_' + u, JSON.stringify({username:u, password:p, gymCode:gc, privacyAccepted:true, achievements:[]}));
-            showErr('✅ Modo DEMO activado. Cargando...', true);
-            setTimeout(function(){ location.reload(); }, 1500);
+            showErr('✅ Modo DEMO activado. Entrando a la app...', true);
+            setTimeout(function(){ window.axcoreShowApp(u); }, 800);
             return;
         }
 
@@ -587,7 +629,8 @@
                 localStorage.setItem('arthur_data_' + u, JSON.stringify({username:u, password:p, gymCode:gc, privacyAccepted:true, achievements:[]}));
                 localStorage.setItem('axcore_first_run', '1');
                 showErr('✅ Cuenta creada. Entrando a AX-CORE...', true);
-                setTimeout(function(){ location.reload(); }, 1500);
+                // Mostrar app directamente — sin reload (evita loop a login)
+                setTimeout(function(){ window.axcoreShowApp(u); }, 800);
             } else {
                 showErr('❌ ' + (d.message || 'No se pudo registrar. Verifica el código.'));
                 if (btn) { btn.textContent = 'CREAR CUENTA ÉLITE'; btn.style.opacity = ''; btn.disabled = false; }
@@ -604,10 +647,11 @@
     </script>
 
     <script>
+        // Desregistrar SW antiguos para evitar caché stale durante desarrollo
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js')
-                .then(() => console.log('SW registrado'))
-                .catch(err => console.error('SW error:', err));
+            navigator.serviceWorker.getRegistrations().then(function(regs){
+                for (var i=0; i<regs.length; i++) regs[i].unregister();
+            }).catch(function(){});
         }
     </script>
 </body>
