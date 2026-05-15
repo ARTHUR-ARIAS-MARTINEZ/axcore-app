@@ -1176,24 +1176,18 @@ body {
     color: #3a5a3c !important;
 }
 
-/* ===== LOGO NEON GLOW — LED reactiva al tema ===== */
+/* ===== LOGO NEON GLOW — reactiva al tema ===== */
 .logo-neon-glow {
     filter:
-        drop-shadow(0 0 4px var(--accent-main))
-        drop-shadow(0 0 12px var(--accent-main))
-        drop-shadow(0 0 22px var(--accent-main));
+        drop-shadow(0 0 2px var(--accent-main))
+        drop-shadow(0 0 7px var(--accent-main));
     transition: filter 0.5s ease;
 }
 .logo-neon-glow-sm {
     filter:
-        drop-shadow(0 0 3px var(--accent-main))
-        drop-shadow(0 0 7px var(--accent-main));
+        drop-shadow(0 0 2px var(--accent-main))
+        drop-shadow(0 0 5px var(--accent-main));
     transition: filter 0.5s ease;
-}
-/* Natural Zen: fondo claro — sin glow, logo opaco normal */
-[data-theme="natural"] .logo-neon-glow,
-[data-theme="natural"] .logo-neon-glow-sm {
-    filter: none !important;
 }
 
 /* ===== NATURAL ZEN — FIXES CONTRASTE ===== */
@@ -1202,8 +1196,18 @@ body {
 [data-theme="natural"] .nav-logo-container img,
 [data-theme="natural"] .nav-logo-mobile img {
     mix-blend-mode: normal !important;
-    filter: none !important;
-    opacity: 0.85;
+    opacity: 0.9;
+}
+/* Neón Natural Zen: glow verde olivo suave sobre fondo claro */
+[data-theme="natural"] .logo-neon-glow {
+    filter:
+        drop-shadow(0 0 3px rgba(46, 125, 50, 0.7))
+        drop-shadow(0 0 10px rgba(46, 125, 50, 0.35)) !important;
+}
+[data-theme="natural"] .logo-neon-glow-sm {
+    filter:
+        drop-shadow(0 0 2px rgba(46, 125, 50, 0.6))
+        drop-shadow(0 0 6px rgba(46, 125, 50, 0.3)) !important;
 }
 /* Texto "BY ARTHUR" (color:white hardcoded) */
 [data-theme="natural"] .nav-logo-container span,
