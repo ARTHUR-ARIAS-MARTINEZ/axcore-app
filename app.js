@@ -170,40 +170,42 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function applySettings() {
-        document.body.setAttribute('data-theme', userData.theme);
+        document.body.setAttribute('data-theme', userData.theme || 'neon');
         themeBtns.forEach(b => {
             b.classList.toggle('active', b.dataset.theme === userData.theme);
         });
-        document.getElementById('display-username').textContent = userData.username.toUpperCase();
+        const dispUser = document.getElementById('display-username');
+        if (dispUser) dispUser.textContent = (userData.username || 'ATLETA').toUpperCase();
         if (userData.avatar) {
             const ap = document.getElementById('avatar-preview');
             if (ap) ap.style.backgroundImage = `url(${userData.avatar})`;
         }
-        
+
         // Listener para avatar
         const avatarEl = document.getElementById('avatar-preview');
         const uploadEl = document.getElementById('avatar-upload');
-        avatarEl.onclick = () => uploadEl.click();
-        uploadEl.onchange = (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = (f) => {
-                const base64 = f.target.result;
-                userData.avatar = base64;
-                avatarEl.style.backgroundImage = `url(${base64})`;
-                saveData();
-                console.log("Avatar guardado profesionalmente.");
+        if (avatarEl && uploadEl) {
+            avatarEl.onclick = () => uploadEl.click();
+            uploadEl.onchange = (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (f) => {
+                    const base64 = f.target.result;
+                    userData.avatar = base64;
+                    avatarEl.style.backgroundImage = `url(${base64})`;
+                    saveData();
+                };
+                reader.readAsDataURL(file);
             };
-            reader.readAsDataURL(file);
-        };
-        
+        }
+
         const unEl = document.getElementById('input-username');
         if (unEl) unEl.value = userData.username || '';
-        document.getElementById('input-height').value = userData.height || '';
-        document.getElementById('input-weight').value = userData.weight || '';
-        document.getElementById('input-waist').value = userData.waist || '';
-        document.getElementById('input-target-weight').value = userData.target_weight || '';
+        const hEl = document.getElementById('input-height'); if (hEl) hEl.value = userData.height || '';
+        const wEl = document.getElementById('input-weight'); if (wEl) wEl.value = userData.weight || '';
+        const waEl = document.getElementById('input-waist'); if (waEl) waEl.value = userData.waist || '';
+        const twEl = document.getElementById('input-target-weight'); if (twEl) twEl.value = userData.target_weight || '';
         const cw = document.getElementById('current-waist');
         if (cw) cw.textContent = userData.waist || 0;
 
@@ -593,43 +595,41 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateDashboard() {
+        const s = (id) => document.getElementById(id);
+
         // Peso
-        document.getElementById('current-weight').textContent = (userData.weight || 0).toFixed(1);
-        document.getElementById('weight-meta-text').textContent = `Meta: ${userData.target_weight || 0} KG`;
+        if (s('current-weight')) s('current-weight').textContent = (userData.weight || 0).toFixed(1);
+        if (s('weight-meta-text')) s('weight-meta-text').textContent = `Meta: ${userData.target_weight || 0} KG`;
         const progW = Math.max(0, Math.min(100, ((110 - (userData.weight || 110)) / Math.max(1, (110 - (userData.target_weight || 85)))) * 100));
 
         // Cintura
-        document.getElementById('current-waist').textContent = userData.waist || 0;
+        if (s('current-waist')) s('current-waist').textContent = userData.waist || 0;
         const targetWaist = userData.target_waist || 0;
         const initialWaist = userData.waist || 0;
         const progWaist = targetWaist > 0 ? Math.max(0, Math.min(100, ((initialWaist - (userData.waist || initialWaist)) / Math.max(1, initialWaist - targetWaist)) * 100)) : 0;
-        document.getElementById('waist-meta-text').textContent = targetWaist > 0 ? `Meta: ${targetWaist} CM` : `Meta: 0 CM`;
-        
+        if (s('waist-meta-text')) s('waist-meta-text').textContent = targetWaist > 0 ? `Meta: ${targetWaist} CM` : `Meta: 0 CM`;
+
         // Calorías
-        const net = userData.caloriesConsumedToday - userData.caloriesBurnedToday;
-        const calEl = document.getElementById('calories-net');
-        calEl.textContent = net;
-        calEl.style.color = net > userData.dailyCalLimit ? 'var(--accent-alert)' : '';
-        document.getElementById('cal-in').textContent = userData.caloriesConsumedToday;
-        document.getElementById('cal-out').textContent = userData.caloriesBurnedToday;
-        
+        const net = (userData.caloriesConsumedToday || 0) - (userData.caloriesBurnedToday || 0);
+        const calEl = s('calories-net');
+        if (calEl) { calEl.textContent = net; calEl.style.color = net > userData.dailyCalLimit ? 'var(--accent-alert)' : ''; }
+        if (s('cal-in')) s('cal-in').textContent = userData.caloriesConsumedToday || 0;
+        if (s('cal-out')) s('cal-out').textContent = userData.caloriesBurnedToday || 0;
+
         const calPerc = userData.dailyCalLimit ? Math.max(0, (userData.caloriesConsumedToday / userData.dailyCalLimit) * 100) : 0;
-        document.getElementById('cal-rem-text').textContent = `Límite diario: ${userData.dailyCalLimit} KCAL`;
+        if (s('cal-rem-text')) s('cal-rem-text').textContent = `Límite diario: ${userData.dailyCalLimit || 0} KCAL`;
 
         // Render o Update de Gráficas
         initOrUpdateCharts(progW, progWaist, calPerc);
 
         // Déficit histórico
         const def = userData.totalNetDeficit || 0;
-        document.getElementById('total-deficit').textContent = def;
+        if (s('total-deficit')) s('total-deficit').textContent = def;
         const kgEquiv = Math.abs(def / 7700).toFixed(2);
-        const kbText = document.getElementById('kilos-burned-text');
-        if (def >= 0) {
-            kbText.textContent = `${kgEquiv} kg`;
-            kbText.style.color = "var(--accent-secondary)";
-        } else {
-            kbText.textContent = `+${kgEquiv} kg`;
-            kbText.style.color = "var(--accent-alert)";
+        const kbText = s('kilos-burned-text');
+        if (kbText) {
+            kbText.textContent = def >= 0 ? `${kgEquiv} kg` : `+${kgEquiv} kg`;
+            kbText.style.color = def >= 0 ? 'var(--accent-secondary)' : 'var(--accent-alert)';
         }
 
         // IMC
