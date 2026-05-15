@@ -23,6 +23,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const sensationFeedback = document.getElementById('sensation-feedback');
     const btnAskAiSensation = document.getElementById('btn-ask-ai-sensation');
 
+    // Gráficas — declaradas aquí para evitar TDZ cuando updateDashboard() se llama desde initAuth()
+    let chartWeight, chartCalories, chartWaist, chartHistory;
+
     // --- INSTALACIÓN PWA ---
     let deferredPrompt = null;
     window.addEventListener('beforeinstallprompt', (e) => {
@@ -492,7 +495,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- DASHBOARD & STATS ---
-    let chartWeight, chartCalories, chartWaist, chartHistory;
 
     function initOrUpdateCharts(progW, progWaist, calPerc) {
         if (typeof ApexCharts === 'undefined' || !document.getElementById('chart-weight')) return;
