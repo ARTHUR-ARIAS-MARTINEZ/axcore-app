@@ -1292,3 +1292,89 @@ body {
     color: var(--accent-main) !important;
 }
 
+/* ===== TARJETAS DE MEDALLAS (achievements) ===== */
+.ach-card {
+    border-radius: 10px;
+    padding: 10px;
+    text-align: center;
+    border: 1px solid;
+    transition: 0.3s;
+}
+.ach-card--got {
+    background: rgba(0,255,136,0.08);
+    border-color: rgba(0,255,136,0.4);
+    opacity: 1;
+}
+.ach-card--locked {
+    background: rgba(255,255,255,0.02);
+    border-color: rgba(255,255,255,0.08);
+    opacity: 0.5;
+}
+.ach-card .ach-icon { font-size: 28px; }
+.ach-card .ach-title {
+    font-family: var(--font-accent);
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    color: var(--accent-main);
+    margin-top: 4px;
+}
+.ach-card--locked .ach-title { color: var(--text-dim); }
+.ach-card .ach-desc { font-size: 9px; color: var(--text-dim); margin-top: 2px; }
+
+/* Natural Zen — medallas */
+[data-theme="natural"] .ach-card--got {
+    background: rgba(46,125,50,0.12) !important;
+    border-color: rgba(46,125,50,0.5) !important;
+}
+[data-theme="natural"] .ach-card--locked {
+    background: rgba(255,255,255,0.7) !important;
+    border-color: rgba(46,125,50,0.2) !important;
+    opacity: 0.7;
+}
+[data-theme="natural"] .ach-card--locked .ach-title,
+[data-theme="natural"] .ach-card--locked .ach-desc {
+    color: #6b7a6d !important;
+}
+
+/* ===== Natural Zen — Inputs en calculadora (con estilos inline en HTML) ===== */
+[data-theme="natural"] #calc-extra-cal,
+[data-theme="natural"] #calc-swap-food,
+[data-theme="natural"] #calc-age,
+[data-theme="natural"] #calc-sex,
+[data-theme="natural"] #calc-activity,
+[data-theme="natural"] #food-desc {
+    background: rgba(255,255,255,0.9) !important;
+    color: #1b2e1e !important;
+    border: 1px solid rgba(46,125,50,0.3) !important;
+}
+[data-theme="natural"] #calc-extra-cal::placeholder,
+[data-theme="natural"] #calc-swap-food::placeholder,
+[data-theme="natural"] #calc-age::placeholder,
+[data-theme="natural"] #food-desc::placeholder {
+    color: #8a9a8c !important;
+}
+
+/* Botón INSTALAR AHORA (inline style background gris) */
+[data-theme="natural"] #btn-install-app {
+    background: rgba(255,255,255,0.9) !important;
+    color: var(--accent-main) !important;
+    border: 1px solid var(--accent-main) !important;
+}
+[data-theme="natural"] #btn-install-app:hover {
+    background: var(--accent-main) !important;
+    color: #fff !important;
+}
+
+/* Glass-cards de la calculadora (con estilos inline) */
+[data-theme="natural"] #page-assistant .glass-card {
+    background: rgba(255,255,255,0.85) !important;
+    border-color: rgba(46,125,50,0.15) !important;
+    color: #1b2e1e !important;
+}
+
+/* Settings panel "INSTALAR ATLETA" */
+[data-theme="natural"] .settings-panel {
+    background: rgba(255,255,255,0.85) !important;
+    color: #1b2e1e !important;
+}
+

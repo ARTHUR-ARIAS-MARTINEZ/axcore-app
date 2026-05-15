@@ -503,15 +503,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- DASHBOARD & STATS ---
 
+    function getThemeColors() {
+        const cs = getComputedStyle(document.body);
+        return {
+            main: (cs.getPropertyValue('--accent-main') || '#00ff88').trim(),
+            secondary: (cs.getPropertyValue('--accent-secondary') || '#00d4ff').trim(),
+            alert: (cs.getPropertyValue('--accent-alert') || '#ff3366').trim(),
+            dim: (cs.getPropertyValue('--text-dim') || '#94a3b8').trim()
+        };
+    }
+
     function initOrUpdateCharts(progW, progWaist, calPerc) {
         if (typeof ApexCharts === 'undefined' || !document.getElementById('chart-weight')) return;
+        const themeColors = getThemeColors();
+        const isLight = document.body.getAttribute('data-theme') === 'natural';
+        const trackBg = isLight ? 'rgba(46,125,50,0.08)' : 'rgba(255,255,255,0.05)';
 
         const commonOptions = {
             chart: { type: 'radialBar', height: 160, sparkline: { enabled: true } },
             plotOptions: {
                 radialBar: {
                     hollow: { size: '60%', background: 'transparent' },
-                    track: { background: 'rgba(255,255,255,0.05)' },
+                    track: { background: trackBg },
                     dataLabels: {
                         name: { show: false },
                         value: {
@@ -519,47 +532,50 @@ document.addEventListener('DOMContentLoaded', () => {
                             fontSize: '18px',
                             fontFamily: 'var(--font-accent)',
                             fontWeight: 'bold',
-                            color: 'var(--accent-main)',
+                            color: themeColors.main,
                             formatter: function (val) { return Math.round(val) + "%" }
                         }
                     }
                 }
             },
-            stroke: { lineCap: 'round' }
+            stroke: { lineCap: 'round' },
+            legend: { show: false }
         };
 
         // Weight
         if (!chartWeight) {
             chartWeight = new ApexCharts(document.querySelector("#chart-weight"), {
-                ...commonOptions, series: [progW], colors: ['#00ff88']
+                ...commonOptions, series: [progW], colors: [themeColors.main]
             });
             chartWeight.render();
         } else {
+            chartWeight.updateOptions({ colors: [themeColors.main], plotOptions: { radialBar: { track: { background: trackBg }, dataLabels: { value: { color: themeColors.main } } } } });
             chartWeight.updateSeries([progW]);
         }
 
         // Calories
-        let colorCal = (userData.caloriesConsumedToday > userData.dailyCalLimit) ? '#ff3366' : '#00ff88';
+        let colorCal = (userData.caloriesConsumedToday > userData.dailyCalLimit) ? themeColors.alert : themeColors.main;
         if (!chartCalories) {
             chartCalories = new ApexCharts(document.querySelector("#chart-calories"), {
-                ...commonOptions, 
-                series: [Math.min(calPerc, 100)], 
+                ...commonOptions,
+                series: [Math.min(calPerc, 100)],
                 colors: [colorCal],
                 plotOptions: { radialBar: { ...commonOptions.plotOptions.radialBar, dataLabels: { value: { ...commonOptions.plotOptions.radialBar.dataLabels.value, color: colorCal } } } }
             });
             chartCalories.render();
         } else {
-            chartCalories.updateOptions({ colors: [colorCal], plotOptions: { radialBar: { dataLabels: { value: { color: colorCal } } } } });
+            chartCalories.updateOptions({ colors: [colorCal], plotOptions: { radialBar: { track: { background: trackBg }, dataLabels: { value: { color: colorCal } } } } });
             chartCalories.updateSeries([Math.min(calPerc, 100)]);
         }
 
         // Waist
         if (!chartWaist) {
             chartWaist = new ApexCharts(document.querySelector("#chart-waist"), {
-                ...commonOptions, series: [progWaist], colors: ['#d4af37']
+                ...commonOptions, series: [progWaist], colors: [themeColors.secondary]
             });
             chartWaist.render();
         } else {
+            chartWaist.updateOptions({ colors: [themeColors.secondary], plotOptions: { radialBar: { track: { background: trackBg }, dataLabels: { value: { color: themeColors.secondary } } } } });
             chartWaist.updateSeries([progWaist]);
         }
 
@@ -579,8 +595,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 stroke: { curve: 'smooth', width: [3, 3] },
                 fill: { type: ['gradient', 'solid'], gradient: { shadeIntensity: 1, opacityFrom: 0.3, opacityTo: 0, stops: [0, 90, 100] } },
                 labels: dates,
-                theme: { mode: 'dark' },
-                colors: ['#00ff88', '#d4af37'],
+                theme: { mode: isLight ? 'light' : 'dark' },
+                colors: [themeColors.main, themeColors.secondary],
                 xaxis: { labels: { style: { colors: '#888' } }, axisBorder: { show: false }, axisTicks: { show: false }, tooltip: { enabled: false } },
                 yaxis: [
                     { labels: { style: { colors: '#888' } } },
@@ -810,7 +826,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderDietPage() {
         const diet = userData.recommendedDiet || { breakfast: '', lunch: '', dinner: '', snacks: '' };
-        const rules = userData.customDietRules && userData.customDietRules.length > 0
+        const hasCustomRules = userData.customDietRules && userData.customDietRules.length > 0;
+        const rules = hasCustomRules
             ? userData.customDietRules
             : (typeof ARTHUR_KNOWLEDGE !== 'undefined' && ARTHUR_KNOWLEDGE.diet_rules ? ARTHUR_KNOWLEDGE.diet_rules : []);
         const dietEl = document.getElementById('page-diet');
@@ -854,11 +871,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 <!-- REGLAS DE PROTOCOLO -->
                 <div class="meal-item glass-card" style="padding:2rem; margin-bottom:2rem; border-color:var(--accent-main);">
-                    <h3 style="color:var(--accent-main); font-size:1rem; margin-bottom:1rem; font-family:var(--font-accent); letter-spacing:1px;">📋 REGLAS DE PROTOCOLO</h3>
-                    <ul style="list-style:none; padding:0; display:flex; flex-direction:column; gap:8px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap; gap:8px;">
+                        <h3 style="color:var(--accent-main); font-size:1rem; font-family:var(--font-accent); letter-spacing:1px; margin:0;">📋 REGLAS DE PROTOCOLO</h3>
+                        <button class="btn-premium" id="btn-edit-rules" style="font-size:0.65rem; padding:0.4rem 0.9rem;">✏️ EDITAR</button>
+                    </div>
+                    ${!hasCustomRules ? '<p style="font-size:0.72rem; color:var(--text-dim); font-style:italic; margin-bottom:0.8rem;">Ejemplos predefinidos. Edita para adaptarlas a tu dieta personal:</p>' : ''}
+                    <ul id="rules-list-display" style="list-style:none; padding:0; display:flex; flex-direction:column; gap:8px;">
                         ${rules.length > 0 ? rules.map(r =>
-                            `<li style="padding:0.6rem 0.8rem; background:rgba(0,255,136,0.05); border-left:3px solid var(--accent-main); border-radius:6px; font-size:0.85rem; color:var(--text-dim);">▸ ${r}</li>`
-                        ).join('') : '<li style="color:var(--text-dim); font-style:italic; font-size:0.85rem;">Sin reglas definidas aún.</li>'}
+                            `<li style="padding:0.6rem 0.8rem; background:rgba(0,255,136,${hasCustomRules ? '0.05' : '0.02'}); border-left:3px solid var(--accent-main); border-radius:6px; font-size:0.85rem; color:${hasCustomRules ? 'var(--text-primary)' : 'var(--text-dim)'}; ${hasCustomRules ? '' : 'opacity:0.55; font-style:italic;'}">▸ ${r}</li>`
+                        ).join('') : '<li style="color:var(--text-dim); font-style:italic; font-size:0.85rem;">Sin reglas definidas aún. Pulsa EDITAR para agregar.</li>'}
                     </ul>
                 </div>
 
@@ -873,6 +894,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             </div>
         `;
+
+        // Editar reglas de protocolo
+        const btnEditRules = document.getElementById('btn-edit-rules');
+        if (btnEditRules) {
+            btnEditRules.onclick = () => {
+                const current = (userData.customDietRules && userData.customDietRules.length > 0)
+                    ? userData.customDietRules
+                    : rules;
+                const text = prompt("Edita tus reglas de protocolo (una por línea):", current.join('\n'));
+                if (text === null) return;
+                const newRules = text.split('\n').map(s => s.trim()).filter(Boolean);
+                userData.customDietRules = newRules;
+                saveData();
+                renderDietPage();
+            };
+        }
 
         // Distribuir dieta completa automáticamente
         document.getElementById('btn-distribute-diet').onclick = () => {
@@ -1199,6 +1236,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const theme = btn.dataset.theme;
             userData.theme = theme;
             applySettings();
+            // Destruir gráficas previas para que se recreen con el color del tema
+            try { if (chartWeight) { chartWeight.destroy(); chartWeight = null; } } catch(_){}
+            try { if (chartCalories) { chartCalories.destroy(); chartCalories = null; } } catch(_){}
+            try { if (chartWaist) { chartWaist.destroy(); chartWaist = null; } } catch(_){}
+            try { if (chartHistory) { chartHistory.destroy(); chartHistory = null; } } catch(_){}
+            updateDashboard();
             saveData();
         };
     });
@@ -1794,15 +1837,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const tone = remaining < 0 ? '⛔' : remaining < 200 ? '⚠️' : '✅';
             status.innerHTML = `${tone} Hoy llevas <strong style="color:var(--accent-main)">${consumed} kcal</strong> ingeridas / <strong>${limit} kcal</strong> límite. Quemaste ${burned} kcal con ejercicio. Te quedan <strong style="color:${remaining < 0 ? '#ff3366' : '#00ff88'};">${remaining} kcal</strong> hoy.`;
         }
-        const rulesList = document.getElementById('calc-rules-list');
-        if (rulesList) {
-            const customRules = (userData.customDietRules && userData.customDietRules.length > 0) ? userData.customDietRules : [];
-            const baseRules = (typeof ARTHUR_KNOWLEDGE !== 'undefined' && ARTHUR_KNOWLEDGE.diet_rules) ? ARTHUR_KNOWLEDGE.diet_rules : [];
-            const allRules = [...customRules, ...baseRules];
-            rulesList.innerHTML = allRules.map(r =>
-                `<li style="padding:0.6rem 0.8rem; margin-bottom:0.4rem; background:rgba(0,255,136,0.05); border-left:3px solid var(--accent-main); border-radius:6px; font-size:0.85rem;">▸ ${r}</li>`
-            ).join('');
-        }
         const ageEl = document.getElementById('calc-age');
         if (ageEl && userData.age && !ageEl.value) ageEl.value = userData.age;
     }
@@ -2091,13 +2125,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const earned = new Set(userData.achievements || []);
         panel.innerHTML = ACHIEVEMENTS_DEF.map(a => {
             const got = earned.has(a.id);
-            return `<div style="background:${got ? 'rgba(0,255,136,0.08)' : 'rgba(255,255,255,0.02)'};
-                         border:1px solid ${got ? 'rgba(0,255,136,0.4)' : 'rgba(255,255,255,0.06)'};
-                         border-radius:10px; padding:10px; text-align:center;
-                         opacity:${got ? '1' : '0.45'};">
-                <div style="font-size:28px;">${a.icon}</div>
-                <div style="font-family:'Oswald'; font-size:12px; letter-spacing:0.5px; color:${got ? '#00ff88' : '#888'};">${a.title}</div>
-                <div style="font-size:9px; color:#888; margin-top:2px;">${a.desc}</div>
+            return `<div class="ach-card ${got ? 'ach-card--got' : 'ach-card--locked'}">
+                <div class="ach-icon">${a.icon}</div>
+                <div class="ach-title">${a.title}</div>
+                <div class="ach-desc">${a.desc}</div>
             </div>`;
         }).join('');
     }

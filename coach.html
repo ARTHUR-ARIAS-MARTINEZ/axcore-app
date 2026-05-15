@@ -10,7 +10,7 @@
     <link rel="icon" href="logo_coach.png" type="image/png">
     <!-- Fuentes -->
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="index.css?v=20260515c">
+    <link rel="stylesheet" href="index.css?v=20260515d">
     <style>
         /* ============================
            COACH TERMINAL VIP
@@ -52,15 +52,23 @@
         .coach-container {
             max-width: 960px;
             margin: 0 auto;
-            padding: 24px 16px;
-            min-height: 100vh;
+            padding: 24px 16px 80px;
             display: flex;
             flex-direction: column;
             justify-content: center;
         }
+        /* Cuando hay dashboard visible, alinear arriba y permitir scroll natural */
+        body.dashboard-mode .coach-container {
+            min-height: auto;
+            justify-content: flex-start;
+        }
+        body:not(.dashboard-mode) .coach-container {
+            min-height: 100vh;
+        }
         .dashboard-container {
             align-items: flex-start;
             justify-content: flex-start;
+            width: 100%;
         }
 
         .header-brand {
@@ -186,16 +194,7 @@
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
             gap: 18px;
-            max-height: calc(100vh - 240px);
-            overflow-y: auto;
             padding-right: 4px;
-            scrollbar-width: thin;
-            scrollbar-color: rgba(212,175,55,0.3) transparent;
-        }
-        .client-grid::-webkit-scrollbar { width: 4px; }
-        .client-grid::-webkit-scrollbar-thumb {
-            background: rgba(212,175,55,0.3);
-            border-radius: 10px;
         }
 
         .client-card {
@@ -454,7 +453,7 @@
 
                 loginSection.style.display = 'none';
                 dashboard.style.display = 'block';
-                gymContainer.style.justifyContent = 'flex-start';
+                document.body.classList.add('dashboard-mode');
 
                 document.getElementById('gym-name-display').textContent = gymData.name.toUpperCase();
                 document.getElementById('gym-code-display').textContent = `ID SUCURSAL: ${gymData.gymCode}`;
@@ -492,6 +491,10 @@
         return div;
     }
 
+    function isGiftUser(name) {
+        return typeof name === 'string' && name.indexOf('🎁') === 0;
+    }
+
     async function loadClients() {
         try {
             const res = await fetch(`${API_URL}/api/coach/codes/${currentGym}`);
@@ -500,11 +503,9 @@
             gymData.currentUsers = codes.length;
             updateStatsBadge();
 
-            // El 1 extra es el código de regalo del coach (último de la lista cronológica)
-            const baseLimit = (gymData.maxUsers || 51) - 1;
-            const sorted = [...codes].sort((a,b) => new Date(a.createdAt||0) - new Date(b.createdAt||0));
-            const regularCodes = sorted.slice(0, baseLimit).reverse();
-            const giftCode = sorted.length > baseLimit ? sorted[sorted.length - 1] : null;
+            // El código de regalo se identifica por prefijo "🎁" en el campo user
+            const giftCode = codes.find(c => isGiftUser(c.user)) || null;
+            const regularCodes = codes.filter(c => !isGiftUser(c.user)).reverse();
 
             clientList.innerHTML = '';
 
@@ -569,34 +570,47 @@
                     <p style="font-size:0.82rem; color:rgba(255,255,255,0.55); line-height:1.6; max-width:480px; margin:0 auto 1.2rem;">
                         Tu membresía incluye <strong style="color:#00ff88;">1 acceso de regalo</strong> para que tú mismo uses la app de tus atletas. Regístrate, vive su experiencia y demuéstrales que tú también lo haces.
                     </p>
-                    <button class="btn-premium" style="padding:0.8rem 2rem; font-size:0.75rem;" onclick="generateGiftCode()">🎁 GENERAR MI CÓDIGO DE REGALO</button>
+                    <button class="btn-premium" style="padding:0.8rem 2rem; font-size:0.75rem;" onclick="generateGiftCode(event)">🎁 GENERAR MI CÓDIGO DE REGALO</button>
                 </div>`;
         }
         clientList.after(section);
     }
 
-    window.generateGiftCode = async () => {
-        const btn = event.target;
-        btn.textContent = 'GENERANDO...';
-        btn.disabled = true;
+    let _giftGenerating = false;
+    window.generateGiftCode = async (evt) => {
+        if (_giftGenerating) return;
+        // Verificar primero si ya existe (defensa extra contra dobles clicks)
+        try {
+            const check = await fetch(`${API_URL}/api/coach/codes/${currentGym}`);
+            const existing = await check.json();
+            if (existing.find(c => isGiftUser(c.user))) {
+                alert('Tu código de regalo ya está generado. Lo verás en la sección VIP.');
+                loadClients();
+                return;
+            }
+        } catch(_) {}
+
+        _giftGenerating = true;
+        const btn = (evt && evt.target) || document.querySelector('#gift-section .btn-premium');
+        if (btn) { btn.textContent = 'GENERANDO...'; btn.disabled = true; }
         try {
             const res = await fetch(`${API_URL}/api/coach/generate`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ gymId: currentGym, user: `Coach ${gymData.name || ''}`.trim() })
+                body: JSON.stringify({ gymId: currentGym, user: `🎁 Coach ${gymData.name || ''}`.trim() })
             });
             const data = await res.json();
             if (data.success) {
                 loadClients();
             } else {
                 alert(data.message);
-                btn.textContent = '🎁 GENERAR MI CÓDIGO DE REGALO';
-                btn.disabled = false;
+                if (btn) { btn.textContent = '🎁 GENERAR MI CÓDIGO DE REGALO'; btn.disabled = false; }
             }
         } catch(e) {
             alert('Error de conexión.');
-            btn.textContent = '🎁 GENERAR MI CÓDIGO DE REGALO';
-            btn.disabled = false;
+            if (btn) { btn.textContent = '🎁 GENERAR MI CÓDIGO DE REGALO'; btn.disabled = false; }
+        } finally {
+            _giftGenerating = false;
         }
     };
 
