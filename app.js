@@ -95,24 +95,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function initAuth() {
         if (currentUser) {
-            loadUserData();
-            showApp();
+            // CRÍTICO: showApp() PRIMERO para garantizar que la UI esté visible
+            // aunque loadUserData() falle por cualquier razón
+            try { showApp(); } catch (e) { console.error('[initAuth] showApp err:', e); }
+            try { loadUserData(); } catch (e) { console.error('[initAuth] loadUserData err:', e); }
+
             // Restaurar la sección donde estaba el usuario antes de recargar
-            const savedPage = localStorage.getItem('axcore_active_page');
-            if (savedPage) {
-                const targetPage = document.getElementById(`page-${savedPage}`);
-                if (targetPage) {
-                    pages.forEach(p => p.classList.remove('active'));
-                    targetPage.classList.add('active');
-                    navLinks.forEach(l => {
-                        l.classList.toggle('active', l.dataset.page === savedPage);
-                    });
-                    if (savedPage === 'diet') renderDietPage();
-                    if (savedPage === 'workout') renderWorkoutPage();
-                    if (savedPage === 'evolution') renderEvolutionPage('all');
-                    if (savedPage === 'studio') renderStudioPage();
+            try {
+                const savedPage = localStorage.getItem('axcore_active_page');
+                if (savedPage) {
+                    const targetPage = document.getElementById(`page-${savedPage}`);
+                    if (targetPage) {
+                        pages.forEach(p => p.classList.remove('active'));
+                        targetPage.classList.add('active');
+                        navLinks.forEach(l => {
+                            l.classList.toggle('active', l.dataset.page === savedPage);
+                        });
+                        if (savedPage === 'diet' && typeof renderDietPage === 'function') renderDietPage();
+                        if (savedPage === 'workout' && typeof renderWorkoutPage === 'function') renderWorkoutPage();
+                        if (savedPage === 'evolution' && typeof renderEvolutionPage === 'function') renderEvolutionPage('all');
+                        if (savedPage === 'studio' && typeof renderStudioPage === 'function') renderStudioPage();
+                    }
                 }
-            }
+            } catch (e) { console.error('[initAuth] savedPage err:', e); }
         } else {
             showLogin();
         }
