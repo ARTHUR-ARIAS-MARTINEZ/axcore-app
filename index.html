@@ -71,7 +71,7 @@
                 </div>
             </div>
             <div id="reg-error" style="display:none; margin-top:0.8rem; padding:0.6rem 1rem; background:rgba(255,60,60,0.15); border:1px solid rgba(255,60,60,0.4); border-radius:8px; color:#ff6b6b; font-size:0.8rem; text-align:left;"></div>
-            <button id="btn-register-confirm" class="btn-premium">CREAR CUENTA ÉLITE</button>
+            <button id="btn-register-confirm" class="btn-premium" onclick="axcoreRegister()">CREAR CUENTA ÉLITE</button>
             <p style="margin-top:1rem; font-size:0.8rem; color:var(--accent-main); cursor:pointer;" id="toggle-to-login" onclick="document.getElementById('register-overlay').classList.add('hidden'); document.getElementById('login-overlay').classList.remove('hidden');">Ya tengo cuenta. Volver al inicio</p>
         </div>
     </div>
@@ -446,6 +446,78 @@
     <script src="https://cdn.jsdelivr.net/npm/apexcharts" defer></script>
     <script src="knowledge.js"></script>
     <script src="app.js"></script>
+
+    <!-- REGISTRO GLOBAL — funciona aunque app.js falle -->
+    <script>
+    window.axcoreRegister = async function() {
+        var u = (document.getElementById('reg-user')?.value || '').trim();
+        var p = (document.getElementById('reg-pass')?.value || '').trim();
+        var gc = (document.getElementById('reg-gym-code')?.value || '').trim().toUpperCase();
+        var privacy = document.getElementById('reg-privacy')?.checked;
+        var btn = document.getElementById('btn-register-confirm');
+        var errDiv = document.getElementById('reg-error');
+
+        var showErr = function(msg, ok) {
+            if (!errDiv) { alert(msg); return; }
+            errDiv.textContent = msg;
+            errDiv.style.display = 'block';
+            errDiv.style.background = ok ? 'rgba(0,255,136,0.15)' : 'rgba(255,60,60,0.15)';
+            errDiv.style.color = ok ? '#00ff88' : '#ff6b6b';
+            errDiv.style.border = ok ? '1px solid rgba(0,255,136,0.4)' : '1px solid rgba(255,60,60,0.4)';
+            errDiv.scrollIntoView({behavior:'smooth', block:'center'});
+        };
+
+        if (errDiv) errDiv.style.display = 'none';
+
+        if (u.length < 3 || p.length < 4) { showErr('⚠️ Usuario mín. 3 caracteres y contraseña mín. 4.'); return; }
+        if (!gc) { showErr('⚠️ Escribe tu CÓDIGO DE ATLETA.'); return; }
+        if (!privacy) { showErr('⚠️ Marca la casilla: He leído y acepto el Aviso de Privacidad y T&C.'); document.getElementById('reg-privacy')?.focus(); return; }
+
+        if (btn) { btn.textContent = '⏳ CONECTANDO...'; btn.style.opacity = '0.7'; btn.disabled = true; }
+
+        var API = 'https://axcore-appax-core-backend.onrender.com';
+
+        if (gc === 'AXV-DEMO') {
+            localStorage.setItem('arthur_current_user', u);
+            localStorage.setItem('arthur_data_' + u, JSON.stringify({username:u, password:p, gymCode:gc, privacyAccepted:true, achievements:[]}));
+            showErr('✅ Modo DEMO activado. Cargando...', true);
+            setTimeout(function(){ location.reload(); }, 1500);
+            return;
+        }
+
+        try {
+            var ctrl = new AbortController();
+            var timer = setTimeout(function(){ ctrl.abort(); }, 60000);
+            var res = await fetch(API + '/api/user/register', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({code:gc, username:u, password:p, privacyAccepted:true, data:{username:u, gymCode:gc, privacyAccepted:true}}),
+                signal: ctrl.signal
+            });
+            clearTimeout(timer);
+            var d = await res.json();
+            if (d.success) {
+                localStorage.setItem('axcore_token', d.token || '');
+                localStorage.setItem('arthur_current_user', u);
+                localStorage.setItem('arthur_data_' + u, JSON.stringify({username:u, password:p, gymCode:gc, privacyAccepted:true, achievements:[]}));
+                localStorage.setItem('axcore_first_run', '1');
+                showErr('✅ Cuenta creada. Entrando a AX-CORE...', true);
+                setTimeout(function(){ location.reload(); }, 1500);
+            } else {
+                showErr('❌ ' + (d.message || 'No se pudo registrar. Verifica el código.'));
+                if (btn) { btn.textContent = 'CREAR CUENTA ÉLITE'; btn.style.opacity = ''; btn.disabled = false; }
+            }
+        } catch(e) {
+            if (e.name === 'AbortError') {
+                showErr('⏱️ El servidor tardó demasiado. Espera 30 segundos e intenta de nuevo.');
+            } else {
+                showErr('❌ Error de conexión: ' + e.message);
+            }
+            if (btn) { btn.textContent = 'CREAR CUENTA ÉLITE'; btn.style.opacity = ''; btn.disabled = false; }
+        }
+    };
+    </script>
+
     <script>
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js')
