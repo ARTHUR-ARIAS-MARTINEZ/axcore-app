@@ -6,19 +6,19 @@
     <title>AX-CORE | COACH TERMINAL VIP</title>
     <!-- PWA Support -->
     <link rel="manifest" href="manifest_vip.json">
-    <meta name="theme-color" content="#d4af37">
+    <meta name="theme-color" content="#0a0e14">
     <link rel="icon" href="logo_coach.png" type="image/png">
-    <!-- Fuentes premium -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
+    <!-- Fuentes -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="index.css">
     <style>
         /* ============================
-           COACH TERMINAL VIP — PREMIUM
+           COACH TERMINAL VIP
            ============================ */
         * { box-sizing: border-box; }
 
         body {
-            background: #060610;
+            background: #0a0e14;
             overflow-x: hidden;
             min-height: 100vh;
         }
@@ -26,9 +26,9 @@
             content: '';
             position: fixed; inset: 0; z-index: -1;
             background:
-                radial-gradient(ellipse 60% 50% at 20% 10%, rgba(212,175,55,0.08), transparent),
-                radial-gradient(ellipse 50% 40% at 80% 80%, rgba(0,255,136,0.06), transparent),
-                radial-gradient(ellipse 40% 30% at 50% 50%, rgba(0,230,255,0.04), transparent);
+                radial-gradient(ellipse 60% 50% at 15% 10%, rgba(0,255,136,0.07), transparent),
+                radial-gradient(ellipse 50% 40% at 85% 85%, rgba(0,212,255,0.05), transparent),
+                radial-gradient(ellipse 40% 30% at 50% 50%, rgba(0,255,136,0.03), transparent);
             animation: bgPulse 12s ease-in-out infinite alternate;
         }
         @keyframes bgPulse {
@@ -37,14 +37,14 @@
         }
 
         .gradient-text {
-            background: linear-gradient(135deg, #d4af37 0%, #ffd700 40%, #f0e68c 60%, #d4af37 100%);
+            background: linear-gradient(135deg, #00ff88 0%, #00d4ff 40%, #00ff88 100%);
             background-size: 200% auto;
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
-            animation: goldShimmer 4s ease-in-out infinite;
+            animation: neonShimmer 4s ease-in-out infinite;
         }
-        @keyframes goldShimmer {
+        @keyframes neonShimmer {
             0%, 100% { background-position: 0% center; }
             50% { background-position: 200% center; }
         }
@@ -69,15 +69,15 @@
             position: relative;
         }
         .header-brand h1 {
-            font-family: 'Oswald', sans-serif;
+            font-family: 'Orbitron', sans-serif;
             font-size: 3.8rem;
             letter-spacing: 4px;
             line-height: 1;
-            text-shadow: 0 0 40px rgba(212,175,55,0.3);
+            text-shadow: 0 0 40px rgba(0,255,136,0.4);
         }
         .header-brand p {
-            font-family: 'Oswald', sans-serif;
-            font-size: 1.3rem;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.95rem;
             color: rgba(255,255,255,0.5);
             letter-spacing: 6px;
             margin-top: 8px;
@@ -87,7 +87,7 @@
             content: '';
             display: block;
             width: 120px; height: 2px;
-            background: linear-gradient(90deg, transparent, #d4af37, transparent);
+            background: linear-gradient(90deg, transparent, #00ff88, transparent);
             margin: 18px auto 0;
         }
 
@@ -96,12 +96,12 @@
             max-width: 480px;
             margin: 0 auto;
             width: 100%;
-            background: rgba(12,12,20,0.7);
+            background: rgba(12,16,24,0.85);
             backdrop-filter: blur(20px);
-            border: 1px solid rgba(212,175,55,0.2);
+            border: 1px solid rgba(0,255,136,0.2);
             border-radius: 20px;
             padding: 2.5rem 2rem;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 30px rgba(212,175,55,0.05);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 30px rgba(0,255,136,0.06);
             position: relative;
             overflow: hidden;
         }
@@ -109,14 +109,15 @@
             content: '';
             position: absolute; top: 0; left: 0; right: 0;
             height: 2px;
-            background: linear-gradient(90deg, transparent, #d4af37, #ffd700, transparent);
+            background: linear-gradient(90deg, transparent, #00ff88, #00d4ff, transparent);
         }
         #login-section h2 {
             text-align: center;
-            font-family: 'Oswald', sans-serif;
-            font-size: 1.5rem;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
             margin-bottom: 2rem;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
+            color: var(--accent-main);
         }
 
         /* DASHBOARD */
@@ -125,11 +126,11 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 24px;
-            background: rgba(10,10,18,0.75);
+            background: rgba(10,14,20,0.85);
             backdrop-filter: blur(20px);
             padding: 1.5rem 2rem;
             border-radius: 12px;
-            border: 1px solid rgba(212,175,55,0.15);
+            border: 1px solid rgba(0,255,136,0.15);
             flex-wrap: wrap;
             gap: 16px;
             box-shadow: 0 8px 32px rgba(0,0,0,0.4);
@@ -139,33 +140,35 @@
             content: '';
             position: absolute; bottom: 0; left: 20px; right: 20px;
             height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(212,175,55,0.3), transparent);
+            background: linear-gradient(90deg, transparent, rgba(0,255,136,0.3), transparent);
         }
         .dashboard-header h2 {
-            font-family: 'Oswald', sans-serif;
+            font-family: 'Orbitron', sans-serif;
             color: #fff;
             margin: 0;
-            font-size: 1.6rem;
-            letter-spacing: 1px;
+            font-size: 1.1rem;
+            letter-spacing: 2px;
         }
         .dashboard-header p {
             margin: 4px 0 0 0;
-            color: rgba(255,255,255,0.4);
-            font-size: 0.8rem;
+            color: rgba(0,255,136,0.5);
+            font-size: 0.75rem;
             letter-spacing: 2px;
+            font-family: 'Orbitron', sans-serif;
         }
 
         .stats-badge {
-            background: rgba(212,175,55,0.08);
-            color: #d4af37;
+            background: rgba(0,255,136,0.08);
+            color: #00ff88;
             padding: 0.6rem 1.2rem;
             border-radius: 30px;
             font-weight: 700;
             font-size: 0.85rem;
-            border: 1px solid rgba(212,175,55,0.25);
-            box-shadow: 0 0 15px rgba(212,175,55,0.1);
+            border: 1px solid rgba(0,255,136,0.25);
+            box-shadow: 0 0 15px rgba(0,255,136,0.1);
             letter-spacing: 0.5px;
             transition: all 0.3s;
+            font-family: 'Orbitron', sans-serif;
         }
         .stats-badge.alert {
             background: rgba(255,50,70,0.08);
@@ -225,11 +228,11 @@
 
         .client-card h3 {
             margin: 0 0 6px 0;
-            font-family: 'Oswald', sans-serif;
-            font-size: 1.1rem;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.95rem;
             color: #fff;
             padding-right: 24px;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
         }
         .client-card p {
             margin: 0 0 4px 0;
@@ -258,15 +261,15 @@
         }
 
         .code-box {
-            font-family: 'JetBrains Mono', monospace, 'Courier New';
-            background: rgba(212,175,55,0.08);
+            font-family: 'Orbitron', monospace, 'Courier New';
+            background: rgba(0,255,136,0.08);
             padding: 4px 10px;
             border-radius: 8px;
-            color: #ffd700;
+            color: #00ff88;
             letter-spacing: 3px;
-            font-size: 1rem;
+            font-size: 0.9rem;
             font-weight: 700;
-            border: 1px solid rgba(212,175,55,0.15);
+            border: 1px solid rgba(0,255,136,0.2);
         }
 
         /* TOAST */
@@ -286,7 +289,7 @@
 
         /* BUTTONS */
         .btn-premium {
-            background: linear-gradient(135deg, #d4af37, #ffd700);
+            background: linear-gradient(135deg, #00ff88, #00cc6a);
             color: #000;
             font-weight: 800;
             border: none;
@@ -295,13 +298,14 @@
             transition: all 0.3s;
             text-transform: uppercase;
             letter-spacing: 1px;
-            font-family: 'Inter', sans-serif;
-            font-size: 0.9rem;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.75rem;
             padding: 0.9rem 1.6rem;
         }
         .btn-premium:hover {
-            box-shadow: 0 6px 24px rgba(212,175,55,0.4);
+            box-shadow: 0 6px 24px rgba(0,255,136,0.4);
             transform: translateY(-2px);
+            filter: brightness(1.1);
         }
         .btn-premium:active { transform: scale(0.97); }
 
@@ -341,8 +345,9 @@
             outline: none;
         }
         .input-group input:focus {
-            border-color: rgba(212,175,55,0.5);
-            box-shadow: 0 0 16px rgba(212,175,55,0.15);
+            border-color: rgba(0,255,136,0.5);
+            box-shadow: 0 0 16px rgba(0,255,136,0.15);
+            outline: none;
         }
 
         #dashboard { display: none; margin-top: -3vh; }
@@ -363,24 +368,24 @@
 
 <div class="coach-container pb-transition" id="main-container">
     <div class="header-brand" style="position:relative;">
-        <h1 style="background: linear-gradient(135deg, #d4af37, #ffd700, #f0c040); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; text-shadow: none;"><span>AX-CORE</span></h1>
-        <p style="font-family: 'Oswald'; font-size: 1.3rem; color:#fff; letter-spacing: 2px; margin-top:5px;">COACH TERMINAL VIP</p>
-        <a id="btn-install-coach" href="#" style="position:absolute; right:16px; top:16px; font-size:1.5rem; color:#d4af37; text-decoration:none; cursor:pointer;" title="Instalar App">⬇</a>
+        <h1 style="background: linear-gradient(135deg, #00ff88, #00d4ff, #00ff88); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; text-shadow: none;"><span>AX-CORE</span></h1>
+        <p style="font-family: 'Orbitron', sans-serif; font-size: 0.85rem; color:rgba(255,255,255,0.6); letter-spacing: 4px; margin-top:5px; text-transform:uppercase;">COACH TERMINAL VIP</p>
+        <a id="btn-install-coach" href="#" style="position:absolute; right:16px; top:16px; font-size:1.5rem; color:#00ff88; text-decoration:none; cursor:pointer;" title="Instalar App">⬇</a>
     </div>
 
     <!-- Login -->
     <div id="login-section" class="glass-card" style="max-width: 500px; margin: 0 auto; width: 100%;">
-        <h2 style="text-align: center; color: var(--accent-main); font-family: 'Oswald'; margin-bottom: 1.5rem;">ACCESO PARA DUEÑOS</h2>
+        <h2 style="text-align: center; color: var(--accent-main); font-family: 'Orbitron', sans-serif; margin-bottom: 1.5rem; font-size:1rem; letter-spacing:3px;">ACCESO COACH</h2>
         <div class="input-group">
-            <label style="color:var(--accent-main); font-size: 0.85rem; font-weight:bold;">1. Código de Franquicia (Ej. AXB-1234)</label>
-            <input type="text" id="gym-id" autocomplete="off" placeholder="Pega aquí tu código" style="font-size: 1rem; text-align: center; letter-spacing: 1px; text-transform: uppercase;">
-            <div style="font-size:0.65rem; color:#888; margin-top:5px;">Este código te lo proporciona el corporativo (AX-CORE).</div>
+            <label style="color:var(--accent-main); font-size: 0.7rem; font-weight:bold; font-family:'Orbitron',sans-serif; letter-spacing:1px;">CÓDIGO DE FRANQUICIA</label>
+            <input type="text" id="gym-id" autocomplete="off" placeholder="Ej. AXB-1234" style="font-size: 1rem; text-align: center; letter-spacing: 2px; text-transform: uppercase;">
+            <div style="font-size:0.62rem; color:#555; margin-top:5px;">Proporcionado por AX-CORE corporativo.</div>
         </div>
         <div class="input-group" style="margin-top:1.5rem;">
-            <label style="color:#ffaa00; font-size: 0.85rem; font-weight:bold;">2. Contraseña Asignada</label>
-            <input type="password" id="gym-pass" autocomplete="new-password" placeholder="Pega aquí tu contraseña" style="font-size: 1rem; text-align: center; letter-spacing: 2px;">
+            <label style="color:var(--accent-secondary); font-size: 0.7rem; font-weight:bold; font-family:'Orbitron',sans-serif; letter-spacing:1px;">CONTRASEÑA</label>
+            <input type="password" id="gym-pass" autocomplete="new-password" placeholder="Contraseña asignada" style="font-size: 1rem; text-align: center; letter-spacing: 2px;">
         </div>
-        <button class="btn-premium" id="btn-login" style="width: 100%; margin-top: 1.5rem; padding: 1.2rem; font-size: 1.1rem;">INICIAR SESIÓN</button>
+        <button class="btn-premium" id="btn-login" style="width: 100%; margin-top: 1.5rem; padding: 1.2rem; font-size: 0.8rem;">INICIAR SESIÓN</button>
     </div>
 
     <!-- Dashboard -->
@@ -388,8 +393,8 @@
         
         <div class="dashboard-header" style="flex-wrap: wrap; gap:8px;">
             <div>
-                <h2 style="font-family: 'Oswald'; color:#fff; margin:0; font-size:1.1rem;" id="gym-name-display">GIMNASIO...</h2>
-                <p style="margin:3px 0 0 0; color:#aaa; font-size:0.7rem;" id="gym-code-display">CÓDIGO: ---</p>
+                <h2 style="font-family: 'Orbitron', sans-serif; color:#fff; margin:0; font-size:0.95rem; letter-spacing:2px;" id="gym-name-display">GIMNASIO...</h2>
+                <p style="margin:3px 0 0 0; color:rgba(0,255,136,0.5); font-size:0.65rem; font-family:'Orbitron',sans-serif; letter-spacing:2px;" id="gym-code-display">ID: ---</p>
             </div>
             <div style="display:flex; flex-direction:column; gap:6px; align-items:flex-end;">
                 <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
