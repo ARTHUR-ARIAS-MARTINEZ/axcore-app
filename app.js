@@ -1315,9 +1315,11 @@ document.addEventListener('DOMContentLoaded', () => {
         tpl: 'neon', fmt: 'story', metrics: ['deficit','weight','waist'],
         textColor: 'theme', textSize: 1.0,
         accentColor: 'neon',       // neon | cyan | gold | blood | fuchsia
-        hudStyle: 'tech-corners',  // tech-corners | scanner-lines | minimal | none
+        hudStyle: 'tech-corners',  // (legacy)
         fontStyle: 'bold-impact',  // bold-impact | tech-mono | elegant-sans
-        overlayFilter: 'clear'     // clear | glitch | grain | vignette
+        overlayFilter: 'clear',    // clear | glitch | grain | vignette
+        cardStyle: 'hud-tactical', // hud-tactical | carbon-elite | data-panel | editorial | split-hero | nordic-dark
+        heroMetric: 'deficit'      // métrica principal (número grande)
     };
 
     const STUDIO_BG_IMAGES = {};
@@ -1393,228 +1395,414 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderStudioCard(canvas, tplId, fmtId, activeMetrics, isPreview) {
         let tpl = STUDIO_TEMPLATES.find(t => t.id === tplId);
-        if (tplId === 'custom') {
-            tpl = { id: 'custom', colors: ['#ffffff','#111111','#00e5ff','#000000'] };
-        } else if (!tpl) {
-            tpl = STUDIO_TEMPLATES[0];
-        }
+        if (tplId === 'custom') tpl = { id:'custom', colors:['#fff','#111','#00e5ff','#000'] };
+        else if (!tpl) tpl = STUDIO_TEMPLATES[0];
         const fmt = STUDIO_FORMATS.find(f => f.id === fmtId) || STUDIO_FORMATS[0];
-        const W = fmt.w, H = fmt.h;
-        const isLandscape = fmtId === 'landscape';
+        const W = fmt.w, H = fmt.h, isL = fmtId === 'landscape';
         canvas.width = W; canvas.height = H;
         const ctx = canvas.getContext('2d');
+        const cx = W / 2, pad = Math.floor(W * 0.065);
 
-        // ─── ACCENT COLOR ────────────────────────────────────────────────────
-        const ACCENT_PALETTE = { neon:'#00e5ff', cyan:'#00ffcc', gold:'#ffd700', blood:'#ff2222', fuchsia:'#ff00e5' };
-        const THEME_ACCENT   = {
-            hielo:'#0099cc', carbono:'#d4af37', neon:'#00e5ff', fuego:'#ffcc00', blood:'#ff3333',
-            militar:'#8aff7a', custom:'#00e5ff', fem1:'#ffcccc', fem2:'#d4a0a8', fem3:'#ffb347',
-            fem4:'#00ced1', gay_m1:'#ff00ff', gay_m2:'#add8e6', gay_m3:'#ffd700',
-            gay_f1:'#ff4500', gay_f2:'#8a2be2', gay_f3:'#8fbc8f'
-        };
+        // ─── ACCENT ──────────────────────────────────────────────────────────
+        const APAL = { neon:'#00e5ff', cyan:'#00ffcc', gold:'#ffd700', blood:'#ff2222', fuchsia:'#ff00e5' };
+        const TACC = { hielo:'#0099cc',carbono:'#d4af37',neon:'#00e5ff',fuego:'#ffcc00',blood:'#ff3333',
+            militar:'#8aff7a',custom:'#00e5ff',fem1:'#ffcccc',fem2:'#d4a0a8',fem3:'#ffb347',
+            fem4:'#00ced1',gay_m1:'#ff00ff',gay_m2:'#add8e6',gay_m3:'#ffd700',
+            gay_f1:'#ff4500',gay_f2:'#8a2be2',gay_f3:'#8fbc8f' };
         const accent = studioState.accentColor === 'theme'
-            ? (THEME_ACCENT[tpl.id] || '#8aff7a')
-            : (ACCENT_PALETTE[studioState.accentColor] || '#00e5ff');
+            ? (TACC[tpl.id] || '#8aff7a') : (APAL[studioState.accentColor] || '#00e5ff');
 
-        // ─── FONT STYLE ──────────────────────────────────────────────────────
-        const FONT_MAP = {
-            'bold-impact':  { fam: "Impact,'Arial Narrow',sans-serif",  wt: '900', itl: false },
-            'tech-mono':    { fam: "'Courier New',Courier,monospace",   wt: '700', itl: false },
-            'elegant-sans': { fam: "'Trebuchet MS',Arial,sans-serif",   wt: '600', itl: true  }
+        // ─── FONT ────────────────────────────────────────────────────────────
+        const FM = {
+            'bold-impact':  { fam:"Impact,'Arial Narrow',sans-serif", wt:'900', itl:false },
+            'tech-mono':    { fam:"'Courier New',Courier,monospace",  wt:'700', itl:false },
+            'elegant-sans': { fam:"'Trebuchet MS',Arial,sans-serif",  wt:'600', itl:true  }
         };
-        const fd = FONT_MAP[studioState.fontStyle] || FONT_MAP['bold-impact'];
-        const fStyle = fd.itl ? 'italic ' : '';
+        const fd = FM[studioState.fontStyle] || FM['bold-impact'];
+        const fi = fd.itl ? 'italic ' : '';
+        const tS = Math.max(0.5, Math.min(2.5, studioState.textSize));
+        const cc = studioState.textColor === 'theme' ? '#ffffff' : studioState.textColor;
+        const isAuto = studioState.textColor === 'theme';
 
-        const tScale    = Math.max(0.5, Math.min(3.0, studioState.textSize));
-        const customColor = studioState.textColor === 'theme' ? '#ffffff' : studioState.textColor;
-        const isAuto    = studioState.textColor === 'theme';
-        const cx        = W / 2;
+        // ─── METRICS & DATA ───────────────────────────────────────────────────
+        const allM  = STUDIO_METRICS.filter(m => activeMetrics.includes(m.key));
+        const heroK = studioState.heroMetric || activeMetrics[0] || 'deficit';
+        const heroM = allM.find(m => m.key === heroK) || allM[0];
+        const secM  = allM.filter(m => m !== heroM).slice(0, isL ? 5 : 3);
+        const name  = (userData.username || 'ATLETA').toUpperCase();
+        const weeks = Math.min(8, Math.max(1, Math.ceil(((userData.history||[]).length)/7)||1));
+        const PHRASES = ["La disciplina paga.","Deficit achieved.",`Week ${weeks} complete.`,
+                         "No excuses, only results.","Powering your biology.","Results don't lie."];
+        const phrase = PHRASES[(weeks + allM.length) % PHRASES.length];
+        const ICONS = { deficit:'🔥',weight:'⚖️',waist:'📏',bicep:'💪',chest:'🏋️',leg:'🦵',hip:'🎯',back:'🔩' };
 
-        // ─── 1. BACKGROUND ───────────────────────────────────────────────────
-        drawStudioBg(ctx, W, H, tpl);
-
-        // ─── 2. CINEMATIC OVERLAY ────────────────────────────────────────────
-        const ov = ctx.createLinearGradient(0, 0, 0, H);
-        ov.addColorStop(0, 'rgba(0,0,0,0.35)');
-        ov.addColorStop(1, 'rgba(0,0,0,0.82)');
-        ctx.fillStyle = ov; ctx.fillRect(0, 0, W, H);
-
-        // ─── 3. HUD PANEL ────────────────────────────────────────────────────
-        const pw = W * 0.90, ph = H * 0.88, px = (W - pw) / 2, py = (H - ph) / 2;
-        ctx.beginPath();
-        if (ctx.roundRect) ctx.roundRect(px, py, pw, ph, 22); else ctx.rect(px, py, pw, ph);
-        ctx.fillStyle = 'rgba(5,8,15,0.40)'; ctx.fill();
-        ctx.lineWidth = 1.2; ctx.strokeStyle = 'rgba(255,255,255,0.07)'; ctx.stroke();
-
-        // ─── 4. HUD STYLE DECORATIONS ────────────────────────────────────────
-        const hudStyle = studioState.hudStyle || 'tech-corners';
-        if (hudStyle === 'tech-corners' || hudStyle === 'scanner-lines') {
-            const cl = 50;
-            ctx.save();
-            ctx.beginPath(); ctx.lineWidth = 4; ctx.strokeStyle = accent;
-            ctx.moveTo(px, py + cl);      ctx.lineTo(px, py);           ctx.lineTo(px + cl, py);
-            ctx.moveTo(px + pw - cl, py); ctx.lineTo(px + pw, py);      ctx.lineTo(px + pw, py + cl);
-            ctx.moveTo(px + pw, py + ph - cl); ctx.lineTo(px + pw, py + ph); ctx.lineTo(px + pw - cl, py + ph);
-            ctx.moveTo(px + cl, py + ph); ctx.lineTo(px, py + ph);      ctx.lineTo(px, py + ph - cl);
-            ctx.stroke();
-            [[px+cl,py],[px+pw-cl,py],[px,py+cl],[px+pw,py+cl],[px,py+ph-cl],[px+pw,py+ph-cl],[px+cl,py+ph],[px+pw-cl,py+ph]]
-                .forEach(([xx, yy]) => { ctx.beginPath(); ctx.arc(xx, yy, 4, 0, Math.PI*2); ctx.fillStyle = accent; ctx.fill(); });
-            ctx.restore();
-        }
-        if (hudStyle === 'minimal') {
-            ctx.save();
-            ctx.beginPath();
-            if (ctx.roundRect) ctx.roundRect(px + 6, py + 6, pw - 12, ph - 12, 16); else ctx.rect(px + 6, py + 6, pw - 12, ph - 12);
-            ctx.lineWidth = 2; ctx.strokeStyle = accent + '99'; ctx.stroke();
-            ctx.restore();
-        }
-        if (hudStyle === 'scanner-lines') {
-            ctx.save();
-            ctx.beginPath();
-            if (ctx.roundRect) ctx.roundRect(px, py, pw, ph, 22); else ctx.rect(px, py, pw, ph);
-            ctx.clip();
-            ctx.lineWidth = 1; ctx.strokeStyle = accent + '18';
-            for (let yy = py; yy < py + ph; yy += 14) {
-                ctx.beginPath(); ctx.moveTo(px, yy); ctx.lineTo(px + pw, yy); ctx.stroke();
-            }
-            ctx.restore();
-        }
-
-        // ─── 5. HEADER ACCENT LINE ───────────────────────────────────────────
-        const headerLineY = py + 20;
-        const hg = ctx.createLinearGradient(px + pw * 0.05, 0, px + pw * 0.95, 0);
-        hg.addColorStop(0, 'rgba(255,255,255,0)'); hg.addColorStop(0.5, accent); hg.addColorStop(1, 'rgba(255,255,255,0)');
-        ctx.fillStyle = hg; ctx.fillRect(px + pw * 0.05, headerLineY, pw * 0.9, 2);
-
-        // ─── 6. LOGO (header, elegante) ──────────────────────────────────────
-        const logoAreaY = py + 32;
-        const logoH = Math.min(H * 0.09, 115);
-        if (STUDIO_LOGO_IMG) {
-            const ar   = STUDIO_LOGO_IMG.width / STUDIO_LOGO_IMG.height;
-            const logoW = Math.min(logoH * ar, pw * 0.55);
-            const lh   = logoW / ar;
-            ctx.globalCompositeOperation = 'screen';
-            ctx.shadowColor = accent; ctx.shadowBlur = 18;
-            ctx.drawImage(STUDIO_LOGO_IMG, cx - logoW / 2, logoAreaY, logoW, lh);
-            ctx.shadowBlur = 0; ctx.globalCompositeOperation = 'source-over';
-        }
-
-        // ─── 7. TÍTULO "POWERING YOUR BIOLOGY" ───────────────────────────────
-        const titleY = logoAreaY + logoH + 28;
-        const titleSize = Math.floor((isLandscape ? 20 : 24) * tScale);
-        ctx.font = `${fStyle}${fd.wt} ${titleSize}px ${fd.fam}`;
-        ctx.textAlign = 'center';
-        ctx.fillStyle = accent; ctx.shadowColor = accent; ctx.shadowBlur = 14;
-        ctx.fillText('POWERING YOUR BIOLOGY', cx, titleY);
-        ctx.shadowBlur = 0;
-
-        const subSize = Math.floor((isLandscape ? 13 : 15) * tScale);
-        ctx.font = `${fStyle}600 ${subSize}px ${fd.fam}`;
-        ctx.fillStyle = 'rgba(255,255,255,0.45)';
-        ctx.fillText('RESULTADOS OFICIALES', cx, titleY + subSize * 2);
-
-        // ─── 8. DIVIDER ──────────────────────────────────────────────────────
-        const div1Y = titleY + subSize * 2 + 28 * tScale;
-        const gd = ctx.createLinearGradient(cx - pw * 0.35, 0, cx + pw * 0.35, 0);
-        gd.addColorStop(0, 'rgba(255,255,255,0)'); gd.addColorStop(0.5, accent); gd.addColorStop(1, 'rgba(255,255,255,0)');
-        ctx.fillStyle = gd; ctx.fillRect(cx - pw * 0.35, div1Y, pw * 0.7, 3);
-
-        // ─── 9. ATHLETE NAME ─────────────────────────────────────────────────
-        const nameY = div1Y + 52 * tScale;
-        const nameSize = Math.floor((isLandscape ? 50 : 68) * tScale);
-        const atletaName = (userData.username || 'ATLETA').toUpperCase();
-        ctx.font = `${fStyle}${fd.wt} ${nameSize}px ${fd.fam}`;
-        ctx.textAlign = 'center';
-        if (isAuto) {
-            ctx.fillStyle = accent; ctx.shadowColor = accent; ctx.shadowBlur = 40;
-            ctx.globalCompositeOperation = 'screen';
-            ctx.fillText(atletaName, cx, nameY);
-            ctx.globalCompositeOperation = 'source-over'; ctx.shadowBlur = 0;
-            ctx.fillStyle = '#ffffff'; ctx.shadowColor = 'rgba(0,0,0,0.95)'; ctx.shadowBlur = 14;
-            ctx.fillText(atletaName, cx, nameY);
-            ctx.globalCompositeOperation = 'overlay';
-            ctx.fillStyle = 'rgba(255,255,255,0.55)';
-            ctx.fillText(atletaName, cx, nameY);
-            ctx.globalCompositeOperation = 'source-over'; ctx.shadowBlur = 0;
-        } else {
-            ctx.fillStyle = customColor; ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = 18;
-            ctx.fillText(atletaName, cx, nameY); ctx.shadowBlur = 0;
-        }
-
-        // ─── 10. METRICS ─────────────────────────────────────────────────────
-        const mets = STUDIO_METRICS.filter(m => activeMetrics.includes(m.key));
-        const metStartY = nameY + 48 * tScale;
-
-        const drawMetric = (label, value, mx, my) => {
-            const lSize = Math.floor((isLandscape ? 18 : 22) * tScale);
-            ctx.font = `${fStyle}600 ${lSize}px ${fd.fam}`;
-            ctx.textAlign = 'center'; ctx.fillStyle = 'rgba(255,255,255,0.55)'; ctx.shadowBlur = 0;
-            ctx.fillText(label.toUpperCase(), mx, my);
-            const vSize = Math.floor((isLandscape ? 46 : 62) * tScale);
-            ctx.font = `${fStyle}${fd.wt} ${vSize}px ${fd.fam}`;
+        // ─── HELPERS ─────────────────────────────────────────────────────────
+        const ac = (a) => {
+            const r=parseInt(accent.slice(1,3),16),g=parseInt(accent.slice(3,5),16),b=parseInt(accent.slice(5,7),16);
+            return `rgba(${r},${g},${b},${a})`;
+        };
+        const gradH = (x1,x2,a0=0,a1=1) => {
+            const g=ctx.createLinearGradient(x1,0,x2,0);
+            g.addColorStop(0,ac(a0)); g.addColorStop(0.5,ac(a1)); g.addColorStop(1,ac(a0)); return g;
+        };
+        const autoText = (txt,x,y,sz) => {
+            ctx.font=`${fi}${fd.wt} ${sz}px ${fd.fam}`; ctx.textAlign='center';
             if (isAuto) {
-                ctx.fillStyle = accent; ctx.shadowColor = accent; ctx.shadowBlur = 28;
-                ctx.globalCompositeOperation = 'screen';
-                ctx.fillText(value, mx, my + vSize * 1.2);
-                ctx.globalCompositeOperation = 'source-over'; ctx.shadowBlur = 0;
-                ctx.fillStyle = '#ffffff'; ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = 10;
-                ctx.fillText(value, mx, my + vSize * 1.2); ctx.shadowBlur = 0;
+                ctx.fillStyle=accent; ctx.shadowColor=accent; ctx.shadowBlur=38; ctx.globalCompositeOperation='screen';
+                ctx.fillText(txt,x,y); ctx.globalCompositeOperation='source-over'; ctx.shadowBlur=0;
+                ctx.fillStyle='#fff'; ctx.shadowColor='rgba(0,0,0,0.95)'; ctx.shadowBlur=12;
+                ctx.fillText(txt,x,y); ctx.shadowBlur=0;
             } else {
-                ctx.fillStyle = customColor; ctx.shadowColor = 'rgba(0,0,0,0.85)'; ctx.shadowBlur = 14;
-                ctx.fillText(value, mx, my + vSize * 1.2); ctx.shadowBlur = 0;
+                ctx.fillStyle=cc; ctx.shadowColor='rgba(0,0,0,0.9)'; ctx.shadowBlur=14;
+                ctx.fillText(txt,x,y); ctx.shadowBlur=0;
             }
         };
+        const weekBar = (y) => {
+            const bW=W-pad*2, sW=bW/8, gap=sW*0.1;
+            for(let i=0;i<8;i++){
+                const bx=pad+i*sW, done=i<weeks, last=i===weeks-1, h=last?14:10;
+                ctx.beginPath(); if(ctx.roundRect) ctx.roundRect(bx,y,sW-gap,h,2); else ctx.rect(bx,y,sW-gap,h);
+                ctx.fillStyle=done?accent:ac(0.08); ctx.fill();
+                if(last){ctx.fillStyle='rgba(255,255,255,0.2)';ctx.fill();}
+                ctx.font=`700 ${Math.floor(9*tS)}px Arial`; ctx.textAlign='center';
+                ctx.fillStyle=done?ac(0.7):ac(0.2);
+                ctx.fillText(`S${i+1}`,bx+(sW-gap)/2,y+h+13);
+            }
+        };
+        const radar = (rcx,rcy,rMax) => {
+            ctx.save();
+            [rMax,rMax*.72,rMax*.44,rMax*.22].forEach((r,i)=>{
+                ctx.beginPath(); ctx.arc(rcx,rcy,r,0,Math.PI*2);
+                ctx.strokeStyle=ac(.07+i*.02); ctx.lineWidth=0.8; ctx.stroke();
+            });
+            ctx.beginPath(); ctx.arc(rcx,rcy,5,0,Math.PI*2); ctx.fillStyle=ac(0.5); ctx.fill();
+            ctx.restore();
+        };
+        const footer = (fy) => {
+            ctx.fillStyle='#181818'; ctx.fillRect(pad,fy-20,W-pad*2,1);
+            ctx.font=`700 ${Math.floor(10*tS)}px ${fd.fam}`; ctx.textAlign='start';
+            ctx.fillStyle=accent; ctx.shadowColor=accent; ctx.shadowBlur=6;
+            ctx.fillText('AX-CORE BY ARTHUR',pad,fy); ctx.shadowBlur=0;
+            ctx.textAlign='end'; ctx.fillStyle='#2a2a2a';
+            ctx.fillText('MÉXICO · 2025',W-pad,fy);
+            [0,10,20].forEach((dx,i)=>{
+                ctx.beginPath(); ctx.arc(pad+dx,fy+16,2.5,0,Math.PI*2);
+                ctx.fillStyle=ac(0.8-i*0.3); ctx.fill();
+            });
+            ctx.fillStyle=accent; ctx.fillRect(0,H-8,W,8);
+            ctx.fillStyle='rgba(255,255,255,0.2)'; ctx.fillRect(0,H-8,W*.3,8);
+        };
+        const grid = () => {
+            ctx.save(); ctx.lineWidth=0.4; ctx.strokeStyle=ac(0.055);
+            for(let x=0;x<=W;x+=W/6){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+            for(let y=0;y<=H;y+=H/10){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+            ctx.restore();
+        };
+        const secBoxes = (y, mArr) => {
+            const n=Math.max(mArr.length,1), cW=(W-pad*2)/n;
+            mArr.forEach((m,i)=>{
+                const bx=pad+i*cW;
+                ctx.fillStyle='rgba(8,10,18,0.75)';
+                ctx.beginPath(); if(ctx.roundRect) ctx.roundRect(bx,y,cW-8,Math.floor(95*tS),5); else ctx.rect(bx,y,cW-8,Math.floor(95*tS));
+                ctx.fill(); ctx.fillStyle=ac(0.7); ctx.fillRect(bx,y,cW-8,2);
+                const mx=bx+(cW-8)/2;
+                ctx.font=`700 ${Math.floor(10*tS)}px ${fd.fam}`; ctx.textAlign='center'; ctx.fillStyle='#444';
+                ctx.fillText(m.label.toUpperCase(),mx,y+18);
+                ctx.font=`${fi}${fd.wt} ${Math.floor(28*tS)}px ${fd.fam}`; ctx.fillStyle='#fff';
+                ctx.shadowColor='rgba(0,0,0,0.9)'; ctx.shadowBlur=8;
+                ctx.fillText(m.val(),mx,y+Math.floor(52*tS)); ctx.shadowBlur=0;
+                ctx.font=`700 ${Math.floor(10*tS)}px ${fd.fam}`; ctx.fillStyle=accent;
+                ctx.fillText(m.key==='deficit'?'kcal total':m.key==='weight'?'kg actual':'cm',mx,y+Math.floor(68*tS));
+            });
+        };
+        const secCols = (y, mArr) => {
+            const n=Math.max(mArr.length,1), cW=(W-pad*2)/n;
+            mArr.forEach((m,i)=>{
+                const mx=pad+i*cW+cW/2;
+                ctx.font=`700 ${Math.floor(10*tS)}px ${fd.fam}`; ctx.textAlign='center'; ctx.fillStyle='#4a5060';
+                ctx.fillText(m.label.toUpperCase(),mx,y);
+                ctx.font=`${fi}${fd.wt} ${Math.floor(30*tS)}px ${fd.fam}`; ctx.fillStyle='#fff';
+                ctx.shadowColor='rgba(0,0,0,0.85)'; ctx.shadowBlur=8;
+                ctx.fillText(m.val(),mx,y+Math.floor(36*tS)); ctx.shadowBlur=0;
+                ctx.font=`700 ${Math.floor(10*tS)}px ${fd.fam}`; ctx.fillStyle=accent;
+                ctx.fillText(m.key==='deficit'?'kcal':m.key==='weight'?'kg':'cm',mx,y+Math.floor(50*tS));
+                if(i<mArr.length-1){ctx.strokeStyle='#1e2228';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(pad+i*cW+cW-12,y-8);ctx.lineTo(pad+i*cW+cW-12,y+Math.floor(62*tS));ctx.stroke();}
+            });
+        };
+        const progressZone = (y) => {
+            ctx.strokeStyle='#1c1c1c'; ctx.lineWidth=1;
+            ctx.beginPath(); ctx.moveTo(pad,y); ctx.lineTo(W-pad,y); ctx.stroke();
+            ctx.font=`700 ${Math.floor(10*tS)}px ${fd.fam}`; ctx.textAlign='start'; ctx.fillStyle='#3a3a3a';
+            ctx.fillText('PROGRESO — 8 SEMANAS',pad,y+18);
+            weekBar(y+26);
+        };
+        const lowerZone = (y) => {
+            ctx.fillStyle='rgba(0,0,0,0.48)'; ctx.fillRect(0,y,W,H-y-8);
+            radar(W*0.82,H*0.89,W*0.24);
+            ctx.font=`900 ${Math.floor(68*tS)}px 'Arial Black',Arial,sans-serif`;
+            ctx.textAlign='start'; ctx.fillStyle='rgba(255,255,255,0.05)';
+            ctx.fillText('AX-CORE',pad,y+H*0.065);
+            ctx.font=`700 ${Math.floor(10*tS)}px ${fd.fam}`; ctx.fillStyle='#333';
+            ctx.fillText('SISTEMA DE CONTROL',pad,H*0.884);
+            ctx.fillText('PESO · RENDIMIENTO · DISCIPLINA',pad,H*0.908);
+        };
 
-        if (mets.length === 0) {
-            ctx.fillStyle = 'rgba(255,255,255,0.2)'; ctx.font = `600 ${Math.floor(24 * tScale)}px ${fd.fam}`;
-            ctx.textAlign = 'center'; ctx.fillText('SELECCIONE MÉTRICAS', cx, metStartY + 80);
-        } else if (isLandscape && mets.length > 1) {
-            const colW = pw / Math.min(mets.length, 8);
-            mets.forEach((m, i) => drawMetric(m.label, m.val(), px + colW / 2 + i * colW, metStartY));
-        } else if (mets.length > 4) {
-            const colW = pw / 2, rowSpacing = 120 * tScale;
-            mets.forEach((m, i) => drawMetric(m.label, m.val(), px + colW / 2 + (i % 2) * colW, metStartY + Math.floor(i / 2) * rowSpacing));
+        // ── BACKGROUND + BASE OVERLAY ─────────────────────────────────────────
+        drawStudioBg(ctx, W, H, tpl);
+        const ov=ctx.createLinearGradient(0,0,0,H);
+        ov.addColorStop(0,'rgba(0,0,0,0.28)'); ov.addColorStop(.45,'rgba(0,0,0,0.55)'); ov.addColorStop(1,'rgba(0,0,0,0.90)');
+        ctx.fillStyle=ov; ctx.fillRect(0,0,W,H);
+
+        // ── CARD STYLE ────────────────────────────────────────────────────────
+        const style = studioState.cardStyle || 'hud-tactical';
+
+        if (style === 'hud-tactical') {
+            // SVG1-INSPIRED: left bar + tech grid + week badges + metric boxes + progress bar
+            grid();
+            ctx.fillStyle=accent; ctx.fillRect(0,0,6,H);
+            ctx.fillStyle=ac(0.25); ctx.fillRect(7.5,0,1.5,H);
+            const halo=ctx.createLinearGradient(0,0,W,0); halo.addColorStop(0,ac(0.08)); halo.addColorStop(1,ac(0));
+            ctx.fillStyle=halo; ctx.fillRect(0,150,W,200);
+            ctx.fillStyle=gradH(0,W*.6,0,0.5); ctx.fillRect(0,153,W*.6,1.5);
+            // Week badges
+            ctx.beginPath(); if(ctx.roundRect) ctx.roundRect(pad,38,116,26,4); else ctx.rect(pad,38,116,26);
+            ctx.fillStyle=accent; ctx.fill();
+            ctx.font=`700 ${Math.floor(11*tS)}px ${fd.fam}`; ctx.textAlign='center'; ctx.fillStyle='#040a0a';
+            ctx.fillText(`WEEK ${String(weeks).padStart(2,'0')}`,pad+58,56);
+            ctx.beginPath(); if(ctx.roundRect) ctx.roundRect(pad+124,38,130,26,4); else ctx.rect(pad+124,38,130,26);
+            ctx.strokeStyle=accent; ctx.lineWidth=1; ctx.stroke();
+            ctx.fillStyle=accent; ctx.fillText('COMPLETADO',pad+189,56);
+            // Name
+            ctx.font=`${fi}700 ${Math.floor(17*tS)}px ${fd.fam}`; ctx.textAlign='start'; ctx.fillStyle='#cccccc';
+            ctx.fillText(name,pad,100); ctx.fillStyle=accent; ctx.fillRect(pad,106,Math.min(name.length*9*tS,200),2);
+            // Hero label + value
+            ctx.font=`700 ${Math.floor(10*tS)}px ${fd.fam}`; ctx.fillStyle=ac(0.85);
+            ctx.fillText(heroM?heroM.label.toUpperCase():'MÉTRICA',pad,138);
+            const hSz=Math.floor((isL?82:112)*tS);
+            ctx.font=`${fi}${fd.wt} ${hSz}px ${fd.fam}`; ctx.textAlign='start';
+            ctx.fillStyle='#fff'; ctx.shadowColor='rgba(0,0,0,0.9)'; ctx.shadowBlur=14;
+            ctx.fillText(heroM?heroM.val():'—',pad,Math.floor(280*tS)); ctx.shadowBlur=0;
+            const sep1Y=Math.floor(280*tS)+26;
+            ctx.fillStyle=ac(0.4); ctx.fillRect(pad,sep1Y,W-pad*2,1);
+            ctx.fillStyle='#111'; ctx.fillRect(pad,sep1Y+1,W-pad*2,1);
+            // Phrase
+            ctx.font=`italic 300 ${Math.floor(17*tS)}px 'Trebuchet MS',Arial,sans-serif`;
+            ctx.textAlign='start'; ctx.fillStyle='#888';
+            ctx.fillText(`"${phrase}"`,pad,sep1Y+52);
+            ctx.strokeStyle='#1c1c1c'; ctx.lineWidth=1;
+            ctx.beginPath(); ctx.moveTo(pad,sep1Y+72); ctx.lineTo(W-pad,sep1Y+72); ctx.stroke();
+            // Secondary metric boxes
+            secBoxes(sep1Y+88, secM);
+            // Progress
+            progressZone(H*0.70);
+            lowerZone(H*0.80);
+            footer(H-50);
+
+        } else if (style === 'carbon-elite') {
+            // IMAGE2-INSPIRED: top/bottom bars + diamond chevron + open columns
+            const tg=ctx.createLinearGradient(0,0,W,0);
+            tg.addColorStop(0,accent); tg.addColorStop(0.6,ac(1)); tg.addColorStop(1,ac(0.3));
+            ctx.fillStyle=tg; ctx.fillRect(0,0,W,4);
+            // Side diagonal chevrons
+            ctx.save(); ctx.strokeStyle=ac(0.55); ctx.lineWidth=3;
+            [20,36,52].forEach(off=>{
+                ctx.beginPath(); ctx.moveTo(pad,H*.2+off); ctx.lineTo(pad+44,H*.18+off); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(W-pad,H*.2+off); ctx.lineTo(W-pad-44,H*.18+off); ctx.stroke();
+            }); ctx.restore();
+            // Name centered
+            ctx.font=`${fi}700 ${Math.floor(22*tS)}px ${fd.fam}`; ctx.textAlign='center'; ctx.fillStyle='#fff';
+            ctx.shadowColor='rgba(0,0,0,0.85)'; ctx.shadowBlur=10;
+            ctx.fillText(name,cx,68); ctx.shadowBlur=0;
+            ctx.fillStyle=ac(0.55); ctx.fillRect(cx-50,74,100,1.5);
+            // Diamond shape behind hero
+            const dcy=H*.34, dh=H*.28, dw=W*.72;
+            ctx.save(); ctx.beginPath();
+            ctx.moveTo(cx,dcy-dh/2); ctx.lineTo(cx+dw/2,dcy); ctx.lineTo(cx,dcy+dh/2); ctx.lineTo(cx-dw/2,dcy); ctx.closePath();
+            ctx.fillStyle=ac(0.055); ctx.fill(); ctx.strokeStyle=ac(0.32); ctx.lineWidth=2; ctx.stroke();
+            // Inner chevrons
+            ctx.strokeStyle=ac(0.22); ctx.lineWidth=1.5;
+            [-60,-30,0].forEach(off=>{
+                ctx.beginPath(); ctx.moveTo(cx-W*.25,dcy+off+28); ctx.lineTo(cx,dcy+off); ctx.lineTo(cx+W*.25,dcy+off+28); ctx.stroke();
+            }); ctx.restore();
+            // Hero value (centered in diamond)
+            const hSz2=Math.floor((isL?80:118)*tS);
+            ctx.font=`700 ${Math.floor(10*tS)}px ${fd.fam}`; ctx.fillStyle=ac(0.75); ctx.textAlign='center';
+            ctx.fillText(heroM?heroM.label.toUpperCase():'MÉTRICA',cx,dcy-hSz2*.55);
+            autoText(heroM?heroM.val():'—',cx,dcy+hSz2*.42,hSz2);
+            // Separator
+            const sep2Y=dcy+dh/2+28;
+            ctx.fillStyle=gradH(pad,W-pad,0,0.4); ctx.fillRect(pad,sep2Y,W-pad*2,2);
+            // Secondary cols (open)
+            secCols(sep2Y+36, secM);
+            const sm2bot=sep2Y+Math.floor(80*tS);
+            // Phrase
+            ctx.font=`italic 300 ${Math.floor(16*tS)}px 'Trebuchet MS',Arial,sans-serif`;
+            ctx.textAlign='center'; ctx.fillStyle='#666';
+            ctx.fillText(`"${phrase}"`,cx,sm2bot+22);
+            progressZone(sm2bot+42);
+            footer(H-50);
+
+        } else if (style === 'data-panel') {
+            // IMAGE3-INSPIRED: big icon panels + centered hero
+            const tg3=ctx.createLinearGradient(0,0,W,0);
+            tg3.addColorStop(0,ac(0)); tg3.addColorStop(0.5,accent); tg3.addColorStop(1,ac(0));
+            ctx.fillStyle=tg3; ctx.fillRect(0,0,W,4);
+            ctx.font=`${fi}700 ${Math.floor(20*tS)}px ${fd.fam}`; ctx.textAlign='center'; ctx.fillStyle='#ccc';
+            ctx.fillText(name,cx,58); ctx.fillStyle=gradH(cx-60,cx+60,0,0.6); ctx.fillRect(cx-60,64,120,1.5);
+            // Hero
+            ctx.font=`700 ${Math.floor(10*tS)}px ${fd.fam}`; ctx.fillStyle=ac(0.8); ctx.textAlign='center';
+            ctx.fillText(heroM?heroM.label.toUpperCase():'MÉTRICA',cx,96);
+            const hSz3=Math.floor((isL?78:122)*tS);
+            autoText(heroM?heroM.val():'—',cx,96+hSz3,hSz3);
+            const ph3Y=96+hSz3*1.12+28;
+            ctx.font=`italic 300 ${Math.floor(15*tS)}px 'Trebuchet MS',Arial,sans-serif`;
+            ctx.textAlign='center'; ctx.fillStyle=isAuto?accent:'#aaa';
+            ctx.fillText(`"${phrase}"`,cx,ph3Y);
+            ctx.fillStyle=gradH(pad,W-pad,0,0.35); ctx.fillRect(pad,ph3Y+16,W-pad*2,2);
+            // Large icon panels
+            const panY=ph3Y+34, nP=Math.min(secM.length,3);
+            const panW=(W-pad*2-(nP-1)*12)/Math.max(nP,1), panH=Math.floor(118*tS);
+            secM.slice(0,nP).forEach((m,i)=>{
+                const bx=pad+i*(panW+12), pcx=bx+panW/2;
+                ctx.fillStyle='rgba(8,12,22,0.72)';
+                ctx.beginPath(); if(ctx.roundRect) ctx.roundRect(bx,panY,panW,panH,12); else ctx.rect(bx,panY,panW,panH);
+                ctx.fill(); ctx.strokeStyle=ac(0.45); ctx.lineWidth=1.5; ctx.stroke();
+                ctx.fillStyle=accent; ctx.fillRect(bx+12,panY,panW-24,2);
+                ctx.font=`${Math.floor(22*tS)}px sans-serif`; ctx.textAlign='center';
+                ctx.fillText(ICONS[m.key]||'📊',pcx,panY+Math.floor(34*tS));
+                ctx.font=`${fi}${fd.wt} ${Math.floor(36*tS)}px ${fd.fam}`; ctx.fillStyle='#fff';
+                ctx.shadowColor='rgba(0,0,0,0.9)'; ctx.shadowBlur=8;
+                ctx.fillText(m.val(),pcx,panY+Math.floor(76*tS)); ctx.shadowBlur=0;
+                ctx.font=`700 ${Math.floor(10*tS)}px ${fd.fam}`; ctx.fillStyle=accent;
+                ctx.fillText(m.label.toUpperCase(),pcx,panY+Math.floor(92*tS));
+            });
+            progressZone(panY+panH+28);
+            radar(W*.8,H*.87,W*.22);
+            ctx.font=`900 ${Math.floor(66*tS)}px 'Arial Black',Arial,sans-serif`;
+            ctx.textAlign='center'; ctx.fillStyle='rgba(255,255,255,0.04)';
+            ctx.fillText('AX-CORE',cx,H*.88);
+            footer(H-50);
+
+        } else if (style === 'editorial') {
+            // SVG2-INSPIRED: left thin bar + week badge top-right + open columns
+            ctx.fillStyle=accent; ctx.fillRect(pad-12,80,3,H*.6);
+            const wbW=144, wbH=54;
+            ctx.beginPath(); if(ctx.roundRect) ctx.roundRect(W-pad-wbW,32,wbW,wbH,4); else ctx.rect(W-pad-wbW,32,wbW,wbH);
+            ctx.strokeStyle=accent; ctx.lineWidth=1; ctx.stroke();
+            ctx.font=`900 ${Math.floor(11*tS)}px ${fd.fam}`; ctx.textAlign='center'; ctx.fillStyle=accent;
+            ctx.fillText('WEEK',W-pad-wbW/2,52);
+            ctx.font=`900 ${Math.floor(22*tS)}px ${fd.fam}`;
+            ctx.fillText(String(weeks).padStart(2,'0'),W-pad-wbW/2,76);
+            ctx.font=`700 ${Math.floor(13*tS)}px ${fd.fam}`; ctx.textAlign='start'; ctx.fillStyle='#888';
+            ctx.fillText(name,pad,56);
+            ctx.strokeStyle=accent; ctx.lineWidth=0.5; ctx.setLineDash([3,6]);
+            ctx.beginPath(); ctx.moveTo(pad,62); ctx.lineTo(W-pad-wbW-20,62); ctx.stroke(); ctx.setLineDash([]);
+            ctx.font=`700 ${Math.floor(10*tS)}px ${fd.fam}`; ctx.fillStyle=ac(0.7);
+            ctx.fillText(heroM?heroM.label.toUpperCase():'MÉTRICA',pad,108);
+            const hSz4=Math.floor((isL?78:110)*tS);
+            ctx.font=`${fi}${fd.wt} ${hSz4}px ${fd.fam}`; ctx.textAlign='start';
+            ctx.fillStyle='#fff'; ctx.shadowColor='rgba(0,0,0,0.9)'; ctx.shadowBlur=12;
+            ctx.fillText(heroM?heroM.val():'—',pad,108+hSz4); ctx.shadowBlur=0;
+            const hy4=108+hSz4;
+            ctx.fillStyle=gradH(pad,W-pad*3,0,0.6); ctx.fillRect(pad,hy4+20,W-pad*3,2);
+            ctx.fillStyle='rgba(255,255,255,0.06)'; ctx.fillRect(pad,hy4+22,W-pad*3,1);
+            ctx.font=`italic 400 ${Math.floor(17*tS)}px Georgia,serif`; ctx.textAlign='start'; ctx.fillStyle='#666';
+            ctx.fillText(`"${phrase}"`,pad,hy4+58);
+            ctx.strokeStyle='#1e1e1e'; ctx.lineWidth=1;
+            ctx.beginPath(); ctx.moveTo(pad,hy4+78); ctx.lineTo(W-pad,hy4+78); ctx.stroke();
+            secCols(hy4+102, secM);
+            progressZone(hy4+Math.floor(170*tS));
+            // Lower zone editorial
+            const lz4=H*.78; ctx.fillStyle='rgba(0,0,0,0.5)'; ctx.fillRect(0,lz4,W,H-lz4-6);
+            radar(cx,H*.875,W*.2);
+            ctx.save(); ctx.strokeStyle=ac(0.06); ctx.lineWidth=0.5;
+            ctx.beginPath(); ctx.moveTo(cx,lz4+8); ctx.lineTo(cx,H-10); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(pad,H*.875); ctx.lineTo(W-pad,H*.875); ctx.stroke();
+            ctx.restore();
+            ctx.font=`900 ${Math.floor(68*tS)}px 'Arial Black',Arial,sans-serif`;
+            ctx.textAlign='start'; ctx.fillStyle='rgba(255,255,255,0.04)';
+            ctx.fillText('AX-CORE',pad,lz4+H*.055);
+            ctx.font=`700 ${Math.floor(10*tS)}px ${fd.fam}`; ctx.fillStyle='#2c3038';
+            ctx.fillText('CONTROL · PESO · RENDIMIENTO',pad,H*.9);
+            footer(H-50);
+
+        } else if (style === 'split-hero') {
+            // SPLIT: Left = giant hero, Right = stacked metrics
+            const splitX=W*.5;
+            ctx.fillStyle='rgba(0,0,0,0.22)'; ctx.fillRect(0,0,splitX,H);
+            ctx.fillStyle=ac(0.28); ctx.fillRect(splitX-1.5,50,2,H-100);
+            ctx.font=`${fi}700 ${Math.floor(13*tS)}px ${fd.fam}`; ctx.textAlign='start'; ctx.fillStyle='#888';
+            ctx.fillText(name,pad,56); ctx.fillStyle=accent; ctx.fillRect(pad,62,80,1.5);
+            ctx.save(); ctx.translate(pad+14,H*.5); ctx.rotate(-Math.PI/2);
+            ctx.font=`700 ${Math.floor(10*tS)}px ${fd.fam}`; ctx.textAlign='center'; ctx.fillStyle=ac(0.5);
+            ctx.fillText(heroM?heroM.label.toUpperCase():'RESULTADO',0,0); ctx.restore();
+            const hcx=splitX*.5+pad/2, hSz5=Math.floor((isL?70:108)*tS);
+            autoText(heroM?heroM.val():'—',hcx,H*.52,hSz5);
+            ctx.font=`italic 300 ${Math.floor(14*tS)}px 'Trebuchet MS',Arial,sans-serif`;
+            ctx.textAlign='center'; ctx.fillStyle='#555';
+            ctx.fillText(`"${phrase}"`,hcx,H*.66);
+            const rx=splitX+pad, rw=W-splitX-pad;
+            ctx.beginPath(); if(ctx.roundRect) ctx.roundRect(rx,40,rw-pad,32,4); else ctx.rect(rx,40,rw-pad,32);
+            ctx.fillStyle=accent; ctx.fill();
+            ctx.font=`700 ${Math.floor(12*tS)}px ${fd.fam}`; ctx.textAlign='center'; ctx.fillStyle='#000';
+            ctx.fillText(`WEEK ${String(weeks).padStart(2,'0')} ✓`,rx+(rw-pad)/2,61);
+            const sm5Y=96, sm5H=Math.floor((H*.65)/Math.max(secM.length,1));
+            secM.forEach((m,i)=>{
+                const my5=sm5Y+i*sm5H;
+                ctx.font=`700 ${Math.floor(10*tS)}px ${fd.fam}`; ctx.textAlign='start'; ctx.fillStyle='#444';
+                ctx.fillText(m.label.toUpperCase(),rx,my5);
+                ctx.font=`${fi}${fd.wt} ${Math.floor(32*tS)}px ${fd.fam}`; ctx.fillStyle='#fff';
+                ctx.shadowColor='rgba(0,0,0,0.9)'; ctx.shadowBlur=8;
+                ctx.fillText(m.val(),rx,my5+Math.floor(36*tS)); ctx.shadowBlur=0;
+                ctx.font=`700 ${Math.floor(10*tS)}px ${fd.fam}`; ctx.fillStyle=accent;
+                ctx.fillText(m.key==='deficit'?'kcal':m.key==='weight'?'kg':'cm',rx,my5+Math.floor(50*tS));
+                if(i<secM.length-1){ctx.strokeStyle='#2a2a2a';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(rx,my5+sm5H-10);ctx.lineTo(W-pad,my5+sm5H-10);ctx.stroke();}
+            });
+            progressZone(H*.72);
+            radar(W*.82,H*.89,W*.2);
+            footer(H-50);
+
         } else {
-            const rowSpacing = 145 * tScale;
-            mets.forEach((m, i) => drawMetric(m.label, m.val(), cx, metStartY + i * rowSpacing));
+            // NORDIC DARK: Ultra minimal — typography dominates, no frame decoration
+            ctx.fillStyle=gradH(0,W,0,1); ctx.fillRect(0,0,W,3);
+            ctx.font=`${fi}700 ${Math.floor(16*tS)}px ${fd.fam}`; ctx.textAlign='center'; ctx.fillStyle='#777';
+            ctx.fillText(name,cx,68); ctx.fillStyle=gradH(cx-40,cx+40,0,0.5); ctx.fillRect(cx-40,74,80,1);
+            ctx.font=`700 ${Math.floor(10*tS)}px ${fd.fam}`; ctx.fillStyle=ac(0.6);
+            ctx.fillText(`SEMANA ${weeks} DE 8`,cx,90);
+            ctx.font=`700 ${Math.floor(10*tS)}px ${fd.fam}`; ctx.fillStyle=ac(0.72); ctx.textAlign='center';
+            ctx.fillText(heroM?heroM.label.toUpperCase():'MÉTRICA',cx,118);
+            const hSz6=Math.floor((isL?85:132)*tS);
+            autoText(heroM?heroM.val():'—',cx,118+hSz6,hSz6);
+            const hy6=118+hSz6;
+            ctx.fillStyle=gradH(cx-W*.3,cx+W*.3,0,0.4); ctx.fillRect(cx-W*.3,hy6+26,W*.6,2);
+            ctx.font=`italic 300 ${Math.floor(16*tS)}px Georgia,serif`; ctx.textAlign='center'; ctx.fillStyle='#5a5a5a';
+            ctx.fillText(`"${phrase}"`,cx,hy6+58);
+            ctx.strokeStyle='#1a1a1a'; ctx.lineWidth=1;
+            ctx.beginPath(); ctx.moveTo(pad,hy6+76); ctx.lineTo(W-pad,hy6+76); ctx.stroke();
+            secCols(hy6+102, secM);
+            progressZone(hy6+Math.floor(178*tS));
+            const lz6=H*.78; ctx.fillStyle='rgba(0,0,0,0.5)'; ctx.fillRect(0,lz6,W,H-lz6-6);
+            radar(cx,H*.875,W*.2);
+            ctx.font=`900 ${Math.floor(66*tS)}px 'Arial Black',Arial,sans-serif`;
+            ctx.textAlign='center'; ctx.fillStyle='rgba(255,255,255,0.04)';
+            ctx.fillText('AX-CORE',cx,H*.88+28);
+            footer(H-50);
         }
 
-        // ─── 11. FOOTER — AX-CORE BY ARTHUR ─────────────────────────────────
-        const footerY = py + ph - 32;
-        const fg = ctx.createLinearGradient(cx - pw * 0.25, 0, cx + pw * 0.25, 0);
-        fg.addColorStop(0, 'rgba(255,255,255,0)'); fg.addColorStop(0.5, accent + 'aa'); fg.addColorStop(1, 'rgba(255,255,255,0)');
-        ctx.fillStyle = fg; ctx.fillRect(cx - pw * 0.25, footerY - 22, pw * 0.5, 1.5);
-        const footerSize = Math.floor(16 * tScale);
-        ctx.font = `${fStyle}${fd.wt} ${footerSize}px ${fd.fam}`;
-        ctx.textAlign = 'center';
-        ctx.fillStyle = accent; ctx.shadowColor = accent; ctx.shadowBlur = 10;
-        ctx.fillText('AX-CORE BY ARTHUR', cx, footerY);
-        ctx.shadowBlur = 0;
-
-        // ─── 12. OVERLAY FILTER ──────────────────────────────────────────────
+        // ── OVERLAY FILTER (always last) ──────────────────────────────────────
         const filter = studioState.overlayFilter || 'clear';
         if (filter === 'vignette') {
-            const vg = ctx.createRadialGradient(cx, H / 2, H * 0.28, cx, H / 2, H * 0.72);
-            vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(0,0,0,0.70)');
-            ctx.fillStyle = vg; ctx.fillRect(0, 0, W, H);
+            const vg=ctx.createRadialGradient(cx,H/2,H*.28,cx,H/2,H*.72);
+            vg.addColorStop(0,'rgba(0,0,0,0)'); vg.addColorStop(1,'rgba(0,0,0,0.70)');
+            ctx.fillStyle=vg; ctx.fillRect(0,0,W,H);
         } else if (filter === 'grain') {
             ctx.save();
-            for (let yy = 0; yy < H; yy += 2) {
-                ctx.fillStyle = `rgba(255,255,255,${Math.random() * 0.035})`;
-                ctx.fillRect(0, yy, W, 1);
-            }
+            for(let yy=0;yy<H;yy+=2){ctx.fillStyle=`rgba(255,255,255,${Math.random()*.035})`;ctx.fillRect(0,yy,W,1);}
             ctx.restore();
         } else if (filter === 'glitch') {
-            ctx.save();
-            ctx.lineWidth = 1; ctx.strokeStyle = 'rgba(0,0,0,0.18)';
-            for (let yy = 0; yy < H; yy += 4) {
-                ctx.beginPath(); ctx.moveTo(0, yy); ctx.lineTo(W, yy); ctx.stroke();
-            }
-            for (let i = 0; i < 6; i++) {
-                const by = Math.random() * H, bh = Math.random() * 5 + 1;
-                ctx.fillStyle = (i % 2 === 0 ? accent : '#ff2222') + '2a';
-                ctx.fillRect(0, by, W, bh);
-            }
+            ctx.save(); ctx.lineWidth=1; ctx.strokeStyle='rgba(0,0,0,0.18)';
+            for(let yy=0;yy<H;yy+=4){ctx.beginPath();ctx.moveTo(0,yy);ctx.lineTo(W,yy);ctx.stroke();}
+            for(let i=0;i<6;i++){ctx.fillStyle=(i%2===0?accent:'#ff2222')+'2a';ctx.fillRect(0,Math.random()*H,W,Math.random()*5+1);}
             ctx.restore();
         }
     }
@@ -1648,14 +1836,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 <h4 style="color:var(--text-primary); font-size:0.8rem; margin:16px 0 8px;">MÉTRICAS A MOSTRAR</h4>
                 <div class="studio-metrics" id="studio-met-list"></div>
 
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:18px 0 8px;">
+                <h4 style="color:var(--accent-main); font-size:0.72rem; margin:16px 0 8px; letter-spacing:1px;">🎨 ESTILO DE TARJETA</h4>
+                <div id="studio-card-style-btns" style="display:flex; flex-wrap:wrap; gap:5px; margin-bottom:14px;"></div>
+
+                <h4 style="color:var(--accent-main); font-size:0.72rem; margin:4px 0 8px; letter-spacing:1px;">⭐ MÉTRICA PRINCIPAL (número grande)</h4>
+                <div id="studio-hero-metric-btns" style="display:flex; flex-wrap:wrap; gap:5px; margin-bottom:16px;"></div>
+
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:8px 0 8px;">
                     <div>
                         <h4 style="color:var(--accent-main); font-size:0.68rem; margin-bottom:8px; letter-spacing:1px;">ACENTO DE COLOR</h4>
                         <div id="studio-accent-btns" style="display:flex; flex-wrap:wrap; gap:5px;"></div>
-                    </div>
-                    <div>
-                        <h4 style="color:var(--accent-main); font-size:0.68rem; margin-bottom:8px; letter-spacing:1px;">ESTILO HUD</h4>
-                        <div id="studio-hud-btns" style="display:flex; flex-wrap:wrap; gap:5px;"></div>
                     </div>
                     <div>
                         <h4 style="color:var(--accent-main); font-size:0.68rem; margin-bottom:8px; letter-spacing:1px;">TIPOGRAFÍA</h4>
@@ -1664,6 +1854,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div>
                         <h4 style="color:var(--accent-main); font-size:0.68rem; margin-bottom:8px; letter-spacing:1px;">FILTRO OVERLAY</h4>
                         <div id="studio-filter-btns" style="display:flex; flex-wrap:wrap; gap:5px;"></div>
+                    </div>
+                    <div>
+                        <h4 style="color:var(--accent-main); font-size:0.68rem; margin-bottom:8px; letter-spacing:1px;">ESTILO HUD</h4>
+                        <div id="studio-hud-btns" style="display:flex; flex-wrap:wrap; gap:5px;"></div>
                     </div>
                 </div>
 
@@ -1828,6 +2022,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const _makeStyleBtns = (containerId, options, stateKey) => {
             const cont = document.getElementById(containerId);
             if (!cont) return;
+            const accent_css = 'var(--accent-main)';
             const redraw = () => renderStudioCard(previewCanvas, studioState.tpl, studioState.fmt, studioState.metrics, true);
             const refreshBtns = () => cont.querySelectorAll('.sx-btn').forEach(b => {
                 const active = b.dataset.val === studioState[stateKey];
@@ -1835,7 +2030,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 b.style.color      = active ? '#000' : 'rgba(255,255,255,0.8)';
                 b.style.borderColor = active ? accent_css : 'rgba(255,255,255,0.15)';
             });
-            const accent_css = 'var(--accent-main)';
             options.forEach(opt => {
                 const btn = document.createElement('button');
                 btn.className = 'sx-btn';
@@ -1856,6 +2050,43 @@ document.addEventListener('DOMContentLoaded', () => {
                 cont.appendChild(btn);
             });
         };
+
+        _makeStyleBtns('studio-card-style-btns', [
+            { l:'HUD TACTICAL', v:'hud-tactical'  },
+            { l:'CARBON ELITE', v:'carbon-elite'  },
+            { l:'DATA PANEL',   v:'data-panel'    },
+            { l:'EDITORIAL',    v:'editorial'      },
+            { l:'SPLIT HERO',   v:'split-hero'    },
+            { l:'NORDIC DARK',  v:'nordic-dark'   }
+        ], 'cardStyle');
+
+        // Métrica hero: botones dinámicos según métricas activas
+        const heroContainer = document.getElementById('studio-hero-metric-btns');
+        if (heroContainer) {
+            const accent_main = 'var(--accent-main)';
+            const refreshHero = () => heroContainer.querySelectorAll('.sx-btn').forEach(b => {
+                const active = b.dataset.val === studioState.heroMetric;
+                b.style.background = active ? accent_main : 'rgba(255,255,255,0.06)';
+                b.style.color      = active ? '#000' : 'rgba(255,255,255,0.8)';
+            });
+            STUDIO_METRICS.filter(m => studioState.metrics.includes(m.key)).forEach(m => {
+                const btn = document.createElement('button');
+                btn.className = 'sx-btn'; btn.dataset.val = m.key;
+                btn.textContent = m.label;
+                const isActive = studioState.heroMetric === m.key;
+                btn.style.cssText = `padding:4px 10px; font-size:0.60rem; border-radius:8px; cursor:pointer;
+                    border:1px solid rgba(255,255,255,0.15);
+                    background:${isActive ? accent_main : 'rgba(255,255,255,0.06)'};
+                    color:${isActive ? '#000' : 'rgba(255,255,255,0.8)'};
+                    font-weight:800; letter-spacing:0.5px; transition:all .15s;`;
+                btn.onclick = () => {
+                    studioState.heroMetric = m.key;
+                    refreshHero();
+                    renderStudioCard(previewCanvas, studioState.tpl, studioState.fmt, studioState.metrics, true);
+                };
+                heroContainer.appendChild(btn);
+            });
+        }
 
         _makeStyleBtns('studio-accent-btns', [
             { l:'NEON',    v:'neon',    dot:'#00e5ff' },
