@@ -1828,7 +1828,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 @media (max-width:680px) {
                     #studio-split { flex-direction:column; }
-                    #studio-sticky-panel { position:sticky; top:0; width:100%; z-index:10; background:var(--bg-card,#111); padding:8px 0; }
+                    #studio-sticky-panel {
+                        order:-1;
+                        position:sticky; top:0; width:100%; z-index:10;
+                        background:var(--bg-dark,#0a0a0a);
+                        padding:6px 0 10px;
+                        border-bottom:1px solid rgba(255,255,255,0.08);
+                    }
+                    #studio-sticky-panel .studio-preview-wrap canvas { max-height:44vw; }
                 }
             </style>
 
