@@ -1818,69 +1818,87 @@ document.addEventListener('DOMContentLoaded', () => {
         const earned = new Set(userData.achievements || []);
         const earnedCount = [...earned].filter(id => ACHIEVEMENTS_DEF.find(a => a.id === id)).length;
         el.innerHTML = `
-            <div class="glass-card" style="padding:1.5rem; margin-bottom:1.5rem;">
-                <h2 style="color:var(--accent-main); margin-bottom:0.3rem; font-size:1.2rem;">🎖 MIS MEDALLAS</h2>
-                <p style="font-size:0.72rem; color:var(--text-dim); margin-bottom:1rem;">${earnedCount} de ${ACHIEVEMENTS_DEF.length} desbloqueadas</p>
-                <div id="achievements-panel" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(90px,1fr)); gap:10px;"></div>
+            <style>
+                #studio-split { display:flex; gap:14px; align-items:flex-start; }
+                #studio-controls { flex:1; min-width:0; }
+                #studio-sticky-panel {
+                    width:240px; flex-shrink:0;
+                    position:sticky; top:60px;
+                    display:flex; flex-direction:column; gap:10px;
+                }
+                @media (max-width:680px) {
+                    #studio-split { flex-direction:column; }
+                    #studio-sticky-panel { position:sticky; top:0; width:100%; z-index:10; background:var(--bg-card,#111); padding:8px 0; }
+                }
+            </style>
+
+            <div class="glass-card" style="padding:1rem 1.2rem; margin-bottom:1rem;">
+                <h2 style="color:var(--accent-main); margin-bottom:0.3rem; font-size:1.1rem;">🎖 MIS MEDALLAS</h2>
+                <p style="font-size:0.70rem; color:var(--text-dim); margin-bottom:0.8rem;">${earnedCount} de ${ACHIEVEMENTS_DEF.length} desbloqueadas</p>
+                <div id="achievements-panel" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(80px,1fr)); gap:8px;"></div>
             </div>
-            <div class="glass-card" style="padding:1.5rem; margin-bottom:1.5rem;">
-                <h2 style="color:var(--accent-main); margin-bottom:0.5rem; font-size:1.2rem;">🏆 ESTUDIO DE LOGROS</h2>
-                <p style="font-size:0.75rem; color:var(--text-dim); margin-bottom:1rem;">Generador oficial en alta resolución.</p>
 
-                <h4 style="color:var(--text-primary); font-size:0.8rem; margin-bottom:8px;">PLANTILLA</h4>
-                <div class="studio-templates" id="studio-tpl-list"></div>
+            <div class="glass-card" style="padding:1rem 1.2rem; margin-bottom:1rem;">
+                <h2 style="color:var(--accent-main); margin-bottom:0.8rem; font-size:1.1rem;">🏆 ESTUDIO DE LOGROS</h2>
 
-                <h4 style="color:var(--text-primary); font-size:0.8rem; margin:16px 0 8px;">FORMATO</h4>
-                <div class="studio-format-btns" id="studio-fmt-btns"></div>
+                <div id="studio-split">
 
-                <h4 style="color:var(--text-primary); font-size:0.8rem; margin:16px 0 8px;">MÉTRICAS A MOSTRAR</h4>
-                <div class="studio-metrics" id="studio-met-list"></div>
+                    <!-- ── CONTROLES (scroll izquierda) ── -->
+                    <div id="studio-controls">
+                        <p style="font-size:0.68rem; color:var(--text-dim); margin-bottom:10px;">Personaliza y ve el resultado en tiempo real →</p>
 
-                <h4 style="color:var(--accent-main); font-size:0.72rem; margin:16px 0 8px; letter-spacing:1px;">🎨 ESTILO DE TARJETA</h4>
-                <div id="studio-card-style-btns" style="display:flex; flex-wrap:wrap; gap:5px; margin-bottom:14px;"></div>
+                        <h4 style="color:var(--text-primary); font-size:0.75rem; margin-bottom:6px;">PLANTILLA</h4>
+                        <div class="studio-templates" id="studio-tpl-list"></div>
 
-                <h4 style="color:var(--accent-main); font-size:0.72rem; margin:4px 0 8px; letter-spacing:1px;">⭐ MÉTRICA PRINCIPAL (número grande)</h4>
-                <div id="studio-hero-metric-btns" style="display:flex; flex-wrap:wrap; gap:5px; margin-bottom:16px;"></div>
+                        <h4 style="color:var(--text-primary); font-size:0.75rem; margin:12px 0 6px;">FORMATO</h4>
+                        <div class="studio-format-btns" id="studio-fmt-btns"></div>
 
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:8px 0 8px;">
-                    <div>
-                        <h4 style="color:var(--accent-main); font-size:0.68rem; margin-bottom:8px; letter-spacing:1px;">ACENTO DE COLOR</h4>
-                        <div id="studio-accent-btns" style="display:flex; flex-wrap:wrap; gap:5px;"></div>
-                    </div>
-                    <div>
-                        <h4 style="color:var(--accent-main); font-size:0.68rem; margin-bottom:8px; letter-spacing:1px;">TIPOGRAFÍA</h4>
-                        <div id="studio-font-btns" style="display:flex; flex-wrap:wrap; gap:5px;"></div>
-                    </div>
-                    <div>
-                        <h4 style="color:var(--accent-main); font-size:0.68rem; margin-bottom:8px; letter-spacing:1px;">FILTRO OVERLAY</h4>
-                        <div id="studio-filter-btns" style="display:flex; flex-wrap:wrap; gap:5px;"></div>
-                    </div>
-                    <div>
-                        <h4 style="color:var(--accent-main); font-size:0.68rem; margin-bottom:8px; letter-spacing:1px;">ESTILO HUD</h4>
-                        <div id="studio-hud-btns" style="display:flex; flex-wrap:wrap; gap:5px;"></div>
-                    </div>
-                </div>
+                        <h4 style="color:var(--text-primary); font-size:0.75rem; margin:12px 0 6px;">MÉTRICAS A MOSTRAR</h4>
+                        <div class="studio-metrics" id="studio-met-list"></div>
 
-                <div style="display:flex; flex-direction:column; gap:12px; margin: 16px 0 8px;">
-                    <div>
-                        <h4 style="color:var(--text-primary); font-size:0.7rem; margin-bottom:8px;">COLOR LETRA</h4>
-                        <div id="studio-color-swatches" style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;"></div>
-                    </div>
-                    <div>
-                        <h4 style="color:var(--text-primary); font-size:0.7rem; margin-bottom:4px;">TAMAÑO LETRA</h4>
+                        <h4 style="color:var(--accent-main); font-size:0.70rem; margin:12px 0 6px; letter-spacing:1px;">🎨 ESTILO DE TARJETA</h4>
+                        <div id="studio-card-style-btns" style="display:flex; flex-wrap:wrap; gap:5px; margin-bottom:10px;"></div>
+
+                        <h4 style="color:var(--accent-main); font-size:0.70rem; margin:4px 0 6px; letter-spacing:1px;">⭐ MÉTRICA PRINCIPAL</h4>
+                        <div id="studio-hero-metric-btns" style="display:flex; flex-wrap:wrap; gap:5px; margin-bottom:12px;"></div>
+
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
+                            <div>
+                                <h4 style="color:var(--accent-main); font-size:0.65rem; margin-bottom:6px; letter-spacing:1px;">ACENTO</h4>
+                                <div id="studio-accent-btns" style="display:flex; flex-wrap:wrap; gap:4px;"></div>
+                            </div>
+                            <div>
+                                <h4 style="color:var(--accent-main); font-size:0.65rem; margin-bottom:6px; letter-spacing:1px;">TIPOGRAFÍA</h4>
+                                <div id="studio-font-btns" style="display:flex; flex-wrap:wrap; gap:4px;"></div>
+                            </div>
+                            <div>
+                                <h4 style="color:var(--accent-main); font-size:0.65rem; margin-bottom:6px; letter-spacing:1px;">OVERLAY</h4>
+                                <div id="studio-filter-btns" style="display:flex; flex-wrap:wrap; gap:4px;"></div>
+                            </div>
+                            <div>
+                                <h4 style="color:var(--accent-main); font-size:0.65rem; margin-bottom:6px; letter-spacing:1px;">ESTILO HUD</h4>
+                                <div id="studio-hud-btns" style="display:flex; flex-wrap:wrap; gap:4px;"></div>
+                            </div>
+                        </div>
+
+                        <h4 style="color:var(--text-primary); font-size:0.68rem; margin-bottom:6px;">COLOR LETRA</h4>
+                        <div id="studio-color-swatches" style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-bottom:10px;"></div>
+
+                        <h4 style="color:var(--text-primary); font-size:0.68rem; margin-bottom:4px;">TAMAÑO LETRA</h4>
                         <input type="range" id="studio-size-picker" min="0.5" max="2.5" step="0.1" value="${studioState.textSize}" style="width:100%; cursor:pointer;">
                     </div>
+
+                    <!-- ── PREVIEW STICKY (derecha) ── -->
+                    <div id="studio-sticky-panel">
+                        <p style="font-size:0.62rem; color:var(--accent-main); text-align:center; margin:0; letter-spacing:1px; font-weight:700;">PREVIEW EN VIVO</p>
+                        <div class="studio-preview-wrap" style="margin:0;">
+                            <canvas id="studio-preview-canvas"></canvas>
+                        </div>
+                        <button class="btn-premium" id="btn-studio-share" style="width:100%; padding:12px 8px; font-size:0.8rem;">📤 COMPARTIR HD</button>
+                    </div>
+
                 </div>
             </div>
-
-            <div class="glass-card" style="padding:1.5rem; margin-bottom:1.5rem;">
-                <h4 style="color:var(--accent-secondary); font-size:0.85rem; margin-bottom:8px; text-align:center;">PREVIEW</h4>
-                <div class="studio-preview-wrap">
-                    <canvas id="studio-preview-canvas"></canvas>
-                </div>
-            </div>
-
-            <button class="btn-premium" id="btn-studio-share" style="width:100%; padding:16px; font-size:1rem;">📤 COMPARTIR TARJETA HD</button>
         `;
 
         // Pintar medallas
@@ -1978,36 +1996,45 @@ document.addEventListener('DOMContentLoaded', () => {
         // --- Eventos controles texto (Paleta extendida) ---
         const swatchesContainer = document.getElementById('studio-color-swatches');
         const palette = [
-            { c:'theme', l:'AUTO', bg:'linear-gradient(45deg, #00ff88, #00d2ff)' },
+            { c:'theme',   l:'AUTO', bg:'linear-gradient(45deg,#00ff88,#00d2ff)', glow:true },
+            // Blancos y grises
             { c:'#ffffff', bg:'#ffffff' },
-            { c:'#d3d3d3', bg:'#d3d3d3' }, // Gris claro
-            { c:'#808080', bg:'#808080' }, // Gris oxford medio
-            { c:'#36454F', bg:'#36454F' }, // Gris oxford oscuro
-            { c:'#ffb6c1', bg:'#ffb6c1' }, // Rosa pastel
-            { c:'#ff00ff', bg:'#ff00ff' }, // Magenta neon
-            { c:'#800080', bg:'#800080' }, // Purpura fuerte
-            { c:'#ff0000', bg:'#ff0000' }, // Rojo vibrante
-            { c:'#00e5ff', bg:'#00e5ff' }, // Cyan neon
-            { c:'#00ff66', bg:'#00ff66' }, // Verde toxic
-            { c:'#ffcc00', bg:'#ffcc00' }, // Oro
-            { c:'#ff4400', bg:'#ff4400' }, // Naranja fuerte
-            { c:'#1a1a1a', bg:'#1a1a1a' }  // Negro oscuro
+            { c:'#d3d3d3', bg:'#d3d3d3' },
+            { c:'#808080', bg:'#808080' },
+            { c:'#36454F', bg:'#36454F' },
+            { c:'#1a1a1a', bg:'#1a1a1a' },
+            // NEONES
+            { c:'#00e5ff', bg:'#00e5ff',  glow:true },  // Cyan neón
+            { c:'#00ffcc', bg:'#00ffcc',  glow:true },  // Aqua neón
+            { c:'#39ff14', bg:'#39ff14',  glow:true },  // Verde eléctrico
+            { c:'#ccff00', bg:'#ccff00',  glow:true },  // Lima neón
+            { c:'#ff073a', bg:'#ff073a',  glow:true },  // Rojo neón sangre
+            { c:'#ff00ff', bg:'#ff00ff',  glow:true },  // Magenta neón
+            { c:'#ff6ec7', bg:'#ff6ec7',  glow:true },  // Rosa hot neón
+            { c:'#ff9500', bg:'#ff9500',  glow:true },  // Ámbar neón
+            { c:'#ffd700', bg:'#ffd700',  glow:true },  // Oro neón
+            { c:'#04d9ff', bg:'#04d9ff',  glow:true },  // Azul eléctrico
+            { c:'#bf5fff', bg:'#bf5fff',  glow:true },  // Violeta neón
+            // Vibrantes
+            { c:'#ff4400', bg:'#ff4400' },
+            { c:'#ff0000', bg:'#ff0000' },
+            { c:'#800080', bg:'#800080' },
+            { c:'#ffb6c1', bg:'#ffb6c1' },
         ];
         
         palette.forEach(p => {
             const btn = document.createElement('button');
-            btn.style.width = '30px'; btn.style.height = '30px'; 
-            btn.style.borderRadius = '8px'; btn.style.border = 'none';
-            btn.style.cursor = 'pointer'; btn.style.background = p.bg;
-            if(p.l) { btn.textContent = p.l; btn.style.fontSize='10px'; btn.style.fontWeight='900'; btn.style.color='#000'; }
-            
+            btn.style.width = '28px'; btn.style.height = '28px';
+            btn.style.borderRadius = '7px'; btn.style.cursor = 'pointer';
+            btn.style.background = p.bg; btn.style.transition = 'transform .15s, box-shadow .15s';
+            if (p.glow) btn.style.boxShadow = `0 0 8px 1px ${p.c === 'theme' ? '#00ff88' : p.c}88`;
+            if (p.l) { btn.textContent = p.l; btn.style.fontSize='9px'; btn.style.fontWeight='900'; btn.style.color='#000'; btn.style.width='44px'; }
             if (studioState.textColor === p.c) {
                 btn.style.outline = '3px solid var(--accent-main)';
-                btn.style.transform = 'scale(1.1)';
+                btn.style.transform = 'scale(1.18)';
             } else {
-                btn.style.border = '1px solid rgba(255,255,255,0.2)';
+                btn.style.border = '1px solid rgba(255,255,255,0.18)';
             }
-            
             btn.onclick = () => { studioState.textColor = p.c; renderStudioPage(); };
             swatchesContainer.appendChild(btn);
         });
