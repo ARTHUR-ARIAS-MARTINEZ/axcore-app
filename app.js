@@ -833,7 +833,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const dietEl = document.getElementById('page-diet');
         dietEl.innerHTML = `
             <div class="glass-card diet-plan" style="max-width:800px; margin: 0 auto;">
-                <h2 style="font-family:var(--font-accent); color:var(--accent-main); margin-bottom:1.5rem; text-align:center;">PLAN ALIMENTICIO VANGUARDIA</h2>
+                <h2 style="font-family:var(--font-accent); color:var(--accent-main); margin-bottom:1.5rem; text-align:center;">NUTRICIÓN</h2>
 
                 <!-- IMPORTAR DIETA COMPLETA -->
                 <div class="meal-item glass-card" style="padding:2rem; border-color:var(--accent-main); margin-bottom:2rem; border-width:2px;">
@@ -847,7 +847,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="meal-item glass-card" style="padding:2rem; border-color:var(--accent-secondary); margin-bottom:2rem;">
                     <h3 style="color:var(--accent-secondary); font-size:1rem; margin-bottom:0.5rem; font-family:var(--font-accent); letter-spacing:1px; border-bottom:1px solid var(--accent-secondary); padding-bottom:0.5rem;">DIETA DETALLADA POR TIEMPO</h3>
                     <p style="font-size:0.78rem; color:var(--text-dim); margin-bottom:1rem;">Edita manualmente cada tiempo de comida. Pulsa <strong>GUARDAR DIETA</strong> cuando termines.</p>
-                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;" class="diet-grid-mobile">
+                    <div style="display:grid; grid-template-columns: 1fr; gap:16px;" class="diet-grid-mobile">
                         <div style="display:flex; flex-direction:column;">
                             <label style="color:var(--accent-main); font-weight:bold; display:block; font-size:0.85rem; margin-bottom:0.5rem;">🌅 DESAYUNO</label>
                             <textarea id="diet-edit-breakfast" style="flex:1; min-height:90px; background:var(--glass-bg, rgba(0,0,0,0.2)); border:1px solid var(--glass-border); border-radius:8px; padding:0.8rem; color:var(--text-primary); line-height:1.5; font-size:0.9rem; font-family:var(--font-main); resize:vertical;" placeholder="Ej. 3 huevos revueltos + 1 tortilla">${diet.breakfast || ''}</textarea>
@@ -886,10 +886,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 <!-- REGISTRO DE CALORÍAS REALES -->
                 <div class="reg-food-container" style="border: 2px solid var(--accent-main); background: var(--glass-bg, rgba(0,0,0,0.1)); padding:2rem; border-radius:20px;">
                     <h3 style="color:var(--accent-main); font-family:var(--font-accent); margin-bottom:0.5rem;">REGISTRO DE INGESTA REAL</h3>
-                    <p style="font-size:0.8rem; margin-bottom:1.5rem; color:var(--text-dim);">Reporta tus alimentos para que Arthur calibre tu metabolismo.</p>
-                    <div class="food-entry-group" style="display:flex; gap:15px;">
-                        <input type="text" id="food-desc" placeholder="Ej. 100g de pollo y media taza de arroz..." style="flex:3; background:var(--glass-bg, rgba(0,0,0,0.2)); border:1px solid var(--accent-main); padding:1rem; color:var(--text-primary); border-radius:12px; font-size:1rem;">
-                        <button class="btn-premium" id="btn-add-food" style="flex:1; padding:1rem; font-weight:bold;">REGISTRAR</button>
+                    <p style="font-size:0.8rem; margin-bottom:1.5rem; color:var(--text-dim);">Reporta tus alimentos para que AXCore calibre tu metabolismo.</p>
+                    <div class="food-entry-group" style="display:flex; gap:12px; flex-wrap:wrap;">
+                        <input type="text" id="food-desc" placeholder="Ej. 100g de pollo y media taza de arroz..." style="flex:1; min-width:150px; background:var(--glass-bg, rgba(0,0,0,0.2)); border:1px solid var(--accent-main); padding:0.9rem; color:var(--text-primary); border-radius:12px; font-size:0.95rem;">
+                        <button class="btn-premium" id="btn-add-food" style="flex:1; min-width:110px; padding:0.9rem; font-weight:bold;">REGISTRAR</button>
                     </div>
                 </div>
             </div>
@@ -1101,13 +1101,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 </div>
 
-                <h2>CATÁLOGO DE ENTRENAMIENTO (BASADO EN CIENCIA REAL)</h2>
+                <h2 style="font-size:1.1rem; margin-bottom:1rem;">CATÁLOGO DE ENTRENAMIENTO</h2>
                 <div class="exercise-catalog" style="grid-template-columns: repeat(2, 1fr);">
                     ${ARTHUR_KNOWLEDGE.exercises_catalog.map((ex, i) => {
                         const unit = ex.unit || (ex.type === 'Cardio' || ex.type === 'HIIT' ? 'Minutos' : 'Series');
-                        const baseVal = ex.baseVal || (ex.type === 'Cardio' || ex.type === 'HIIT' ? 30 : 4); 
+                        const baseVal = ex.baseVal || (ex.type === 'Cardio' || ex.type === 'HIIT' ? 30 : 4);
                         return `
-                        <div class="exercise-card" style="text-align:left; padding:1.5rem;">
+                        <div class="exercise-card" style="text-align:left; padding:0.85rem;">
                             <h4 style="color:var(--text-primary); font-family:var(--font-accent);">${ex.name}</h4>
                             <span style="font-size:0.7rem; color:var(--bg-dark); background:var(--accent-secondary); border-radius:10px; padding:3px 8px; display:inline-block; margin-bottom:10px; font-weight:bold;">${ex.type}</span>
                             <small>${ex.desc}</small>
