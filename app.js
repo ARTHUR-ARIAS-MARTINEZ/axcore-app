@@ -712,6 +712,79 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     });
 
+    // ═══════════════════════════════════════════════════════════
+    // SWIPE LATERAL — Cambiar de sección con el pulgar (←/→)
+    // ═══════════════════════════════════════════════════════════
+    (function setupSwipeNavigation() {
+        const contentArea = document.querySelector('.content-area') || document.body;
+        let sX = 0, sY = 0, sT = 0;
+        const MIN_DX = 70;        // mínimo horizontal
+        const MAX_DY = 55;        // máximo vertical (para no confundir con scroll)
+        const MAX_TIME = 450;     // ms máximos del gesto
+
+        // Selectores donde NO queremos interceptar (scroll horizontal interno, controles, etc.)
+        const BLOCK_SEL = [
+            'input', 'textarea', 'select', 'canvas', 'button',
+            '[type="range"]',
+            '.studio-templates', '.studio-pro-pills', '.studio-metrics',
+            '.studio-format-btns', '.studio-pro-swatches', '.studio-pro-slider',
+            '.studio-pro-tabs', '.ach-card', '.exercise-card',
+            '.glass-card[id*="chart"]', '#chart-history',
+            '#sw-mini-container', '.modal', '.overlay'
+        ].join(', ');
+
+        function activePageId() {
+            const active = document.querySelector('.page.active');
+            return active ? active.id.replace(/^page-/, '') : null;
+        }
+
+        function orderedNavList() {
+            return Array.from(navLinks)
+                .filter(l => l.dataset.page && l.id !== 'nav-logout');
+        }
+
+        contentArea.addEventListener('touchstart', (e) => {
+            if (e.target.closest(BLOCK_SEL)) { sX = 0; return; }
+            sX = e.touches[0].clientX;
+            sY = e.touches[0].clientY;
+            sT = Date.now();
+        }, { passive: true });
+
+        contentArea.addEventListener('touchend', (e) => {
+            if (!sX) return;
+            const dt = Date.now() - sT;
+            if (dt > MAX_TIME) return;
+            const eX = e.changedTouches[0].clientX;
+            const eY = e.changedTouches[0].clientY;
+            const dx = eX - sX;
+            const dy = Math.abs(eY - sY);
+            sX = 0;
+            if (Math.abs(dx) < MIN_DX) return;
+            if (dy > MAX_DY) return;
+
+            const list = orderedNavList();
+            const curId = activePageId();
+            const idx = list.findIndex(l => l.dataset.page === curId);
+            if (idx < 0) return;
+
+            let newIdx;
+            if (dx < 0) newIdx = (idx + 1) % list.length;        // swipe izq → siguiente
+            else        newIdx = (idx - 1 + list.length) % list.length; // swipe der → anterior
+
+            const target = list[newIdx];
+            if (target) {
+                target.click();
+                // Feedback visual sutil
+                const pg = document.querySelector('.page.active');
+                if (pg) {
+                    pg.style.animation = 'none';
+                    void pg.offsetWidth;
+                    pg.style.animation = `axcore-swipe-${dx < 0 ? 'l' : 'r'} 0.25s ease`;
+                }
+            }
+        }, { passive: true });
+    })();
+
     // --- EVOLUTION LOGIC ---
     function renderEvolutionPage(filter = 'all') {
         const body = document.getElementById('history-body');
@@ -1845,66 +1918,89 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div id="achievements-panel" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(80px,1fr)); gap:8px;"></div>
             </div>
 
-            <div class="glass-card" style="padding:1rem 1.2rem; margin-bottom:1rem;">
-                <h2 style="color:var(--accent-main); margin-bottom:0.8rem; font-size:1.1rem;">🏆 ESTUDIO DE LOGROS</h2>
+            <div class="glass-card studio-pro" style="padding:0; margin-bottom:1rem; overflow:hidden;">
 
-                <div id="studio-split">
-
-                    <!-- ── CONTROLES (scroll izquierda) ── -->
-                    <div id="studio-controls">
-                        <p style="font-size:0.68rem; color:var(--text-dim); margin-bottom:10px;">Personaliza y ve el resultado en tiempo real →</p>
-
-                        <h4 style="color:var(--text-primary); font-size:0.75rem; margin-bottom:6px;">PLANTILLA</h4>
-                        <div class="studio-templates" id="studio-tpl-list"></div>
-
-                        <h4 style="color:var(--text-primary); font-size:0.75rem; margin:12px 0 6px;">FORMATO</h4>
-                        <div class="studio-format-btns" id="studio-fmt-btns"></div>
-
-                        <h4 style="color:var(--text-primary); font-size:0.75rem; margin:12px 0 6px;">MÉTRICAS A MOSTRAR</h4>
-                        <div class="studio-metrics" id="studio-met-list"></div>
-
-                        <h4 style="color:var(--accent-main); font-size:0.70rem; margin:12px 0 6px; letter-spacing:1px;">🎨 ESTILO DE TARJETA</h4>
-                        <div id="studio-card-style-btns" style="display:flex; flex-wrap:wrap; gap:5px; margin-bottom:10px;"></div>
-
-                        <h4 style="color:var(--accent-main); font-size:0.70rem; margin:4px 0 6px; letter-spacing:1px;">⭐ MÉTRICA PRINCIPAL</h4>
-                        <div id="studio-hero-metric-btns" style="display:flex; flex-wrap:wrap; gap:5px; margin-bottom:12px;"></div>
-
-                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
-                            <div>
-                                <h4 style="color:var(--accent-main); font-size:0.65rem; margin-bottom:6px; letter-spacing:1px;">ACENTO</h4>
-                                <div id="studio-accent-btns" style="display:flex; flex-wrap:wrap; gap:4px;"></div>
-                            </div>
-                            <div>
-                                <h4 style="color:var(--accent-main); font-size:0.65rem; margin-bottom:6px; letter-spacing:1px;">TIPOGRAFÍA</h4>
-                                <div id="studio-font-btns" style="display:flex; flex-wrap:wrap; gap:4px;"></div>
-                            </div>
-                            <div>
-                                <h4 style="color:var(--accent-main); font-size:0.65rem; margin-bottom:6px; letter-spacing:1px;">OVERLAY</h4>
-                                <div id="studio-filter-btns" style="display:flex; flex-wrap:wrap; gap:4px;"></div>
-                            </div>
-                            <div>
-                                <h4 style="color:var(--accent-main); font-size:0.65rem; margin-bottom:6px; letter-spacing:1px;">ESTILO HUD</h4>
-                                <div id="studio-hud-btns" style="display:flex; flex-wrap:wrap; gap:4px;"></div>
-                            </div>
-                        </div>
-
-                        <h4 style="color:var(--text-primary); font-size:0.68rem; margin-bottom:6px;">COLOR LETRA</h4>
-                        <div id="studio-color-swatches" style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-bottom:10px;"></div>
-
-                        <h4 style="color:var(--text-primary); font-size:0.68rem; margin-bottom:4px;">TAMAÑO LETRA</h4>
-                        <input type="range" id="studio-size-picker" min="0.5" max="2.5" step="0.1" value="${studioState.textSize}" style="width:100%; cursor:pointer;">
-                    </div>
-
-                    <!-- ── PREVIEW STICKY (derecha) ── -->
-                    <div id="studio-sticky-panel">
-                        <p style="font-size:0.62rem; color:var(--accent-main); text-align:center; margin:0; letter-spacing:1px; font-weight:700;">PREVIEW EN VIVO</p>
-                        <div class="studio-preview-wrap" style="margin:0;">
-                            <canvas id="studio-preview-canvas"></canvas>
-                        </div>
-                        <button class="btn-premium" id="btn-studio-share" style="width:100%; padding:12px 8px; font-size:0.8rem;">📤 COMPARTIR HD</button>
-                    </div>
-
+                <!-- HEADER -->
+                <div class="studio-pro-header">
+                    <h2>🏆 ESTUDIO DE LOGROS</h2>
                 </div>
+
+                <!-- PREVIEW EN VIVO -->
+                <div class="studio-pro-preview">
+                    <span class="studio-pro-eyebrow">VISTA PREVIA EN VIVO</span>
+                    <div class="studio-preview-wrap">
+                        <canvas id="studio-preview-canvas"></canvas>
+                    </div>
+                    <button class="btn-premium" id="btn-studio-share">📤 COMPARTIR HD</button>
+                </div>
+
+                <!-- PLANTILLAS (siempre visible) -->
+                <div class="studio-pro-section">
+                    <div class="studio-pro-label">PLANTILLAS</div>
+                    <div class="studio-templates" id="studio-tpl-list"></div>
+                </div>
+
+                <!-- FORMATO (siempre visible) -->
+                <div class="studio-pro-section">
+                    <div class="studio-pro-label">FORMATO</div>
+                    <div class="studio-format-btns" id="studio-fmt-btns"></div>
+                </div>
+
+                <!-- TABS -->
+                <div class="studio-pro-tabs">
+                    <button class="studio-pro-tab active" data-stab="diseno">DISEÑO</button>
+                    <button class="studio-pro-tab" data-stab="metricas">MÉTRICAS</button>
+                    <button class="studio-pro-tab" data-stab="efectos">EFECTOS</button>
+                </div>
+
+                <!-- TAB: DISEÑO -->
+                <div class="studio-pro-tab-content active" id="stab-diseno">
+                    <div class="studio-pro-section">
+                        <div class="studio-pro-label">🎨 ESTILO DE TARJETA</div>
+                        <div id="studio-card-style-btns" class="studio-pro-pills"></div>
+                    </div>
+                    <div class="studio-pro-section">
+                        <div class="studio-pro-label">ACENTO</div>
+                        <div id="studio-accent-btns" class="studio-pro-pills"></div>
+                    </div>
+                    <div class="studio-pro-section">
+                        <div class="studio-pro-label">TIPOGRAFÍA</div>
+                        <div id="studio-font-btns" class="studio-pro-pills"></div>
+                    </div>
+                    <div class="studio-pro-section">
+                        <div class="studio-pro-label">COLOR LETRA</div>
+                        <div id="studio-color-swatches" class="studio-pro-swatches"></div>
+                    </div>
+                    <div class="studio-pro-section">
+                        <div class="studio-pro-label"><span>TAMAÑO LETRA</span><span class="studio-pro-val" id="studio-size-val">${Math.round(studioState.textSize*100)}%</span></div>
+                        <input type="range" id="studio-size-picker" class="studio-pro-slider" min="0.5" max="2.5" step="0.1" value="${studioState.textSize}">
+                    </div>
+                </div>
+
+                <!-- TAB: MÉTRICAS -->
+                <div class="studio-pro-tab-content" id="stab-metricas">
+                    <div class="studio-pro-section">
+                        <div class="studio-pro-label">MÉTRICAS A MOSTRAR</div>
+                        <div class="studio-metrics" id="studio-met-list"></div>
+                    </div>
+                    <div class="studio-pro-section">
+                        <div class="studio-pro-label">⭐ MÉTRICA PRINCIPAL</div>
+                        <div id="studio-hero-metric-btns" class="studio-pro-pills"></div>
+                    </div>
+                </div>
+
+                <!-- TAB: EFECTOS -->
+                <div class="studio-pro-tab-content" id="stab-efectos">
+                    <div class="studio-pro-section">
+                        <div class="studio-pro-label">OVERLAY</div>
+                        <div id="studio-filter-btns" class="studio-pro-pills"></div>
+                    </div>
+                    <div class="studio-pro-section">
+                        <div class="studio-pro-label">ESTILO HUD</div>
+                        <div id="studio-hud-btns" class="studio-pro-pills"></div>
+                    </div>
+                </div>
+
             </div>
         `;
 
@@ -2047,10 +2143,24 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         const sizePicker = document.getElementById('studio-size-picker');
+        const sizeVal = document.getElementById('studio-size-val');
         sizePicker.oninput = (e) => {
             studioState.textSize = parseFloat(e.target.value);
+            if (sizeVal) sizeVal.textContent = Math.round(studioState.textSize * 100) + '%';
             renderStudioCard(previewCanvas, studioState.tpl, studioState.fmt, studioState.metrics, true);
         };
+
+        // --- Lógica de TABS del estudio (DISEÑO / MÉTRICAS / EFECTOS) ---
+        document.querySelectorAll('.studio-pro-tab').forEach(tab => {
+            tab.onclick = () => {
+                const target = tab.dataset.stab;
+                document.querySelectorAll('.studio-pro-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                document.querySelectorAll('.studio-pro-tab-content').forEach(c => c.classList.remove('active'));
+                const content = document.getElementById('stab-' + target);
+                if (content) content.classList.add('active');
+            };
+        });
 
         // --- Selectores de Estilo Avanzado ---
         const _makeStyleBtns = (containerId, options, stateKey) => {

@@ -1418,6 +1418,268 @@ body {
 }
 
 
+/* ════════════════════════════════════════════════════════════
+   SWIPE LATERAL — Animaciones de transición entre páginas
+   ════════════════════════════════════════════════════════════ */
+@keyframes axcore-swipe-l {
+    from { transform: translateX(28px); opacity: 0.4; }
+    to   { transform: translateX(0); opacity: 1; }
+}
+@keyframes axcore-swipe-r {
+    from { transform: translateX(-28px); opacity: 0.4; }
+    to   { transform: translateX(0); opacity: 1; }
+}
+
+/* ════════════════════════════════════════════════════════════
+   ESTUDIO PRO — Diseño profesional con tabs (todas pantallas)
+   ════════════════════════════════════════════════════════════ */
+.studio-pro {
+    border-radius: 16px;
+    background: linear-gradient(180deg, rgba(15,20,32,0.85) 0%, rgba(8,12,20,0.95) 100%);
+    border: 1px solid rgba(255,255,255,0.06);
+}
+.studio-pro-header {
+    padding: 14px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    text-align: center;
+}
+.studio-pro-header h2 {
+    margin: 0;
+    font-size: 1rem;
+    letter-spacing: 1px;
+    color: var(--accent-main);
+    font-family: var(--font-accent);
+}
+.studio-pro-preview {
+    padding: 14px 14px 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.studio-pro-eyebrow {
+    display: block;
+    font-size: 9.5px;
+    letter-spacing: 2.5px;
+    color: rgba(255,255,255,0.4);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    font-weight: 700;
+}
+.studio-pro-preview .studio-preview-wrap {
+    max-height: 380px;
+    background: #000;
+    border-radius: 14px;
+    overflow: hidden;
+    padding: 6px;
+    margin: 0 0 12px;
+    border: 1px solid rgba(255,255,255,0.05);
+}
+.studio-pro-preview #btn-studio-share {
+    width: 100%;
+    padding: 12px;
+    font-size: 0.82rem;
+    letter-spacing: 1px;
+}
+
+.studio-pro-section {
+    padding: 12px 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.studio-pro-section:last-child { border-bottom: none; }
+.studio-pro-label {
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: rgba(255,255,255,0.55);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    font-weight: 700;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.studio-pro-val {
+    font-size: 11px;
+    color: var(--accent-main);
+    letter-spacing: 1px;
+    font-family: 'SF Mono', Monaco, monospace;
+}
+
+/* TABS */
+.studio-pro-tabs {
+    display: flex;
+    background: rgba(0,0,0,0.25);
+    border-top: 1px solid rgba(255,255,255,0.05);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    position: sticky;
+    top: 0;
+    z-index: 5;
+}
+.studio-pro-tab {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding: 14px 8px;
+    color: rgba(255,255,255,0.4);
+    font-family: var(--font-accent);
+    font-size: 0.72rem;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: color .2s;
+    position: relative;
+    font-weight: 700;
+}
+.studio-pro-tab:hover { color: rgba(255,255,255,0.7); }
+.studio-pro-tab.active {
+    color: var(--accent-main);
+}
+.studio-pro-tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 16%;
+    right: 16%;
+    height: 2px;
+    background: var(--accent-main);
+    border-radius: 2px;
+    box-shadow: 0 0 8px var(--accent-main);
+}
+.studio-pro-tab-content { display: none; }
+.studio-pro-tab-content.active { display: block; }
+
+/* Pills (botones de opciones) — UI consistente */
+.studio-pro-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+.studio-pro-pills button {
+    padding: 7px 12px !important;
+    font-size: 0.7rem !important;
+    border-radius: 20px !important;
+    font-weight: 700 !important;
+}
+
+/* Swatches de color */
+.studio-pro-swatches {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+}
+
+/* Slider mejorado */
+.studio-pro-slider {
+    width: 100%;
+    -webkit-appearance: none;
+    height: 4px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 2px;
+    outline: none;
+}
+.studio-pro-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    background: var(--accent-main);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 0 4px rgba(0,255,136,0.15);
+}
+
+/* Plantillas: scroll horizontal con esquinas */
+.studio-pro .studio-templates {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: thin;
+    margin: 0 -2px;
+}
+.studio-pro .studio-tpl-card {
+    flex: 0 0 auto;
+    min-width: 78px;
+    width: 78px;
+    height: 100px;
+    border-radius: 12px;
+    border: 2px solid rgba(255,255,255,0.1);
+    overflow: hidden;
+    cursor: pointer;
+    transition: all .2s;
+    position: relative;
+}
+.studio-pro .studio-tpl-card.selected {
+    border-color: var(--accent-main);
+    box-shadow: 0 0 16px rgba(0,255,136,0.3);
+}
+.studio-pro .studio-tpl-card canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+.studio-pro .studio-tpl-card > span {
+    position: absolute;
+    bottom: 4px;
+    left: 0; right: 0;
+    text-align: center;
+    font-size: 8.5px;
+    color: #fff;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.9);
+}
+
+/* Métricas toggle */
+.studio-pro .studio-metrics {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+}
+.studio-pro .studio-metric-toggle {
+    padding: 8px 6px !important;
+    font-size: 0.7rem !important;
+    min-height: auto !important;
+    border-radius: 20px !important;
+    text-align: center;
+    border: 1px solid rgba(255,255,255,0.15) !important;
+}
+.studio-pro .studio-metric-toggle.on {
+    border-color: var(--accent-main) !important;
+    background: rgba(0,255,136,0.08) !important;
+    color: var(--accent-main) !important;
+}
+.studio-pro .studio-metric-toggle .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    display: inline-block;
+    margin-right: 4px;
+}
+.studio-pro .studio-metric-toggle.on .dot {
+    background: var(--accent-main);
+    box-shadow: 0 0 6px var(--accent-main);
+}
+
+/* Formato buttons */
+.studio-pro .studio-format-btns {
+    display: flex;
+    gap: 6px;
+}
+.studio-pro .studio-format-btns button {
+    flex: 1;
+    padding: 8px 6px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.7);
+    font-size: 0.7rem;
+    cursor: pointer;
+    font-family: var(--font-accent);
+    letter-spacing: 0.5px;
+}
+.studio-pro .studio-format-btns button.active {
+    background: rgba(0,255,136,0.12);
+    border-color: var(--accent-main);
+    color: var(--accent-main);
+}
+
 /* === EDITOR MOVIL — INICIO (no borrar marcadores) === */
 
 /* ════════════════════════════════════════════════════════════
@@ -1556,146 +1818,49 @@ body {
     }
 
     /* ════════════════════════════════════════════════════════
-       ESTUDIO DE LOGROS — Layout: imagen IZQ + controles DER
+       ESTUDIO PRO — ajustes específicos para móvil
        ════════════════════════════════════════════════════════ */
-    #page-studio > div > h2:first-child,
-    #page-studio h2 {
-        text-align: center !important;
-        font-size: 1.05rem !important;
-    }
-
-    #studio-split {
-        display: flex !important;
-        flex-direction: row-reverse !important; /* preview a la izquierda */
-        gap: 8px !important;
-        align-items: flex-start !important;
-    }
-
-    /* Preview a la izquierda — sticky para que no se mueva al scrollear opciones */
-    #studio-sticky-panel {
-        flex: 0 0 42% !important;
-        max-width: 42% !important;
-        position: sticky !important;
-        top: 6px !important;
-        margin: 0 !important;
-    }
-    #studio-sticky-panel .studio-preview-wrap {
-        max-height: 280px !important;
-        padding: 4px 0 !important;
-    }
-    #studio-sticky-panel > p:first-child {
-        font-size: 9px !important;
-        margin-bottom: 4px !important;
-        letter-spacing: 1.5px !important;
-    }
-    #btn-studio-share {
-        padding: 0.45rem !important;
-        font-size: 0.72rem !important;
-        margin-top: 8px !important;
-        width: 100% !important;
-    }
-
-    /* Controles a la derecha — scroll vertical contenido */
-    #studio-controls {
-        flex: 1 1 auto !important;
-        min-width: 0 !important;
-        max-height: 78vh !important;
-        overflow-y: auto !important;
-        padding-right: 4px;
-        scrollbar-width: thin;
-    }
-    #studio-controls::-webkit-scrollbar { width: 4px; }
-    #studio-controls::-webkit-scrollbar-thumb {
-        background: rgba(255,255,255,0.15);
-        border-radius: 2px;
-    }
-
-    #studio-controls h4 {
-        font-size: 9.5px !important;
-        margin: 10px 0 4px !important;
+    .studio-pro-header h2 {
+        font-size: 0.9rem !important;
         letter-spacing: 1.2px !important;
     }
-    #studio-controls h4:first-child {
-        margin-top: 0 !important;
+    .studio-pro-preview {
+        padding: 12px 12px 10px !important;
     }
-
-    /* CADA fila de opciones → scroll horizontal */
-    #studio-tpl-list,
-    #studio-fmt-btns,
-    #studio-met-list,
-    #studio-card-style-btns,
-    #studio-hero-metric-btns,
-    #studio-accent-btns,
-    #studio-font-btns,
-    #studio-filter-btns,
-    #studio-hud-btns,
-    #studio-color-swatches {
-        display: flex !important;
-        flex-wrap: nowrap !important;
-        overflow-x: auto !important;
-        overflow-y: hidden !important;
-        gap: 5px !important;
-        padding-bottom: 4px !important;
-        -webkit-overflow-scrolling: touch;
+    .studio-pro-preview .studio-preview-wrap {
+        max-height: 320px !important;
     }
-
-    /* Métricas: cambiar de grid a flex con scroll horizontal */
-    #studio-controls .studio-metrics {
-        grid-template-columns: none !important;
-        display: flex !important;
-        flex-wrap: nowrap !important;
-        overflow-x: auto !important;
-        gap: 5px !important;
-        padding-bottom: 4px !important;
-    }
-    #studio-controls .studio-metric-toggle {
-        flex: 0 0 auto !important;
-        min-width: 95px !important;
-        padding: 6px 8px !important;
-        font-size: 0.7rem !important;
-        min-height: auto !important;
-    }
-
-    /* Cada hijo de las filas → no se encoge (mantiene su tamaño) */
-    #studio-tpl-list > *,
-    #studio-fmt-btns > *,
-    #studio-card-style-btns > *,
-    #studio-hero-metric-btns > *,
-    #studio-accent-btns > *,
-    #studio-font-btns > *,
-    #studio-filter-btns > *,
-    #studio-hud-btns > *,
-    #studio-color-swatches > * {
-        flex: 0 0 auto !important;
-    }
-
-    /* Plantillas: más compactas */
-    .studio-tpl-card {
-        min-width: 56px !important;
-        width: 56px !important;
-        height: 72px !important;
-    }
-    .studio-tpl-card .studio-tpl-label,
-    .studio-tpl-card > span,
-    .studio-tpl-card > div {
-        font-size: 7px !important;
-    }
-
-    /* Grid 2x2 (Acento/Tipo/Overlay/HUD) → apilado vertical en mobile */
-    #studio-controls > div[style*="grid-template-columns:1fr 1fr"],
-    #studio-controls > div[style*="grid-template-columns: 1fr 1fr"] {
-        display: block !important;
-    }
-
-    /* Formato (Story/Cuadrado/Paisaje): scroll horizontal */
-    .studio-format-btns {
-        flex-wrap: nowrap !important;
-        overflow-x: auto !important;
-    }
-    .studio-format-btns button {
-        flex: 0 0 auto !important;
+    .studio-pro-tab {
+        padding: 12px 4px !important;
         font-size: 0.65rem !important;
+        letter-spacing: 1.2px !important;
+    }
+    .studio-pro-section {
+        padding: 10px 12px !important;
+    }
+    .studio-pro-label {
+        font-size: 9px !important;
+        letter-spacing: 1.8px !important;
+        margin-bottom: 8px !important;
+    }
+    .studio-pro .studio-tpl-card {
+        min-width: 64px !important;
+        width: 64px !important;
+        height: 84px !important;
+    }
+    .studio-pro .studio-tpl-card > span {
+        font-size: 7.5px !important;
+    }
+    .studio-pro .studio-metrics {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+    .studio-pro .studio-metric-toggle {
+        padding: 7px 5px !important;
+        font-size: 0.62rem !important;
+    }
+    .studio-pro-pills button {
         padding: 6px 10px !important;
+        font-size: 0.62rem !important;
     }
 }
 
