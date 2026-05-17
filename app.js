@@ -760,72 +760,86 @@ document.addEventListener('DOMContentLoaded', () => {
     // SWIPE LATERAL — Cambiar de sección con el pulgar (←/→)
     // ═══════════════════════════════════════════════════════════
     (function setupSwipeNavigation() {
-        const contentArea = document.querySelector('.content-area') || document.body;
-        let sX = 0, sY = 0, sT = 0;
-        const MIN_DX = 70;        // mínimo horizontal
-        const MAX_DY = 55;        // máximo vertical (para no confundir con scroll)
-        const MAX_TIME = 450;     // ms máximos del gesto
+        let sX = 0, sY = 0, sT = 0, tracking = false;
 
-        // Selectores donde NO queremos interceptar (scroll horizontal interno, controles, etc.)
-        const BLOCK_SEL = [
-            'input', 'textarea', 'select', 'canvas', 'button',
-            '[type="range"]',
-            '.studio-templates', '.studio-pro-pills', '.studio-metrics',
-            '.studio-format-btns', '.studio-pro-swatches', '.studio-pro-slider',
-            '.studio-pro-tabs', '.ach-card', '.exercise-card',
-            '.glass-card[id*="chart"]', '#chart-history',
-            '#sw-mini-container', '.modal', '.overlay'
-        ].join(', ');
+        // Solo bloqueamos elementos que USAN scroll horizontal propio
+        // o capturan touch de forma activa (inputs, sliders, scroll horizontal)
+        function isHorizontalScroller(el) {
+            if (!el) return false;
+            // Range inputs capturan el swipe para cambiar valor
+            if (el.tagName === 'INPUT' && el.type === 'range') return true;
+            // Contenedores con scroll horizontal (plantillas, etc.)
+            const style = window.getComputedStyle(el);
+            if ((style.overflowX === 'auto' || style.overflowX === 'scroll') && el.scrollWidth > el.clientWidth + 4) return true;
+            return false;
+        }
+
+        function shouldBlock(target) {
+            // Bloqueamos inputs de texto y textareas (el usuario escribe)
+            if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT') return true;
+            // Recorremos hacia arriba buscando un scroller horizontal
+            let el = target;
+            for (let i = 0; i < 8 && el; i++) {
+                if (isHorizontalScroller(el)) return true;
+                el = el.parentElement;
+            }
+            return false;
+        }
 
         function activePageId() {
             const active = document.querySelector('.page.active');
             return active ? active.id.replace(/^page-/, '') : null;
         }
 
-        function orderedNavList() {
-            return Array.from(navLinks)
-                .filter(l => l.dataset.page && l.id !== 'nav-logout');
+        function goToPage(dx) {
+            const list = Array.from(navLinks).filter(l => l.dataset.page && l.id !== 'nav-logout');
+            const curId = activePageId();
+            const idx = list.findIndex(l => l.dataset.page === curId);
+            if (idx < 0) return;
+            const newIdx = dx < 0
+                ? (idx + 1) % list.length
+                : (idx - 1 + list.length) % list.length;
+            const target = list[newIdx];
+            if (!target) return;
+            target.click();
+            const pg = document.querySelector('.page.active');
+            if (pg) {
+                pg.style.animation = 'none';
+                void pg.offsetWidth;
+                pg.style.animation = `axcore-swipe-${dx < 0 ? 'l' : 'r'} 0.28s ease`;
+            }
         }
 
-        contentArea.addEventListener('touchstart', (e) => {
-            if (e.target.closest(BLOCK_SEL)) { sX = 0; return; }
+        document.addEventListener('touchstart', (e) => {
+            tracking = false;
+            if (shouldBlock(e.target)) return;
             sX = e.touches[0].clientX;
             sY = e.touches[0].clientY;
             sT = Date.now();
+            tracking = true;
         }, { passive: true });
 
-        contentArea.addEventListener('touchend', (e) => {
-            if (!sX) return;
+        document.addEventListener('touchmove', (e) => {
+            if (!tracking) return;
+            // Si la dirección inicial es mayormente vertical, cancelar tracking
+            const dx = Math.abs(e.touches[0].clientX - sX);
+            const dy = Math.abs(e.touches[0].clientY - sY);
+            if (dy > dx && dy > 12) tracking = false;
+        }, { passive: true });
+
+        document.addEventListener('touchend', (e) => {
+            if (!tracking) return;
+            tracking = false;
             const dt = Date.now() - sT;
-            if (dt > MAX_TIME) return;
+            if (dt > 500) return;
             const eX = e.changedTouches[0].clientX;
             const eY = e.changedTouches[0].clientY;
             const dx = eX - sX;
             const dy = Math.abs(eY - sY);
-            sX = 0;
-            if (Math.abs(dx) < MIN_DX) return;
-            if (dy > MAX_DY) return;
-
-            const list = orderedNavList();
-            const curId = activePageId();
-            const idx = list.findIndex(l => l.dataset.page === curId);
-            if (idx < 0) return;
-
-            let newIdx;
-            if (dx < 0) newIdx = (idx + 1) % list.length;        // swipe izq → siguiente
-            else        newIdx = (idx - 1 + list.length) % list.length; // swipe der → anterior
-
-            const target = list[newIdx];
-            if (target) {
-                target.click();
-                // Feedback visual sutil
-                const pg = document.querySelector('.page.active');
-                if (pg) {
-                    pg.style.animation = 'none';
-                    void pg.offsetWidth;
-                    pg.style.animation = `axcore-swipe-${dx < 0 ? 'l' : 'r'} 0.25s ease`;
-                }
-            }
+            if (Math.abs(dx) < 50) return;   // mínimo 50px horizontal
+            if (dy > 80) return;             // máximo 80px vertical
+            if (Math.abs(dx) < dy * 1.5) return; // debe ser más horizontal que diagonal
+            goToPage(dx);
         }, { passive: true });
     })();
 
