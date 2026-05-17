@@ -302,7 +302,22 @@
                     
                     <div style="margin-top: 2rem; border-top: 1px solid var(--glass-border); padding-top: 1.5rem;">
                         <h3 style="font-family:var(--font-accent); font-size:0.85rem; color:var(--accent-main); margin-bottom:1rem; letter-spacing:1px; text-align:center;">EVOLUCIÓN RECIENTE</h3>
-                        <div id="chart-history" style="min-height: 250px; width: 100%;"></div>
+                        <!-- Barra de progreso hacia la meta -->
+                        <div id="evol-progress-wrap" style="margin-bottom:1.2rem; display:none;">
+                            <div style="display:flex; justify-content:space-between; font-size:0.65rem; color:var(--text-dim); margin-bottom:4px;">
+                                <span id="evol-prog-start">Inicio</span>
+                                <span id="evol-prog-label" style="color:var(--accent-main); font-weight:600;"></span>
+                                <span id="evol-prog-goal">Meta</span>
+                            </div>
+                            <div style="height:8px; background:rgba(255,255,255,0.07); border-radius:99px; overflow:hidden;">
+                                <div id="evol-prog-bar" style="height:100%; background:linear-gradient(90deg,var(--accent-secondary),var(--accent-main)); border-radius:99px; transition:width .6s ease; width:0%;"></div>
+                            </div>
+                        </div>
+                        <!-- Tarjetas de los últimos 5 registros -->
+                        <div id="evol-cards" style="display:flex; gap:8px; overflow-x:auto; padding-bottom:6px; scrollbar-width:none;"></div>
+                        <!-- Sparkline mini -->
+                        <div id="chart-history" style="min-height:130px; width:100%; margin-top:0.8rem;"></div>
+                        <p id="evol-empty" style="text-align:center; font-size:0.75rem; color:var(--text-dim); padding:1.5rem 0; display:none;">Sin registros aún. Añade medidas en la sección Evolución.</p>
                     </div>
                 </div>
 

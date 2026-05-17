@@ -86,15 +86,17 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 20px;
+        padding: 10px;
+        overflow: hidden;
         background:
             radial-gradient(circle at 30% 30%, rgba(0,229,255,.04) 0%, transparent 50%),
             radial-gradient(circle at 70% 70%, rgba(124,58,237,.04) 0%, transparent 50%);
     }
 
     .phone-wrap {
-        transform-origin: center;
+        transform-origin: top center;
         transition: transform .3s;
+        flex-shrink: 0;
     }
 
     .phone {
@@ -260,13 +262,23 @@
     updateClock();
     setInterval(updateClock, 30000);
 
-    // Auto-ajuste de escala si la ventana es muy chica
+    // Auto-ajuste de escala para que el teléfono quepa completo
     function autoFit() {
         const PHONE_H = 852, PHONE_W = 393;
-        const availH = window.innerHeight - 50 - 40; // header + padding
-        const availW = window.innerWidth - 40;
+        const availH = window.innerHeight - 50 - 20; // header (50px) + padding (20px)
+        const availW = window.innerWidth - 20;
         const scale = Math.min(availH / PHONE_H, availW / PHONE_W, 1);
-        document.getElementById('phoneWrap').style.transform = `scale(${scale})`;
+        const wrap = document.getElementById('phoneWrap');
+        wrap.style.transform = `scale(${scale})`;
+        // Compensar el espacio de layout que ocupa el elemento sin escalar
+        // Cuando scale < 1, los márgenes negativos reducen el espacio ocupado
+        const compensate = Math.round(PHONE_H * (scale - 1) / 2);
+        wrap.style.marginTop = `${compensate}px`;
+        wrap.style.marginBottom = `${compensate}px`;
+        // Compensar ancho también
+        const compensateW = Math.round(PHONE_W * (scale - 1) / 2);
+        wrap.style.marginLeft = `${compensateW}px`;
+        wrap.style.marginRight = `${compensateW}px`;
     }
     autoFit();
     window.addEventListener('resize', autoFit);

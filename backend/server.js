@@ -114,6 +114,7 @@ const userSchema = new mongoose.Schema({
     privacyDate: { type: Date, default: null },
     data:        { type: mongoose.Schema.Types.Mixed, default: {} }, // payload completo del atleta
     achievements:{ type: [String], default: [] },
+    activeSessionId: { type: String, default: '' }, // ID de sesión activa (un solo dispositivo)
     createdAt:   { type: Date, default: Date.now },
     lastSync:    { type: Date, default: Date.now }
 });
@@ -140,13 +141,24 @@ function requireAdminAuth(req, res, next) {
     next();
 }
 
-function requireUserAuth(req, res, next) {
+async function requireUserAuth(req, res, next) {
     const auth = req.header('Authorization') || '';
     const token = auth.startsWith('Bearer ') ? auth.slice(7) : '';
     if (!token) return res.status(401).json({ success: false, message: 'Token requerido.' });
     try {
         const payload = jwt.verify(token, JWT_SECRET);
-        req.user = payload; // { code, gymCode, username }
+        req.user = payload; // { code, gymCode, username, sid }
+        // Verificar que la sesión siga siendo la activa en la BD
+        if (payload.sid) {
+            const user = await User.findOne({ code: payload.code }, 'activeSessionId').lean();
+            if (!user || user.activeSessionId !== payload.sid) {
+                return res.status(401).json({
+                    success: false,
+                    message: 'Sesión desplazada.',
+                    displaced: true
+                });
+            }
+        }
         next();
     } catch {
         return res.status(401).json({ success: false, message: 'Sesión inválida o expirada.' });
@@ -391,6 +403,7 @@ app.post('/api/user/register', loginLimiter, async (req, res) => {
         if (existing) return res.json({ success: false, message: 'Este código ya tiene un usuario registrado. Usa el botón INICIAR SESIÓN.' });
 
         const hashed = await hashPassword(p);
+        const sid = crypto.randomBytes(16).toString('hex');
         const user = await User.create({
             code: codeUp,
             gymCode: pass.gymCode,
@@ -399,11 +412,12 @@ app.post('/api/user/register', loginLimiter, async (req, res) => {
             privacyAccepted: true,
             privacyDate: new Date(),
             data: data || {},
-            achievements: []
+            achievements: [],
+            activeSessionId: sid
         });
         await Code.updateOne({ code: codeUp }, { registered: true, user: u });
 
-        const token = jwt.sign({ code: codeUp, gymCode: pass.gymCode, username: u }, JWT_SECRET, { expiresIn: '30d' });
+        const token = jwt.sign({ code: codeUp, gymCode: pass.gymCode, username: u, sid }, JWT_SECRET, { expiresIn: '30d' });
         res.json({ success: true, message: 'Usuario registrado.', token, gymCode: pass.gymCode, gymName: gym?.name || '' });
     } catch (e) {
         if (e.code === 11000) return res.json({ success: false, message: 'Ya existe un usuario con ese código.' });
@@ -432,7 +446,11 @@ app.post('/api/user/login', loginLimiter, async (req, res) => {
         const gym = await Gym.findOne({ gymCode: user.gymCode });
         if (gym && !gym.active) return res.json({ success: false, message: 'Franquicia sin pago activo.' });
 
-        const token = jwt.sign({ code: codeUp, gymCode: user.gymCode, username: user.username }, JWT_SECRET, { expiresIn: '30d' });
+        // Generar nuevo sessionId — invalida automáticamente cualquier sesión previa
+        const sid = crypto.randomBytes(16).toString('hex');
+        await User.updateOne({ code: codeUp }, { activeSessionId: sid });
+
+        const token = jwt.sign({ code: codeUp, gymCode: user.gymCode, username: user.username, sid }, JWT_SECRET, { expiresIn: '30d' });
         res.json({
             success: true,
             token,
@@ -461,6 +479,14 @@ app.post('/api/user/sync', requireUserAuth, async (req, res) => {
 
         await User.updateOne({ code: req.user.code }, update);
         res.json({ success: true, lastSync: update.lastSync });
+    } catch (e) { res.status(500).json({ success: false, message: e.message }); }
+});
+
+// Logout — invalida la sesión activa en este dispositivo
+app.post('/api/user/logout', requireUserAuth, async (req, res) => {
+    try {
+        await User.updateOne({ code: req.user.code }, { activeSessionId: '' });
+        res.json({ success: true });
     } catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 

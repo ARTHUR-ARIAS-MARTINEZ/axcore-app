@@ -253,7 +253,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     })
                 });
                 if (res.status === 401) {
-                    // Token inválido — limpiar pero NO cerrar sesión local
+                    try {
+                        const body = await res.json();
+                        if (body.displaced) {
+                            // Otro dispositivo inició sesión — forzar cierre aquí
+                            clearApiToken();
+                            localStorage.removeItem('arthur_current_user');
+                            alert('⚠️ Tu cuenta fue abierta en otro dispositivo.\nEsta sesión se ha cerrado para proteger tu cuenta.');
+                            location.reload();
+                            return;
+                        }
+                    } catch (_) {}
                     clearApiToken();
                     console.warn('[sync] sesión remota expirada, datos solo en local.');
                 }
@@ -579,39 +589,115 @@ document.addEventListener('DOMContentLoaded', () => {
             chartWaist.updateSeries([progWaist]);
         }
 
-        // History
+        // Evolución Reciente — tarjetas visuales + sparkline
+        renderEvolReciente(themeColors, isLight);
+    }
+
+    function renderEvolReciente(themeColors, isLight) {
         const historyData = userData.history || [];
-        const dates = historyData.map(h => h.date).slice(-10); // last 10
-        const weights = historyData.map(h => h.weight).slice(-10);
-        const waists = historyData.map(h => h.waist || 0).slice(-10);
+        const cardsEl   = document.getElementById('evol-cards');
+        const emptyEl   = document.getElementById('evol-empty');
+        const progWrap  = document.getElementById('evol-progress-wrap');
 
-        if (!chartHistory && document.querySelector("#chart-history")) {
-            const histOptions = {
+        if (!cardsEl) return;
+
+        if (historyData.length === 0) {
+            cardsEl.innerHTML = '';
+            if (emptyEl) { emptyEl.style.display = 'block'; }
+            if (progWrap) progWrap.style.display = 'none';
+            if (chartHistory) { chartHistory.destroy(); chartHistory = null; }
+            return;
+        }
+        if (emptyEl) emptyEl.style.display = 'none';
+
+        // Barra de progreso hacia la meta
+        const initW  = userData.weight || 0;
+        const goalW  = userData.target_weight || 0;
+        const lastH  = historyData[historyData.length - 1];
+        const currW  = lastH ? (lastH.weight || initW) : initW;
+        if (progWrap && goalW > 0 && initW > goalW) {
+            progWrap.style.display = 'block';
+            const totalToLose = initW - goalW;
+            const lostSoFar   = Math.max(0, initW - currW);
+            const pct = Math.min(100, Math.round((lostSoFar / totalToLose) * 100));
+            const bar = document.getElementById('evol-prog-bar');
+            const lbl = document.getElementById('evol-prog-label');
+            const start = document.getElementById('evol-prog-start');
+            const goal  = document.getElementById('evol-prog-goal');
+            if (bar) bar.style.width = pct + '%';
+            if (lbl) lbl.textContent = `${pct}% completado · ${lostSoFar.toFixed(1)} kg perdidos`;
+            if (start) start.textContent = `${initW} kg`;
+            if (goal)  goal.textContent  = `${goalW} kg`;
+        } else if (progWrap) {
+            progWrap.style.display = 'none';
+        }
+
+        // Tarjetas de los últimos 5 registros (más reciente primero)
+        const recent = [...historyData].slice(-5).reverse();
+        cardsEl.innerHTML = recent.map((h, i, arr) => {
+            const prev   = arr[i + 1];
+            const delta  = prev ? (h.weight - prev.weight) : null;
+            const losing = delta !== null && delta < 0;
+            const gaining = delta !== null && delta > 0;
+            const arrow  = delta === null ? '' : (losing ? '▼' : (gaining ? '▲' : '→'));
+            const dColor = delta === null ? '#888' : (losing ? '#00ff88' : (gaining ? '#ff3366' : '#888'));
+            const dText  = delta === null ? '—' : (losing ? delta.toFixed(1) : `+${delta.toFixed(1)}`);
+            const dateShort = (h.date || '').slice(5); // MM-DD
+            return `
+            <div style="
+                flex-shrink:0; width:88px; background:rgba(255,255,255,0.04);
+                border:1px solid rgba(255,255,255,0.08); border-radius:14px;
+                padding:10px 8px; text-align:center; position:relative;
+                ${i === 0 ? 'border-color:' + dColor + ';box-shadow:0 0 8px ' + dColor + '22;' : ''}
+            ">
+                ${i === 0 ? '<span style="position:absolute;top:4px;right:6px;font-size:8px;color:#888;">HOY</span>' : ''}
+                <p style="font-size:0.6rem;color:#666;margin-bottom:4px;">${dateShort}</p>
+                <p style="font-family:var(--font-accent);font-size:1.05rem;color:#fff;margin:0;">${(h.weight||0).toFixed(1)}</p>
+                <p style="font-size:0.6rem;color:#555;margin:0 0 4px;">kg</p>
+                <p style="font-size:0.85rem;font-weight:700;color:${dColor};margin:0;">${arrow} ${dText}</p>
+                ${h.waist ? `<p style="font-size:0.6rem;color:#555;margin-top:3px;">${h.waist}cm</p>` : ''}
+            </div>`;
+        }).join('');
+
+        // Sparkline compacto (últimas 10 entradas)
+        const last10    = historyData.slice(-10);
+        const dates10   = last10.map(h => (h.date || '').slice(5));
+        const weights10 = last10.map(h => h.weight || 0);
+        const waists10  = last10.map(h => h.waist || 0);
+        const sparkEl   = document.querySelector('#chart-history');
+
+        if (!chartHistory && sparkEl) {
+            chartHistory = new ApexCharts(sparkEl, {
                 series: [
-                    { name: 'Peso', type: 'area', data: weights },
-                    { name: 'Cintura', type: 'line', data: waists }
+                    { name: 'Peso kg', data: weights10 },
+                    { name: 'Cintura cm', data: waists10 }
                 ],
-                chart: { height: 250, type: 'line', toolbar: { show: false }, background: 'transparent', parentHeightOffset: 0 },
-                stroke: { curve: 'smooth', width: [3, 3] },
-                fill: { type: ['gradient', 'solid'], gradient: { shadeIntensity: 1, opacityFrom: 0.3, opacityTo: 0, stops: [0, 90, 100] } },
-                labels: dates,
-                theme: { mode: isLight ? 'light' : 'dark' },
+                chart: { height: 130, type: 'area', toolbar: { show: false }, background: 'transparent', sparkline: { enabled: false }, parentHeightOffset: 0, animations: { enabled: false } },
+                stroke: { curve: 'smooth', width: [2, 2] },
+                fill: {
+                    type: ['gradient', 'solid'],
+                    gradient: { shade: 'dark', shadeIntensity: 1, opacityFrom: 0.3, opacityTo: 0.02 },
+                    opacity: [1, 0]
+                },
                 colors: [themeColors.main, themeColors.secondary],
-                xaxis: { labels: { style: { colors: '#888' } }, axisBorder: { show: false }, axisTicks: { show: false }, tooltip: { enabled: false } },
+                labels: dates10,
+                xaxis: { labels: { style: { colors: '#555', fontSize: '9px' } }, axisBorder: { show: false }, axisTicks: { show: false }, tooltip: { enabled: false } },
                 yaxis: [
-                    { labels: { style: { colors: '#888' } } },
-                    { opposite: true, labels: { style: { colors: '#888' } } }
+                    { labels: { style: { colors: '#555', fontSize: '9px' }, formatter: v => v.toFixed(0) + 'kg' } },
+                    { opposite: true, labels: { style: { colors: '#555', fontSize: '9px' }, formatter: v => v.toFixed(0) + 'cm' } }
                 ],
-                legend: { position: 'top', labels: { colors: '#fff' } },
-                tooltip: { theme: 'dark' },
-                grid: { borderColor: 'rgba(255,255,255,0.05)', strokeDashArray: 4 }
-            };
-
-            chartHistory = new ApexCharts(document.querySelector("#chart-history"), histOptions);
+                legend: { show: true, position: 'top', labels: { colors: '#888' }, fontSize: '10px', markers: { size: 5 } },
+                tooltip: { theme: 'dark', shared: true },
+                grid: { borderColor: 'rgba(255,255,255,0.04)', strokeDashArray: 4, padding: { top: 0, bottom: 0 } },
+                theme: { mode: isLight ? 'light' : 'dark' }
+            });
             chartHistory.render();
         } else if (chartHistory) {
-            chartHistory.updateOptions({ xaxis: { categories: dates } });
-            chartHistory.updateSeries([ { name: 'Peso', data: weights }, { name: 'Cintura', data: waists } ]);
+            chartHistory.updateOptions({ labels: dates10, theme: { mode: isLight ? 'light' : 'dark' } });
+            chartHistory.updateSeries([
+                { name: 'Peso kg', data: weights10 },
+                { name: 'Cintura cm', data: waists10 }
+            ]);
         }
     }
 
@@ -678,6 +764,14 @@ document.addEventListener('DOMContentLoaded', () => {
         link.onclick = (e) => {
             if (link.id === 'nav-logout') {
                 if (confirm("¿Cerrar sesión táctica en AX-CORE?")) {
+                    // Invalidar sesión en el servidor para liberar el dispositivo
+                    if (apiToken()) {
+                        try {
+                            await fetch(`${API_URL}/api/user/logout`, {
+                                method: 'POST', headers: apiAuthHeaders()
+                            });
+                        } catch (_) {}
+                    }
                     localStorage.removeItem('arthur_current_user');
                     clearApiToken();
                     location.reload();
@@ -836,9 +930,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const eY = e.changedTouches[0].clientY;
             const dx = eX - sX;
             const dy = Math.abs(eY - sY);
-            if (Math.abs(dx) < 50) return;   // mínimo 50px horizontal
+            if (Math.abs(dx) < 30) return;   // mínimo 30px horizontal
             if (dy > 80) return;             // máximo 80px vertical
-            if (Math.abs(dx) < dy * 1.5) return; // debe ser más horizontal que diagonal
+            if (Math.abs(dx) < dy * 1.2) return; // debe ser más horizontal que diagonal
             goToPage(dx);
         }, { passive: true });
     })();
