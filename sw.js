@@ -1,4 +1,4 @@
-const CACHE_NAME = 'axcore-v3.2-mobile-pro';
+const CACHE_NAME = 'axcore-v3.3-insignias-swipehint';
 const urlsToCache = [
   './',
   './index.html',

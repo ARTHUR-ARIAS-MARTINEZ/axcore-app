@@ -713,6 +713,50 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ═══════════════════════════════════════════════════════════
+    // INDICADOR DE SWIPE — se muestra una sola vez al entrar
+    // ═══════════════════════════════════════════════════════════
+    (function showSwipeHint() {
+        try {
+            if (localStorage.getItem('axcore_swipe_hint_seen')) return;
+            const hint = document.createElement('div');
+            hint.id = 'swipe-hint';
+            hint.innerHTML = '<span>← Desliza con el pulgar para cambiar de sección →</span>';
+            hint.style.cssText = `
+                position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+                background: rgba(0,229,255,0.12); color: var(--accent-main);
+                border: 1px solid rgba(0,229,255,0.4); border-radius: 30px;
+                padding: 10px 20px; font-size: 0.8rem; font-weight: 700;
+                letter-spacing: 0.5px; z-index: 9999;
+                backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+                animation: hintPulse 2s ease-in-out infinite;
+                box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+                pointer-events: none;
+            `;
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes hintPulse {
+                    0%, 100% { transform: translateX(-50%) scale(1); opacity: 0.95; }
+                    50% { transform: translateX(-50%) scale(1.04); opacity: 1; }
+                }
+                @keyframes hintOut {
+                    to { opacity: 0; transform: translateX(-50%) translateY(20px); }
+                }
+            `;
+            document.head.appendChild(style);
+            setTimeout(() => {
+                if (document.body) document.body.appendChild(hint);
+            }, 1500);
+            setTimeout(() => {
+                if (hint.parentNode) {
+                    hint.style.animation = 'hintOut 0.5s forwards';
+                    setTimeout(() => hint.remove(), 600);
+                }
+                localStorage.setItem('axcore_swipe_hint_seen', '1');
+            }, 6000);
+        } catch(e) {}
+    })();
+
+    // ═══════════════════════════════════════════════════════════
     // SWIPE LATERAL — Cambiar de sección con el pulgar (←/→)
     // ═══════════════════════════════════════════════════════════
     (function setupSwipeNavigation() {
@@ -1913,7 +1957,7 @@ document.addEventListener('DOMContentLoaded', () => {
             </style>
 
             <div class="glass-card" style="padding:1rem 1.2rem; margin-bottom:1rem;">
-                <h2 style="color:var(--accent-main); margin-bottom:0.3rem; font-size:1.1rem;">🎖 MIS MEDALLAS</h2>
+                <h2 style="color:var(--accent-main); margin-bottom:0.3rem; font-size:1.1rem;">🎖 MIS INSIGNIAS</h2>
                 <p style="font-size:0.70rem; color:var(--text-dim); margin-bottom:0.8rem;">${earnedCount} de ${ACHIEVEMENTS_DEF.length} desbloqueadas</p>
                 <div id="achievements-panel" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(80px,1fr)); gap:8px;"></div>
             </div>
@@ -2728,7 +2772,7 @@ document.addEventListener('DOMContentLoaded', () => {
             { title: '⚖️ Registra tu peso', body: 'Ve a la sección PESO y escribe tu peso del día. Hazlo siempre en las mismas condiciones (al despertar, sin zapatos).' },
             { title: '🥗 Registra lo que comes', body: 'En ALIMENTOS escribe lo que comiste. Tenemos +677 alimentos mexicanos en la base. Si no aparece, te pedimos las kcal una vez y se queda guardado.' },
             { title: '🧮 Usa la calculadora', body: 'En CALCULADORA puedes: compensar excesos, sustituir alimentos, calcular tu gasto diario y proyectar cuándo llegarás a tu meta.' },
-            { title: '🏆 Gana logros', body: 'Cada constancia se reconoce: rachas, kilos abajo, hitos. Verás medallas conforme avances. ¡Empezamos!' }
+            { title: '🏆 Gana logros', body: 'Cada constancia se reconoce: rachas, kilos abajo, hitos. Verás insignias conforme avances. ¡Empezamos!' }
         ];
         let idx = 0;
         const ov = document.createElement('div');
