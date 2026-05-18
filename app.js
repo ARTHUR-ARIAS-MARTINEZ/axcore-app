@@ -1676,31 +1676,43 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 </div>
 
-                <h2 style="font-size:1.1rem; margin-bottom:1rem;">CATÁLOGO DE ENTRENAMIENTO</h2>
-                <div class="exercise-catalog" style="grid-template-columns: repeat(2, 1fr);">
+                <div class="pm-workout-filters" id="pm-wf-bar">
+                    <button class="pm-wf-chip active-todos" data-filter="todos">TODOS</button>
+                    <button class="pm-wf-chip" data-filter="cardio">CARDIO</button>
+                    <button class="pm-wf-chip" data-filter="hiit">HIIT</button>
+                    <button class="pm-wf-chip" data-filter="pierna">PIERNA</button>
+                    <button class="pm-wf-chip" data-filter="gluteo">GLÚTEO</button>
+                    <button class="pm-wf-chip" data-filter="pecho">PECHO</button>
+                    <button class="pm-wf-chip" data-filter="hombro">HOMBRO</button>
+                </div>
+                <div class="exercise-catalog" id="pm-ex-catalog" style="grid-template-columns: repeat(2, 1fr);">
                     ${ARTHUR_KNOWLEDGE.exercises_catalog.map((ex, i) => {
                         const unit = ex.unit || (ex.type === 'Cardio' || ex.type === 'HIIT' ? 'Minutos' : 'Series');
                         const baseVal = ex.baseVal || (ex.type === 'Cardio' || ex.type === 'HIIT' ? 30 : 4);
-                        // Slug del tipo: minúsculas, sin acentos, espacios → guiones
-                        // Mapeo manual (sin regex unicode) para evitar bugs de encoding
                         const typeSlug = (ex.type || '')
                             .toLowerCase()
                             .replace(/á/g, 'a').replace(/é/g, 'e').replace(/í/g, 'i').replace(/ó/g, 'o').replace(/ú/g, 'u')
-                            .replace(/ñ/g, 'n')
-                            .replace(/\s+/g, '-');
+                            .replace(/ñ/g, 'n').replace(/\s+/g, '-');
+                        const filterKey = typeSlug.startsWith('hombro') ? 'hombro'
+                            : typeSlug.startsWith('pierna') || typeSlug === 'pantorrilla' ? 'pierna'
+                            : typeSlug.startsWith('gluteo') ? 'gluteo'
+                            : typeSlug.startsWith('pecho') || typeSlug === 'espalda' ? 'pecho'
+                            : typeSlug.startsWith('cardio') ? 'cardio'
+                            : typeSlug.startsWith('hiit') ? 'hiit'
+                            : typeSlug;
                         return `
-                        <div class="exercise-card" data-ex-type="${typeSlug}" style="text-align:left; padding:0.85rem;">
-                            <h4 style="color:var(--text-primary); font-family:var(--font-accent);">${ex.name}</h4>
+                        <div class="exercise-card" data-ex-type="${typeSlug}" data-filter-key="${filterKey}" style="text-align:left;">
+                            <h4>${ex.name}</h4>
                             <span class="ex-type-chip ex-type-${typeSlug}">${ex.type}</span>
-                            <small>${ex.desc}</small>
-                            <div style="margin:1rem 0; display:flex; align-items:center; gap:10px;">
-                                <input type="number" class="ex-input" value="${baseVal}" style="width:60px; background:var(--glass-bg, rgba(0,0,0,0.2)); border:1px solid var(--accent-main); color:var(--text-primary); padding:5px; border-radius:5px;">
-                                <label style="font-size:0.8rem;">${unit}</label>
+                            <small class="ex-desc">${ex.desc}</small>
+                            <div style="margin:8px 0; display:flex; align-items:center; gap:8px;">
+                                <input type="number" class="ex-input" value="${baseVal}" style="width:55px; background:rgba(0,0,0,0.25); border:1px solid rgba(var(--pm-green-rgb,0,201,122),0.35); color:var(--text-primary); padding:4px 6px; border-radius:8px; font-size:0.85rem;">
+                                <label style="font-size:0.7rem; color:var(--pm-dim2,#5a7a99);">${unit}</label>
                             </div>
-                            <button class="btn-finish-ex" 
-                                data-base-cal="${ex.cal}" 
-                                data-base-unit="${baseVal}"
-                                style="width:100%;">REGISTRAR</button>
+                            <div style="display:flex; gap:6px; align-items:center;">
+                                <button class="btn-finish-ex" data-base-cal="${ex.cal}" data-base-unit="${baseVal}">REGISTRAR</button>
+                                <button class="btn-ex-check" data-base-cal="${ex.cal}" data-base-unit="${baseVal}" title="Registrar rápido">✓</button>
+                            </div>
                         </div>
                     `}).join('')}
                 </div>
@@ -1724,42 +1736,70 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('btn-sw-start').textContent = 'INICIAR';
         };
 
-        // Registro ejercicio – MÚLTIPLES VECES por ejercicio
+        // Filtros de workout
+        document.querySelectorAll('#pm-wf-bar .pm-wf-chip').forEach(chip => {
+            chip.onclick = () => {
+                const filter = chip.dataset.filter;
+                // Actualizar chip activo
+                document.querySelectorAll('#pm-wf-bar .pm-wf-chip').forEach(c => {
+                    c.className = 'pm-wf-chip';
+                });
+                chip.classList.add(`active-${filter}`);
+                // Mostrar/ocultar tarjetas
+                document.querySelectorAll('#pm-ex-catalog .exercise-card').forEach(card => {
+                    if (filter === 'todos' || card.dataset.filterKey === filter) {
+                        card.style.display = '';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            };
+        });
+
+        // Helper para registrar calorías desde una tarjeta
+        function registerExercise(card, btn, baseCal, baseUnit) {
+            const val = parseFloat(card.querySelector('.ex-input').value) || 0;
+            if (val <= 0) return;
+            const realCal = Math.round((baseCal / baseUnit) * val);
+            userData.caloriesBurnedToday += realCal;
+            userData.totalNetDeficit += realCal;
+            saveData();
+            updateDashboard();
+            // Badge acumulado
+            let badge = card.querySelector('.ex-badge');
+            if (!badge) {
+                badge = document.createElement('span');
+                badge.className = 'ex-badge';
+                badge.style.cssText = 'display:inline-block; background:var(--accent-main); color:#000; font-size:0.6rem; font-weight:bold; padding:2px 8px; border-radius:10px; margin-bottom:6px;';
+                card.querySelector('h4').insertAdjacentElement('afterend', badge);
+            }
+            const newTotal = parseInt(badge.dataset.total || '0') + realCal;
+            badge.dataset.total = newTotal;
+            badge.textContent = `+${newTotal} CAL HOY`;
+            return realCal;
+        }
+
+        // Botón REGISTRAR (outline)
         document.querySelectorAll('.btn-finish-ex').forEach(btn => {
             btn.onclick = (e) => {
                 const card = e.target.closest('.exercise-card');
-                const val = parseFloat(card.querySelector('.ex-input').value) || 0;
-                if (val <= 0) return;
-                const baseCal = parseInt(e.target.dataset.baseCal);
-                const baseUnit = parseInt(e.target.dataset.baseUnit);
-                const realCal = Math.round((baseCal / baseUnit) * val);
-                
-                userData.caloriesBurnedToday += realCal;
-                userData.totalNetDeficit += realCal;
-                saveData();
-                updateDashboard();
-                
-                // Acumular en badge de la tarjeta
-                let badge = card.querySelector('.ex-badge');
-                if (!badge) {
-                    badge = document.createElement('span');
-                    badge.className = 'ex-badge';
-                    badge.style.cssText = 'display:inline-block; background:var(--accent-main); color:#000; font-size:0.6rem; font-weight:bold; padding:2px 8px; border-radius:10px; margin-bottom:8px;';
-                    card.querySelector('h4').insertAdjacentElement('afterend', badge);
-                }
-                const prev = parseInt(badge.dataset.total || '0');
-                const newTotal = prev + realCal;
-                badge.dataset.total = newTotal;
-                badge.textContent = `✅ Acumulado: +${newTotal} CAL`;
-                
-                // Feedback en botón brevemente, luego se reactiva
-                const origText = e.target.textContent;
-                e.target.textContent = `+${realCal} CAL ✓`;
-                e.target.style.background = 'rgba(0,201,122,0.2)';
-                setTimeout(() => {
-                    e.target.textContent = 'REGISTRAR';
-                    e.target.style.background = '';
-                }, 1500);
+                const realCal = registerExercise(card, btn, parseInt(btn.dataset.baseCal), parseInt(btn.dataset.baseUnit));
+                if (!realCal) return;
+                btn.textContent = `+${realCal} CAL ✓`;
+                btn.style.background = 'rgba(var(--pm-green-rgb,0,201,122),0.12)';
+                setTimeout(() => { btn.textContent = 'REGISTRAR'; btn.style.background = ''; }, 1500);
+            };
+        });
+
+        // Botón checkmark (círculo relleno) — registrar con valor actual
+        document.querySelectorAll('.btn-ex-check').forEach(btn => {
+            btn.onclick = (e) => {
+                const card = e.target.closest('.exercise-card');
+                const realCal = registerExercise(card, btn, parseInt(btn.dataset.baseCal), parseInt(btn.dataset.baseUnit));
+                if (!realCal) return;
+                btn.textContent = '✓';
+                btn.style.transform = 'scale(1.2)';
+                setTimeout(() => { btn.style.transform = ''; }, 300);
             };
         });
     }
