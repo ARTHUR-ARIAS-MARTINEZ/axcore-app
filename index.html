@@ -8,9 +8,9 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0a0e14">
     <link rel="apple-touch-icon" href="logo.png">
-    <link rel="stylesheet" href="index.css?v=20260518a">
+    <link rel="stylesheet" href="index.css?v=20260518b">
     <!-- Premium UI overrides (inerte si <body> NO tiene .premium-mode) -->
-    <link rel="stylesheet" href="premium.css?v=20260518a">
+    <link rel="stylesheet" href="premium.css?v=20260518b">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <!-- Fuentes: Inter para cuerpos de texto, Oswald (Heavy Gym) para titulares -->
@@ -296,6 +296,105 @@
 
             <!-- DASHBOARD PAGE -->
             <div id="page-dashboard" class="page active">
+
+                <!-- ═══════ DASHBOARD PREMIUM (solo visible con .premium-mode) ═══════ -->
+                <div class="premium-only pd-wrap" id="premiumDashboard">
+
+                    <!-- HERO CARD -->
+                    <div class="pd-hero">
+                        <div class="pd-hero-top">
+                            <div class="pd-hero-left">
+                                <div class="pd-label">PESO ACTUAL</div>
+                                <div class="pd-weight"><span id="pd-weight">0.0</span><small>kg</small></div>
+                                <div class="pd-goal-text" id="pd-goal-text">Meta: 0 kg</div>
+                            </div>
+                            <div class="pd-ring-wrap">
+                                <svg viewBox="0 0 86 86">
+                                    <defs><linearGradient id="pdRingGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#00c97a"/><stop offset="100%" style="stop-color:#00e5ff"/></linearGradient></defs>
+                                    <circle cx="43" cy="43" r="35" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="7"/>
+                                    <circle id="pd-ring-progress" cx="43" cy="43" r="35" fill="none" stroke="url(#pdRingGrad)" stroke-width="7" stroke-dasharray="220" stroke-dashoffset="220" stroke-linecap="round" transform="rotate(-90 43 43)" style="transition:stroke-dashoffset 1.2s ease;"/>
+                                </svg>
+                                <div class="pd-ring-pct"><div class="pd-ring-num" id="pd-ring-pct">0%</div><div class="pd-ring-lbl">META</div></div>
+                            </div>
+                        </div>
+                        <div class="pd-hero-mid">
+                            <div class="pd-streak">🔥 <span id="pd-streak-days">0</span> DÍAS RACHA</div>
+                            <div class="pd-phrase">CADA REP CUENTA</div>
+                        </div>
+                        <div class="pd-progress-bar-wrap">
+                            <div class="pd-progress-labels">
+                                <span id="pd-progress-start">0 kg</span>
+                                <span id="pd-progress-pct-label">0% completado</span>
+                                <span id="pd-progress-goal">0 kg</span>
+                            </div>
+                            <div class="pd-progress-bg"><div class="pd-progress-fill" id="pd-progress-bar"></div></div>
+                        </div>
+                        <div class="pd-hero-btns">
+                            <button class="btn-premium" style="flex:1;" onclick="window.pdGoToEvolution && window.pdGoToEvolution()">+ REGISTRAR PROGRESO</button>
+                            <button class="btn-outline" onclick="window.pdGoToEvolution && window.pdGoToEvolution()">VER TODO</button>
+                        </div>
+                    </div>
+
+                    <!-- SUMMARY 2x2 -->
+                    <div class="pd-section-title">RESUMEN DE HOY</div>
+                    <div class="pd-summary-grid">
+                        <div class="pd-sum c1">
+                            <div class="pd-sum-lbl">INGERIDAS</div>
+                            <div class="pd-sum-val"><span id="pd-cal-in">0</span><small>kcal</small></div>
+                            <div class="pd-sum-sub">de <span id="pd-cal-limit">0</span> permitidas</div>
+                        </div>
+                        <div class="pd-sum c2">
+                            <div class="pd-sum-lbl">EJERCICIO</div>
+                            <div class="pd-sum-val">-<span id="pd-cal-out">0</span><small>kcal</small></div>
+                            <div class="pd-sum-sub">quemadas hoy</div>
+                        </div>
+                        <div class="pd-sum c3">
+                            <div class="pd-sum-lbl">DÉFICIT TOTAL</div>
+                            <div class="pd-sum-val"><span id="pd-deficit">0</span><small>kcal</small></div>
+                            <div class="pd-sum-sub">acumulado</div>
+                        </div>
+                        <div class="pd-sum c4">
+                            <div class="pd-sum-lbl">GRASA EQUIV.</div>
+                            <div class="pd-sum-val"><span id="pd-fat">0.0</span><small>kg</small></div>
+                            <div class="pd-sum-sub">estimado perdido</div>
+                        </div>
+                    </div>
+
+                    <!-- IMC + ÚLTIMA MEDIDA en formato premium -->
+                    <div class="pd-imc-row">
+                        <div class="pd-imc-card">
+                            <div class="pd-imc-lbl">ÍNDICE DE MASA CORPORAL</div>
+                            <div class="pd-imc-val" id="pd-imc-val">0.0</div>
+                            <div class="pd-imc-tag" id="pd-imc-tag">--</div>
+                        </div>
+                        <div class="pd-imc-card">
+                            <div class="pd-imc-lbl">ÚLTIMO REGISTRO</div>
+                            <div class="pd-last-info" id="pd-last-info">Sin registros aún</div>
+                        </div>
+                    </div>
+
+                    <!-- PRÓXIMO LOGRO -->
+                    <div class="pd-next-ach-card" id="pd-next-ach" style="display:none;">
+                        <div class="pd-next-ach-icon" id="pd-next-ach-icon">🏅</div>
+                        <div class="pd-next-ach-info">
+                            <div class="pd-next-ach-label">PRÓXIMO LOGRO</div>
+                            <div class="pd-next-ach-name" id="pd-next-ach-name">Cargando...</div>
+                            <div class="pd-next-ach-pb"><div class="pd-next-ach-pf" id="pd-next-ach-bar"></div></div>
+                        </div>
+                        <div class="pd-next-ach-pct" id="pd-next-ach-pct">0%</div>
+                    </div>
+
+                    <!-- INSIGNIAS scroll -->
+                    <div class="pd-badges-header">
+                        <div class="pd-section-title" style="margin-bottom:0;">INSIGNIAS · <span id="pd-badges-count" style="color:#00c97a;">0</span><span style="color:#3d5570;">/100</span></div>
+                        <span style="font-size:0.7rem;color:#00c97a;cursor:pointer;letter-spacing:1px;" onclick="document.querySelector('[data-page=studio]').click();">Ver todas →</span>
+                    </div>
+                    <div class="pd-badges-scroll" id="pd-badges-scroll"></div>
+                </div>
+                <!-- ═══════ FIN DASHBOARD PREMIUM ═══════ -->
+
+                <!-- DASHBOARD LEGACY (visible cuando NO está premium-mode) -->
+                <div class="legacy-only">
                 <div class="grid-stats">
                     <div class="glass-card stat-card" style="position:relative; overflow:hidden;">
                         <h3>PESO ACTUAL</h3>
@@ -394,6 +493,7 @@
                         <div id="sensation-analysis" style="margin-top:0.8rem; padding:0.8rem; background:rgba(0,0,0,0.3); border-radius:8px; font-size:0.8rem; line-height:1.5; display:none;"></div>
                     </div>
                 </div>
+                </div><!-- /.legacy-only -->
             </div>
 
             <!-- EVOLUTION PAGE -->

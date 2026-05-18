@@ -757,7 +757,106 @@ document.addEventListener('DOMContentLoaded', () => {
             const last = userData.history[userData.history.length - 1];
             lastEl.textContent = `${last.date} | Peso: ${last.weight}kg | Cintura: ${last.waist || 0}cm | Bícep: ${last.bicep || 0}cm`;
         }
+
+        // ═══ PREMIUM DASHBOARD (Paso 2) ═══
+        try { updatePremiumDashboard(); } catch(e) { console.warn('[premium-dash]', e.message); }
     }
+
+    // ═══════════════ PREMIUM DASHBOARD ═══════════════
+    function updatePremiumDashboard() {
+        const get = (id) => document.getElementById(id);
+        const set = (id, val) => { const el = get(id); if (el) el.textContent = val; };
+
+        // PESO ACTUAL + META
+        const w  = +(userData.weight || 0);
+        const tw = +(userData.target_weight || 0);
+        const sw = +(userData.startWeight || (userData.history?.[0]?.weight) || w);
+        set('pd-weight', w.toFixed(1));
+        const remain = (w - tw).toFixed(1);
+        set('pd-goal-text', tw > 0 ? `Meta: ${tw} kg · ${remain} kg restantes` : 'Meta: configura tu peso objetivo');
+
+        // RING DE PROGRESO + BARRA
+        let pct = 0;
+        if (sw > tw && sw > 0) {
+            const lost = Math.max(0, sw - w);
+            const total = sw - tw;
+            pct = Math.max(0, Math.min(100, Math.round((lost / total) * 100)));
+        }
+        const ring = get('pd-ring-progress');
+        if (ring) {
+            const dashLen = 220;
+            ring.setAttribute('stroke-dashoffset', dashLen - (dashLen * pct / 100));
+        }
+        set('pd-ring-pct', pct + '%');
+        const bar = get('pd-progress-bar');
+        if (bar) bar.style.width = pct + '%';
+        set('pd-progress-start', sw + ' kg');
+        set('pd-progress-goal', tw + ' kg');
+        set('pd-progress-pct-label', pct + '% completado');
+
+        // RACHA — del state si existe, si no calcular
+        const streak = userData.streak || (userData.history?.length || 0);
+        set('pd-streak-days', streak);
+
+        // RESUMEN DE HOY
+        const calIn  = +(userData.caloriesConsumedToday || 0);
+        const calOut = +(userData.caloriesBurnedToday || 0);
+        const lim    = +(userData.dailyCalLimit || 0);
+        const deficit = +(userData.totalNetDeficit || 0);
+        set('pd-cal-in', calIn.toLocaleString());
+        set('pd-cal-limit', lim.toLocaleString());
+        set('pd-cal-out', calOut);
+        set('pd-deficit', deficit.toLocaleString());
+        const fat = Math.abs(deficit / 7700).toFixed(2);
+        set('pd-fat', fat);
+
+        // IMC
+        const h = +(userData.height || 0);
+        if (h > 0 && w > 0) {
+            const imc = w / (h * h);
+            set('pd-imc-val', imc.toFixed(1));
+            let tag = '--';
+            if (imc < 18.5) tag = 'BAJO PESO';
+            else if (imc < 25) tag = 'NORMAL';
+            else if (imc < 30) tag = 'SOBREPESO';
+            else tag = 'OBESIDAD';
+            set('pd-imc-tag', tag);
+        }
+
+        // ÚLTIMA MEDIDA
+        if (userData.history && userData.history.length > 0) {
+            const last = userData.history[userData.history.length - 1];
+            set('pd-last-info', `${last.date} · ${last.weight} kg · cintura ${last.waist || 0} cm`);
+        }
+
+        // INSIGNIAS scroll (8 visibles, primeras unlocked + locked como mystery)
+        const ach = userData.achievements || [];
+        const ACHIEVEMENT_DEFS = (typeof ACHIEVEMENTS_DEF !== 'undefined') ? ACHIEVEMENTS_DEF : [];
+        const allBadges = (ACHIEVEMENT_DEFS.length > 0) ? ACHIEVEMENT_DEFS : [
+            // Fallback si no hay definiciones
+            { id: 'welcome', name: 'Bienvenido', emoji: '🎯' },
+            { id: 'first_log', name: '1er Registro', emoji: '📋' },
+            { id: 'streak_3', name: 'Racha 3', emoji: '🔥' },
+            { id: 'streak_7', name: 'Racha 7', emoji: '⚡' }
+        ];
+        const unlockedB = allBadges.filter(b => ach.includes(b.id)).slice(0, 6);
+        const lockedCount = Math.max(2, 8 - unlockedB.length);
+        const scroll = get('pd-badges-scroll');
+        if (scroll) {
+            scroll.innerHTML = unlockedB.map(b =>
+                `<div class="pd-badge"><div class="pd-badge-icon unlocked">${b.emoji || '🏅'}</div><div class="pd-badge-name">${(b.name || '').toUpperCase()}</div></div>`
+            ).join('') + Array.from({length: lockedCount}).map(() =>
+                `<div class="pd-badge locked"><div class="pd-badge-icon locked">🔒</div><div class="pd-badge-name">???</div></div>`
+            ).join('');
+        }
+        set('pd-badges-count', ach.length);
+    }
+
+    // Navegación rápida desde botones del hero
+    window.pdGoToEvolution = function() {
+        const link = document.querySelector('[data-page=evolution]');
+        if (link) link.click();
+    };
 
     // --- NAVIGATION ---
     navLinks.forEach(link => {
