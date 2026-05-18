@@ -157,6 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     userData = { ...userData, ...remote.data };
                     userData.lastSync = remote.lastSync;
                     if (Array.isArray(remote.achievements)) userData.achievements = remote.achievements;
+                    window.userData = userData;
                     localStorage.setItem(getStorageKey(), JSON.stringify(userData));
                     applySettings();
                     updateDashboard();

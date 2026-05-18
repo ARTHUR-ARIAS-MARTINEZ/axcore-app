@@ -711,19 +711,27 @@ body.premium-mode #page-studio h2 {
   color: var(--pm-green) !important;
 }
 
-/* Achievements grid */
+/* Achievements grid — HTML real usa #achievements-panel > .ach-card (got|locked) */
+body.premium-mode #achievements-panel .ach-card,
 body.premium-mode .achievements-grid > div {
   background: linear-gradient(135deg, rgba(0,201,122,0.12), rgba(0,229,255,0.06)) !important;
   border: 1px solid rgba(0,201,122,0.3) !important;
   border-radius: var(--pm-r2) !important;
   transition: transform .15s !important;
 }
+body.premium-mode #achievements-panel .ach-card--got {
+  background: linear-gradient(135deg, rgba(0,201,122,0.18), rgba(0,229,255,0.08)) !important;
+  border-color: rgba(0,201,122,0.45) !important;
+  box-shadow: 0 0 12px rgba(0,201,122,0.18) !important;
+}
+body.premium-mode #achievements-panel .ach-card:hover,
 body.premium-mode .achievements-grid > div:hover {
   transform: translateY(-2px);
   border-color: rgba(0,201,122,0.5) !important;
 }
 
-/* Insignias bloqueadas / no desbloqueadas → mystery block */
+/* Insignias bloqueadas → mystery block */
+body.premium-mode #achievements-panel .ach-card--locked,
 body.premium-mode .achievements-grid > div[style*="opacity"] {
   background: repeating-linear-gradient(45deg, rgba(0,0,0,.5), rgba(0,0,0,.5) 8px, rgba(20,20,20,.5) 8px, rgba(20,20,20,.5) 16px), #0a0a0a !important;
   border: 1px dashed rgba(255,255,255,0.12) !important;
@@ -731,15 +739,21 @@ body.premium-mode .achievements-grid > div[style*="opacity"] {
   filter: none !important;
   position: relative;
 }
+body.premium-mode #achievements-panel .ach-card--locked .ach-icon,
+body.premium-mode #achievements-panel .ach-card--locked .ach-title,
+body.premium-mode #achievements-panel .ach-card--locked .ach-desc,
 body.premium-mode .achievements-grid > div[style*="opacity"] img,
 body.premium-mode .achievements-grid > div[style*="opacity"] > div:first-child {
   opacity: 0.15 !important;
   filter: blur(2px) !important;
 }
+body.premium-mode #achievements-panel .ach-card--locked .ach-title,
+body.premium-mode #achievements-panel .ach-card--locked .ach-desc,
 body.premium-mode .achievements-grid > div[style*="opacity"] > p {
   color: rgba(255,255,255,0.2) !important;
   font-style: italic !important;
 }
+body.premium-mode #achievements-panel .ach-card--locked::after,
 body.premium-mode .achievements-grid > div[style*="opacity"]::after {
   content: '🔒';
   position: absolute;
@@ -749,6 +763,8 @@ body.premium-mode .achievements-grid > div[style*="opacity"]::after {
   color: rgba(255,255,255,0.35);
   pointer-events: none;
   z-index: 1;
+  filter: none !important;
+  opacity: 1 !important;
 }
 
 /* Studio Pro / controles */
