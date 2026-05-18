@@ -8,9 +8,9 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0a0e14">
     <link rel="apple-touch-icon" href="logo.png">
-    <link rel="stylesheet" href="index.css?v=20260518d">
+    <link rel="stylesheet" href="index.css?v=20260518e">
     <!-- Premium UI overrides (inerte si <body> NO tiene .premium-mode) -->
-    <link rel="stylesheet" href="premium.css?v=20260518d">
+    <link rel="stylesheet" href="premium.css?v=20260518e">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <!-- Fuentes: Inter para cuerpos de texto, Oswald (Heavy Gym) para titulares -->
@@ -31,7 +31,9 @@
     <script>
     (function applyPremiumPref(){
         try {
-            var on = localStorage.getItem('axcore_premium_ui') === '1';
+            // Premium = DEFAULT (Paso 5). Si nunca tocaste el toggle → premium ON.
+            var pref = localStorage.getItem('axcore_premium_ui');
+            var on = pref === null ? true : (pref === '1');
             if (on) {
                 var apply = function(){ document.body && document.body.classList.add('premium-mode'); };
                 if (document.body) apply();
@@ -43,7 +45,8 @@
     // Función global para toggle (usada desde Ajustes)
     window.togglePremiumUI = function(){
         try {
-            var cur = localStorage.getItem('axcore_premium_ui') === '1';
+            var pref = localStorage.getItem('axcore_premium_ui');
+            var cur = pref === null ? true : (pref === '1');
             var next = !cur;
             localStorage.setItem('axcore_premium_ui', next ? '1' : '0');
             document.body.classList.toggle('premium-mode', next);
@@ -61,7 +64,9 @@
     // Sincronizar el visual del toggle cuando navega a Ajustes
     window.syncPremiumToggleVisual = function(){
         try {
-            var on = localStorage.getItem('axcore_premium_ui') === '1';
+            // Si pref es null, premium está ON por default
+            var pref = localStorage.getItem('axcore_premium_ui');
+            var on = pref === null ? true : (pref === '1');
             var sw = document.getElementById('premiumToggleSwitch');
             if (sw) sw.classList.toggle('on', on);
         } catch(e) {}
@@ -680,13 +685,13 @@
             <div id="page-studio" class="page"></div>
             <div id="page-settings" class="page">
 
-                <!-- TOGGLE MODO PREMIUM (Paso 1 de migración progresiva) -->
+                <!-- TOGGLE MODO PREMIUM (Paso 5: ahora DEFAULT activo) -->
                 <div class="premium-toggle-row" id="premiumToggleRow" onclick="togglePremiumUI()" style="max-width:800px;margin:0 auto 1.5rem;">
                     <div class="ptr-text">
-                        <div class="ptr-title">MODO PREMIUM <span class="premium-beta-tag">BETA</span></div>
-                        <div class="ptr-sub">Nueva interfaz visual estilo prototipo. Toggle ON/OFF cuando quieras — todos tus datos se mantienen.</div>
+                        <div class="ptr-title">MODO PREMIUM <span class="premium-beta-tag">ACTIVO</span></div>
+                        <div class="ptr-sub">Nueva interfaz premium con FAB, 100 insignias y onboarding. Apágalo aquí si prefieres la versión clásica — tus datos se mantienen.</div>
                     </div>
-                    <div class="premium-toggle-switch" id="premiumToggleSwitch"></div>
+                    <div class="premium-toggle-switch on" id="premiumToggleSwitch"></div>
                 </div>
 
                 <div class="grid-stats">
@@ -732,9 +737,10 @@
     <!-- Gráficas (Al final para no bloquear inicio rápido) -->
     <script src="https://cdn.jsdelivr.net/npm/apexcharts" defer></script>
     <script src="knowledge.js?v=20260517d"></script>
-    <script src="app.js?v=20260518c"></script>
-    <!-- Premium UI: sistema de 100 insignias (carga después de app.js) -->
-    <script src="premium-badges.js?v=20260518c"></script>
+    <script src="app.js?v=20260518e"></script>
+    <!-- Premium UI: sistema de 100 insignias + FAB + onboarding -->
+    <script src="premium-badges.js?v=20260518e"></script>
+    <script src="premium-extras.js?v=20260518e"></script>
 
     <!-- REGISTRO GLOBAL — funciona aunque app.js falle -->
     <script>
