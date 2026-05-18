@@ -955,6 +955,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (pageId === 'assistant' && typeof window._activateCalculator === 'function') window._activateCalculator();
             if (pageId === 'settings' && typeof window.syncPremiumToggleVisual === 'function') window.syncPremiumToggleVisual();
 
+            // Sincronizar bottom nav premium
+            document.querySelectorAll('.pm-nav-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.pmPage === pageId);
+            });
+
             // Mostrar mini-cronómetro cuando NO estamos en workout y está corriendo
             const miniContainer = document.getElementById('sw-mini-container');
             if (miniContainer) {

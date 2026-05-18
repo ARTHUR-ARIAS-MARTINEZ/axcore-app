@@ -1287,3 +1287,245 @@ body.premium-mode .theme-btn:active {
   margin-left: 8px;
   vertical-align: middle;
 }
+
+/* ══════════════════════════════════════════════════════════════════
+   PREMIUM LAYOUT TRANSFORMATION
+   Convierte la UI de producción al look élite del prototipo.
+   Activo solo cuando body tiene .premium-mode.
+   ══════════════════════════════════════════════════════════════════ */
+
+/* ── 1. OCULTAR SIDE-NAV LEGACY ── */
+body.premium-mode .side-nav { display: none !important; }
+
+/* ── 2. APP-CONTAINER FULL WIDTH ── */
+body.premium-mode #app-container {
+  grid-template-columns: 1fr !important;
+  grid-template-rows: auto 1fr !important;
+}
+
+/* ── 3. CONTENT AREA SIN PADDING EXTRA ── */
+body.premium-mode .content-area {
+  padding: 0 !important;
+  padding-bottom: 88px !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  max-width: 100vw !important;
+}
+
+/* ── 4. TOP BAR → HEADER COMPACTO ÉLITE ── */
+body.premium-mode .top-bar {
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  margin-bottom: 0 !important;
+  padding: 10px 16px !important;
+  background: rgba(6,13,26,0.97) !important;
+  border-bottom: 1px solid rgba(0,201,122,0.08) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 200 !important;
+  gap: 10px !important;
+  min-height: 52px !important;
+}
+
+/* User badge compacto */
+body.premium-mode .user-badge {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  gap: 8px !important;
+  flex: 1 !important;
+  min-width: 0 !important;
+}
+
+/* Avatar premium pequeño */
+body.premium-mode .avatar {
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 50% !important;
+  border: 1.5px solid rgba(0,201,122,0.5) !important;
+  box-shadow: 0 0 8px rgba(0,201,122,0.3), 0 0 0 3px rgba(0,201,122,0.06) !important;
+  flex-shrink: 0 !important;
+  background: linear-gradient(135deg,rgba(0,201,122,0.3),rgba(0,229,255,0.2)) !important;
+}
+
+/* Nombre de usuario compacto */
+body.premium-mode .user-rank {
+  font-family: 'Oswald', sans-serif !important;
+  font-size: 0.72rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 1.5px !important;
+  color: #e8edf5 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  max-width: 140px !important;
+  text-shadow: none !important;
+}
+
+/* "toca para editar" subtítulo pequeño */
+body.premium-mode .user-badge::after {
+  content: 'toca para editar';
+  display: block;
+  font-size: 0.5rem;
+  color: rgba(0,201,122,0.6);
+  letter-spacing: 1px;
+  line-height: 1;
+  margin-top: 2px;
+}
+body.premium-mode .avatar-upload { display: none !important; }
+
+/* Live stats compacto (reloj + fecha) — derecha */
+body.premium-mode .live-stats {
+  font-size: 0.7rem !important;
+  text-align: right !important;
+  color: #e8edf5 !important;
+  font-family: 'Oswald', sans-serif !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.5px !important;
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-end !important;
+  gap: 1px !important;
+}
+body.premium-mode .live-stats .separator { display: none !important; }
+body.premium-mode #live-date {
+  font-size: 0.52rem !important;
+  color: rgba(90,122,153,0.9) !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.5px !important;
+}
+
+/* Ocultar mini-cronómetro del header en premium (FAB lo cubre) */
+body.premium-mode #sw-mini-container { display: none !important; }
+
+/* ── 5. DASHBOARD PREMIUM: PD-WRAP SIN MARGEN LATERAL EXTRA ── */
+body.premium-mode .pd-wrap {
+  padding: 14px 14px 20px !important;
+  max-width: 100% !important;
+}
+
+/* Peso actual: fuente igual al prototipo (46px equiv) */
+body.premium-mode .pd-weight {
+  font-size: 3.4rem !important;
+  letter-spacing: -1.5px !important;
+}
+body.premium-mode .pd-label {
+  font-size: 0.6rem !important;
+  letter-spacing: 2.5px !important;
+}
+
+/* Botones hero más compactos */
+body.premium-mode .pd-hero {
+  padding: 18px 18px 16px !important;
+}
+
+/* ── 6. PÁGINAS — PADDING PARA NAV INFERIOR ── */
+body.premium-mode .page {
+  padding-bottom: 90px !important;
+}
+body.premium-mode #page-dashboard {
+  padding-bottom: 0 !important;
+}
+body.premium-mode .pd-wrap {
+  padding-bottom: 90px !important;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   PREMIUM BOTTOM NAV — Idéntico al prototipo
+   ══════════════════════════════════════════════════════════════════ */
+.pm-bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 80px;
+  padding: 0 12px 12px;
+  display: none;
+  align-items: flex-end;
+  z-index: 500;
+  pointer-events: none;
+}
+body.premium-mode .pm-bottom-nav { display: flex; }
+
+.pm-bottom-nav-inner {
+  width: 100%;
+  max-width: 560px;
+  margin: 0 auto;
+  height: 60px;
+  background: rgba(9,18,30,0.92);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(0,201,122,0.08);
+  border-radius: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 4px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.03);
+  pointer-events: all;
+}
+
+.pm-nav-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 7px 2px;
+  cursor: pointer;
+  border-radius: 14px;
+  transition: all .2s;
+  position: relative;
+  min-width: 0;
+}
+.pm-nav-btn svg {
+  width: 18px;
+  height: 18px;
+  stroke: rgba(90,122,153,0.7);
+  fill: none;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: all .2s;
+}
+.pm-nav-btn span {
+  font-size: 5.5px;
+  color: rgba(90,122,153,0.7);
+  letter-spacing: 0.5px;
+  font-weight: 600;
+  font-family: 'Oswald', sans-serif;
+  white-space: nowrap;
+  transition: color .2s;
+}
+.pm-nav-btn.active svg {
+  stroke: #00c97a;
+  filter: drop-shadow(0 0 4px rgba(0,201,122,0.7));
+}
+.pm-nav-btn.active span { color: #00c97a; }
+.pm-nav-btn.active::before {
+  content: '';
+  position: absolute;
+  top: 3px; left: 50%;
+  transform: translateX(-50%);
+  width: 4px; height: 4px;
+  background: #00c97a;
+  border-radius: 50%;
+  box-shadow: 0 0 6px #00c97a;
+}
+.pm-nav-btn:active { transform: scale(0.88); }
+
+/* FAB no chocar con el nav */
+body.premium-mode .pm-fab-wrap {
+  bottom: 88px !important;
+}
+@media (max-width: 768px) {
+  body.premium-mode .pm-fab-wrap {
+    bottom: 92px !important;
+    right: 16px !important;
+  }
+}
