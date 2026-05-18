@@ -2283,9 +2283,19 @@ body.premium-mode .danger-btn:active { transform: scale(0.97); }
 /* Etiquetas de sección — uniformes en TODA la app premium */
 body.premium-mode .pd-section-title,
 body.premium-mode .section-title,
+body.premium-mode .pd-badges-header .pd-section-title,
+body.premium-mode .pm-diet-bar-lbl {
+  font-family: 'Oswald', sans-serif !important;
+  font-size: 0.65rem !important;
+  letter-spacing: 2px !important;
+  text-transform: uppercase !important;
+  color: var(--pm-dim2) !important;
+  font-weight: 600 !important;
+}
+/* Hint de Dieta NO debe ser uppercase (es un texto descriptivo, no etiqueta) */
 body.premium-mode .pm-d-log-hint {
   font-family: 'Oswald', sans-serif !important;
-  letter-spacing: 2px !important;
+  letter-spacing: 1.5px !important;
 }
 
 /* Streak badge — estilo idéntico al prototipo (.streak-badge) */
@@ -2313,4 +2323,271 @@ body.premium-mode .pd-streak span {
   font-family: 'Oswald', sans-serif;
   font-size: 0.75rem;
   font-weight: 700;
+}
+
+/* Link "Ver todas →" en el header de insignias */
+body.premium-mode .pd-badges-link {
+  color: var(--pm-green) !important;
+  transition: opacity .2s;
+}
+body.premium-mode .pd-badges-link:hover {
+  opacity: 0.7;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   BARRIDO PARTE 2 — CHIPS DE TIPO DE EJERCICIO POR COLOR SEMÁNTICO
+   Cada tipo tiene un color distinto. Los chips son:
+   .ex-type-chip + .ex-type-[slug] (cardio, hiit, pierna, etc.)
+   ══════════════════════════════════════════════════════════════════ */
+body.premium-mode .ex-type-chip {
+  display: inline-block;
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  padding: 3px 9px;
+  border-radius: 99px;
+  margin-bottom: 8px;
+  background: rgba(255,255,255,0.05);
+  color: var(--pm-dim2);
+  border: 1px solid rgba(255,255,255,0.06);
+  text-transform: uppercase;
+}
+
+/* CARDIO — cyan del tema (acento secundario) */
+body.premium-mode .ex-type-cardio {
+  background: rgba(var(--pm-cyan-rgb), 0.12) !important;
+  color: var(--pm-cyan) !important;
+  border-color: rgba(var(--pm-cyan-rgb), 0.3) !important;
+}
+
+/* HIIT — rojo/coral */
+body.premium-mode .ex-type-hiit {
+  background: rgba(255, 99, 107, 0.12) !important;
+  color: #ff636b !important;
+  border-color: rgba(255, 99, 107, 0.3) !important;
+}
+
+/* PIERNA, PANTORRILLA — violeta */
+body.premium-mode .ex-type-pierna,
+body.premium-mode .ex-type-pantorrilla {
+  background: rgba(155, 127, 255, 0.12) !important;
+  color: #9b7fff !important;
+  border-color: rgba(155, 127, 255, 0.3) !important;
+}
+
+/* GLÚTEO — rosa */
+body.premium-mode .ex-type-gluteo {
+  background: rgba(255, 107, 157, 0.12) !important;
+  color: #ff6b9d !important;
+  border-color: rgba(255, 107, 157, 0.3) !important;
+}
+
+/* PECHO, HOMBROS, ESPALDA — ámbar/naranja (tren superior) */
+body.premium-mode .ex-type-pecho,
+body.premium-mode .ex-type-hombros,
+body.premium-mode .ex-type-espalda {
+  background: rgba(255, 153, 0, 0.12) !important;
+  color: #ff9900 !important;
+  border-color: rgba(255, 153, 0, 0.3) !important;
+}
+
+/* BÍCEPS, TRÍCEPS — verde acento (brazos) */
+body.premium-mode .ex-type-biceps,
+body.premium-mode .ex-type-triceps {
+  background: rgba(var(--pm-green-rgb), 0.12) !important;
+  color: var(--pm-green) !important;
+  border-color: rgba(var(--pm-green-rgb), 0.3) !important;
+}
+
+/* CORE, CALISTENIA — lavanda eléctrica */
+body.premium-mode .ex-type-core,
+body.premium-mode .ex-type-calistenia {
+  background: rgba(191, 95, 255, 0.12) !important;
+  color: #bf5fff !important;
+  border-color: rgba(191, 95, 255, 0.3) !important;
+}
+
+/* CARRERA — cyan ligeramente diferenciado */
+body.premium-mode .ex-type-carrera {
+  background: rgba(0, 191, 255, 0.12) !important;
+  color: #00bfff !important;
+  border-color: rgba(0, 191, 255, 0.3) !important;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   BARRIDO PARTE 3 — AJUSTES LISTA iOS-STYLE
+   ══════════════════════════════════════════════════════════════════ */
+
+.pm-settings-block { display: none; }
+
+body.premium-mode .pm-settings-block {
+  display: block;
+  background: var(--pm-s1);
+  border: 1px solid var(--pm-border);
+  border-radius: var(--pm-r2);
+  overflow: hidden;
+  max-width: 800px;
+  margin: 0 auto 14px;
+}
+
+body.premium-mode .pm-s-row {
+  padding: 14px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--pm-border);
+  cursor: pointer;
+  transition: background .15s;
+}
+body.premium-mode .pm-s-row:last-child {
+  border-bottom: none;
+}
+body.premium-mode .pm-s-row:hover {
+  background: rgba(255,255,255,0.02);
+}
+body.premium-mode .pm-s-row:active {
+  background: rgba(var(--pm-green-rgb), 0.05);
+}
+
+body.premium-mode .pm-s-row-lbl {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--pm-white);
+}
+body.premium-mode .pm-s-row-val {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.82rem;
+  color: var(--pm-dim2);
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 60%;
+  text-align: right;
+}
+/* Cuando el valor de instalar es "DISPONIBLE" lo pintamos verde */
+body.premium-mode .pm-s-row-disp.available {
+  color: var(--pm-green) !important;
+  font-weight: 600;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   BARRIDO PARTE 4 — PANTALLA CALC (Asistente de Comida + Proyección)
+   Look idéntico al prototipo: .calc-tool con borde de acento
+   ══════════════════════════════════════════════════════════════════ */
+
+body.premium-mode .pm-calc-tool {
+  background: var(--pm-s1) !important;
+  border: 1px solid var(--pm-border) !important;
+  border-radius: var(--pm-r2) !important;
+  padding: 14px !important;
+  margin-bottom: 10px !important;
+  color: var(--pm-white);
+}
+
+/* Tarjeta destacada del Asistente — con un toque de acento */
+body.premium-mode .pm-calc-assistant {
+  background: linear-gradient(135deg, var(--pm-s1), rgba(var(--pm-green-rgb), 0.04)) !important;
+  border: 1px solid rgba(var(--pm-green-rgb), 0.25) !important;
+}
+
+body.premium-mode .pm-calc-hdr {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+body.premium-mode .pm-calc-icon {
+  font-size: 18px;
+  line-height: 1;
+}
+body.premium-mode .pm-calc-title {
+  font-family: 'Oswald', sans-serif !important;
+  font-size: 0.95rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 1px !important;
+  margin: 0 !important;
+}
+body.premium-mode .pm-calc-title-green  { color: var(--pm-green) !important; }
+body.premium-mode .pm-calc-title-violet { color: #9b7fff !important; }
+
+body.premium-mode .pm-calc-desc {
+  font-size: 0.7rem !important;
+  color: var(--pm-dim2) !important;
+  margin: 4px 0 12px !important;
+  line-height: 1.5;
+}
+
+/* Input + botón en la MISMA línea (no debajo) */
+body.premium-mode .pm-calc-row {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+body.premium-mode .pm-calc-input {
+  flex: 1;
+  background: rgba(0,0,0,0.3) !important;
+  border: 1px solid var(--pm-border) !important;
+  border-radius: var(--pm-r3) !important;
+  padding: 9px 10px !important;
+  color: var(--pm-white) !important;
+  font-family: 'Inter', sans-serif !important;
+  font-size: 0.85rem !important;
+  outline: none;
+  min-width: 0;
+}
+body.premium-mode .pm-calc-input:focus {
+  border-color: rgba(var(--pm-green-rgb), 0.45) !important;
+}
+
+body.premium-mode .pm-calc-btn {
+  background: var(--pm-green);
+  color: #000;
+  font-family: 'Oswald', sans-serif;
+  font-weight: 700;
+  font-size: 0.75rem;
+  letter-spacing: 1.5px;
+  border: none;
+  padding: 9px 16px;
+  border-radius: var(--pm-r3);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: transform .15s, box-shadow .2s;
+}
+body.premium-mode .pm-calc-btn:active { transform: scale(0.95); }
+body.premium-mode .pm-calc-btn-green {
+  background: var(--pm-green) !important;
+  color: #000 !important;
+  box-shadow: 0 2px 10px rgba(var(--pm-green-rgb), 0.3) !important;
+}
+
+/* Botón violeta semántico para PROYECCIÓN */
+body.premium-mode .pm-calc-btn-violet {
+  background: #9b7fff !important;
+  background: linear-gradient(135deg, #9b7fff, #7c5cbf) !important;
+  color: #fff !important;
+  border: none !important;
+  font-family: 'Oswald', sans-serif !important;
+  font-weight: 700 !important;
+  letter-spacing: 2px !important;
+  border-radius: 99px !important;
+  box-shadow: 0 4px 18px rgba(155, 127, 255, 0.35) !important;
+}
+body.premium-mode .pm-calc-btn-violet:hover {
+  box-shadow: 0 6px 24px rgba(155, 127, 255, 0.5) !important;
+}
+
+/* Subtexto pequeño debajo del input ("o escribe kcal directamente") */
+body.premium-mode .pm-calc-sub {
+  font-size: 0.6rem;
+  color: var(--pm-dim);
+  letter-spacing: 1px;
+  text-align: center;
+  margin: 4px 0 8px;
+}
+body.premium-mode .pm-calc-sub strong {
+  color: var(--pm-green);
+  font-family: 'Oswald', sans-serif;
 }

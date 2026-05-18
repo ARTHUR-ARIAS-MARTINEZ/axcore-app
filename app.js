@@ -873,17 +873,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 const cPath = hasWaist ? waists.map((v, i) => `${i===0?'M':'L'}${toX(i).toFixed(1)},${toY(v).toFixed(1)}`).join(' ') : '';
                 const lastX = toX(pts.length - 1).toFixed(1);
                 const lastY = toY(weights[weights.length - 1]).toFixed(1);
+                // Leer color del tema activo (responde a NEON/GOLD/CORAL/etc.)
+                const themeStyles = getComputedStyle(document.body);
+                const accentMain = (themeStyles.getPropertyValue('--accent-main') || '#00c97a').trim();
+                const accentSec  = (themeStyles.getPropertyValue('--accent-secondary') || '#00e5ff').trim();
                 spark.innerHTML = `
                     <defs>
                         <linearGradient id="pdSG" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" style="stop-color:#00c97a;stop-opacity:.28"/>
-                            <stop offset="100%" style="stop-color:#00c97a;stop-opacity:0"/>
+                            <stop offset="0%" style="stop-color:${accentMain};stop-opacity:.28"/>
+                            <stop offset="100%" style="stop-color:${accentMain};stop-opacity:0"/>
                         </linearGradient>
                     </defs>
                     <path d="${aPath}" fill="url(#pdSG)" opacity=".7"/>
-                    <path d="${wPath}" fill="none" stroke="#00c97a" stroke-width="2" stroke-linecap="round"/>
-                    ${cPath ? `<path d="${cPath}" fill="none" stroke="#00e5ff" stroke-width="1.5" stroke-dasharray="4 2" opacity=".7"/>` : ''}
-                    <circle cx="${lastX}" cy="${lastY}" r="3" fill="#00c97a"/>`;
+                    <path d="${wPath}" fill="none" stroke="${accentMain}" stroke-width="2" stroke-linecap="round"/>
+                    ${cPath ? `<path d="${cPath}" fill="none" stroke="${accentSec}" stroke-width="1.5" stroke-dasharray="4 2" opacity=".7"/>` : ''}
+                    <circle cx="${lastX}" cy="${lastY}" r="3" fill="${accentMain}"/>`;
                 get('pd-spark-svg').parentElement.style.display = '';
             }
         } else if (evolSection) {
@@ -921,6 +925,46 @@ document.addEventListener('DOMContentLoaded', () => {
         if (link) link.click();
     };
 
+    // ═══════════════ AJUSTES iOS — Funciones de filas ═══════════════
+    window.pmEditUserName = function() {
+        try {
+            const ud = window.userData || userData || {};
+            const cur = ud.userName || currentUser || '';
+            const v = prompt('Nombre de usuario:', cur);
+            if (v === null) return;
+            const newName = v.trim();
+            if (!newName) return;
+            userData.userName = newName;
+            saveData();
+            // Sync visual: profile hero + fila iOS + display-username del header
+            if (typeof window.updatePmProfileHero === 'function') window.updatePmProfileHero();
+            const row = document.getElementById('pmSRowName');
+            if (row) row.textContent = newName.toUpperCase() + ' ›';
+            const du = document.getElementById('display-username');
+            if (du) du.textContent = newName.toUpperCase();
+        } catch (e) { console.warn('[pmEditUserName]', e.message); }
+    };
+
+    window.pmChangePassword = function() {
+        // Si existe lógica de cambio de contraseña en el backend, se conecta aquí.
+        // Por ahora: feedback claro al usuario.
+        alert('Para cambiar tu contraseña, contacta al administrador.\n\nEn próxima versión podrás hacerlo desde aquí.');
+    };
+
+    // Actualizar visibilidad de "Instalar en dispositivo"
+    window.pmSyncInstallRow = function() {
+        const val = document.getElementById('pmInstallVal');
+        if (!val) return;
+        // Si hay deferredPrompt → mostrar DISPONIBLE
+        if (deferredPrompt) {
+            val.textContent = 'DISPONIBLE ›';
+            val.classList.add('available');
+        } else {
+            val.textContent = 'NO DISPONIBLE ›';
+            val.classList.remove('available');
+        }
+    };
+
     // ═══════════════ PROFILE HERO (Ajustes premium) ═══════════════
     window.updatePmProfileHero = function() {
         try {
@@ -944,6 +988,9 @@ document.addEventListener('DOMContentLoaded', () => {
             setText('pmProfName', name.toUpperCase());
             const code = ud.gymCode || ud.axvCode || 'AXV-DEMO';
             setText('pmProfCode', `● ${code} · ACTIVO`);
+
+            // Sync nombre en fila iOS de Ajustes
+            setText('pmSRowName', name.toUpperCase() + ' ›');
 
             // Stats: días, kg perdidos, insignias
             const history = Array.isArray(ud.history) ? ud.history : [];
@@ -1003,6 +1050,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (pageId === 'assistant' && typeof window._activateCalculator === 'function') window._activateCalculator();
             if (pageId === 'settings' && typeof window.syncPremiumToggleVisual === 'function') window.syncPremiumToggleVisual();
             if (pageId === 'settings' && typeof window.updatePmProfileHero === 'function') window.updatePmProfileHero();
+            if (pageId === 'settings' && typeof window.pmSyncInstallRow === 'function') window.pmSyncInstallRow();
 
             // Sincronizar bottom nav premium
             document.querySelectorAll('.pm-nav-btn').forEach(btn => {
@@ -1633,10 +1681,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     ${ARTHUR_KNOWLEDGE.exercises_catalog.map((ex, i) => {
                         const unit = ex.unit || (ex.type === 'Cardio' || ex.type === 'HIIT' ? 'Minutos' : 'Series');
                         const baseVal = ex.baseVal || (ex.type === 'Cardio' || ex.type === 'HIIT' ? 30 : 4);
+                        // Slug del tipo: minúsculas, sin acentos, espacios → guiones
+                        // Mapeo manual (sin regex unicode) para evitar bugs de encoding
+                        const typeSlug = (ex.type || '')
+                            .toLowerCase()
+                            .replace(/á/g, 'a').replace(/é/g, 'e').replace(/í/g, 'i').replace(/ó/g, 'o').replace(/ú/g, 'u')
+                            .replace(/ñ/g, 'n')
+                            .replace(/\s+/g, '-');
                         return `
-                        <div class="exercise-card" style="text-align:left; padding:0.85rem;">
+                        <div class="exercise-card" data-ex-type="${typeSlug}" style="text-align:left; padding:0.85rem;">
                             <h4 style="color:var(--text-primary); font-family:var(--font-accent);">${ex.name}</h4>
-                            <span style="font-size:0.7rem; color:var(--bg-dark); background:var(--accent-secondary); border-radius:10px; padding:3px 8px; display:inline-block; margin-bottom:10px; font-weight:bold;">${ex.type}</span>
+                            <span class="ex-type-chip ex-type-${typeSlug}">${ex.type}</span>
                             <small>${ex.desc}</small>
                             <div style="margin:1rem 0; display:flex; align-items:center; gap:10px;">
                                 <input type="number" class="ex-input" value="${baseVal}" style="width:60px; background:var(--glass-bg, rgba(0,0,0,0.2)); border:1px solid var(--accent-main); color:var(--text-primary); padding:5px; border-radius:5px;">

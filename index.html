@@ -8,9 +8,9 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0a0e14">
     <link rel="apple-touch-icon" href="logo.png">
-    <link rel="stylesheet" href="index.css?v=20260518l">
+    <link rel="stylesheet" href="index.css?v=20260518r">
     <!-- Premium UI overrides (inerte si <body> NO tiene .premium-mode) -->
-    <link rel="stylesheet" href="premium.css?v=20260518l">
+    <link rel="stylesheet" href="premium.css?v=20260518r">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <!-- Fuentes: Inter para cuerpos de texto, Oswald (Heavy Gym) para titulares -->
@@ -322,8 +322,8 @@
                                 <div class="pd-goal-text" id="pd-goal-text">Meta: 0 kg</div>
                             </div>
                             <div class="pd-ring-wrap">
-                                <svg viewBox="0 0 86 86">
-                                    <defs><linearGradient id="pdRingGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#00c97a"/><stop offset="100%" style="stop-color:#00e5ff"/></linearGradient></defs>
+                                <svg viewBox="0 0 86 86" class="pd-ring-svg">
+                                    <defs><linearGradient id="pdRingGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:var(--accent-main, #00c97a)"/><stop offset="100%" style="stop-color:var(--accent-secondary, #00e5ff)"/></linearGradient></defs>
                                     <circle cx="43" cy="43" r="35" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="7"/>
                                     <circle id="pd-ring-progress" cx="43" cy="43" r="35" fill="none" stroke="url(#pdRingGrad)" stroke-width="7" stroke-dasharray="220" stroke-dashoffset="220" stroke-linecap="round" transform="rotate(-90 43 43)" style="transition:stroke-dashoffset 1.2s ease;"/>
                                 </svg>
@@ -416,8 +416,8 @@
 
                     <!-- INSIGNIAS scroll -->
                     <div class="pd-badges-header">
-                        <div class="pd-section-title" style="margin-bottom:0;">INSIGNIAS · <span id="pd-badges-count" style="color:#00c97a;">0</span><span style="color:#3d5570;">/100</span></div>
-                        <span style="font-size:0.7rem;color:#00c97a;cursor:pointer;letter-spacing:1px;" onclick="window.pmOpenBadges && window.pmOpenBadges()">Ver todas →</span>
+                        <div class="pd-section-title" style="margin-bottom:0;">INSIGNIAS · <span id="pd-badges-count" style="color:var(--accent-main);">0</span><span style="color:var(--text-dim);">/100</span></div>
+                        <span class="pd-badges-link" style="font-size:0.7rem;cursor:pointer;letter-spacing:1px;" onclick="window.pmOpenBadges && window.pmOpenBadges()">Ver todas →</span>
                     </div>
                     <div class="pd-badges-scroll" id="pd-badges-scroll"></div>
                 </div>
@@ -654,14 +654,18 @@
                     <p id="calc-status-line" style="font-size:0.85rem; color:var(--text-dim); line-height:1.5;">--</p>
                 </div>
 
-                <!-- 1. COMPENSAR CALORÍAS EXTRA -->
-                <div class="glass-card" style="padding:1.5rem; margin-bottom:1.5rem;">
-                    <h3 style="color:var(--accent-main); font-family:var(--font-accent); font-size:0.95rem; margin-bottom:0.3rem;">🔥 COMPENSAR EXTRA</h3>
-                    <p style="font-size:0.75rem; color:var(--text-dim); margin-bottom:1rem;">Te pasaste de calorías o vas a comer algo extra. Te digo cuánto ejercicio compensa.</p>
-                    <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                        <input type="number" id="calc-extra-cal" placeholder="kcal extra (ej. 300)" style="flex:1; min-width:140px; background:rgba(0,0,0,0.3); border:1px solid var(--accent-main); padding:0.9rem; color:#fff; border-radius:10px; font-size:1rem;">
-                        <button class="btn-premium" id="btn-calc-compensate" style="flex:1; min-width:110px; padding:0.9rem; font-weight:bold;">CALCULAR</button>
+                <!-- 1. ASISTENTE DE COMIDA (look del prototipo) -->
+                <div class="glass-card pm-calc-tool pm-calc-assistant" style="padding:1.5rem; margin-bottom:1.5rem;">
+                    <div class="pm-calc-hdr">
+                        <span class="pm-calc-icon">🧠</span>
+                        <h3 class="pm-calc-title pm-calc-title-green">ASISTENTE DE COMIDA</h3>
                     </div>
+                    <p class="pm-calc-desc">Escribe un alimento o pega cuántas kcal vas a meter. Te digo calorías, ejercicio para compensar y alternativas.</p>
+                    <div class="pm-calc-row">
+                        <input type="number" id="calc-extra-cal" class="pm-calc-input" placeholder="Ej. taco al pastor / pizza / 300">
+                        <button class="pm-calc-btn pm-calc-btn-green" id="btn-calc-compensate">ANALIZAR</button>
+                    </div>
+                    <div class="pm-calc-sub">o escribe directamente cuántas kcal (ej. <strong>300</strong>)</div>
                     <div id="calc-compensate-result" style="margin-top:1rem;"></div>
                 </div>
 
@@ -699,10 +703,13 @@
                 </div>
 
                 <!-- 4. PROYECCIÓN A META -->
-                <div class="glass-card" style="padding:1.5rem; margin-bottom:1.5rem;">
-                    <h3 style="color:#00d4ff; font-family:var(--font-accent); font-size:0.95rem; margin-bottom:0.3rem;">🎯 PROYECCIÓN A TU META</h3>
-                    <p style="font-size:0.75rem; color:var(--text-dim); margin-bottom:1rem;">Calcula cuándo llegarás a tu meta según tu déficit acumulado.</p>
-                    <button class="btn-premium" id="btn-calc-projection" style="width:100%; padding:0.9rem; font-weight:bold;">VER PROYECCIÓN</button>
+                <div class="glass-card pm-calc-tool" style="padding:1.5rem; margin-bottom:1.5rem;">
+                    <div class="pm-calc-hdr">
+                        <span class="pm-calc-icon">🎯</span>
+                        <h3 class="pm-calc-title pm-calc-title-violet">PROYECCIÓN A TU META</h3>
+                    </div>
+                    <p class="pm-calc-desc">Con tu ritmo actual, cuándo llegas a tu peso meta y cuántos gramos por día.</p>
+                    <button class="btn-premium pm-calc-btn-violet" id="btn-calc-projection" style="width:100%; padding:0.9rem; font-weight:bold;">VER PROYECCIÓN</button>
                     <div id="calc-projection-result" style="margin-top:1rem;"></div>
                 </div>
 
@@ -754,16 +761,37 @@
                         <button id="save-settings" class="btn-premium" style="width:100%">GUARDAR SISTEMA</button>
                     </div>
 
-                    <div class="glass-card settings-panel" style="text-align: center;">
+                    <!-- Panel COMPARTIR / DESCARGAR (legacy mode) -->
+                    <div class="glass-card settings-panel legacy-only" style="text-align: center;">
                         <h2 style="color:var(--accent-secondary);">📤 COMPARTIR APP</h2>
                         <p style="font-size:0.8rem; color:var(--text-dim); margin-bottom:1rem;">Comparte el acceso a AX-CORE con otros atletas.</p>
                         <button id="btn-share-app" class="btn-premium" style="width:100%; background:transparent; border:1px solid var(--accent-secondary); color:var(--accent-secondary); margin-bottom:1rem;">COMPARTIR APP AX-CORE</button>
-                        
+
                         <h2 style="color:var(--accent-main); margin-top:2rem;">⬇ DESCARGAR APP</h2>
                         <p style="font-size:0.8rem; color:var(--text-dim); margin-bottom:1rem;">Instala AX-CORE en tu celular para acceder más rápido.</p>
                         <button id="btn-install-app" class="btn-premium" style="width:100%; display:none; background:rgba(0,0,0,0.5); border:1px solid var(--accent-main); color:var(--accent-main);">INSTALAR AHORA</button>
 
                         <p style="font-size:0.75rem; color:var(--text-dim); margin-top:2rem;">Para compartir tus logros con tarjetas personalizadas, ve a la sección <strong style="color:var(--accent-main);">🏆 Estudio</strong>.</p>
+                    </div>
+                </div>
+
+                <!-- ═══ LISTA iOS-STYLE (premium only) ═══ -->
+                <div class="premium-only pm-settings-block" id="pmSettingsBlock">
+                    <div class="pm-s-row" onclick="pmEditUserName()">
+                        <span class="pm-s-row-lbl">Nombre de usuario</span>
+                        <span class="pm-s-row-val" id="pmSRowName">USUARIO ›</span>
+                    </div>
+                    <div class="pm-s-row" onclick="pmChangePassword()">
+                        <span class="pm-s-row-lbl">Cambiar contraseña</span>
+                        <span class="pm-s-row-val">›</span>
+                    </div>
+                    <div class="pm-s-row" onclick="document.getElementById('btn-share-app').click()">
+                        <span class="pm-s-row-lbl">Compartir app</span>
+                        <span class="pm-s-row-val">Copiar link ›</span>
+                    </div>
+                    <div class="pm-s-row" id="pmInstallRow" onclick="document.getElementById('btn-install-app').click()">
+                        <span class="pm-s-row-lbl">Instalar en dispositivo</span>
+                        <span class="pm-s-row-val pm-s-row-disp" id="pmInstallVal">NO DISPONIBLE ›</span>
                     </div>
                 </div>
                 <div class="glass-card" style="margin-top:2rem; text-align:center;">
@@ -811,10 +839,10 @@
     <!-- Gráficas (Al final para no bloquear inicio rápido) -->
     <script src="https://cdn.jsdelivr.net/npm/apexcharts" defer></script>
     <script src="knowledge.js?v=20260517d"></script>
-    <script src="app.js?v=20260518l"></script>
+    <script src="app.js?v=20260518r"></script>
     <!-- Premium UI: sistema de 100 insignias + FAB + onboarding -->
-    <script src="premium-badges.js?v=20260518l"></script>
-    <script src="premium-extras.js?v=20260518l"></script>
+    <script src="premium-badges.js?v=20260518r"></script>
+    <script src="premium-extras.js?v=20260518r"></script>
 
     <!-- REGISTRO GLOBAL — funciona aunque app.js falle -->
     <script>
