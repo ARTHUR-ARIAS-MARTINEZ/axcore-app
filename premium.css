@@ -338,6 +338,279 @@ body.premium-mode .pd-badge-icon.locked { background: repeating-linear-gradient(
 body.premium-mode .pd-badge-name { font-size: 0.55rem; color: var(--pm-dim2); line-height: 1.3; letter-spacing: 0.5px; }
 body.premium-mode .pd-badge.locked .pd-badge-name { color: rgba(255,255,255,0.2); font-style: italic; }
 
+/* ═══════════════════════════════════════════════════════════════
+   PASO 3 — DIETA / WORKOUT / CALCULADORA premium
+   Restyling CSS-only sobre HTML existente (no rompe lógica)
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ───────── DIETA ───────── */
+body.premium-mode .diet-plan {
+  background: rgba(13,24,38,0.7) !important;
+  border: 1px solid var(--pm-border) !important;
+  border-radius: var(--pm-r) !important;
+  padding: 1.5rem !important;
+}
+
+body.premium-mode .meal-item {
+  background: linear-gradient(135deg, var(--pm-s2), var(--pm-s1)) !important;
+  border: 1px solid var(--pm-border) !important;
+  border-radius: var(--pm-r2) !important;
+  padding: 1.25rem !important;
+  margin-bottom: 1rem !important;
+  transition: border-color .2s, transform .15s !important;
+}
+body.premium-mode .meal-item:hover {
+  border-color: var(--pm-border2) !important;
+}
+
+/* Importar dieta (resalta como acción primaria) */
+body.premium-mode .meal-item[style*="accent-main"] {
+  background: linear-gradient(135deg, rgba(0,201,122,0.08), rgba(0,229,255,0.04)) !important;
+  border-color: var(--pm-border2) !important;
+}
+
+/* Textareas de dieta → glassmorphism */
+body.premium-mode #diet-full-import,
+body.premium-mode #diet-edit-breakfast,
+body.premium-mode #diet-edit-lunch,
+body.premium-mode #diet-edit-dinner,
+body.premium-mode #diet-edit-snacks {
+  background: rgba(0,0,0,0.3) !important;
+  border: 1px solid var(--pm-border) !important;
+  border-radius: var(--pm-r3) !important;
+  color: var(--pm-white) !important;
+  font-family: 'Inter', sans-serif !important;
+  line-height: 1.6 !important;
+  resize: none !important;
+}
+body.premium-mode #diet-edit-breakfast:focus,
+body.premium-mode #diet-edit-lunch:focus,
+body.premium-mode #diet-edit-dinner:focus,
+body.premium-mode #diet-edit-snacks:focus,
+body.premium-mode #diet-full-import:focus {
+  border-color: rgba(0,201,122,0.45) !important;
+  outline: none !important;
+}
+
+/* Headers de comidas (DESAYUNO, COMIDA, etc.) */
+body.premium-mode .meal-item h3 {
+  font-family: 'Oswald', sans-serif !important;
+  font-size: 0.95rem !important;
+  letter-spacing: 2px !important;
+  font-weight: 700 !important;
+  border-bottom: 1px solid var(--pm-border) !important;
+  padding-bottom: 0.6rem !important;
+  margin-bottom: 0.8rem !important;
+  color: var(--pm-green) !important;
+}
+
+/* Botones de dieta */
+body.premium-mode #btn-distribute-diet {
+  background: linear-gradient(135deg, var(--pm-cyan), #00a8c0) !important;
+  color: #000 !important;
+  box-shadow: 0 4px 18px rgba(0,229,255,0.3) !important;
+}
+body.premium-mode #btn-save-diet {
+  background: linear-gradient(135deg, var(--pm-green), #00a865) !important;
+}
+body.premium-mode #btn-reset-diet {
+  background: transparent !important;
+  border: 1px solid rgba(232,57,74,0.4) !important;
+  color: #ff6b6b !important;
+}
+
+/* Reglas (lista numerada premium) */
+body.premium-mode #rules-list-display li,
+body.premium-mode .diet-rules-list li {
+  background: rgba(255,255,255,0.03) !important;
+  border-left: 3px solid var(--pm-green) !important;
+  padding: 8px 12px !important;
+  margin-bottom: 6px !important;
+  border-radius: 0 var(--pm-r3) var(--pm-r3) 0 !important;
+  list-style: none !important;
+}
+
+/* Registro de ingesta */
+body.premium-mode .reg-food-container,
+body.premium-mode .food-entry-group {
+  background: rgba(13,24,38,0.6) !important;
+  border: 1px solid var(--pm-border) !important;
+  border-radius: var(--pm-r2) !important;
+  padding: 1rem !important;
+}
+body.premium-mode #food-desc {
+  background: rgba(0,0,0,0.3) !important;
+  border: 1px solid var(--pm-border) !important;
+  border-radius: var(--pm-r3) !important;
+  color: var(--pm-white) !important;
+  padding: 0.85rem 1rem !important;
+}
+body.premium-mode #btn-add-food {
+  background: var(--pm-green) !important;
+  color: #000 !important;
+  border-radius: 99px !important;
+  font-family: 'Oswald', sans-serif !important;
+  font-weight: 700 !important;
+  letter-spacing: 1.5px !important;
+}
+
+/* ───────── WORKOUT ───────── */
+body.premium-mode .workout-plan {
+  background: rgba(13,24,38,0.7) !important;
+  border: 1px solid var(--pm-border) !important;
+  border-radius: var(--pm-r) !important;
+}
+
+body.premium-mode .stopwatch-container {
+  background: linear-gradient(135deg, var(--pm-s2), var(--pm-s1)) !important;
+  border: 1px solid var(--pm-border2) !important;
+  border-radius: var(--pm-r) !important;
+  padding: 2rem 1.5rem !important;
+  text-align: center !important;
+  box-shadow: 0 0 40px rgba(0,201,122,0.06), 0 16px 40px rgba(0,0,0,0.3) !important;
+}
+body.premium-mode #sw-display {
+  font-family: 'Oswald', sans-serif !important;
+  font-size: 2.4rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 2px !important;
+  color: var(--pm-white) !important;
+  text-shadow: 0 0 20px rgba(0,201,122,0.3) !important;
+  font-variant-numeric: tabular-nums !important;
+}
+body.premium-mode #btn-sw-start {
+  background: var(--pm-green) !important;
+  color: #000 !important;
+  border-radius: 99px !important;
+  font-family: 'Oswald', sans-serif !important;
+  letter-spacing: 2px !important;
+  box-shadow: 0 4px 16px rgba(0,201,122,0.35) !important;
+}
+body.premium-mode #btn-sw-stop {
+  background: rgba(0,229,255,0.1) !important;
+  border: 1px solid rgba(0,229,255,0.3) !important;
+  color: var(--pm-cyan) !important;
+  border-radius: 99px !important;
+}
+body.premium-mode #btn-sw-reset {
+  background: rgba(255,255,255,0.05) !important;
+  color: var(--pm-dim2) !important;
+  border: 1px solid var(--pm-border) !important;
+  border-radius: 99px !important;
+}
+
+/* Catálogo de ejercicios — cards premium */
+body.premium-mode .exercise-card {
+  background: var(--pm-s1) !important;
+  border: 1px solid var(--pm-border) !important;
+  border-radius: var(--pm-r2) !important;
+  padding: 1rem !important;
+  transition: border-color .2s !important;
+}
+body.premium-mode .exercise-card:hover {
+  border-color: var(--pm-border2) !important;
+}
+body.premium-mode .exercise-card h4 {
+  font-family: 'Oswald', sans-serif !important;
+  letter-spacing: 1px !important;
+  font-size: 0.95rem !important;
+  color: var(--pm-white) !important;
+}
+
+/* ───────── CALCULADORA (page-assistant) ───────── */
+body.premium-mode #page-assistant .glass-card {
+  background: rgba(13,24,38,0.7) !important;
+  border: 1px solid var(--pm-border) !important;
+  border-radius: var(--pm-r2) !important;
+  padding: 1.25rem !important;
+  margin-bottom: 1rem !important;
+}
+body.premium-mode #page-assistant .glass-card h3 {
+  font-family: 'Oswald', sans-serif !important;
+  letter-spacing: 1.5px !important;
+  font-weight: 700 !important;
+}
+
+/* Status line de la calculadora — destacar */
+body.premium-mode #calc-status-line {
+  font-size: 0.85rem !important;
+  color: var(--pm-white) !important;
+  line-height: 1.6 !important;
+}
+
+/* Inputs de calculadora */
+body.premium-mode #calc-extra-cal,
+body.premium-mode #calc-swap-food,
+body.premium-mode #calc-age,
+body.premium-mode #calc-sex,
+body.premium-mode #calc-activity {
+  background: rgba(0,0,0,0.3) !important;
+  border: 1px solid var(--pm-border) !important;
+  border-radius: var(--pm-r3) !important;
+  color: var(--pm-white) !important;
+  font-family: 'Inter', sans-serif !important;
+}
+body.premium-mode #calc-extra-cal:focus,
+body.premium-mode #calc-swap-food:focus {
+  border-color: rgba(0,201,122,0.45) !important;
+  outline: none !important;
+}
+
+/* Botones de calc */
+body.premium-mode #btn-calc-compensate {
+  background: linear-gradient(135deg, var(--pm-green), #00a865) !important;
+}
+body.premium-mode #btn-calc-swap {
+  background: linear-gradient(135deg, var(--pm-cyan), #00a8c0) !important;
+  color: #000 !important;
+}
+body.premium-mode #btn-calc-tdee {
+  background: linear-gradient(135deg, #ffd700, #d4af37) !important;
+  color: #000 !important;
+}
+body.premium-mode #btn-calc-projection {
+  background: linear-gradient(135deg, #9b7fff, #7a5cd4) !important;
+  color: #fff !important;
+}
+body.premium-mode #btn-apply-limit {
+  background: linear-gradient(135deg, var(--pm-green), #00a865) !important;
+  color: #000 !important;
+  border-radius: 99px !important;
+  font-family: 'Oswald', sans-serif !important;
+  letter-spacing: 2px !important;
+  font-weight: 700 !important;
+  padding: 0.8rem 1.5rem !important;
+  box-shadow: 0 4px 16px rgba(0,201,122,0.35) !important;
+}
+
+/* Resultados de calc */
+body.premium-mode #calc-compensate-result,
+body.premium-mode #calc-swap-result,
+body.premium-mode #calc-tdee-result,
+body.premium-mode #calc-projection-result {
+  background: rgba(0,201,122,0.06) !important;
+  border: 1px solid rgba(0,201,122,0.2) !important;
+  border-radius: var(--pm-r3) !important;
+  padding: 0.85rem !important;
+}
+
+/* ───────── GENERIC: botones h3 de secciones ───────── */
+body.premium-mode .glass-card > h2 {
+  font-family: 'Oswald', sans-serif !important;
+  letter-spacing: 2.5px !important;
+  font-weight: 700 !important;
+}
+
+/* Mini-cronómetro flotante en top-bar */
+body.premium-mode #sw-mini-container {
+  background: rgba(0,201,122,0.12) !important;
+  border: 1px solid rgba(0,201,122,0.3) !important;
+  backdrop-filter: blur(8px) !important;
+}
+body.premium-mode #sw-mini-display {
+  color: var(--pm-green) !important;
+}
+
 /* Badge "BETA" */
 .premium-beta-tag {
   display: inline-block;
