@@ -1035,7 +1035,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- DIET PAGE ---
     function parseDietText(text) {
-        const result = { breakfast: '', lunch: '', dinner: '', snacks: '' };
+        const result = { breakfast: '', lunch: '', dinner: '', snacks: '', recommendations: '' };
         const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
         let current = null;
         for (const line of lines) {
@@ -1043,10 +1043,17 @@ document.addEventListener('DOMContentLoaded', () => {
             if (/desayuno|breakfast|mañana/i.test(low)) { current = 'breakfast'; result.breakfast += line.replace(/.*?[:：]\s*/,'') + '\n'; continue; }
             if (/comida|almuerzo|lunch|mediod[ií]a/i.test(low)) { current = 'lunch'; result.lunch += line.replace(/.*?[:：]\s*/,'') + '\n'; continue; }
             if (/cena|dinner|noche/i.test(low)) { current = 'dinner'; result.dinner += line.replace(/.*?[:：]\s*/,'') + '\n'; continue; }
-            if (/snack|merienda|colaci[oó]n|tentempié|refrigerio/i.test(low)) { current = 'snacks'; result.snacks += line.replace(/.*?[:：]\s*/,'') + '\n'; continue; }
+            if (/snack|merienda|colaci[oó]n|tentempié|refrigerio|botana|extras/i.test(low)) { current = 'snacks'; result.snacks += line.replace(/.*?[:：]\s*/,'') + '\n'; continue; }
+            if (/recomend|reglas?|consejo|tips|indicaciones|protocolo|importante/i.test(low)) { current = 'recommendations'; result.recommendations += line.replace(/.*?[:：]\s*/,'') + '\n'; continue; }
             if (current) result[current] += line + '\n';
         }
-        return { breakfast: result.breakfast.trim(), lunch: result.lunch.trim(), dinner: result.dinner.trim(), snacks: result.snacks.trim() };
+        return {
+            breakfast: result.breakfast.trim(),
+            lunch: result.lunch.trim(),
+            dinner: result.dinner.trim(),
+            snacks: result.snacks.trim(),
+            recommendations: result.recommendations.trim()
+        };
     }
 
     function renderDietPage() {
@@ -1141,18 +1148,27 @@ document.addEventListener('DOMContentLoaded', () => {
             const raw = document.getElementById('diet-full-import').value.trim();
             if (!raw) { alert('Escribe o pega tu dieta primero.'); return; }
             const parsed = parseDietText(raw);
-            const hasData = parsed.breakfast || parsed.lunch || parsed.dinner || parsed.snacks;
+            const hasData = parsed.breakfast || parsed.lunch || parsed.dinner || parsed.snacks || parsed.recommendations;
             if (!hasData) {
-                alert('No se encontraron secciones reconocibles.\nUsa palabras como "Desayuno:", "Comida:", "Cena:", "Snacks:" para que la app las detecte.');
+                alert('No se encontraron secciones reconocibles.\nUsa palabras como "Desayuno:", "Comida:", "Cena:", "Snacks:", "Recomendaciones:" para que la app las detecte.');
                 return;
             }
             if (parsed.breakfast) document.getElementById('diet-edit-breakfast').value = parsed.breakfast;
             if (parsed.lunch)     document.getElementById('diet-edit-lunch').value = parsed.lunch;
             if (parsed.dinner)    document.getElementById('diet-edit-dinner').value = parsed.dinner;
             if (parsed.snacks)    document.getElementById('diet-edit-snacks').value = parsed.snacks;
+            // Recomendaciones detectadas → se convierten en reglas custom
+            if (parsed.recommendations) {
+                const newRules = parsed.recommendations.split('\n').map(l => l.trim()).filter(l => l.length > 3);
+                if (newRules.length > 0) {
+                    userData.customDietRules = newRules;
+                    saveData();
+                }
+            }
             document.getElementById('diet-full-import').value = '';
             document.getElementById('diet-edit-breakfast').scrollIntoView({ behavior: 'smooth' });
-            alert('✅ Dieta distribuida. Revisa cada sección y pulsa GUARDAR DIETA cuando estés conforme.');
+            const recsMsg = parsed.recommendations ? '\n💡 También detecté reglas/recomendaciones y se guardaron como reglas custom.' : '';
+            alert('✅ Dieta distribuida. Revisa cada sección y pulsa GUARDAR DIETA cuando estés conforme.' + recsMsg);
         };
 
         // Guardar dieta editada manualmente
