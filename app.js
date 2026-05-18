@@ -126,6 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const saved = localStorage.getItem(getStorageKey());
         if (saved) {
             userData = { ...userData, ...JSON.parse(saved) };
+            window.userData = userData;
             if (!userData.foodLogToday) userData.foodLogToday = [];
             if (!userData.forearm) userData.forearm = 0;
             if (!userData.back) userData.back = 0;
@@ -292,6 +293,8 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem(getStorageKey(), JSON.stringify(userData));
             pushSync(); // debounced — solo si hay token
         }
+        // Exponer userData globalmente para premium-badges.js
+        window.userData = userData;
     }
 
     // --- LOGIC AUTH ---

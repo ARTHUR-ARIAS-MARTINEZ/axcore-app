@@ -8,9 +8,9 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0a0e14">
     <link rel="apple-touch-icon" href="logo.png">
-    <link rel="stylesheet" href="index.css?v=20260518c">
+    <link rel="stylesheet" href="index.css?v=20260518d">
     <!-- Premium UI overrides (inerte si <body> NO tiene .premium-mode) -->
-    <link rel="stylesheet" href="premium.css?v=20260518c">
+    <link rel="stylesheet" href="premium.css?v=20260518d">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <!-- Fuentes: Inter para cuerpos de texto, Oswald (Heavy Gym) para titulares -->
@@ -387,7 +387,7 @@
                     <!-- INSIGNIAS scroll -->
                     <div class="pd-badges-header">
                         <div class="pd-section-title" style="margin-bottom:0;">INSIGNIAS · <span id="pd-badges-count" style="color:#00c97a;">0</span><span style="color:#3d5570;">/100</span></div>
-                        <span style="font-size:0.7rem;color:#00c97a;cursor:pointer;letter-spacing:1px;" onclick="document.querySelector('[data-page=studio]').click();">Ver todas →</span>
+                        <span style="font-size:0.7rem;color:#00c97a;cursor:pointer;letter-spacing:1px;" onclick="window.pmOpenBadges && window.pmOpenBadges()">Ver todas →</span>
                     </div>
                     <div class="pd-badges-scroll" id="pd-badges-scroll"></div>
                 </div>
@@ -732,7 +732,9 @@
     <!-- Gráficas (Al final para no bloquear inicio rápido) -->
     <script src="https://cdn.jsdelivr.net/npm/apexcharts" defer></script>
     <script src="knowledge.js?v=20260517d"></script>
-    <script src="app.js?v=20260517d"></script>
+    <script src="app.js?v=20260518c"></script>
+    <!-- Premium UI: sistema de 100 insignias (carga después de app.js) -->
+    <script src="premium-badges.js?v=20260518c"></script>
 
     <!-- REGISTRO GLOBAL — funciona aunque app.js falle -->
     <script>
