@@ -1,4 +1,4 @@
-const CACHE_NAME = 'axcore-v3.4-swipe-fix';
+const CACHE_NAME = 'axcore-v3.5-fix-await';
 const urlsToCache = [
   './',
   './index.html',

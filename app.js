@@ -761,7 +761,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- NAVIGATION ---
     navLinks.forEach(link => {
-        link.onclick = (e) => {
+        link.onclick = async (e) => {
             if (link.id === 'nav-logout') {
                 if (confirm("¿Cerrar sesión táctica en AX-CORE?")) {
                     // Invalidar sesión en el servidor para liberar el dispositivo
