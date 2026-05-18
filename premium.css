@@ -317,6 +317,27 @@ body.premium-mode .pd-imc-val { font-family: 'Oswald', sans-serif; font-size: 1.
 body.premium-mode .pd-imc-tag { font-size: 0.6rem; color: var(--pm-cyan); letter-spacing: 1px; margin-top: 4px; }
 body.premium-mode .pd-last-info { font-size: 0.65rem; color: var(--pm-white); line-height: 1.5; margin-top: 8px; font-style: italic; }
 
+/* EVOLUCIÓN RECIENTE */
+body.premium-mode .pd-evol-section { margin-bottom: 14px; }
+body.premium-mode .pd-evol-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; scrollbar-width: none; -ms-overflow-style: none; margin-bottom: 12px; }
+body.premium-mode .pd-evol-scroll::-webkit-scrollbar { display: none; }
+body.premium-mode .pd-evol-card { flex-shrink: 0; background: var(--pm-s1); border: 1px solid var(--pm-border); border-radius: var(--pm-r2); padding: 10px 14px; text-align: center; min-width: 68px; }
+body.premium-mode .pd-evol-card.first { border-color: rgba(0,201,122,0.35); background: rgba(0,201,122,0.08); }
+body.premium-mode .pd-evol-date { font-size: 0.52rem; letter-spacing: 1px; color: var(--pm-dim2); margin-bottom: 4px; text-transform: uppercase; }
+body.premium-mode .pd-evol-w { font-family: 'Oswald', sans-serif; font-size: 1.15rem; font-weight: 700; color: #fff; line-height: 1; }
+body.premium-mode .pd-evol-unit { font-size: 0.52rem; color: var(--pm-dim2); margin-bottom: 4px; }
+body.premium-mode .pd-evol-delta { font-size: 0.6rem; font-weight: 700; font-family: 'Oswald', sans-serif; }
+body.premium-mode .pd-evol-delta.dn { color: #00c97a; }
+body.premium-mode .pd-evol-delta.up { color: #ff6b6b; }
+body.premium-mode .pd-evol-delta.eq { color: var(--pm-dim2); }
+/* Sparkline */
+body.premium-mode .pd-spark-wrap { background: var(--pm-s1); border: 1px solid var(--pm-border); border-radius: var(--pm-r2); padding: 12px 14px 10px; }
+body.premium-mode .pd-spark-hdr { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+body.premium-mode .pd-spark-lbl { font-size: 0.55rem; letter-spacing: 2px; color: var(--pm-dim2); font-weight: 600; }
+body.premium-mode .pd-spark-legend { display: flex; gap: 10px; }
+body.premium-mode .pd-leg-g { font-size: 0.52rem; color: #00c97a; letter-spacing: 1px; }
+body.premium-mode .pd-leg-c { font-size: 0.52rem; color: #00e5ff; letter-spacing: 1px; }
+
 /* PRÓXIMO LOGRO */
 body.premium-mode .pd-next-ach-card { background: linear-gradient(135deg, var(--pm-s2), var(--pm-s1)); border: 1px solid var(--pm-border2); border-radius: var(--pm-r2); padding: 12px 14px; margin-bottom: 14px; display: flex; gap: 12px; align-items: center; }
 body.premium-mode .pd-next-ach-icon { width: 46px; height: 46px; border-radius: 14px; background: rgba(0,201,122,0.12); border: 1px solid rgba(0,201,122,0.3); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }

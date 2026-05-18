@@ -833,6 +833,63 @@ document.addEventListener('DOMContentLoaded', () => {
             set('pd-last-info', `${last.date} · ${last.weight} kg · cintura ${last.waist || 0} cm`);
         }
 
+        // EVOLUCIÓN RECIENTE + SPARKLINE
+        const hist = userData.history || [];
+        const evolSection = get('pd-evol-section');
+        const evolScroll  = get('pd-evol-scroll');
+        if (evolSection && hist.length > 0) {
+            evolSection.style.display = '';
+            const recent = hist.slice(-10).reverse(); // últimos 10, más reciente primero
+            evolScroll.innerHTML = recent.map((entry, i) => {
+                const prev = recent[i + 1];
+                let delta = '', dClass = 'eq';
+                if (prev) {
+                    const diff = (+(entry.weight) - +(prev.weight)).toFixed(1);
+                    if (+diff < 0) { delta = `▼ ${diff}`; dClass = 'dn'; }
+                    else if (+diff > 0) { delta = `▲ +${diff}`; dClass = 'up'; }
+                    else { delta = `— 0.0`; dClass = 'eq'; }
+                }
+                const label = i === 0 ? 'HOY' : entry.date.split('-').slice(1).join('/');
+                return `<div class="pd-evol-card${i===0?' first':''}">
+                    <div class="pd-evol-date">${label}</div>
+                    <div class="pd-evol-w">${(+entry.weight).toFixed(1)}</div>
+                    <div class="pd-evol-unit">kg</div>
+                    ${delta ? `<div class="pd-evol-delta ${dClass}">${delta}</div>` : ''}
+                </div>`;
+            }).join('');
+            // SPARKLINE (hasta 10 puntos de peso)
+            const spark = get('pd-spark-svg');
+            if (spark && recent.length >= 2) {
+                const pts = recent.slice().reverse(); // cronológico
+                const weights = pts.map(p => +(p.weight));
+                const waists  = pts.map(p => +(p.waist || 0));
+                const W = 310, H = 58, pad = 4;
+                const minW = Math.min(...weights) - 1, maxW = Math.max(...weights) + 1;
+                const toY = v => H - pad - ((v - minW) / (maxW - minW + 0.001)) * (H - pad * 2);
+                const toX = i => (i / (pts.length - 1)) * W;
+                const wPath = weights.map((v, i) => `${i===0?'M':'L'}${toX(i).toFixed(1)},${toY(v).toFixed(1)}`).join(' ');
+                const aPath = wPath + ` L${W},${H} L0,${H}Z`;
+                const hasWaist = waists.some(v => v > 0);
+                const cPath = hasWaist ? waists.map((v, i) => `${i===0?'M':'L'}${toX(i).toFixed(1)},${toY(v).toFixed(1)}`).join(' ') : '';
+                const lastX = toX(pts.length - 1).toFixed(1);
+                const lastY = toY(weights[weights.length - 1]).toFixed(1);
+                spark.innerHTML = `
+                    <defs>
+                        <linearGradient id="pdSG" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" style="stop-color:#00c97a;stop-opacity:.28"/>
+                            <stop offset="100%" style="stop-color:#00c97a;stop-opacity:0"/>
+                        </linearGradient>
+                    </defs>
+                    <path d="${aPath}" fill="url(#pdSG)" opacity=".7"/>
+                    <path d="${wPath}" fill="none" stroke="#00c97a" stroke-width="2" stroke-linecap="round"/>
+                    ${cPath ? `<path d="${cPath}" fill="none" stroke="#00e5ff" stroke-width="1.5" stroke-dasharray="4 2" opacity=".7"/>` : ''}
+                    <circle cx="${lastX}" cy="${lastY}" r="3" fill="#00c97a"/>`;
+                get('pd-spark-svg').parentElement.style.display = '';
+            }
+        } else if (evolSection) {
+            evolSection.style.display = 'none';
+        }
+
         // INSIGNIAS scroll (8 visibles, primeras unlocked + locked como mystery)
         const ach = userData.achievements || [];
         const ACHIEVEMENT_DEFS = (typeof ACHIEVEMENTS_DEF !== 'undefined') ? ACHIEVEMENTS_DEF : [];

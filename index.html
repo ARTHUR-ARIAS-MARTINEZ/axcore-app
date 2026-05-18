@@ -8,9 +8,9 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0a0e14">
     <link rel="apple-touch-icon" href="logo.png">
-    <link rel="stylesheet" href="index.css?v=20260518f">
+    <link rel="stylesheet" href="index.css?v=20260518g">
     <!-- Premium UI overrides (inerte si <body> NO tiene .premium-mode) -->
-    <link rel="stylesheet" href="premium.css?v=20260518f">
+    <link rel="stylesheet" href="premium.css?v=20260518g">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <!-- Fuentes: Inter para cuerpos de texto, Oswald (Heavy Gym) para titulares -->
@@ -378,6 +378,19 @@
                         </div>
                     </div>
 
+                    <!-- EVOLUCIÓN RECIENTE -->
+                    <div class="pd-evol-section" id="pd-evol-section" style="display:none;">
+                        <div class="pd-section-title">EVOLUCIÓN RECIENTE</div>
+                        <div class="pd-evol-scroll" id="pd-evol-scroll"></div>
+                        <div class="pd-spark-wrap">
+                            <div class="pd-spark-hdr">
+                                <div class="pd-spark-lbl">TENDENCIA 10 DÍAS</div>
+                                <div class="pd-spark-legend"><span class="pd-leg-g">PESO</span><span class="pd-leg-c">CINTURA</span></div>
+                            </div>
+                            <svg id="pd-spark-svg" viewBox="0 0 310 58" style="width:100%;height:58px;overflow:visible;" preserveAspectRatio="none"></svg>
+                        </div>
+                    </div>
+
                     <!-- PRÓXIMO LOGRO -->
                     <div class="pd-next-ach-card" id="pd-next-ach" style="display:none;">
                         <div class="pd-next-ach-icon" id="pd-next-ach-icon">🏅</div>
@@ -737,10 +750,10 @@
     <!-- Gráficas (Al final para no bloquear inicio rápido) -->
     <script src="https://cdn.jsdelivr.net/npm/apexcharts" defer></script>
     <script src="knowledge.js?v=20260517d"></script>
-    <script src="app.js?v=20260518f"></script>
+    <script src="app.js?v=20260518g"></script>
     <!-- Premium UI: sistema de 100 insignias + FAB + onboarding -->
-    <script src="premium-badges.js?v=20260518f"></script>
-    <script src="premium-extras.js?v=20260518f"></script>
+    <script src="premium-badges.js?v=20260518g"></script>
+    <script src="premium-extras.js?v=20260518g"></script>
 
     <!-- REGISTRO GLOBAL — funciona aunque app.js falle -->
     <script>
