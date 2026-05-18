@@ -8,13 +8,13 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0a0e14">
     <link rel="apple-touch-icon" href="logo.png">
-    <link rel="stylesheet" href="index.css?v=20260518h">
+    <link rel="stylesheet" href="index.css?v=20260518l">
     <!-- Premium UI overrides (inerte si <body> NO tiene .premium-mode) -->
-    <link rel="stylesheet" href="premium.css?v=20260518h">
+    <link rel="stylesheet" href="premium.css?v=20260518l">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <!-- Fuentes: Inter para cuerpos de texto, Oswald (Heavy Gym) para titulares -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
 </head>
 <body data-theme="neon">
 
@@ -280,6 +280,14 @@
 
         <section class="content-area">
             <header class="top-bar">
+                <!-- Badge AX-CORE (premium only) -->
+                <div class="pm-brand-badge premium-only">
+                    <div class="pm-brand-logo">AX</div>
+                    <div class="pm-brand-text">
+                        <div class="pm-brand-name">AX-CORE</div>
+                        <small>POWERING YOUR BIOLOGY</small>
+                    </div>
+                </div>
                 <!-- Perfil (en móvil aparece arriba) -->
                 <div class="user-badge">
                     <input type="file" id="avatar-upload" class="avatar-upload" accept="image/*">
@@ -323,7 +331,7 @@
                             </div>
                         </div>
                         <div class="pd-hero-mid">
-                            <div class="pd-streak">🔥 <span id="pd-streak-days">0</span> DÍAS RACHA</div>
+                            <div class="pd-streak"><svg class="pd-streak-flame" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1C5 4 3 6.5 3 9a5 5 0 0010 0c0-2.5-2-5-5-8z"/></svg><span id="pd-streak-days">0</span> DÍAS RACHA</div>
                             <div class="pd-phrase">CADA REP CUENTA</div>
                         </div>
                         <div class="pd-progress-bar-wrap">
@@ -347,21 +355,25 @@
                             <div class="pd-sum-lbl">INGERIDAS</div>
                             <div class="pd-sum-val"><span id="pd-cal-in">0</span><small>kcal</small></div>
                             <div class="pd-sum-sub">de <span id="pd-cal-limit">0</span> permitidas</div>
+                            <div class="pd-sum-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
                         </div>
                         <div class="pd-sum c2">
                             <div class="pd-sum-lbl">EJERCICIO</div>
                             <div class="pd-sum-val">-<span id="pd-cal-out">0</span><small>kcal</small></div>
                             <div class="pd-sum-sub">quemadas hoy</div>
+                            <div class="pd-sum-ico"><svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9z"/></svg></div>
                         </div>
                         <div class="pd-sum c3">
                             <div class="pd-sum-lbl">DÉFICIT TOTAL</div>
                             <div class="pd-sum-val"><span id="pd-deficit">0</span><small>kcal</small></div>
                             <div class="pd-sum-sub">acumulado</div>
+                            <div class="pd-sum-ico"><svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div>
                         </div>
                         <div class="pd-sum c4">
                             <div class="pd-sum-lbl">GRASA EQUIV.</div>
                             <div class="pd-sum-val"><span id="pd-fat">0.0</span><small>kg</small></div>
                             <div class="pd-sum-sub">estimado perdido</div>
+                            <div class="pd-sum-ico"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></div>
                         </div>
                     </div>
 
@@ -707,6 +719,20 @@
                     <div class="premium-toggle-switch on" id="premiumToggleSwitch"></div>
                 </div>
 
+                <!-- ═══ PROFILE HERO (solo visible en .premium-mode) ═══ -->
+                <div class="premium-only pm-profile-hero" id="pmProfileHero">
+                    <div class="pm-prof-av" id="pmProfAvatar">A</div>
+                    <div class="pm-prof-info">
+                        <div class="pm-prof-name" id="pmProfName">USUARIO</div>
+                        <div class="pm-prof-code" id="pmProfCode">● AXV-DEMO · ACTIVO</div>
+                        <div class="pm-prof-stats">
+                            <div class="pm-prof-stat"><strong id="pmProfDays">0</strong> días</div>
+                            <div class="pm-prof-stat"><strong id="pmProfLost">0.0</strong> kg perdidos</div>
+                            <div class="pm-prof-stat"><strong id="pmProfBadges">0</strong> insignias</div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="grid-stats">
                     <div class="glass-card settings-panel">
                         <h2 style="cursor:default; transition:0.3s;">SISTEMA ÉLITE</h2>
@@ -717,12 +743,12 @@
                         <div class="input-group">
                             <label>ESTILO VISUAL</label>
                             <div class="theme-buttons" style="display:grid; grid-template-columns: repeat(2, 1fr); gap:10px;">
-                                <button class="theme-btn active" data-theme="neon">NEON NAVY</button>
-                                <button class="theme-btn" data-theme="original">GOLD ELITE</button>
-                                <button class="theme-btn" data-theme="fuchsia">CORAL GLOW</button>
-                                <button class="theme-btn" data-theme="dark">ULTRA DARK</button>
-                                <button class="theme-btn" data-theme="pride">PRIDE VIBRANT</button>
-                                <button class="theme-btn" data-theme="natural">NATURAL ZEN</button>
+                                <button class="theme-btn active" data-theme="neon"><span class="theme-dot" style="background:linear-gradient(135deg,#00c97a,#00e5ff);"></span><span class="theme-label-full">NEON NAVY</span><span class="theme-label-short">NEON</span></button>
+                                <button class="theme-btn" data-theme="original"><span class="theme-dot" style="background:linear-gradient(135deg,#d4af37,#00f2ff);"></span><span class="theme-label-full">GOLD ELITE</span><span class="theme-label-short">GOLD</span></button>
+                                <button class="theme-btn" data-theme="fuchsia"><span class="theme-dot" style="background:linear-gradient(135deg,#ff6b9d,#ffc857);"></span><span class="theme-label-full">CORAL GLOW</span><span class="theme-label-short">CORAL</span></button>
+                                <button class="theme-btn" data-theme="dark"><span class="theme-dot" style="background:linear-gradient(135deg,#ffffff,#888888);"></span><span class="theme-label-full">ULTRA DARK</span><span class="theme-label-short">DARK</span></button>
+                                <button class="theme-btn" data-theme="pride"><span class="theme-dot" style="background:linear-gradient(135deg,#ff4db8,#00e5ff);"></span><span class="theme-label-full">PRIDE VIBRANT</span><span class="theme-label-short">PRIDE</span></button>
+                                <button class="theme-btn" data-theme="natural"><span class="theme-dot" style="background:linear-gradient(135deg,#2e7d32,#e65100);"></span><span class="theme-label-full">NATURAL ZEN</span><span class="theme-label-short">ZEN</span></button>
                             </div>
                         </div>
                         <button id="save-settings" class="btn-premium" style="width:100%">GUARDAR SISTEMA</button>
@@ -785,10 +811,10 @@
     <!-- Gráficas (Al final para no bloquear inicio rápido) -->
     <script src="https://cdn.jsdelivr.net/npm/apexcharts" defer></script>
     <script src="knowledge.js?v=20260517d"></script>
-    <script src="app.js?v=20260518h"></script>
+    <script src="app.js?v=20260518l"></script>
     <!-- Premium UI: sistema de 100 insignias + FAB + onboarding -->
-    <script src="premium-badges.js?v=20260518h"></script>
-    <script src="premium-extras.js?v=20260518h"></script>
+    <script src="premium-badges.js?v=20260518l"></script>
+    <script src="premium-extras.js?v=20260518l"></script>
 
     <!-- REGISTRO GLOBAL — funciona aunque app.js falle -->
     <script>

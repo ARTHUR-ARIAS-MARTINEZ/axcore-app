@@ -904,8 +904,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const lockedCount = Math.max(2, 8 - unlockedB.length);
         const scroll = get('pd-badges-scroll');
         if (scroll) {
+            // Tier: usa b.tier o b.t (definiciones) o calcula por nombre. Default 1 (bronce).
+            const getTier = (b) => +(b.tier || b.t || 1);
             scroll.innerHTML = unlockedB.map(b =>
-                `<div class="pd-badge"><div class="pd-badge-icon unlocked">${b.emoji || '🏅'}</div><div class="pd-badge-name">${(b.name || '').toUpperCase()}</div></div>`
+                `<div class="pd-badge"><div class="pd-badge-icon unlocked t${getTier(b)}">${b.emoji || b.icon || '🏅'}</div><div class="pd-badge-name">${(b.name || b.title || '').toUpperCase()}</div></div>`
             ).join('') + Array.from({length: lockedCount}).map(() =>
                 `<div class="pd-badge locked"><div class="pd-badge-icon locked">🔒</div><div class="pd-badge-name">???</div></div>`
             ).join('');
@@ -917,6 +919,52 @@ document.addEventListener('DOMContentLoaded', () => {
     window.pdGoToEvolution = function() {
         const link = document.querySelector('[data-page=evolution]');
         if (link) link.click();
+    };
+
+    // ═══════════════ PROFILE HERO (Ajustes premium) ═══════════════
+    window.updatePmProfileHero = function() {
+        try {
+            const ud = window.userData || userData || {};
+            const setText = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+
+            // Avatar: inicial del nombre (o foto si existe)
+            const name = (ud.userName || currentUser || 'USUARIO').toString();
+            const av = document.getElementById('pmProfAvatar');
+            if (av) {
+                if (ud.avatarPhoto) {
+                    av.style.background = `url(${ud.avatarPhoto}) center/cover`;
+                    av.textContent = '';
+                } else {
+                    av.style.background = '';
+                    av.textContent = (name[0] || 'A').toUpperCase();
+                }
+            }
+
+            // Nombre y código
+            setText('pmProfName', name.toUpperCase());
+            const code = ud.gymCode || ud.axvCode || 'AXV-DEMO';
+            setText('pmProfCode', `● ${code} · ACTIVO`);
+
+            // Stats: días, kg perdidos, insignias
+            const history = Array.isArray(ud.history) ? ud.history : [];
+            const days = history.length || (ud.streak || 0);
+            setText('pmProfDays', days);
+
+            let lost = 0;
+            if (history.length >= 2) {
+                const first = +(history[0].weight) || 0;
+                const last  = +(history[history.length - 1].weight) || 0;
+                lost = Math.max(0, first - last);
+            } else if (ud.startWeight && ud.weight) {
+                lost = Math.max(0, (+ud.startWeight) - (+ud.weight));
+            }
+            setText('pmProfLost', lost.toFixed(1));
+
+            const badges = Array.isArray(ud.achievements) ? ud.achievements.length : 0;
+            setText('pmProfBadges', badges);
+        } catch (e) {
+            console.warn('[pm-profile-hero]', e.message);
+        }
     };
 
     // --- NAVIGATION ---
@@ -954,6 +1002,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (pageId === 'studio') renderStudioPage();
             if (pageId === 'assistant' && typeof window._activateCalculator === 'function') window._activateCalculator();
             if (pageId === 'settings' && typeof window.syncPremiumToggleVisual === 'function') window.syncPremiumToggleVisual();
+            if (pageId === 'settings' && typeof window.updatePmProfileHero === 'function') window.updatePmProfileHero();
 
             // Sincronizar bottom nav premium
             document.querySelectorAll('.pm-nav-btn').forEach(btn => {
@@ -1229,69 +1278,137 @@ document.addEventListener('DOMContentLoaded', () => {
             ? userData.customDietRules
             : (typeof ARTHUR_KNOWLEDGE !== 'undefined' && ARTHUR_KNOWLEDGE.diet_rules ? ARTHUR_KNOWLEDGE.diet_rules : []);
         const dietEl = document.getElementById('page-diet');
+
+        // Datos para barra de calorías
+        const calIn  = +(userData.caloriesConsumedToday || 0);
+        const calLim = +(userData.dailyCalLimit || 0);
+        const calAvail = Math.max(0, calLim - calIn);
+        const calPct = calLim > 0 ? Math.min(100, Math.round((calIn / calLim) * 100)) : 0;
+        const foodLog = Array.isArray(userData.foodLogToday) ? userData.foodLogToday : [];
+
+        // Genera HTML preview de cada comida (con fadeOut si es muy largo)
+        const mealPreview = (text, emoji, name) => {
+            const t = (text || '').trim();
+            if (!t) return `<div class="d-meal-empty">Sin contenido — toca para agregar</div>`;
+            return `<div class="d-meal-preview">${t.replace(/\n/g, '<br>')}</div>`;
+        };
+
         dietEl.innerHTML = `
-            <div class="glass-card diet-plan" style="max-width:800px; margin: 0 auto;">
-                <h2 style="font-family:var(--font-accent); color:var(--accent-main); margin-bottom:1.5rem; text-align:center;">NUTRICIÓN</h2>
+            <div class="pm-diet-wrap" style="max-width:800px; margin:0 auto;">
+                <h2 class="pm-diet-h2">NUTRICIÓN</h2>
 
-                <!-- IMPORTAR DIETA COMPLETA -->
-                <div class="meal-item glass-card" style="padding:2rem; border-color:var(--accent-main); margin-bottom:2rem; border-width:2px;">
-                    <h3 style="color:var(--accent-main); font-size:1rem; margin-bottom:0.4rem; font-family:var(--font-accent); letter-spacing:1px;">📋 IMPORTAR DIETA COMPLETA</h3>
-                    <p style="font-size:0.78rem; color:var(--text-dim); margin-bottom:1rem; line-height:1.5;">Pega aquí el plan de tu nutriólogo o toda tu dieta en texto libre. La app la distribuirá automáticamente en desayuno, comida, cena y snacks.</p>
-                    <textarea id="diet-full-import" style="width:100%; min-height:130px; background:var(--glass-bg, rgba(0,0,0,0.2)); border:1px solid var(--glass-border); border-radius:10px; padding:1rem; color:var(--text-primary); font-family:var(--font-main); font-size:0.9rem; line-height:1.6; resize:vertical;" placeholder="Ejemplo:&#10;Desayuno: 3 huevos revueltos, 1 taza de avena con fruta&#10;Comida: 200g pechuga a la plancha, 1 taza arroz integral, ensalada&#10;Cena: 2 tortillas con frijoles, 1 taza de sopa de verduras&#10;Snacks: 1 manzana, 30g nueces"></textarea>
-                    <button class="btn-premium" id="btn-distribute-diet" style="width:100%; margin-top:1rem;">⚡ DISTRIBUIR DIETA AUTOMÁTICAMENTE</button>
-                </div>
-
-                <!-- DIETA EDITABLE MANUAL -->
-                <div class="meal-item glass-card" style="padding:2rem; border-color:var(--accent-secondary); margin-bottom:2rem;">
-                    <h3 style="color:var(--accent-secondary); font-size:1rem; margin-bottom:0.5rem; font-family:var(--font-accent); letter-spacing:1px; border-bottom:1px solid var(--accent-secondary); padding-bottom:0.5rem;">DIETA DETALLADA POR TIEMPO</h3>
-                    <p style="font-size:0.78rem; color:var(--text-dim); margin-bottom:1rem;">Edita manualmente cada tiempo de comida. Pulsa <strong>GUARDAR DIETA</strong> cuando termines.</p>
-                    <div style="display:grid; grid-template-columns: 1fr; gap:16px;" class="diet-grid-mobile">
-                        <div style="display:flex; flex-direction:column;">
-                            <label style="color:var(--accent-main); font-weight:bold; display:block; font-size:0.85rem; margin-bottom:0.5rem;">🌅 DESAYUNO</label>
-                            <textarea id="diet-edit-breakfast" style="flex:1; min-height:90px; background:var(--glass-bg, rgba(0,0,0,0.2)); border:1px solid var(--glass-border); border-radius:8px; padding:0.8rem; color:var(--text-primary); line-height:1.5; font-size:0.9rem; font-family:var(--font-main); resize:vertical;" placeholder="Ej. 3 huevos revueltos + 1 tortilla">${diet.breakfast || ''}</textarea>
+                <!-- BARRA DE CALORÍAS HOY -->
+                <div class="pm-diet-bar">
+                    <div class="pm-diet-bar-top">
+                        <div>
+                            <div class="pm-diet-bar-lbl">CALORÍAS HOY</div>
+                            <div class="pm-diet-num"><span id="dCalIn">${calIn.toLocaleString()}</span> <span class="pm-diet-num-sep">/ <span id="dCalLim">${calLim.toLocaleString()}</span></span></div>
                         </div>
-                        <div style="display:flex; flex-direction:column;">
-                            <label style="color:var(--accent-main); font-weight:bold; display:block; font-size:0.85rem; margin-bottom:0.5rem;">☀️ COMIDA</label>
-                            <textarea id="diet-edit-lunch" style="flex:1; min-height:90px; background:var(--glass-bg, rgba(0,0,0,0.2)); border:1px solid var(--glass-border); border-radius:8px; padding:0.8rem; color:var(--text-primary); line-height:1.5; font-size:0.9rem; font-family:var(--font-main); resize:vertical;" placeholder="Ej. Pechuga asada 200g + arroz integral + ensalada">${diet.lunch || ''}</textarea>
-                        </div>
-                        <div style="display:flex; flex-direction:column;">
-                            <label style="color:var(--accent-main); font-weight:bold; display:block; font-size:0.85rem; margin-bottom:0.5rem;">🌙 CENA</label>
-                            <textarea id="diet-edit-dinner" style="flex:1; min-height:90px; background:var(--glass-bg, rgba(0,0,0,0.2)); border:1px solid var(--glass-border); border-radius:8px; padding:0.8rem; color:var(--text-primary); line-height:1.5; font-size:0.9rem; font-family:var(--font-main); resize:vertical;" placeholder="Ej. 2 tortillas con 2 huevos + ensalada">${diet.dinner || ''}</textarea>
-                        </div>
-                        <div style="display:flex; flex-direction:column;">
-                            <label style="color:var(--accent-main); font-weight:bold; display:block; font-size:0.85rem; margin-bottom:0.5rem;">🍎 SNACKS / ADICIONALES</label>
-                            <textarea id="diet-edit-snacks" style="flex:1; min-height:90px; background:var(--glass-bg, rgba(0,0,0,0.2)); border:1px solid var(--glass-border); border-radius:8px; padding:0.8rem; color:var(--text-primary); line-height:1.5; font-size:0.9rem; font-family:var(--font-main); resize:vertical;" placeholder="Ej. Zanahoria con limón, té verde">${diet.snacks || ''}</textarea>
+                        <div style="text-align:right;">
+                            <div class="pm-diet-avail"><span id="dCalAvail">${calAvail.toLocaleString()}</span><small>disponibles</small></div>
                         </div>
                     </div>
-                    <button class="btn-premium" id="btn-save-diet" style="width:100%; margin-top:1.2rem;">💾 GUARDAR DIETA</button>
-                    <button class="btn-premium" id="btn-reset-diet" style="width:100%; margin-top:10px; background:transparent; border:1px solid var(--accent-alert); color:var(--accent-alert);">🗑️ REINICIAR DIETA</button>
+                    <div class="pm-diet-bar-bg"><div id="dCalBar" class="pm-diet-bar-fill" style="width:${calPct}%;"></div></div>
                 </div>
 
-                <!-- REGLAS DE PROTOCOLO -->
-                <div class="meal-item glass-card" style="padding:2rem; margin-bottom:2rem; border-color:var(--accent-main);">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap; gap:8px;">
-                        <h3 style="color:var(--accent-main); font-size:1rem; font-family:var(--font-accent); letter-spacing:1px; margin:0;">📋 REGLAS DE PROTOCOLO</h3>
-                        <button class="btn-premium" id="btn-edit-rules" style="font-size:0.65rem; padding:0.4rem 0.9rem;">✏️ EDITAR</button>
-                    </div>
-                    ${!hasCustomRules ? '<p style="font-size:0.72rem; color:var(--text-dim); font-style:italic; margin-bottom:0.8rem;">Ejemplos predefinidos. Edita para adaptarlas a tu dieta personal:</p>' : ''}
-                    <ul id="rules-list-display" style="list-style:none; padding:0; display:flex; flex-direction:column; gap:8px;">
-                        ${rules.length > 0 ? rules.map(r =>
-                            `<li style="padding:0.6rem 0.8rem; background:rgba(0,255,136,${hasCustomRules ? '0.05' : '0.02'}); border-left:3px solid var(--accent-main); border-radius:6px; font-size:0.85rem; color:${hasCustomRules ? 'var(--text-primary)' : 'var(--text-dim)'}; ${hasCustomRules ? '' : 'opacity:0.55; font-style:italic;'}">▸ ${r}</li>`
-                        ).join('') : '<li style="color:var(--text-dim); font-style:italic; font-size:0.85rem;">Sin reglas definidas aún. Pulsa EDITAR para agregar.</li>'}
-                    </ul>
+                <!-- PESTAÑAS -->
+                <div class="pm-d-tabs">
+                    <div class="pm-d-tab on" data-d-tab="plan">MI PLAN</div>
+                    <div class="pm-d-tab" data-d-tab="log">REGISTRAR</div>
+                    <div class="pm-d-tab" data-d-tab="rules">REGLAS</div>
                 </div>
 
-                <!-- REGISTRO DE CALORÍAS REALES -->
-                <div class="reg-food-container" style="border: 2px solid var(--accent-main); background: var(--glass-bg, rgba(0,0,0,0.1)); padding:2rem; border-radius:20px;">
-                    <h3 style="color:var(--accent-main); font-family:var(--font-accent); margin-bottom:0.5rem;">REGISTRO DE INGESTA REAL</h3>
-                    <p style="font-size:0.8rem; margin-bottom:1.5rem; color:var(--text-dim);">Reporta tus alimentos para que AXCore calibre tu metabolismo.</p>
-                    <div class="food-entry-group" style="display:flex; gap:12px; flex-wrap:wrap;">
-                        <input type="text" id="food-desc" placeholder="Ej. 100g de pollo y media taza de arroz..." style="flex:1; min-width:150px; background:var(--glass-bg, rgba(0,0,0,0.2)); border:1px solid var(--accent-main); padding:0.9rem; color:var(--text-primary); border-radius:12px; font-size:0.95rem;">
-                        <button class="btn-premium" id="btn-add-food" style="flex:1; min-width:110px; padding:0.9rem; font-weight:bold;">REGISTRAR</button>
+                <!-- ─── TAB MI PLAN ─── -->
+                <div class="pm-d-panel on" id="pmDt-plan">
+                    <div class="pm-d-meal ${diet.breakfast ? 'has-content' : ''}" data-meal="breakfast">
+                        <div class="pm-d-meal-hdr"><span class="pm-d-meal-name">🌅 DESAYUNO</span><span class="pm-d-meal-icon">⛶</span></div>
+                        ${mealPreview(diet.breakfast)}
                     </div>
+                    <div class="pm-d-meal ${diet.lunch ? 'has-content' : ''}" data-meal="lunch">
+                        <div class="pm-d-meal-hdr"><span class="pm-d-meal-name">☀️ COMIDA</span><span class="pm-d-meal-icon">⛶</span></div>
+                        ${mealPreview(diet.lunch)}
+                    </div>
+                    <div class="pm-d-meal ${diet.dinner ? 'has-content' : ''}" data-meal="dinner">
+                        <div class="pm-d-meal-hdr"><span class="pm-d-meal-name">🌙 CENA</span><span class="pm-d-meal-icon">⛶</span></div>
+                        ${mealPreview(diet.dinner)}
+                    </div>
+                    <div class="pm-d-meal ${diet.snacks ? 'has-content' : ''}" data-meal="snacks">
+                        <div class="pm-d-meal-hdr"><span class="pm-d-meal-name">🥕 SNACKS</span><span class="pm-d-meal-icon">⛶</span></div>
+                        ${mealPreview(diet.snacks)}
+                    </div>
+
+                    <!-- TEXTAREAS OCULTOS — se exponen al click del meal card -->
+                    <div id="pmDietEditWrap" style="display:none; margin-top:14px;">
+                        <textarea id="diet-edit-breakfast" class="pm-d-edit" placeholder="Desayuno">${diet.breakfast || ''}</textarea>
+                        <textarea id="diet-edit-lunch" class="pm-d-edit" placeholder="Comida">${diet.lunch || ''}</textarea>
+                        <textarea id="diet-edit-dinner" class="pm-d-edit" placeholder="Cena">${diet.dinner || ''}</textarea>
+                        <textarea id="diet-edit-snacks" class="pm-d-edit" placeholder="Snacks">${diet.snacks || ''}</textarea>
+                        <button class="btn-premium pm-d-save" id="btn-save-diet" style="width:100%; margin-top:8px;">💾 GUARDAR DIETA</button>
+                        <button class="btn-premium pm-d-reset" id="btn-reset-diet" style="width:100%; margin-top:8px; background:transparent; border:1px solid rgba(255,51,102,.4); color:#ff3366;">🗑️ REINICIAR DIETA</button>
+                    </div>
+
+                    <!-- INGRESO AUTOMÁTICO DE DIETA -->
+                    <div class="pm-diet-import-card">
+                        <div class="pm-diet-import-title">📥 INGRESO DE DIETA COMPLETA</div>
+                        <div class="pm-diet-import-sub">Pega tu plan completo. El sistema lo distribuye en Desayuno · Comida · Cena · Snacks · Recomendaciones automáticamente.</div>
+                        <textarea class="pm-diet-import-area" id="diet-full-import" placeholder="Ejemplo:&#10;Desayuno: 3 huevos revueltos + tortilla&#10;Comida: pechuga 200g + arroz integral + ensalada&#10;Cena: 2 tortillas con verduras&#10;Snacks: 1 manzana, 30g nueces&#10;Recomendaciones: 3L agua, ayuno 6PM-7AM"></textarea>
+                        <button class="pm-diet-import-btn" id="btn-distribute-diet">⚡ DISTRIBUIR AUTOMÁTICAMENTE</button>
+                    </div>
+                </div>
+
+                <!-- ─── TAB REGISTRAR ALIMENTO ─── -->
+                <div class="pm-d-panel" id="pmDt-log">
+                    <div class="pm-d-log-hint">Registra lo que comes HOY · suma al contador de calorías</div>
+                    <div class="pm-d-food-row">
+                        <input type="text" id="food-desc" class="pm-d-food-input" placeholder="Ej. 100g pollo y arroz...">
+                        <button class="pm-d-food-add" id="btn-add-food">+ AGREGAR</button>
+                    </div>
+                    <div class="pm-d-food-log" id="pmFoodLogList">
+                        ${foodLog.length === 0
+                            ? '<div class="pm-d-food-empty">Sin registros hoy. Agrega tu primera comida arriba ↑</div>'
+                            : foodLog.map(f => `<div class="pm-d-food-item"><span class="pm-d-food-name">${(f.desc || '').toString().replace(/</g,'&lt;')}</span><span class="pm-d-food-cal">${f.cal || 0}<small>kcal</small></span></div>`).join('')
+                        }
+                    </div>
+                </div>
+
+                <!-- ─── TAB REGLAS ─── -->
+                <div class="pm-d-panel" id="pmDt-rules">
+                    <div class="pm-d-log-hint">Reglas de tu plan + protocolo base AX-CORE</div>
+                    <div class="pm-d-rules-list" id="rules-list-display">
+                        ${rules.length > 0
+                            ? rules.map((r, i) => `<div class="pm-d-rule"><div class="pm-d-rule-num">${i+1}</div><div class="pm-d-rule-txt">${r}</div></div>`).join('')
+                            : '<div class="pm-d-rule"><div class="pm-d-rule-num">!</div><div class="pm-d-rule-txt" style="opacity:.6;font-style:italic;">Sin reglas aún. Pulsa EDITAR REGLAS para agregar.</div></div>'
+                        }
+                    </div>
+                    <button class="btn-premium" id="btn-edit-rules" style="width:100%; margin-top:14px;">✏️ EDITAR REGLAS</button>
                 </div>
             </div>
         `;
+
+        // ─── Lógica de pestañas ───
+        dietEl.querySelectorAll('.pm-d-tab').forEach(tab => {
+            tab.onclick = () => {
+                const target = tab.dataset.dTab;
+                dietEl.querySelectorAll('.pm-d-tab').forEach(t => t.classList.toggle('on', t === tab));
+                dietEl.querySelectorAll('.pm-d-panel').forEach(p => p.classList.toggle('on', p.id === `pmDt-${target}`));
+            };
+        });
+
+        // ─── Click en meal card: muestra/oculta editor inline + scroll al textarea ───
+        dietEl.querySelectorAll('.pm-d-meal').forEach(card => {
+            card.onclick = () => {
+                const editor = document.getElementById('pmDietEditWrap');
+                if (editor) {
+                    editor.style.display = 'block';
+                    const meal = card.dataset.meal;
+                    const ta = document.getElementById(`diet-edit-${meal}`);
+                    if (ta) {
+                        ta.scrollIntoView({behavior:'smooth', block:'center'});
+                        setTimeout(() => ta.focus(), 350);
+                    }
+                }
+            };
+        });
 
         // Editar reglas de protocolo
         const btnEditRules = document.getElementById('btn-edit-rules');
@@ -1323,6 +1440,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (parsed.lunch)     document.getElementById('diet-edit-lunch').value = parsed.lunch;
             if (parsed.dinner)    document.getElementById('diet-edit-dinner').value = parsed.dinner;
             if (parsed.snacks)    document.getElementById('diet-edit-snacks').value = parsed.snacks;
+            // Mostrar el editor inline al distribuir (los textareas están en pmDietEditWrap)
+            const pmEdit = document.getElementById('pmDietEditWrap');
+            if (pmEdit) pmEdit.style.display = 'block';
             // Recomendaciones detectadas → se convierten en reglas custom
             if (parsed.recommendations) {
                 const newRules = parsed.recommendations.split('\n').map(l => l.trim()).filter(l => l.length > 3);
