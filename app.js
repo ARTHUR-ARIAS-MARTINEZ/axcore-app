@@ -801,6 +801,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // RACHA — del state si existe, si no calcular
         const streak = userData.streak || (userData.history?.length || 0);
         set('pd-streak-days', streak);
+        set('pd-ach-streak-days', streak);
 
         // RESUMEN DE HOY
         const calIn  = +(userData.caloriesConsumedToday || 0);
@@ -917,6 +918,25 @@ document.addEventListener('DOMContentLoaded', () => {
             ).join('');
         }
         set('pd-badges-count', ach.length);
+
+        // PRÓXIMO LOGRO — calcular siguiente insignia y actualizar card
+        try {
+            const nextBadge = allBadges.find(b => !ach.includes(b.id));
+            const totalB = allBadges.length || 100;
+            const earnedB = ach.length;
+            const pct = totalB > 0 ? Math.round((earnedB / totalB) * 100) : 0;
+            if (nextBadge) {
+                const nameEl = get('pd-next-ach-name');
+                const iconEl = get('pd-next-ach-icon');
+                const barEl  = get('pd-next-ach-bar');
+                const pctEl  = get('pd-next-ach-pct');
+                if (nameEl) nameEl.textContent = (nextBadge.name || nextBadge.title || 'PRÓXIMA INSIGNIA').toUpperCase();
+                if (iconEl) iconEl.textContent  = nextBadge.emoji || nextBadge.icon || '🏅';
+                if (barEl)  barEl.style.width   = pct + '%';
+                if (pctEl)  pctEl.textContent   = pct + '%';
+                set('pd-ach-pct-label', pct + '%');
+            }
+        } catch(e) {}
     }
 
     // Navegación rápida desde botones del hero
