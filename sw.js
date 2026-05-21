@@ -1,8 +1,9 @@
-const CACHE_NAME = 'axcore-v3.5-fix-await';
+const CACHE_NAME = 'axcore-v4.0-premium-redesign';
 const urlsToCache = [
   './',
   './index.html',
   './index.css',
+  './premium.css',
   './app.js',
   './knowledge.js',
   './logo.png',
