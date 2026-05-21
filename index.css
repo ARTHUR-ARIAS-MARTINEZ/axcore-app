@@ -73,6 +73,50 @@
     --glass-bg: rgba(255, 255, 255, 0.5);
 }
 
+[data-theme="tactical"] {
+    --bg-dark: #0b0c10;
+    --accent-main: #ff6a00;
+    --accent-secondary: #00ffcc;
+    --accent-alert: #ff0055;
+    --glass: rgba(255, 106, 0, 0.07);
+    --glass-border: rgba(255, 106, 0, 0.3);
+    --neon-glow: 0 0 10px rgba(255, 106, 0, 0.5), 0 0 20px rgba(255, 106, 0, 0.2);
+    --text-dim: #7f8c8d;
+}
+
+[data-theme="military"] {
+    --bg-dark: #0f140d;
+    --accent-main: #849b4c;
+    --accent-secondary: #c2a649;
+    --accent-alert: #9b2c2c;
+    --glass: rgba(132, 155, 76, 0.08);
+    --glass-border: rgba(132, 155, 76, 0.35);
+    --neon-glow: 0 0 8px rgba(132, 155, 76, 0.4), 0 0 16px rgba(194, 166, 73, 0.2);
+    --text-dim: #9aa58c;
+}
+
+[data-theme="rainbow"] {
+    --bg-dark: #0d0c15;
+    --accent-main: #ff0055;
+    --accent-secondary: #00ffd5;
+    --accent-alert: #ffff00;
+    --glass: rgba(255, 255, 255, 0.06);
+    --glass-border: rgba(255, 0, 85, 0.25);
+    --neon-glow: 0 0 12px rgba(0, 255, 213, 0.4), 0 0 24px rgba(255, 0, 85, 0.2);
+    --text-dim: #a6a3b6;
+}
+
+[data-theme="pink"] {
+    --bg-dark: #1f0b15;
+    --accent-main: #ff4da6;
+    --accent-secondary: #ffccd5;
+    --accent-alert: #ff1a1a;
+    --glass: rgba(255, 77, 166, 0.08);
+    --glass-border: rgba(255, 77, 166, 0.35);
+    --neon-glow: 0 0 10px rgba(255, 77, 166, 0.5), 0 0 20px rgba(255, 204, 213, 0.25);
+    --text-dim: #e6b3cc;
+}
+
 * {
     margin: 0;
     padding: 0;

@@ -15,10 +15,62 @@ document.addEventListener('DOMContentLoaded', () => {
     const navLinks = document.querySelectorAll('.nav-links li');
     const pages = document.querySelectorAll('.page');
     
-    const themeBtns = document.querySelectorAll('.theme-btn');
+    const themeBtns = document.querySelectorAll('.theme-buttons .theme-btn');
     const saveSettingsBtn = document.getElementById('save-settings');
     const saveMeasurementsBtn = document.getElementById('save-measurements');
     const navLogout = document.getElementById('nav-logout');
+
+    // Modal de comida premium a pantalla completa
+    let currentEditingMeal = null;
+    function openMealModal(mealType) {
+        currentEditingMeal = mealType;
+        const diet = userData.recommendedDiet || { breakfast: '', lunch: '', dinner: '', snacks: '' };
+        const titleEl = document.getElementById('meal-modal-title');
+        const textareaEl = document.getElementById('meal-modal-textarea');
+        const overlayEl = document.getElementById('meal-modal-overlay');
+        
+        if (titleEl) {
+            const names = {
+                breakfast: 'DESAYUNO',
+                lunch: 'COMIDA',
+                dinner: 'CENA',
+                snacks: 'SNACKS'
+            };
+            titleEl.textContent = names[mealType] || 'COMIDA';
+        }
+        if (textareaEl) {
+            textareaEl.value = diet[mealType] || '';
+        }
+        if (overlayEl) {
+            overlayEl.classList.add('active');
+        }
+    }
+    
+    function closeMealModal() {
+        const overlayEl = document.getElementById('meal-modal-overlay');
+        if (overlayEl) {
+            overlayEl.classList.remove('active');
+        }
+        currentEditingMeal = null;
+    }
+    
+    function saveMealModal() {
+        if (!currentEditingMeal) return;
+        const textareaEl = document.getElementById('meal-modal-textarea');
+        if (textareaEl) {
+            if (!userData.recommendedDiet) userData.recommendedDiet = { breakfast: '', lunch: '', dinner: '', snacks: '' };
+            userData.recommendedDiet[currentEditingMeal] = textareaEl.value.trim();
+            saveData();
+            renderDietPage();
+        }
+        closeMealModal();
+    }
+
+    const mBack = document.getElementById('meal-modal-back');
+    if (mBack) mBack.onclick = closeMealModal;
+    
+    const mSave = document.getElementById('meal-modal-save');
+    if (mSave) mSave.onclick = saveMealModal;
 
     const sensationFeedback = document.getElementById('sensation-feedback');
     const btnAskAiSensation = document.getElementById('btn-ask-ai-sensation');
@@ -178,11 +230,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function applySettings() {
         document.body.setAttribute('data-theme', userData.theme || 'neon');
-        themeBtns.forEach(b => {
+        const currentThemeBtns = document.querySelectorAll('.theme-buttons .theme-btn');
+        currentThemeBtns.forEach(b => {
             b.classList.toggle('active', b.dataset.theme === userData.theme);
         });
         const dispUser = document.getElementById('display-username');
-        if (dispUser) dispUser.textContent = (userData.username || 'ATLETA').toUpperCase();
+        if (dispUser) dispUser.textContent = (userData.username || userData.userName || 'USUARIO').toUpperCase();
         if (userData.avatar) {
             const ap = document.getElementById('avatar-preview');
             if (ap) ap.style.backgroundImage = `url(${userData.avatar})`;
@@ -200,8 +253,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 reader.onload = (f) => {
                     const base64 = f.target.result;
                     userData.avatar = base64;
+                    userData.avatarPhoto = base64; // Sincronización para ajustes premium
                     avatarEl.style.backgroundImage = `url(${base64})`;
                     saveData();
+                    if (typeof window.updatePmProfileHero === 'function') window.updatePmProfileHero();
                 };
                 reader.readAsDataURL(file);
             };
@@ -955,6 +1010,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const newName = v.trim();
             if (!newName) return;
             userData.userName = newName;
+            userData.username = newName;
             saveData();
             // Sync visual: profile hero + fila iOS + display-username del header
             if (typeof window.updatePmProfileHero === 'function') window.updatePmProfileHero();
@@ -1354,16 +1410,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const calPct = calLim > 0 ? Math.min(100, Math.round((calIn / calLim) * 100)) : 0;
         const foodLog = Array.isArray(userData.foodLogToday) ? userData.foodLogToday : [];
 
-        // Genera HTML preview de cada comida (con fadeOut si es muy largo)
-        const mealPreview = (text, emoji, name) => {
+        const formatMealText = (text) => {
             const t = (text || '').trim();
-            if (!t) return `<div class="d-meal-empty">Sin contenido — toca para agregar</div>`;
-            return `<div class="d-meal-preview">${t.replace(/\n/g, '<br>')}</div>`;
+            return t ? t.replace(/\n/g, '<br>') : '<span style="opacity:0.5;font-style:italic;">Sin contenido — toca para agregar</span>';
         };
 
         dietEl.innerHTML = `
             <div class="pm-diet-wrap" style="max-width:800px; margin:0 auto;">
-                <h2 class="pm-diet-h2">NUTRICIÓN</h2>
+                <h2 class="pm-diet-h2">PLAN ALIMENTICIO</h2>
 
                 <!-- BARRA DE CALORÍAS HOY -->
                 <div class="pm-diet-bar">
@@ -1390,29 +1444,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="pm-d-panel on" id="pmDt-plan">
                     <div class="pm-d-meal ${diet.breakfast ? 'has-content' : ''}" data-meal="breakfast">
                         <div class="pm-d-meal-hdr"><span class="pm-d-meal-name">🌅 DESAYUNO</span><span class="pm-d-meal-icon">⛶</span></div>
-                        ${mealPreview(diet.breakfast)}
+                        <div class="pm-d-meal-body">${formatMealText(diet.breakfast)}</div>
                     </div>
                     <div class="pm-d-meal ${diet.lunch ? 'has-content' : ''}" data-meal="lunch">
                         <div class="pm-d-meal-hdr"><span class="pm-d-meal-name">☀️ COMIDA</span><span class="pm-d-meal-icon">⛶</span></div>
-                        ${mealPreview(diet.lunch)}
+                        <div class="pm-d-meal-body">${formatMealText(diet.lunch)}</div>
                     </div>
                     <div class="pm-d-meal ${diet.dinner ? 'has-content' : ''}" data-meal="dinner">
                         <div class="pm-d-meal-hdr"><span class="pm-d-meal-name">🌙 CENA</span><span class="pm-d-meal-icon">⛶</span></div>
-                        ${mealPreview(diet.dinner)}
+                        <div class="pm-d-meal-body">${formatMealText(diet.dinner)}</div>
                     </div>
                     <div class="pm-d-meal ${diet.snacks ? 'has-content' : ''}" data-meal="snacks">
                         <div class="pm-d-meal-hdr"><span class="pm-d-meal-name">🥕 SNACKS</span><span class="pm-d-meal-icon">⛶</span></div>
-                        ${mealPreview(diet.snacks)}
-                    </div>
-
-                    <!-- TEXTAREAS OCULTOS — se exponen al click del meal card -->
-                    <div id="pmDietEditWrap" style="display:none; margin-top:14px;">
-                        <textarea id="diet-edit-breakfast" class="pm-d-edit" placeholder="Desayuno">${diet.breakfast || ''}</textarea>
-                        <textarea id="diet-edit-lunch" class="pm-d-edit" placeholder="Comida">${diet.lunch || ''}</textarea>
-                        <textarea id="diet-edit-dinner" class="pm-d-edit" placeholder="Cena">${diet.dinner || ''}</textarea>
-                        <textarea id="diet-edit-snacks" class="pm-d-edit" placeholder="Snacks">${diet.snacks || ''}</textarea>
-                        <button class="btn-premium pm-d-save" id="btn-save-diet" style="width:100%; margin-top:8px;">💾 GUARDAR DIETA</button>
-                        <button class="btn-premium pm-d-reset" id="btn-reset-diet" style="width:100%; margin-top:8px; background:transparent; border:1px solid rgba(255,51,102,.4); color:#ff3366;">🗑️ REINICIAR DIETA</button>
+                        <div class="pm-d-meal-body">${formatMealText(diet.snacks)}</div>
                     </div>
 
                     <!-- INGRESO AUTOMÁTICO DE DIETA -->
@@ -1422,6 +1466,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <textarea class="pm-diet-import-area" id="diet-full-import" placeholder="Ejemplo:&#10;Desayuno: 3 huevos revueltos + tortilla&#10;Comida: pechuga 200g + arroz integral + ensalada&#10;Cena: 2 tortillas con verduras&#10;Snacks: 1 manzana, 30g nueces&#10;Recomendaciones: 3L agua, ayuno 6PM-7AM"></textarea>
                         <button class="pm-diet-import-btn" id="btn-distribute-diet">⚡ DISTRIBUIR AUTOMÁTICAMENTE</button>
                     </div>
+                    <button class="btn-premium pm-d-reset" id="btn-reset-diet" style="width:100%; margin-top:14px; background:transparent; border:1px solid rgba(255,51,102,.4); color:#ff3366;">🗑️ REINICIAR DIETA</button>
                 </div>
 
                 <!-- ─── TAB REGISTRAR ALIMENTO ─── -->
@@ -1462,19 +1507,10 @@ document.addEventListener('DOMContentLoaded', () => {
             };
         });
 
-        // ─── Click en meal card: muestra/oculta editor inline + scroll al textarea ───
+        // ─── Click en meal card: abre modal de comida a pantalla completa ───
         dietEl.querySelectorAll('.pm-d-meal').forEach(card => {
             card.onclick = () => {
-                const editor = document.getElementById('pmDietEditWrap');
-                if (editor) {
-                    editor.style.display = 'block';
-                    const meal = card.dataset.meal;
-                    const ta = document.getElementById(`diet-edit-${meal}`);
-                    if (ta) {
-                        ta.scrollIntoView({behavior:'smooth', block:'center'});
-                        setTimeout(() => ta.focus(), 350);
-                    }
-                }
+                openMealModal(card.dataset.meal);
             };
         });
 
@@ -1494,7 +1530,7 @@ document.addEventListener('DOMContentLoaded', () => {
             };
         }
 
-        // Distribuir dieta completa automáticamente
+        // Distribuir dieta completa automáticamente y guardar de inmediato
         document.getElementById('btn-distribute-diet').onclick = () => {
             const raw = document.getElementById('diet-full-import').value.trim();
             if (!raw) { alert('Escribe o pega tu dieta primero.'); return; }
@@ -1504,37 +1540,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert('No se encontraron secciones reconocibles.\nUsa palabras como "Desayuno:", "Comida:", "Cena:", "Snacks:", "Recomendaciones:" para que la app las detecte.');
                 return;
             }
-            if (parsed.breakfast) document.getElementById('diet-edit-breakfast').value = parsed.breakfast;
-            if (parsed.lunch)     document.getElementById('diet-edit-lunch').value = parsed.lunch;
-            if (parsed.dinner)    document.getElementById('diet-edit-dinner').value = parsed.dinner;
-            if (parsed.snacks)    document.getElementById('diet-edit-snacks').value = parsed.snacks;
-            // Mostrar el editor inline al distribuir (los textareas están en pmDietEditWrap)
-            const pmEdit = document.getElementById('pmDietEditWrap');
-            if (pmEdit) pmEdit.style.display = 'block';
+            if (parsed.breakfast) userData.recommendedDiet.breakfast = parsed.breakfast;
+            if (parsed.lunch)     userData.recommendedDiet.lunch = parsed.lunch;
+            if (parsed.dinner)    userData.recommendedDiet.dinner = parsed.dinner;
+            if (parsed.snacks)    userData.recommendedDiet.snacks = parsed.snacks;
+            
             // Recomendaciones detectadas → se convierten en reglas custom
             if (parsed.recommendations) {
                 const newRules = parsed.recommendations.split('\n').map(l => l.trim()).filter(l => l.length > 3);
                 if (newRules.length > 0) {
                     userData.customDietRules = newRules;
-                    saveData();
                 }
             }
-            document.getElementById('diet-full-import').value = '';
-            document.getElementById('diet-edit-breakfast').scrollIntoView({ behavior: 'smooth' });
-            const recsMsg = parsed.recommendations ? '\n💡 También detecté reglas/recomendaciones y se guardaron como reglas custom.' : '';
-            alert('✅ Dieta distribuida. Revisa cada sección y pulsa GUARDAR DIETA cuando estés conforme.' + recsMsg);
-        };
-
-        // Guardar dieta editada manualmente
-        document.getElementById('btn-save-diet').onclick = () => {
-            const breakfast = document.getElementById('diet-edit-breakfast').value.trim();
-            const lunch = document.getElementById('diet-edit-lunch').value.trim();
-            const dinner = document.getElementById('diet-edit-dinner').value.trim();
-            const snacks = document.getElementById('diet-edit-snacks').value.trim();
-
-            userData.recommendedDiet = { breakfast, lunch, dinner, snacks };
             saveData();
-            alert('✅ Dieta guardada correctamente.');
+            document.getElementById('diet-full-import').value = '';
+            renderDietPage();
+            const recsMsg = parsed.recommendations ? '\n💡 También detecté reglas/recomendaciones y se guardaron como reglas custom.' : '';
+            alert('✅ Dieta distribuida y guardada de inmediato.' + recsMsg);
         };
 
         const btnResetDiet = document.getElementById('btn-reset-diet');
@@ -1873,9 +1895,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // (applySettings duplicado eliminado — la versión completa está en la línea 108)
 
-    themeBtns.forEach(btn => {
-        btn.onclick = () => {
-            const theme = btn.dataset.theme;
+    document.addEventListener('click', (e) => {
+        const themeBtn = e.target.closest('.theme-buttons .theme-btn');
+        if (themeBtn) {
+            const theme = themeBtn.dataset.theme;
             userData.theme = theme;
             applySettings();
             // Destruir gráficas previas para que se recreen con el color del tema
@@ -1885,7 +1908,7 @@ document.addEventListener('DOMContentLoaded', () => {
             try { if (chartHistory) { chartHistory.destroy(); chartHistory = null; } } catch(_){}
             updateDashboard();
             saveData();
-        };
+        }
     });
 
     // SHARE BUTTONS
@@ -2071,7 +2094,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const heroK = studioState.heroMetric || activeMetrics[0] || 'deficit';
         const heroM = allM.find(m => m.key === heroK) || allM[0];
         const secM  = allM.filter(m => m !== heroM).slice(0, isL ? 5 : 3);
-        const name  = (userData.username || 'ATLETA').toUpperCase();
+        const name  = (userData.username || userData.userName || 'USUARIO').toUpperCase();
         const weeks = Math.min(8, Math.max(1, Math.ceil(((userData.history||[]).length)/7)||1));
         const PHRASES = ["La disciplina paga.","Deficit achieved.",`Week ${weeks} complete.`,
                          "No excuses, only results.","Powering your biology.","Results don't lie."];
@@ -2867,8 +2890,17 @@ document.addEventListener('DOMContentLoaded', () => {
         // Guardar nombre de usuario si se editó
         const unInput = document.getElementById('input-username');
         if (unInput && unInput.value.trim()) {
-            userData.username = unInput.value.trim();
-            document.getElementById('display-username').textContent = userData.username.toUpperCase();
+            const newName = unInput.value.trim();
+            userData.username = newName;
+            userData.userName = newName;
+            
+            // Sync visual
+            const du = document.getElementById('display-username');
+            if (du) du.textContent = newName.toUpperCase();
+            
+            if (typeof window.updatePmProfileHero === 'function') window.updatePmProfileHero();
+            const row = document.getElementById('pmSRowName');
+            if (row) row.textContent = newName.toUpperCase() + ' ›';
         }
         saveData();
         alert("Configuración guardada.");
@@ -3125,21 +3157,30 @@ document.addEventListener('DOMContentLoaded', () => {
         setInterval(() => {
             const now = new Date();
             
-            // Reloj 12 horas sin AM/PM
-            let h = now.getHours();
-            const m = now.getMinutes().toString().padStart(2, '0');
-            const s = now.getSeconds().toString().padStart(2, '0');
-            h = h % 12 || 12; // Convierte 0 a 12, 13 a 1, etc.
-            liveTimeEl.textContent = `${h.toString().padStart(2, '0')}:${m}:${s}`;
-            
-            // Fecha con mayúsculas en Día y Mes
-            let dateStr = now.toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long' }).replace(',', '');
-            let words = dateStr.split(' ').map(w => {
-                if(w.toLowerCase() === 'de' || w.toLowerCase() === 'del') return w.toLowerCase();
-                return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
-            });
-            liveDateEl.textContent = words.join(' ');
-
+            if (document.body.classList.contains('premium-mode')) {
+                // Modo premium: Reloj de 24 horas blanca brillante y fecha en inglés mayúsculas sin punto
+                const h24 = now.getHours().toString().padStart(2, '0');
+                const m = now.getMinutes().toString().padStart(2, '0');
+                liveTimeEl.textContent = `${h24}:${m}`;
+                
+                const dateStr = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase().replace('.', '');
+                liveDateEl.textContent = dateStr;
+            } else {
+                // Reloj 12 horas sin AM/PM
+                let h = now.getHours();
+                const m = now.getMinutes().toString().padStart(2, '0');
+                const s = now.getSeconds().toString().padStart(2, '0');
+                h = h % 12 || 12; // Convierte 0 a 12, 13 a 1, etc.
+                liveTimeEl.textContent = `${h.toString().padStart(2, '0')}:${m}:${s}`;
+                
+                // Fecha con mayúsculas en Día y Mes
+                let dateStr = now.toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long' }).replace(',', '');
+                let words = dateStr.split(' ').map(w => {
+                    if(w.toLowerCase() === 'de' || w.toLowerCase() === 'del') return w.toLowerCase();
+                    return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
+                });
+                liveDateEl.textContent = words.join(' ');
+            }
         }, 1000);
     }
 

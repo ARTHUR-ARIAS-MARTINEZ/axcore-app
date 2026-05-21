@@ -71,6 +71,26 @@ body.premium-mode[data-theme="natural"] {  /* NATURAL ZEN (tema claro) */
   --pm-s1: #e4e8df; --pm-s2: #d8dcce; --pm-s3: #c8cdc0; --pm-dim: #8a9a80;
   --pm-border: rgba(0,0,0,0.08);
 }
+body.premium-mode[data-theme="tactical"] {  /* TACTICAL ORANGE */
+  --pm-green-rgb: 255,106,0;
+  --pm-cyan-rgb:  0,255,204;
+  --pm-s1: #101216; --pm-s2: #161a22; --pm-s3: #1f2530; --pm-dim: #543b20;
+}
+body.premium-mode[data-theme="military"] {  /* MILITARY GREEN */
+  --pm-green-rgb: 132,155,76;
+  --pm-cyan-rgb:  194,166,73;
+  --pm-s1: #141b12; --pm-s2: #1c2619; --pm-s3: #263322; --pm-dim: #3b4226;
+}
+body.premium-mode[data-theme="rainbow"] {  /* RAINBOW PRIDE */
+  --pm-green-rgb: 255,0,85;
+  --pm-cyan-rgb:  0,255,213;
+  --pm-s1: #11101a; --pm-s2: #181625; --pm-s3: #201e30; --pm-dim: #442a5a;
+}
+body.premium-mode[data-theme="pink"] {  /* SAKURA PINK */
+  --pm-green-rgb: 255,77,166;
+  --pm-cyan-rgb:  255,204,213;
+  --pm-s1: #260e1b; --pm-s2: #301424; --pm-s3: #3c1a2f; --pm-dim: #60204a;
+}
 
 /* TARJETAS — glass premium */
 body.premium-mode .glass-card {
@@ -1441,7 +1461,8 @@ body.premium-mode #app-container {
 /* ── 3. CONTENT AREA SIN PADDING EXTRA ── */
 body.premium-mode .content-area {
   padding: 0 !important;
-  padding-bottom: 88px !important;
+  padding-top: 52px !important; /* Espacio para el top-bar fijo */
+  padding-bottom: 160px !important;
   overflow-y: auto !important;
   overflow-x: hidden !important;
   max-width: 100vw !important;
@@ -1455,14 +1476,17 @@ body.premium-mode .top-bar {
   margin-bottom: 0 !important;
   padding: 10px 16px !important;
   background: rgba(6,13,26,0.97) !important;
-  border-bottom: 1px solid rgba(var(--pm-green-rgb), 0.08) !important;
+  border-bottom: 1px solid rgba(var(--pm-green-rgb), 0.15) !important;
   backdrop-filter: blur(16px) !important;
   -webkit-backdrop-filter: blur(16px) !important;
-  position: sticky !important;
+  position: fixed !important;
   top: 0 !important;
-  z-index: 200 !important;
-  gap: 10px !important;
+  left: 0 !important;
+  right: 0 !important;
+  z-index: 1000 !important;
+  height: 52px !important;
   min-height: 52px !important;
+  gap: 10px !important;
 }
 
 /* User badge compacto */
@@ -1473,6 +1497,8 @@ body.premium-mode .user-badge {
   gap: 8px !important;
   flex: 1 !important;
   min-width: 0 !important;
+  display: flex !important;
+  align-items: center !important;
 }
 
 /* Avatar premium pequeño */
@@ -1489,10 +1515,10 @@ body.premium-mode .avatar {
 /* Nombre de usuario compacto */
 body.premium-mode .user-rank {
   font-family: 'Oswald', sans-serif !important;
-  font-size: 0.72rem !important;
-  font-weight: 600 !important;
-  letter-spacing: 1.5px !important;
-  color: #e8edf5 !important;
+  font-size: 0.85rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 1px !important;
+  color: #ffffff !important;
   white-space: nowrap !important;
   overflow: hidden !important;
   text-overflow: ellipsis !important;
@@ -1500,21 +1526,14 @@ body.premium-mode .user-rank {
   text-shadow: none !important;
 }
 
-/* "toca para editar" subtítulo pequeño */
+/* "toca para editar" subtítulo pequeño - ELIMINADO/OCULTO */
 body.premium-mode .user-badge::after {
-  content: 'toca para editar';
-  display: block;
-  font-size: 0.5rem;
-  color: rgba(var(--pm-green-rgb), 0.6);
-  letter-spacing: 1px;
-  line-height: 1;
-  margin-top: 2px;
+  display: none !important;
 }
 body.premium-mode .avatar-upload { display: none !important; }
 
 /* Live stats compacto (reloj + fecha) — derecha */
 body.premium-mode .live-stats {
-  font-size: 11px !important;
   text-align: right !important;
   color: var(--pm-dim2) !important;
   font-family: 'Oswald', sans-serif !important;
@@ -1530,14 +1549,16 @@ body.premium-mode .live-stats {
 body.premium-mode .live-stats .separator { display: none !important; }
 body.premium-mode #live-time {
   font-size: 11px !important;
-  color: var(--pm-dim2) !important;
-  font-weight: 500 !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
 }
 body.premium-mode #live-date {
-  font-size: 11px !important;
-  color: var(--pm-dim2) !important;
-  font-weight: 500 !important;
+  font-size: 9px !important;
+  color: var(--accent-main) !important;
+  font-weight: 600 !important;
   letter-spacing: 0.5px !important;
+}
+
 }
 
 /* Ocultar mini-cronómetro del header en premium (FAB lo cubre) */
@@ -1830,7 +1851,7 @@ body.premium-mode .theme-btn:active { transform: scale(0.96); }
    ══════════════════════════════════════════════════════════════════ */
 
 body.premium-mode .pm-diet-wrap {
-  padding: 14px 14px 90px;
+  padding: 14px 14px 160px;
   color: var(--pm-white);
 }
 
@@ -1954,10 +1975,14 @@ body.premium-mode .pm-d-meal {
   background: var(--pm-s1);
   border: 1px solid var(--pm-border);
   border-radius: var(--pm-r2);
-  padding: 12px 14px;
+  padding: 16px 14px;
   margin-bottom: 8px;
   cursor: pointer;
   transition: transform .15s, border-color .2s;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
 }
 body.premium-mode .pm-d-meal:active { transform: scale(0.98); }
 body.premium-mode .pm-d-meal.has-content {
@@ -1965,38 +1990,125 @@ body.premium-mode .pm-d-meal.has-content {
 }
 body.premium-mode .pm-d-meal-hdr {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-  margin-bottom: 6px;
+  width: 100%;
 }
 body.premium-mode .pm-d-meal-name {
   font-family: 'Oswald', sans-serif;
-  font-size: 0.85rem;
-  font-weight: 600;
-  letter-spacing: 1.5px;
+  font-size: 1.25rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 2px;
   color: var(--pm-green);
+  text-align: center;
+  text-transform: uppercase;
 }
 body.premium-mode .pm-d-meal-icon {
-  font-size: 0.95rem;
+  position: absolute;
+  right: 16px;
+  font-size: 1.1rem !important;
   color: var(--pm-green);
-  opacity: 0.7;
+  opacity: 0.8;
 }
 body.premium-mode .d-meal-preview {
-  font-size: 12px;
-  color: var(--pm-dim2);
-  line-height: 1.5;
-  margin-top: 4px;
-  max-height: 50px;
-  overflow: hidden;
-  position: relative;
-  mask-image: linear-gradient(to bottom, #000 60%, transparent);
-  -webkit-mask-image: linear-gradient(to bottom, #000 60%, transparent);
+  display: none !important;
 }
 body.premium-mode .d-meal-empty {
-  font-size: 0.7rem;
-  color: var(--pm-dim);
-  font-style: italic;
-  margin-top: 4px;
+  display: none !important;
+}
+
+/* Modal de Comida Premium a Pantalla Completa */
+body.premium-mode .meal-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(6, 13, 26, 0.98);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  z-index: 2000;
+  display: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  align-items: stretch;
+}
+body.premium-mode .meal-modal-overlay.active {
+  display: flex !important;
+  opacity: 1;
+}
+body.premium-mode .meal-modal-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  padding: 16px;
+}
+body.premium-mode .meal-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 56px;
+  border-bottom: 1px solid rgba(var(--pm-green-rgb), 0.15);
+  margin-bottom: 16px;
+}
+body.premium-mode .meal-modal-back-btn {
+  background: transparent;
+  border: none;
+  color: var(--pm-white);
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  letter-spacing: 1px;
+}
+body.premium-mode .meal-modal-title {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--pm-green);
+  text-align: center;
+}
+body.premium-mode .meal-modal-save-btn {
+  background: linear-gradient(135deg, var(--pm-green), rgba(var(--pm-green-rgb), 0.7));
+  border: none;
+  border-radius: 20px;
+  color: #000;
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  padding: 6px 16px;
+  cursor: pointer;
+  letter-spacing: 1px;
+  box-shadow: 0 4px 12px rgba(var(--pm-green-rgb), 0.2);
+}
+body.premium-mode .meal-modal-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  margin-bottom: 80px; /* Margen inferior para que no quede detrás del FAB ni del bottom nav */
+}
+body.premium-mode #meal-modal-textarea {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid rgba(var(--pm-green-rgb), 0.15) !important;
+  border-radius: var(--pm-r2) !important;
+  padding: 16px !important;
+  color: var(--pm-white) !important;
+  font-family: 'Inter', sans-serif !important;
+  font-size: 1rem !important;
+  line-height: 1.6 !important;
+  resize: none;
+  outline: none !important;
+  box-shadow: inset 0 2px 8px rgba(0,0,0,0.5);
+}
+body.premium-mode #meal-modal-textarea:focus {
+  border-color: rgba(var(--pm-green-rgb), 0.5) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
 }
 
 /* Textareas escondidos del editor */

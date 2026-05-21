@@ -745,13 +745,26 @@
                         </div>
                         <div class="input-group">
                             <label>ESTILO VISUAL</label>
-                            <div class="theme-buttons" style="display:grid; grid-template-columns: repeat(2, 1fr); gap:10px;">
+                            <div class="theme-buttons" style="display:grid; grid-template-columns: repeat(3, 1fr); gap:8px;">
+                                <!-- Masculinos -->
                                 <button class="theme-btn active" data-theme="neon"><span class="theme-dot" style="background:linear-gradient(135deg,#00c97a,#00e5ff);"></span><span class="theme-label-full">NEON NAVY</span><span class="theme-label-short">NEON</span></button>
+                                <button class="theme-btn" data-theme="tactical"><span class="theme-dot" style="background:linear-gradient(135deg,#ff6a00,#00ffcc);"></span><span class="theme-label-full">TACTICAL ORANGE</span><span class="theme-label-short">TACTICAL</span></button>
+                                <button class="theme-btn" data-theme="military"><span class="theme-dot" style="background:linear-gradient(135deg,#849b4c,#c2a649);"></span><span class="theme-label-full">MILITARY GREEN</span><span class="theme-label-short">MILITARY</span></button>
+                                
+                                <!-- Neutros & LGBT -->
                                 <button class="theme-btn" data-theme="original"><span class="theme-dot" style="background:linear-gradient(135deg,#d4af37,#00f2ff);"></span><span class="theme-label-full">GOLD ELITE</span><span class="theme-label-short">GOLD</span></button>
-                                <button class="theme-btn" data-theme="fuchsia"><span class="theme-dot" style="background:linear-gradient(135deg,#ff6b9d,#ffc857);"></span><span class="theme-label-full">CORAL GLOW</span><span class="theme-label-short">CORAL</span></button>
                                 <button class="theme-btn" data-theme="dark"><span class="theme-dot" style="background:linear-gradient(135deg,#ffffff,#888888);"></span><span class="theme-label-full">ULTRA DARK</span><span class="theme-label-short">DARK</span></button>
-                                <button class="theme-btn" data-theme="pride"><span class="theme-dot" style="background:linear-gradient(135deg,#ff4db8,#00e5ff);"></span><span class="theme-label-full">PRIDE VIBRANT</span><span class="theme-label-short">PRIDE</span></button>
                                 <button class="theme-btn" data-theme="natural"><span class="theme-dot" style="background:linear-gradient(135deg,#2e7d32,#e65100);"></span><span class="theme-label-full">NATURAL ZEN</span><span class="theme-label-short">ZEN</span></button>
+                                
+                                <!-- LGBT & Feminine -->
+                                <button class="theme-btn" data-theme="pride"><span class="theme-dot" style="background:linear-gradient(135deg,#ff4db8,#00e5ff);"></span><span class="theme-label-full">PRIDE VIBRANT</span><span class="theme-label-short">PRIDE</span></button>
+                                <button class="theme-btn" data-theme="rainbow"><span class="theme-dot" style="background:linear-gradient(135deg,#ff0055,#00ffd5);"></span><span class="theme-label-full">RAINBOW PRIDE</span><span class="theme-label-short">RAINBOW</span></button>
+                                <button class="theme-btn" data-theme="fuchsia"><span class="theme-dot" style="background:linear-gradient(135deg,#ff6b9d,#ffc857);"></span><span class="theme-label-full">CORAL GLOW</span><span class="theme-label-short">CORAL</span></button>
+                                
+                                <!-- Sakura Pink -->
+                                <button class="theme-btn" data-theme="pink"><span class="theme-dot" style="background:linear-gradient(135deg,#ff4da6,#ffccd5);"></span><span class="theme-label-full">SAKURA PINK</span><span class="theme-label-short">PINK</span></button>
+                                <div style="visibility: hidden;"></div>
+                                <div style="visibility: hidden;"></div>
                             </div>
                         </div>
                         <button id="save-settings" class="btn-premium" style="width:100%">GUARDAR SISTEMA</button>
@@ -920,5 +933,18 @@
             }).catch(function(){});
         }
     </script>
+    <!-- Modal de Comida Premium a Pantalla Completa -->
+    <div id="meal-modal-overlay" class="meal-modal-overlay">
+        <div class="meal-modal-container">
+            <header class="meal-modal-header">
+                <button class="meal-modal-back-btn" id="meal-modal-back">← VOLVER</button>
+                <h1 class="meal-modal-title" id="meal-modal-title">COMIDA</h1>
+                <button class="meal-modal-save-btn" id="meal-modal-save">GUARDAR</button>
+            </header>
+            <div class="meal-modal-body">
+                <textarea id="meal-modal-textarea" placeholder="Escribe el plan detallado para esta comida..."></textarea>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
