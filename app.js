@@ -235,7 +235,11 @@ document.addEventListener('DOMContentLoaded', () => {
             b.classList.toggle('active', b.dataset.theme === userData.theme);
         });
         const dispUser = document.getElementById('display-username');
-        if (dispUser) dispUser.textContent = (userData.username || userData.userName || 'USUARIO').toUpperCase();
+        let nameToDisp = userData.username || userData.userName || 'USUARIO';
+        if (nameToDisp.toUpperCase() === 'ATLETA' || !nameToDisp.trim()) {
+            nameToDisp = 'USUARIO';
+        }
+        if (dispUser) dispUser.textContent = nameToDisp.toUpperCase();
         if (userData.avatar) {
             const ap = document.getElementById('avatar-preview');
             if (ap) ap.style.backgroundImage = `url(${userData.avatar})`;
@@ -1048,7 +1052,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const setText = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
 
             // Avatar: inicial del nombre (o foto si existe)
-            const name = (ud.userName || currentUser || 'USUARIO').toString();
+            let name = (ud.userName || currentUser || 'USUARIO').toString();
+            if (name.toUpperCase() === 'ATLETA' || !name.trim()) {
+                name = 'USUARIO';
+            }
             const av = document.getElementById('pmProfAvatar');
             if (av) {
                 if (ud.avatarPhoto) {
