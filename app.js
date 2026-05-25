@@ -245,7 +245,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const photoSrc = userData.avatarPhoto || userData.avatar;
         if (photoSrc) {
             const ap = document.getElementById('avatar-preview');
-            if (ap) { ap.style.backgroundImage = `url(${photoSrc})`; ap.style.backgroundSize = 'cover'; }
+            // Usar background shorthand (inline style siempre supera CSS externo sin !important)
+            if (ap) ap.style.background = `url(${photoSrc}) center/cover no-repeat`;
         }
 
         // Listener para avatar
@@ -1261,11 +1262,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const headerAvatar = document.getElementById('avatar-preview');
             if (headerAvatar) {
                 if (photo) {
-                    headerAvatar.style.backgroundImage = `url(${photo})`;
-                    headerAvatar.style.backgroundSize  = 'cover';
+                    // Usar background shorthand → supera al CSS externo sin !important
+                    headerAvatar.style.background = `url(${photo}) center/cover no-repeat`;
                 } else {
-                    headerAvatar.style.backgroundImage = '';
-                    headerAvatar.style.backgroundSize  = '';
+                    // Sin foto: limpiar inline para que el CSS (gradiente) tome el control
+                    headerAvatar.style.background = '';
                 }
             }
 
