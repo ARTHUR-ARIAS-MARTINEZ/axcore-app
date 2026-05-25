@@ -1588,21 +1588,43 @@ body.premium-mode .avatar {
   background: linear-gradient(135deg,rgba(var(--pm-green-rgb), 0.3),rgba(var(--pm-cyan-rgb), 0.2));
 }
 
+/* Contenedor de nombre + subtítulo (al lado del avatar) */
+body.premium-mode .user-info {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 1px !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+}
+
 /* Nombre de usuario compacto */
 body.premium-mode .user-rank {
   font-family: 'Oswald', sans-serif !important;
-  font-size: 0.85rem !important;
+  font-size: 0.9rem !important;
   font-weight: 700 !important;
   letter-spacing: 1px !important;
   color: #ffffff !important;
   white-space: nowrap !important;
   overflow: hidden !important;
   text-overflow: ellipsis !important;
-  max-width: 140px !important;
-  text-shadow: none !important;
+  max-width: 160px !important;
+  display: block !important; /* inline-block para que max-width funcione */
+  line-height: 1.15 !important;
 }
 
-/* "toca para editar" subtítulo pequeño - ELIMINADO/OCULTO */
+/* Subtítulo "toca para editar" */
+body.premium-mode .user-edit-hint {
+  font-family: 'Oswald', sans-serif !important;
+  font-size: 0.6rem !important;
+  color: var(--accent-secondary) !important;
+  letter-spacing: 0.5px !important;
+  white-space: nowrap !important;
+  cursor: pointer !important;
+  opacity: 0.85 !important;
+  transition: opacity .15s !important;
+}
+body.premium-mode .user-edit-hint:hover { opacity: 1 !important; }
+
 body.premium-mode .user-badge::after {
   display: none !important;
 }
@@ -2974,8 +2996,12 @@ body.premium-mode .user-rank {
 /* EVOLUCIÓN RECIENTE — forzar visible en premium (JS también la muestra) */
 body.premium-mode #pd-evol-section { display: block !important; }
 
-/* INSIGNIAS BLOQUEADAS — ocultas en el scroll del dashboard premium */
-body.premium-mode .pd-badges-scroll .pd-badge.locked { display: none !important; }
+/* INSIGNIAS BLOQUEADAS — visibles pero atenuadas en el scroll del dashboard premium */
+body.premium-mode .pd-badges-scroll .pd-badge.locked {
+  display: flex !important;
+  opacity: 0.3 !important;
+  filter: grayscale(1) !important;
+}
 
 /* STREAK COUNTER dentro de Próximo Logro */
 body.premium-mode .pd-ach-streak-row {

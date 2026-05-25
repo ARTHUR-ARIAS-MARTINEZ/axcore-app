@@ -145,6 +145,12 @@ document.addEventListener('DOMContentLoaded', () => {
     initAuth();
     startClock();
 
+    // Garantizar que el nombre y foto quedan sincronizados DESPUÉS de que
+    // todos los scripts (premium-badges.js, premium-extras.js) hayan terminado
+    setTimeout(function() {
+        if (typeof window.syncProfileEverywhere === 'function') window.syncProfileEverywhere();
+    }, 400);
+
     function initAuth() {
         if (currentUser) {
             // CRÍTICO: showApp() PRIMERO para garantizar que la UI esté visible
@@ -1257,7 +1263,8 @@ document.addEventListener('DOMContentLoaded', () => {
     window.syncProfileEverywhere = function() {
         try {
             const ud = window.userData || userData || {};
-            let raw  = (ud.userName || ud.username || '').toString().trim();
+            // Jerarquía: userName (display elegido) → username (login) → currentUser (sesión) → USUARIO
+            let raw  = (ud.userName || ud.username || currentUser || '').toString().trim();
             const low = raw.toLowerCase();
             if (!raw || low === 'atleta' || low === 'admin' || low === 'usuario') raw = 'USUARIO';
             const nameUp = raw.toUpperCase();

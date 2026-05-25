@@ -284,7 +284,10 @@
                 <div class="user-badge">
                     <input type="file" id="avatar-upload" class="avatar-upload" accept="image/*">
                     <div class="avatar" id="avatar-preview" title="Cambiar foto de perfil"></div>
-                    <span class="user-rank" id="display-username">USUARIO</span>
+                    <div class="user-info">
+                        <span class="user-rank" id="display-username">USUARIO</span>
+                        <span class="user-edit-hint premium-only" onclick="document.querySelector('[data-page=settings]')?.click()">◦ toca para editar</span>
+                    </div>
                 </div>
                 <!-- Reloj y fecha (en móvil aparece debajo) -->
                 <div class="live-stats">
@@ -404,18 +407,7 @@
                     </div>
                     <div class="pd-badges-scroll" id="pd-badges-scroll"></div>
 
-                    <!-- IMC + ÚLTIMA MEDIDA en formato premium -->
-                    <div class="pd-imc-row">
-                        <div class="pd-imc-card">
-                            <div class="pd-imc-lbl">ÍNDICE DE MASA CORPORAL</div>
-                            <div class="pd-imc-val" id="pd-imc-val">0.0</div>
-                            <div class="pd-imc-tag" id="pd-imc-tag">--</div>
-                        </div>
-                        <div class="pd-imc-card">
-                            <div class="pd-imc-lbl">ÚLTIMO REGISTRO</div>
-                            <div class="pd-last-info" id="pd-last-info">Sin registros aún</div>
-                        </div>
-                    </div>
+                    <!-- pd-imc-row eliminado del dashboard premium por rediseño -->
                 </div>
                 <!-- ═══════ FIN DASHBOARD PREMIUM ═══════ -->
 
@@ -840,10 +832,10 @@
     <!-- Gráficas (Al final para no bloquear inicio rápido) -->
     <script src="https://cdn.jsdelivr.net/npm/apexcharts" defer></script>
     <script src="knowledge.js?v=20260517d"></script>
-    <script src="app.js?v=20260518w"></script>
+    <script src="app.js?v=20260525a"></script>
     <!-- Premium UI: sistema de 100 insignias + FAB + onboarding -->
-    <script src="premium-badges.js?v=20260518w"></script>
-    <script src="premium-extras.js?v=20260518w"></script>
+    <script src="premium-badges.js?v=20260525a"></script>
+    <script src="premium-extras.js?v=20260525a"></script>
 
     <!-- REGISTRO GLOBAL — funciona aunque app.js falle -->
     <script>
