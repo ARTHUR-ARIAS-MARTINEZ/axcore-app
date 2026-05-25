@@ -1,9 +1,10 @@
-const CACHE_NAME = 'axcore-v5.3-persistence';
+const CACHE_NAME = 'axcore-v5.4-profile-persist';
 const urlsToCache = [
   './',
   './index.html',
   './index.css',
   './premium.css',
+  './profile-persist.js',
   './app.js',
   './knowledge.js',
   './logo.png',

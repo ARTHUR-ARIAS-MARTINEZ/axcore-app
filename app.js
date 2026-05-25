@@ -462,8 +462,37 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function saveData() {
         if (currentUser) {
-            localStorage.setItem(getStorageKey(), JSON.stringify(userData));
-            pushSync(); // debounced — solo si hay token
+            try {
+                // CRÍTICO: si la foto está dentro de userData (legado), removerla
+                // antes de serializar — la foto vive ahora en axcore_profile_v1.
+                // Esto previene QuotaExceededError por JSON gigante.
+                const _backupPhoto = userData.avatarPhoto;
+                const _backupAv    = userData.avatar;
+                if (_backupPhoto && _backupPhoto.length > 1000) userData.avatarPhoto = '';
+                if (_backupAv    && _backupAv.length    > 1000) userData.avatar      = '';
+                localStorage.setItem(getStorageKey(), JSON.stringify(userData));
+                // Restaurar en memoria (no en localStorage) por si el resto del código las usa
+                if (_backupPhoto) userData.avatarPhoto = _backupPhoto;
+                if (_backupAv)    userData.avatar      = _backupAv;
+                pushSync(); // debounced — solo si hay token
+            } catch (e) {
+                console.error('[saveData] Falló:', e.message);
+                // Si excede cuota incluso sin la foto, limpia caches secundarios
+                if (e.name === 'QuotaExceededError' || e.code === 22) {
+                    try {
+                        for (let i = localStorage.length - 1; i >= 0; i--) {
+                            const k = localStorage.key(i);
+                            if (k && (k.indexOf('axcore_avatar_') === 0 || k.indexOf('axcore_uname_') === 0)) {
+                                localStorage.removeItem(k);
+                            }
+                        }
+                        // Reintentar
+                        userData.avatarPhoto = '';
+                        userData.avatar = '';
+                        localStorage.setItem(getStorageKey(), JSON.stringify(userData));
+                    } catch(e2) { console.error('[saveData] no se pudo recuperar:', e2.message); }
+                }
+            }
         }
         // Exponer userData globalmente para premium-badges.js
         window.userData = userData;
@@ -1163,28 +1192,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function pmApplyNewName(newName) {
         try {
+            // DELEGAR al sistema robusto AXProfile (clave única, persistencia inmune)
+            if (window.AXProfile && typeof window.AXProfile.saveName === 'function') {
+                window.AXProfile.saveName(newName);
+            }
+            // Sincronizar también con userData para compatibilidad con código viejo
             userData.userName = newName;
             userData.username = newName;
-            // Mantener window.userData en sincronía (otras funciones pueden leerlo)
             window.userData = userData;
-            saveData();
-            // PERSISTENCIA INMUNE: guarda en clave separada que NO se ve afectada
-            // por pullRemoteData() ni por ningún otro overwrite de userData
-            try {
-                if (currentUser) localStorage.setItem('axcore_uname_' + currentUser, newName);
-                localStorage.setItem('axcore_uname_global', newName);
-            } catch(_) {}
-            // Sincronizar TODO ahora y otra vez tras un tick para vencer cualquier
-            // posible re-render asíncrono que podría sobreescribir el header
-            if (typeof window.syncProfileEverywhere === 'function') {
-                window.syncProfileEverywhere();
-                setTimeout(window.syncProfileEverywhere, 50);
-                setTimeout(window.syncProfileEverywhere, 250);
-            }
-            // Forzar también applySettings (vuelve a poner el nombre con inline !important)
-            if (typeof applySettings === 'function') {
-                try { applySettings(); } catch(_) {}
-            }
+            try { saveData(); } catch(e) { console.warn('[pmApplyNewName] saveData:', e.message); }
             pmShowToast('✓ Nombre actualizado', 'green');
         } catch (e) { console.warn('[pmApplyNewName]', e.message); }
     }
@@ -1304,73 +1320,33 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // Handler compartido para el cambio de foto (usado por label y por pmEditPhoto)
+    // Handler compartido para el cambio de foto — DELEGA al sistema robusto AXProfile
+    // (compresión agresiva a 256x256 JPEG q=0.55 → ~20KB → cabe en localStorage)
     window.pmHandlePhotoChange = function(inputEl) {
+        if (window.AXProfile && typeof window.AXProfile.handleFileInput === 'function') {
+            window.AXProfile.handleFileInput(inputEl);
+            return;
+        }
+        // Fallback: si AXProfile no cargó, lógica antigua mínima
         const file = inputEl?.files?.[0];
         if (!file) return;
-        // Comprimir si es muy grande (>2MB)
-        if (file.size > 2 * 1024 * 1024) {
-            const img = new Image();
-            const url = URL.createObjectURL(file);
-            img.onload = () => {
-                const canvas = document.createElement('canvas');
-                const MAX = 400;
-                let w = img.width, h = img.height;
-                if (w > h) { if (w > MAX) { h = h * MAX / w; w = MAX; } }
-                else       { if (h > MAX) { w = w * MAX / h; h = MAX; } }
-                canvas.width = w; canvas.height = h;
-                canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-                URL.revokeObjectURL(url);
-                const dataUrl = canvas.toDataURL('image/jpeg', 0.82);
-                pmSaveAvatar(dataUrl);
-            };
-            img.src = url;
-        } else {
-            const reader = new FileReader();
-            reader.onload = (ev) => pmSaveAvatar(ev.target.result);
-            reader.readAsDataURL(file);
-        }
+        const reader = new FileReader();
+        reader.onload = (ev) => pmSaveAvatar(ev.target.result);
+        reader.readAsDataURL(file);
     };
 
+    // Guarda la foto delegando al sistema robusto AXProfile.
+    // CRÍTICO: NO se mete la foto en userData (causaba QuotaExceededError al
+    // hacer JSON.stringify(userData) → impedía persistir cualquier cosa).
     function pmSaveAvatar(dataUrl) {
-        userData.avatarPhoto = dataUrl;
-        userData.avatar = dataUrl; // Mantener ambas propiedades sincronizadas
-        window.userData = userData;
-        saveData();
-        // PERSISTENCIA INMUNE: guarda foto en clave separada que NO se sobreescribe
-        // con pullRemoteData() ni con ningún reset de userData
+        if (window.AXProfile && typeof window.AXProfile.savePhoto === 'function') {
+            window.AXProfile.savePhoto(dataUrl);
+            return;
+        }
+        // Fallback de emergencia (solo si profile-persist.js no cargó)
         try {
-            if (currentUser) localStorage.setItem('axcore_avatar_' + currentUser, dataUrl);
-            localStorage.setItem('axcore_avatar_global', dataUrl);
-        } catch(e) {
-            // Si excede cuota (foto muy grande), seguimos con userData ya guardado
-            console.warn('[pmSaveAvatar] localStorage cuota:', e.message);
-        }
-        // Forzar update directo del avatar del header (gana a cualquier CSS)
-        const headerAvatar = document.getElementById('avatar-preview');
-        if (headerAvatar) {
-            headerAvatar.style.setProperty('background-image', `url("${dataUrl}")`, 'important');
-            headerAvatar.style.setProperty('background-size', 'cover', 'important');
-            headerAvatar.style.setProperty('background-position', 'center', 'important');
-            headerAvatar.style.setProperty('background-repeat', 'no-repeat', 'important');
-            headerAvatar.textContent = '';
-        }
-        // Forzar update también del avatar de Ajustes
-        const pmAv = document.getElementById('pmProfAvatar');
-        if (pmAv) {
-            pmAv.style.setProperty('background-image', `url("${dataUrl}")`, 'important');
-            pmAv.style.setProperty('background-size', 'cover', 'important');
-            pmAv.style.setProperty('background-position', 'center', 'important');
-            pmAv.style.setProperty('background-repeat', 'no-repeat', 'important');
-            pmAv.textContent = '';
-        }
-        // Sincronizar TODO ahora y dos veces más para vencer re-renders asíncronos
-        if (typeof window.syncProfileEverywhere === 'function') {
-            window.syncProfileEverywhere();
-            setTimeout(window.syncProfileEverywhere, 50);
-            setTimeout(window.syncProfileEverywhere, 250);
-        }
-        pmShowToast('✓ Foto actualizada', 'green');
+            localStorage.setItem('axcore_profile_v1', JSON.stringify({ photo: dataUrl, updatedAt: Date.now() }));
+        } catch(e) { console.warn('[pmSaveAvatar fallback]', e.message); }
     }
 
     // Actualizar visibilidad de "Instalar en dispositivo"
