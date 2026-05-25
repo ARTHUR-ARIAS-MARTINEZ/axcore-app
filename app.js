@@ -229,20 +229,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function applySettings() {
-        document.body.setAttribute('data-theme', userData.theme || 'neon');
-        const currentThemeBtns = document.querySelectorAll('.theme-buttons .theme-btn');
-        currentThemeBtns.forEach(b => {
-            b.classList.toggle('active', b.dataset.theme === userData.theme);
+        const activeTheme = userData.theme || 'neon';
+        document.body.setAttribute('data-theme', activeTheme);
+        // Marcar theme-btn (legacy) y t-swatch (premium) con estado activo
+        document.querySelectorAll('.theme-buttons .theme-btn, .t-swatch').forEach(b => {
+            b.classList.toggle('active', b.dataset.theme === activeTheme);
         });
         const dispUser = document.getElementById('display-username');
-        let nameToDisp = userData.username || userData.userName || 'USUARIO';
-        if (nameToDisp.toUpperCase() === 'ATLETA' || !nameToDisp.trim()) {
+        let nameToDisp = (userData.userName || '').trim();
+        const lowName = nameToDisp.toLowerCase();
+        if (!nameToDisp || lowName === 'atleta' || lowName === 'admin' || lowName === 'usuario') {
             nameToDisp = 'USUARIO';
         }
         if (dispUser) dispUser.textContent = nameToDisp.toUpperCase();
-        if (userData.avatar) {
+        const photoSrc = userData.avatarPhoto || userData.avatar;
+        if (photoSrc) {
             const ap = document.getElementById('avatar-preview');
-            if (ap) ap.style.backgroundImage = `url(${userData.avatar})`;
+            if (ap) { ap.style.backgroundImage = `url(${photoSrc})`; ap.style.backgroundSize = 'cover'; }
         }
 
         // Listener para avatar
@@ -267,7 +270,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const unEl = document.getElementById('input-username');
-        if (unEl) unEl.value = userData.username || '';
+        let initialInputVal = (userData.userName || '').trim();
+        const lowInputVal = initialInputVal.toLowerCase();
+        if (lowInputVal === 'admin' || lowInputVal === 'atleta' || lowInputVal === 'usuario') {
+            initialInputVal = '';
+        }
+        if (unEl) unEl.value = initialInputVal;
         const hEl = document.getElementById('input-height'); if (hEl) hEl.value = userData.height || '';
         const wEl = document.getElementById('input-weight'); if (wEl) wEl.value = userData.weight || '';
         const waEl = document.getElementById('input-waist'); if (waEl) waEl.value = userData.waist || '';
@@ -277,7 +285,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Logros Spans
         const achUser = document.getElementById('ach-username');
-        if (achUser) achUser.textContent = (userData.username || 'USUARIO').toUpperCase();
+        let achName = (userData.userName || '').trim();
+        const lowAch = achName.toLowerCase();
+        if (!achName || lowAch === 'admin' || lowAch === 'atleta' || lowAch === 'usuario') {
+            achName = 'USUARIO';
+        }
+        if (achUser) achUser.textContent = achName.toUpperCase();
         const achDef = document.getElementById('ach-deficit');
         if (achDef) achDef.textContent = userData.totalNetDeficit || 0;
         const achWaist = document.getElementById('ach-waist');
@@ -1005,31 +1018,219 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // ═══════════════ AJUSTES iOS — Funciones de filas ═══════════════
+    // ── Helpers modal nombre ──────────────────────────────────────────────────
     window.pmEditUserName = function() {
         try {
             const ud = window.userData || userData || {};
-            const cur = ud.userName || currentUser || '';
-            const v = prompt('Nombre de usuario:', cur);
-            if (v === null) return;
-            const newName = v.trim();
-            if (!newName) return;
-            userData.userName = newName;
-            userData.username = newName;
-            saveData();
-            // Sync visual: profile hero + fila iOS + display-username del header
-            if (typeof window.updatePmProfileHero === 'function') window.updatePmProfileHero();
-            const row = document.getElementById('pmSRowName');
-            if (row) row.textContent = newName.toUpperCase() + ' ›';
-            const du = document.getElementById('display-username');
-            if (du) du.textContent = newName.toUpperCase();
+            let cur = (ud.userName || '').trim();
+            const low = cur.toLowerCase();
+            if (!cur || low === 'admin' || low === 'atleta' || low === 'usuario') cur = '';
+
+            const modal = document.getElementById('pm-name-modal');
+            const input = document.getElementById('pm-name-input');
+            if (!modal || !input) {
+                // Fallback si el modal no existe
+                const v = prompt('Nombre de usuario:', cur);
+                if (v === null) return;
+                pmApplyNewName(v.trim());
+                return;
+            }
+            input.value = cur;
+            modal.style.display = 'flex';
+            setTimeout(() => input.focus(), 80);
+            // Cerrar al hacer clic fuera del panel
+            modal.onclick = function(e) { if (e.target === modal) pmCloseNameModal(); };
+            // Confirmar con Enter
+            input.onkeydown = function(e) {
+                if (e.key === 'Enter') { e.preventDefault(); pmConfirmName(); }
+                if (e.key === 'Escape') pmCloseNameModal();
+            };
         } catch (e) { console.warn('[pmEditUserName]', e.message); }
     };
 
-    window.pmChangePassword = function() {
-        // Si existe lógica de cambio de contraseña en el backend, se conecta aquí.
-        // Por ahora: feedback claro al usuario.
-        alert('Para cambiar tu contraseña, contacta al administrador.\n\nEn próxima versión podrás hacerlo desde aquí.');
+    window.pmConfirmName = function() {
+        const input = document.getElementById('pm-name-input');
+        if (!input) return;
+        const newName = input.value.trim();
+        if (newName.length < 1) { input.focus(); return; }
+        pmApplyNewName(newName);
+        pmCloseNameModal();
     };
+
+    window.pmCloseNameModal = function() {
+        const modal = document.getElementById('pm-name-modal');
+        if (modal) modal.style.display = 'none';
+    };
+
+    function pmApplyNewName(newName) {
+        try {
+            userData.userName = newName;
+            userData.username = newName;
+            saveData();
+            let nameToDisp = newName;
+            const low = nameToDisp.toLowerCase();
+            if (!nameToDisp || low === 'atleta' || low === 'admin' || low === 'usuario') nameToDisp = 'USUARIO';
+            if (typeof window.updatePmProfileHero === 'function') window.updatePmProfileHero();
+            const row = document.getElementById('pmSRowName');
+            if (row) row.textContent = nameToDisp.toUpperCase() + ' ›';
+            const du = document.getElementById('display-username');
+            if (du) du.textContent = nameToDisp.toUpperCase();
+            pmShowToast('✓ Nombre actualizado', 'green');
+        } catch (e) { console.warn('[pmApplyNewName]', e.message); }
+    }
+
+    // ── Helpers modal contraseña ──────────────────────────────────────────────
+    window.pmChangePassword = function() {
+        const modal = document.getElementById('pm-pass-modal');
+        if (!modal) { alert('Función de cambio de contraseña no disponible.'); return; }
+        // Limpiar campos
+        ['pm-pass-current','pm-pass-new','pm-pass-new2'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.value = '';
+        });
+        const errDiv = document.getElementById('pm-pass-err');
+        if (errDiv) errDiv.style.display = 'none';
+        modal.style.display = 'flex';
+        setTimeout(() => { const el = document.getElementById('pm-pass-current'); if (el) el.focus(); }, 80);
+        modal.onclick = function(e) { if (e.target === modal) pmClosePassModal(); };
+    };
+
+    window.pmClosePassModal = function() {
+        const modal = document.getElementById('pm-pass-modal');
+        if (modal) modal.style.display = 'none';
+    };
+
+    window.pmConfirmPassword = async function() {
+        const cur = (document.getElementById('pm-pass-current')?.value || '').trim();
+        const nw  = (document.getElementById('pm-pass-new')?.value  || '').trim();
+        const nw2 = (document.getElementById('pm-pass-new2')?.value || '').trim();
+        const errDiv = document.getElementById('pm-pass-err');
+        const showErr = (msg) => { if (errDiv) { errDiv.textContent = msg; errDiv.style.display = 'block'; } };
+
+        if (!cur) { showErr('⚠️ Escribe tu contraseña actual.'); return; }
+        const savedPass = (userData.password || '').toString();
+        if (cur !== savedPass) { showErr('⚠️ Contraseña actual incorrecta.'); return; }
+        if (nw.length < 4) { showErr('⚠️ La nueva contraseña debe tener al menos 4 caracteres.'); return; }
+        if (nw !== nw2)   { showErr('⚠️ Las contraseñas nuevas no coinciden.'); return; }
+
+        userData.password = nw;
+        saveData();
+
+        // Intentar actualizar en el backend si hay token
+        if (typeof apiToken === 'function' && apiToken() && typeof API_URL !== 'undefined') {
+            try {
+                await fetch(`${API_URL}/api/user/change-password`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', ...(typeof apiAuthHeaders === 'function' ? apiAuthHeaders() : {}) },
+                    body: JSON.stringify({ currentPassword: cur, newPassword: nw })
+                });
+            } catch(e) { /* Se guardó localmente igual */ }
+        }
+
+        pmClosePassModal();
+        pmShowToast('🔒 Contraseña actualizada', 'green');
+    };
+
+    // ── Toast reutilizable ────────────────────────────────────────────────────
+    function pmShowToast(msg, color) {
+        const bgMap = { green: 'rgba(0,201,122,.95)', red: 'rgba(239,68,68,.95)', blue: 'rgba(0,229,255,.95)' };
+        const t = document.createElement('div');
+        t.textContent = msg;
+        t.style.cssText = `position:fixed;bottom:90px;left:50%;transform:translateX(-50%);
+            background:${bgMap[color]||bgMap.green};color:#000;font-family:'Oswald',sans-serif;
+            font-weight:700;letter-spacing:1px;padding:10px 20px;border-radius:99px;
+            box-shadow:0 8px 24px rgba(0,0,0,.4);z-index:99998;font-size:12px;
+            white-space:nowrap;`;
+        document.body.appendChild(t);
+        setTimeout(() => t.remove(), 2200);
+    }
+
+    window.pmSetTheme = function(themeName) {
+        try {
+            userData.theme = themeName;
+            document.body.setAttribute('data-theme', themeName);
+            // Marcar el swatch activo
+            document.querySelectorAll('.t-swatch').forEach(btn => {
+                if (btn.dataset.theme === themeName) btn.classList.add('active');
+                else btn.classList.remove('active');
+            });
+            // Destruir gráficas para que recojan los nuevos colores del tema
+            if (typeof chartWeight !== 'undefined' && chartWeight) { chartWeight.destroy(); chartWeight = null; }
+            if (typeof chartCalories !== 'undefined' && chartCalories) { chartCalories.destroy(); chartCalories = null; }
+            if (typeof chartWaist !== 'undefined' && chartWaist) { chartWaist.destroy(); chartWaist = null; }
+            if (typeof chartHistory !== 'undefined' && chartHistory) { chartHistory.destroy(); chartHistory = null; }
+            saveData();
+            if (typeof updateDashboard === 'function') updateDashboard();
+            if (typeof applySettings === 'function') applySettings();
+            // Toast de confirmación (usa la función local o la existente)
+            const toastFn = typeof pmShowToast === 'function' ? pmShowToast : null;
+            if (toastFn) {
+                const nombres = { black:'ULTRA DARK', cyberpunk:'CYBERPUNK', military:'MILITAR',
+                                  pink:'PREMIUM ROSA', salmon:'SALMÓN', pastel:'PASTELES',
+                                  pride:'PRIDE', trans:'TRANS PRIDE', 'neon-bi':'NEON BI',
+                                  neon:'NEON', original:'GOLD ELITE', fuchsia:'CORAL GLOW',
+                                  dark:'DARK', natural:'ZEN', tactical:'TACTICAL', rainbow:'RAINBOW' };
+                toastFn('✦ Tema: ' + (nombres[themeName] || themeName.toUpperCase()), 'green');
+            }
+        } catch (e) {
+            console.warn('[pmSetTheme]', e.message);
+        }
+    };
+
+    window.pmEditPhoto = function() {
+        // Usar el <input> real del DOM en vez de crear uno dinámico (más compatible en móvil)
+        const realInput = document.getElementById('pm-avatar-file-input');
+        if (realInput) {
+            realInput.click();
+        } else {
+            // Fallback: crear dinámicamente si el elemento no existe
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.style.display = 'none';
+            document.body.appendChild(input);
+            input.onchange = (e) => { pmHandlePhotoChange(e.target); input.remove(); };
+            input.click();
+        }
+    };
+
+    // Handler compartido para el cambio de foto (usado por label y por pmEditPhoto)
+    window.pmHandlePhotoChange = function(inputEl) {
+        const file = inputEl?.files?.[0];
+        if (!file) return;
+        // Comprimir si es muy grande (>2MB)
+        if (file.size > 2 * 1024 * 1024) {
+            const img = new Image();
+            const url = URL.createObjectURL(file);
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const MAX = 400;
+                let w = img.width, h = img.height;
+                if (w > h) { if (w > MAX) { h = h * MAX / w; w = MAX; } }
+                else       { if (h > MAX) { w = w * MAX / h; h = MAX; } }
+                canvas.width = w; canvas.height = h;
+                canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                URL.revokeObjectURL(url);
+                const dataUrl = canvas.toDataURL('image/jpeg', 0.82);
+                pmSaveAvatar(dataUrl);
+            };
+            img.src = url;
+        } else {
+            const reader = new FileReader();
+            reader.onload = (ev) => pmSaveAvatar(ev.target.result);
+            reader.readAsDataURL(file);
+        }
+    };
+
+    function pmSaveAvatar(dataUrl) {
+        userData.avatarPhoto = dataUrl;
+        saveData();
+        if (typeof window.updatePmProfileHero === 'function') window.updatePmProfileHero();
+        // Actualizar también el avatar del header
+        const ap = document.getElementById('avatar-preview');
+        if (ap) { ap.style.backgroundImage = `url(${dataUrl})`; ap.style.backgroundSize = 'cover'; }
+        pmShowToast('✓ Foto actualizada', 'green');
+    }
 
     // Actualizar visibilidad de "Instalar en dispositivo"
     window.pmSyncInstallRow = function() {
@@ -1052,8 +1253,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const setText = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
 
             // Avatar: inicial del nombre (o foto si existe)
-            let name = (ud.userName || currentUser || 'USUARIO').toString();
-            if (name.toUpperCase() === 'ATLETA' || !name.trim()) {
+            let name = (ud.userName || '').toString().trim();
+            const lowName = name.toLowerCase();
+            if (!name || lowName === 'atleta' || lowName === 'admin' || lowName === 'usuario') {
                 name = 'USUARIO';
             }
             const av = document.getElementById('pmProfAvatar');
@@ -1067,10 +1269,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            // Nombre y código
-            setText('pmProfName', name.toUpperCase());
-            const code = ud.gymCode || ud.axvCode || 'AXV-DEMO';
-            setText('pmProfCode', `● ${code} · ACTIVO`);
+            // Nombre con icono de edición
+            const nameEl = document.getElementById('pmProfName');
+            if (nameEl) nameEl.textContent = name.toUpperCase() + ' ✎';
 
             // Sync nombre en fila iOS de Ajustes
             setText('pmSRowName', name.toUpperCase() + ' ›');
@@ -2894,20 +3095,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     saveSettingsBtn.onclick = () => {
-        // Guardar nombre de usuario si se editó
+        // Guardar nombre de usuario
         const unInput = document.getElementById('input-username');
-        if (unInput && unInput.value.trim()) {
+        if (unInput) {
             const newName = unInput.value.trim();
             userData.username = newName;
             userData.userName = newName;
             
+            let nameToDisp = newName;
+            const low = nameToDisp.toLowerCase();
+            if (!nameToDisp || low === 'atleta' || low === 'admin' || low === 'usuario') {
+                nameToDisp = 'USUARIO';
+            }
+            
             // Sync visual
             const du = document.getElementById('display-username');
-            if (du) du.textContent = newName.toUpperCase();
+            if (du) du.textContent = nameToDisp.toUpperCase();
             
             if (typeof window.updatePmProfileHero === 'function') window.updatePmProfileHero();
             const row = document.getElementById('pmSRowName');
-            if (row) row.textContent = newName.toUpperCase() + ' ›';
+            if (row) row.textContent = nameToDisp.toUpperCase() + ' ›';
         }
         saveData();
         alert("Configuración guardada.");

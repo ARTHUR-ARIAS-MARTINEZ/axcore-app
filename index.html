@@ -10,7 +10,7 @@
     <link rel="apple-touch-icon" href="logo.png">
     <link rel="stylesheet" href="index.css?v=20260518w">
     <!-- Premium UI overrides (inerte si <body> NO tiene .premium-mode) -->
-    <link rel="stylesheet" href="premium.css?v=20260518w">
+    <link rel="stylesheet" href="premium.css?v=20260521w">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <!-- Fuentes: Inter para cuerpos de texto, Oswald (Heavy Gym) para titulares -->
@@ -713,21 +713,15 @@
             <div id="page-studio" class="page"></div>
             <div id="page-settings" class="page">
 
-                <!-- TOGGLE MODO PREMIUM (Paso 5: ahora DEFAULT activo) -->
-                <div class="premium-toggle-row" id="premiumToggleRow" onclick="togglePremiumUI()" style="max-width:800px;margin:0 auto 1.5rem;">
-                    <div class="ptr-text">
-                        <div class="ptr-title">MODO PREMIUM <span class="premium-beta-tag">ACTIVO</span></div>
-                        <div class="ptr-sub">Nueva interfaz premium con FAB, 100 insignias y onboarding. Apágalo aquí si prefieres la versión clásica — tus datos se mantienen.</div>
-                    </div>
-                    <div class="premium-toggle-switch on" id="premiumToggleSwitch"></div>
-                </div>
-
                 <!-- ═══ PROFILE HERO (solo visible en .premium-mode) ═══ -->
+                <!-- Input de archivo oculto para cambio de foto -->
+                <input type="file" id="pm-avatar-file-input" accept="image/*" style="display:none;" onchange="pmHandlePhotoChange(this)">
                 <div class="premium-only pm-profile-hero" id="pmProfileHero">
-                    <div class="pm-prof-av" id="pmProfAvatar">A</div>
+                    <label for="pm-avatar-file-input" style="cursor:pointer; flex-shrink:0;" title="Cambiar foto de perfil">
+                        <div class="pm-prof-av" id="pmProfAvatar">A</div>
+                    </label>
                     <div class="pm-prof-info">
-                        <div class="pm-prof-name" id="pmProfName">USUARIO</div>
-                        <div class="pm-prof-code" id="pmProfCode">● AXV-DEMO · ACTIVO</div>
+                        <div class="pm-prof-name" id="pmProfName" onclick="pmEditUserName()" style="cursor:pointer;" title="Clic para editar nombre">USUARIO ✎</div>
                         <div class="pm-prof-stats">
                             <div class="pm-prof-stat"><strong id="pmProfDays">0</strong> días</div>
                             <div class="pm-prof-stat"><strong id="pmProfLost">0.0</strong> kg perdidos</div>
@@ -736,51 +730,49 @@
                     </div>
                 </div>
 
-                <div class="grid-stats">
-                    <div class="glass-card settings-panel">
-                        <h2 style="cursor:default; transition:0.3s;">SISTEMA ÉLITE</h2>
-                        <div class="input-group">
-                            <label>NOMBRE DE USUARIO</label>
-                            <input type="text" id="input-username" placeholder="Tu nombre o alias">
+                <!-- ═══ THEMES ═══ -->
+                <div class="premium-only" style="margin-bottom:12px;">
+                    <div class="pm-section-title" style="margin-left:5px; margin-bottom:8px; font-family:var(--font-accent); font-size:10px; letter-spacing:2px; color:var(--text-dim);">ESTILO VISUAL</div>
+                    <div class="theme-grid" id="theme-grid" style="display:grid; grid-template-columns: repeat(3, 1fr); gap:7px;">
+                        <!-- Masculinos -->
+                        <div class="t-swatch active" data-theme="black" onclick="pmSetTheme('black')">
+                            <div class="t-dot" style="background:linear-gradient(135deg,#ffffff,#444444); border:2px solid rgba(255,255,255,.1); width:24px; height:24px; border-radius:50%; margin:0 auto 5px;"></div>
+                            <div class="t-name" style="font-size:8px; color:var(--text-dim); letter-spacing:1px; font-weight:600;">ULTRA DARK</div>
                         </div>
-                        <div class="input-group">
-                            <label>ESTILO VISUAL</label>
-                            <div class="theme-buttons" style="display:grid; grid-template-columns: repeat(3, 1fr); gap:8px;">
-                                <!-- Masculinos -->
-                                <button class="theme-btn active" data-theme="neon"><span class="theme-dot" style="background:linear-gradient(135deg,#00c97a,#00e5ff);"></span><span class="theme-label-full">NEON NAVY</span><span class="theme-label-short">NEON</span></button>
-                                <button class="theme-btn" data-theme="tactical"><span class="theme-dot" style="background:linear-gradient(135deg,#ff6a00,#00ffcc);"></span><span class="theme-label-full">TACTICAL ORANGE</span><span class="theme-label-short">TACTICAL</span></button>
-                                <button class="theme-btn" data-theme="military"><span class="theme-dot" style="background:linear-gradient(135deg,#849b4c,#c2a649);"></span><span class="theme-label-full">MILITARY GREEN</span><span class="theme-label-short">MILITARY</span></button>
-                                
-                                <!-- Neutros & LGBT -->
-                                <button class="theme-btn" data-theme="original"><span class="theme-dot" style="background:linear-gradient(135deg,#d4af37,#00f2ff);"></span><span class="theme-label-full">GOLD ELITE</span><span class="theme-label-short">GOLD</span></button>
-                                <button class="theme-btn" data-theme="dark"><span class="theme-dot" style="background:linear-gradient(135deg,#ffffff,#888888);"></span><span class="theme-label-full">ULTRA DARK</span><span class="theme-label-short">DARK</span></button>
-                                <button class="theme-btn" data-theme="natural"><span class="theme-dot" style="background:linear-gradient(135deg,#2e7d32,#e65100);"></span><span class="theme-label-full">NATURAL ZEN</span><span class="theme-label-short">ZEN</span></button>
-                                
-                                <!-- LGBT & Feminine -->
-                                <button class="theme-btn" data-theme="pride"><span class="theme-dot" style="background:linear-gradient(135deg,#ff4db8,#00e5ff);"></span><span class="theme-label-full">PRIDE VIBRANT</span><span class="theme-label-short">PRIDE</span></button>
-                                <button class="theme-btn" data-theme="rainbow"><span class="theme-dot" style="background:linear-gradient(135deg,#ff0055,#00ffd5);"></span><span class="theme-label-full">RAINBOW PRIDE</span><span class="theme-label-short">RAINBOW</span></button>
-                                <button class="theme-btn" data-theme="fuchsia"><span class="theme-dot" style="background:linear-gradient(135deg,#ff6b9d,#ffc857);"></span><span class="theme-label-full">CORAL GLOW</span><span class="theme-label-short">CORAL</span></button>
-                                
-                                <!-- Sakura Pink -->
-                                <button class="theme-btn" data-theme="pink"><span class="theme-dot" style="background:linear-gradient(135deg,#ff4da6,#ffccd5);"></span><span class="theme-label-full">SAKURA PINK</span><span class="theme-label-short">PINK</span></button>
-                                <div style="visibility: hidden;"></div>
-                                <div style="visibility: hidden;"></div>
-                            </div>
+                        <div class="t-swatch" data-theme="cyberpunk" onclick="pmSetTheme('cyberpunk')">
+                            <div class="t-dot" style="background:linear-gradient(135deg,#00e5ff,#ffea00); border:2px solid rgba(255,255,255,.1); width:24px; height:24px; border-radius:50%; margin:0 auto 5px;"></div>
+                            <div class="t-name" style="font-size:8px; color:var(--text-dim); letter-spacing:1px; font-weight:600;">CYBERPUNK</div>
                         </div>
-                        <button id="save-settings" class="btn-premium" style="width:100%">GUARDAR SISTEMA</button>
-                    </div>
-
-                    <!-- Panel COMPARTIR / DESCARGAR (legacy mode) -->
-                    <div class="glass-card settings-panel legacy-only" style="text-align: center;">
-                        <h2 style="color:var(--accent-secondary);">📤 COMPARTIR APP</h2>
-                        <p style="font-size:0.8rem; color:var(--text-dim); margin-bottom:1rem;">Comparte el acceso a AX-CORE con otros atletas.</p>
-                        <button id="btn-share-app" class="btn-premium" style="width:100%; background:transparent; border:1px solid var(--accent-secondary); color:var(--accent-secondary); margin-bottom:1rem;">COMPARTIR APP AX-CORE</button>
-
-                        <h2 style="color:var(--accent-main); margin-top:2rem;">⬇ DESCARGAR APP</h2>
-                        <p style="font-size:0.8rem; color:var(--text-dim); margin-bottom:1rem;">Instala AX-CORE en tu celular para acceder más rápido.</p>
-                        <button id="btn-install-app" class="btn-premium" style="width:100%; display:none; background:rgba(0,0,0,0.5); border:1px solid var(--accent-main); color:var(--accent-main);">INSTALAR AHORA</button>
-
-                        <p style="font-size:0.75rem; color:var(--text-dim); margin-top:2rem;">Para compartir tus logros con tarjetas personalizadas, ve a la sección <strong style="color:var(--accent-main);">🏆 Estudio</strong>.</p>
+                        <div class="t-swatch" data-theme="military" onclick="pmSetTheme('military')">
+                            <div class="t-dot" style="background:linear-gradient(135deg,#4b5320,#8c9c61); border:2px solid rgba(255,255,255,.1); width:24px; height:24px; border-radius:50%; margin:0 auto 5px;"></div>
+                            <div class="t-name" style="font-size:8px; color:var(--text-dim); letter-spacing:1px; font-weight:600;">MILITAR</div>
+                        </div>
+                        <!-- Femeninos -->
+                        <div class="t-swatch" data-theme="pink" onclick="pmSetTheme('pink')">
+                            <div class="t-dot" style="background:linear-gradient(135deg,#ff6b9d,#ffc857); border:2px solid rgba(255,255,255,.1); width:24px; height:24px; border-radius:50%; margin:0 auto 5px;"></div>
+                            <div class="t-name" style="font-size:8px; color:var(--text-dim); letter-spacing:1px; font-weight:600;">PREMIUM ROSA</div>
+                        </div>
+                        <div class="t-swatch" data-theme="salmon" onclick="pmSetTheme('salmon')">
+                            <div class="t-dot" style="background:linear-gradient(135deg,#ff7e67,#ff9985); border:2px solid rgba(255,255,255,.1); width:24px; height:24px; border-radius:50%; margin:0 auto 5px;"></div>
+                            <div class="t-name" style="font-size:8px; color:var(--text-dim); letter-spacing:1px; font-weight:600;">SALMÓN</div>
+                        </div>
+                        <div class="t-swatch" data-theme="pastel" onclick="pmSetTheme('pastel')">
+                            <div class="t-dot" style="background:linear-gradient(135deg,#ffb6c1,#add8e6); border:2px solid rgba(255,255,255,.1); width:24px; height:24px; border-radius:50%; margin:0 auto 5px;"></div>
+                            <div class="t-name" style="font-size:8px; color:var(--text-dim); letter-spacing:1px; font-weight:600;">PASTELES</div>
+                        </div>
+                        <!-- Diversidad -->
+                        <div class="t-swatch" data-theme="pride" onclick="pmSetTheme('pride')">
+                            <div class="t-dot" style="background:linear-gradient(135deg,#ff0000,#ffff00 30%,#00ff00 60%,#0000ff); border:2px solid rgba(255,255,255,.1); width:24px; height:24px; border-radius:50%; margin:0 auto 5px;"></div>
+                            <div class="t-name" style="font-size:8px; color:var(--text-dim); letter-spacing:1px; font-weight:600;">PRIDE</div>
+                        </div>
+                        <div class="t-swatch" data-theme="trans" onclick="pmSetTheme('trans')">
+                            <div class="t-dot" style="background:linear-gradient(135deg,#5bcefa,#f5a9b8 40%,#ffffff 60%,#f5a9b8 80%,#5bcefa); border:2px solid rgba(255,255,255,.1); width:24px; height:24px; border-radius:50%; margin:0 auto 5px;"></div>
+                            <div class="t-name" style="font-size:8px; color:var(--text-dim); letter-spacing:1px; font-weight:600;">TRANS PRIDE</div>
+                        </div>
+                        <div class="t-swatch" data-theme="neon-bi" onclick="pmSetTheme('neon-bi')">
+                            <div class="t-dot" style="background:linear-gradient(135deg,#d60270,#9b4f96 50%,#0038a8); border:2px solid rgba(255,255,255,.1); width:24px; height:24px; border-radius:50%; margin:0 auto 5px;"></div>
+                            <div class="t-name" style="font-size:8px; color:var(--text-dim); letter-spacing:1px; font-weight:600;">NEON BI</div>
+                        </div>
                     </div>
                 </div>
 
@@ -943,6 +935,81 @@
             </header>
             <div class="meal-modal-body">
                 <textarea id="meal-modal-textarea" placeholder="Escribe el plan detallado para esta comida..."></textarea>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ MODAL — EDITAR NOMBRE DE USUARIO ═══ -->
+    <div id="pm-name-modal" style="
+        display:none; position:fixed; inset:0; z-index:99999;
+        background:rgba(0,0,0,0.75); backdrop-filter:blur(6px);
+        align-items:center; justify-content:center;">
+        <div style="
+            background:var(--pm-s1,#0d1826); border:1px solid var(--pm-border2,rgba(0,201,122,0.25));
+            border-radius:18px; padding:28px 24px; width:min(340px,90vw); color:var(--pm-white,#e8edf5);">
+            <h3 style="font-family:'Oswald',sans-serif; font-size:15px; letter-spacing:2px; margin-bottom:16px; color:var(--accent-main,#00c97a);">✎ EDITAR NOMBRE</h3>
+            <input id="pm-name-input" type="text" maxlength="30" autocomplete="off"
+                style="width:100%; background:var(--pm-s2,#111f30); border:1px solid var(--pm-dim,#3d5570);
+                       color:var(--pm-white,#e8edf5); border-radius:10px; padding:12px 14px;
+                       font-family:'Oswald',sans-serif; font-size:16px; letter-spacing:1px; outline:none;
+                       box-sizing:border-box; margin-bottom:14px;"
+                placeholder="Tu nombre de usuario">
+            <div style="display:flex; gap:10px;">
+                <button onclick="pmConfirmName()" style="
+                    flex:1; background:var(--accent-main,#00c97a); color:#000;
+                    font-family:'Oswald',sans-serif; font-weight:700; font-size:13px;
+                    letter-spacing:2px; border:none; border-radius:10px; padding:12px; cursor:pointer;">
+                    GUARDAR
+                </button>
+                <button onclick="pmCloseNameModal()" style="
+                    flex:1; background:transparent; color:var(--pm-white,#e8edf5);
+                    font-family:'Oswald',sans-serif; font-size:13px; letter-spacing:1px;
+                    border:1px solid var(--pm-dim,#3d5570); border-radius:10px; padding:12px; cursor:pointer;">
+                    CANCELAR
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ MODAL — CAMBIAR CONTRASEÑA ═══ -->
+    <div id="pm-pass-modal" style="
+        display:none; position:fixed; inset:0; z-index:99999;
+        background:rgba(0,0,0,0.75); backdrop-filter:blur(6px);
+        align-items:center; justify-content:center;">
+        <div style="
+            background:var(--pm-s1,#0d1826); border:1px solid var(--pm-border2,rgba(0,201,122,0.25));
+            border-radius:18px; padding:28px 24px; width:min(340px,90vw); color:var(--pm-white,#e8edf5);">
+            <h3 style="font-family:'Oswald',sans-serif; font-size:15px; letter-spacing:2px; margin-bottom:6px; color:var(--accent-main,#00c97a);">🔒 CAMBIAR CONTRASEÑA</h3>
+            <p style="font-size:11px; color:var(--pm-dim2,#6b7280); margin-bottom:16px; letter-spacing:.5px;">Ingresa tu contraseña actual y la nueva.</p>
+            <input id="pm-pass-current" type="password" maxlength="40" autocomplete="current-password"
+                style="width:100%; background:var(--pm-s2,#111f30); border:1px solid var(--pm-dim,#3d5570);
+                       color:var(--pm-white,#e8edf5); border-radius:10px; padding:12px 14px;
+                       font-size:14px; outline:none; box-sizing:border-box; margin-bottom:10px;"
+                placeholder="Contraseña actual">
+            <input id="pm-pass-new" type="password" maxlength="40" autocomplete="new-password"
+                style="width:100%; background:var(--pm-s2,#111f30); border:1px solid var(--pm-dim,#3d5570);
+                       color:var(--pm-white,#e8edf5); border-radius:10px; padding:12px 14px;
+                       font-size:14px; outline:none; box-sizing:border-box; margin-bottom:10px;"
+                placeholder="Nueva contraseña (mín. 4 caracteres)">
+            <input id="pm-pass-new2" type="password" maxlength="40" autocomplete="new-password"
+                style="width:100%; background:var(--pm-s2,#111f30); border:1px solid var(--pm-dim,#3d5570);
+                       color:var(--pm-white,#e8edf5); border-radius:10px; padding:12px 14px;
+                       font-size:14px; outline:none; box-sizing:border-box; margin-bottom:6px;"
+                placeholder="Repetir nueva contraseña">
+            <div id="pm-pass-err" style="display:none; font-size:11px; color:#ff6b6b; margin-bottom:10px; padding:8px 12px; background:rgba(255,60,60,0.12); border-radius:8px;"></div>
+            <div style="display:flex; gap:10px;">
+                <button onclick="pmConfirmPassword()" style="
+                    flex:1; background:var(--accent-main,#00c97a); color:#000;
+                    font-family:'Oswald',sans-serif; font-weight:700; font-size:13px;
+                    letter-spacing:2px; border:none; border-radius:10px; padding:12px; cursor:pointer;">
+                    ACTUALIZAR
+                </button>
+                <button onclick="pmClosePassModal()" style="
+                    flex:1; background:transparent; color:var(--pm-white,#e8edf5);
+                    font-family:'Oswald',sans-serif; font-size:13px; letter-spacing:1px;
+                    border:1px solid var(--pm-dim,#3d5570); border-radius:10px; padding:12px; cursor:pointer;">
+                    CANCELAR
+                </button>
             </div>
         </div>
     </div>

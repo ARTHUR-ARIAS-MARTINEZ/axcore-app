@@ -1,4 +1,4 @@
-const CACHE_NAME = 'axcore-v4.1-meal-tabs-scroll';
+const CACHE_NAME = 'axcore-v4.3-temas-perfil';
 const urlsToCache = [
   './',
   './index.html',
