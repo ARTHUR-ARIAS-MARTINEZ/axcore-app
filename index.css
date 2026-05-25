@@ -362,7 +362,7 @@ body {
 .user-rank {
     font-size: 0.8rem;
     font-weight: bold;
-    color: var(--accent-secondary);
+    color: var(--text-primary, #ffffff); /* siempre blanco en modo oscuro; premium.css lo sobrescribe */
 }
 
 .avatar {

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'axcore-v4.9-avatar-bigger';
+const CACHE_NAME = 'axcore-v5.0-color-harmony';
 const urlsToCache = [
   './',
   './index.html',

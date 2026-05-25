@@ -252,7 +252,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!nameToDisp || lowName === 'atleta' || lowName === 'admin' || lowName === 'usuario') {
             nameToDisp = 'USUARIO';
         }
-        if (dispUser) dispUser.textContent = nameToDisp.toUpperCase();
+        if (dispUser) {
+            dispUser.textContent = nameToDisp.toUpperCase();
+            // Forzar visibilidad absoluta via inline style (gana sobre cualquier CSS)
+            dispUser.style.setProperty('color', '#ffffff', 'important');
+            dispUser.style.setProperty('display', 'block', 'important');
+            dispUser.style.setProperty('visibility', 'visible', 'important');
+            dispUser.style.setProperty('opacity', '1', 'important');
+        }
         const photoSrc = userData.avatarPhoto || userData.avatar;
         if (photoSrc) {
             const ap = document.getElementById('avatar-preview');
@@ -1272,7 +1279,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // 1. Header superior: nombre y avatar
             const headerName = document.getElementById('display-username');
-            if (headerName) headerName.textContent = nameUp;
+            if (headerName) {
+                headerName.textContent = nameUp;
+                // Forzar visibilidad: inline style !important gana sobre cualquier CSS externo
+                headerName.style.setProperty('color', '#ffffff', 'important');
+                headerName.style.setProperty('display', 'block', 'important');
+                headerName.style.setProperty('visibility', 'visible', 'important');
+                headerName.style.setProperty('opacity', '1', 'important');
+            }
 
             const headerAvatar = document.getElementById('avatar-preview');
             if (headerAvatar) {

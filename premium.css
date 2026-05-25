@@ -391,14 +391,14 @@ body.premium-mode .pd-ring-num { font-family: 'Oswald', sans-serif; font-size: 1
 body.premium-mode .pd-ring-lbl { font-size: 0.55rem; color: var(--pm-dim2); letter-spacing: 1px; }
 
 body.premium-mode .pd-hero-mid { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; position: relative; }
-body.premium-mode .pd-streak { display: flex; align-items: center; gap: 4px; background: rgba(255,153,0,0.12); border: 1px solid rgba(255,153,0,0.25); border-radius: 99px; padding: 5px 11px; font-family: 'Oswald', sans-serif; font-size: 0.7rem; font-weight: 700; color: #ff9900; letter-spacing: 0.5px; }
-body.premium-mode .pd-phrase { font-family: 'Oswald', sans-serif; font-size: 0.7rem; color: #9b7fff; letter-spacing: 2px; }
+body.premium-mode .pd-streak { display: flex; align-items: center; gap: 4px; background: rgba(var(--pm-green-rgb),0.12); border: 1px solid rgba(var(--pm-green-rgb),0.25); border-radius: 99px; padding: 5px 11px; font-family: 'Oswald', sans-serif; font-size: 0.7rem; font-weight: 700; color: var(--pm-green); letter-spacing: 0.5px; }
+body.premium-mode .pd-phrase { font-family: 'Oswald', sans-serif; font-size: 0.7rem; color: var(--pm-cyan); letter-spacing: 2px; }
 
 body.premium-mode .pd-progress-bar-wrap { margin-bottom: 16px; position: relative; }
 body.premium-mode .pd-progress-labels { display: flex; justify-content: space-between; font-size: 0.62rem; color: var(--pm-dim); margin-bottom: 5px; }
 body.premium-mode .pd-progress-labels #pd-progress-pct-label { color: var(--pm-green); font-weight: 600; }
 body.premium-mode .pd-progress-bg { height: 6px; background: rgba(255,255,255,0.07); border-radius: 99px; overflow: hidden; }
-body.premium-mode .pd-progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #ff6b9d, var(--accent-main)); border-radius: 99px; transition: width 1.2s ease; position: relative; }
+body.premium-mode .pd-progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--pm-cyan), var(--pm-green)); border-radius: 99px; transition: width 1.2s ease; position: relative; }
 body.premium-mode .pd-progress-fill::after { content:''; position: absolute; right: 0; top: 50%; transform: translateY(-50%); width: 11px; height: 11px; background: #fff; border-radius: 50%; box-shadow: 0 0 6px var(--pm-green); }
 
 body.premium-mode .pd-hero-btns { display: flex; gap: 8px; position: relative; align-items: center; }
@@ -407,8 +407,8 @@ body.premium-mode .pd-hero-btns .btn-premium {
   flex: 1 !important;
   padding: 12px 20px !important;
   font-size: 0.7rem !important;
-  background: linear-gradient(135deg, #ff6b9d, var(--accent-main)) !important;
-  box-shadow: 0 4px 16px rgba(255,107,157,0.3) !important;
+  background: linear-gradient(135deg, var(--pm-green), var(--pm-cyan)) !important;
+  box-shadow: 0 4px 16px rgba(var(--pm-green-rgb),0.35) !important;
 }
 body.premium-mode .pd-hero-btns .btn-outline {
   background: transparent;
@@ -430,7 +430,7 @@ body.premium-mode .pd-hero-btns .btn-outline:hover { opacity: 0.8; }
 body.premium-mode .pd-hero-btns .btn-outline:active { transform: scale(0.96); }
 
 /* SECTION TITLE */
-body.premium-mode .pd-section-title { font-family: 'Oswald', sans-serif; font-size: 0.7rem; letter-spacing: 3px; color: #9b7fff; margin: 12px 2px 8px; font-weight: 600; }
+body.premium-mode .pd-section-title { font-family: 'Oswald', sans-serif; font-size: 0.7rem; letter-spacing: 3px; color: var(--pm-green); margin: 12px 2px 8px; font-weight: 600; }
 
 /* SUMMARY 2x2 */
 body.premium-mode .pd-summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
@@ -438,9 +438,9 @@ body.premium-mode .pd-sum { background: var(--pm-s1); border: 1px solid var(--pm
 body.premium-mode .pd-sum::before { content:''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
 body.premium-mode .pd-sum.c1::before { background: var(--pm-green); }
 body.premium-mode .pd-sum.c2::before { background: var(--pm-cyan); }
-body.premium-mode .pd-sum.c3::before { background: #9b7fff; }
-body.premium-mode .pd-sum.c4::before { background: #ff6b9d; }
-body.premium-mode .pd-sum-lbl { font-size: 0.55rem; letter-spacing: 1.5px; color: #ff6b9d; margin-bottom: 4px; text-transform: uppercase; }
+body.premium-mode .pd-sum.c3::before { background: rgba(var(--pm-cyan-rgb),0.8); }
+body.premium-mode .pd-sum.c4::before { background: rgba(var(--pm-green-rgb),0.55); }
+body.premium-mode .pd-sum-lbl { font-size: 0.55rem; letter-spacing: 1.5px; color: var(--pm-dim2); margin-bottom: 4px; text-transform: uppercase; }
 body.premium-mode .pd-sum-val { font-family: 'Oswald', sans-serif; font-size: 20px; font-weight: 700; line-height: 1; color: #fff; }
 body.premium-mode .pd-sum-val small { font-size: 0.65rem; font-weight: 400; color: var(--pm-dim2); margin-left: 3px; }
 body.premium-mode .pd-sum-sub { font-size: 0.6rem; color: var(--pm-dim); margin-top: 3px; }
@@ -850,17 +850,27 @@ body.premium-mode #sw-mini-display {
    PASO 4 — EVOLUCIÓN / STUDIO / AJUSTES premium
    ═══════════════════════════════════════════════════════════════ */
 
-/* ───────── EVOLUCIÓN ───────── */
+/* ───────── EVOLUCIÓN — contraste adaptado al tema ───────── */
 body.premium-mode .evolution-panel,
 body.premium-mode #page-evolution .glass-card {
-  background: rgba(13,24,38,0.7) !important;
+  background: var(--pm-s2) !important; /* usa la superficie del tema, no azul fijo */
   border: 1px solid var(--pm-border) !important;
   border-radius: var(--pm-r) !important;
 }
 body.premium-mode #page-evolution h2 {
   font-family: 'Oswald', sans-serif !important;
   letter-spacing: 2px !important;
-  color: var(--pm-green) !important;
+  color: var(--pm-green) !important; /* título principal = acento primario */
+}
+/* Subtítulos de sección en evolución: usan acento secundario para contraste */
+body.premium-mode #page-evolution h3 {
+  font-family: 'Oswald', sans-serif !important;
+  color: var(--pm-cyan) !important;
+  letter-spacing: 1px !important;
+}
+/* Labels genéricos de tabla — dim para jerarquía */
+body.premium-mode #page-evolution label {
+  color: var(--pm-dim2) !important;
 }
 body.premium-mode .measurement-form {
   background: var(--pm-s1) !important;
@@ -914,7 +924,7 @@ body.premium-mode .history-table-container table thead {
 body.premium-mode .history-table-container th {
   font-family: 'Oswald', sans-serif !important;
   letter-spacing: 1px !important;
-  color: var(--pm-green) !important;
+  color: var(--pm-dim2) !important; /* etiquetas de columna en dim para jerarquía */
   border-bottom: 1px solid var(--pm-border2) !important;
 }
 body.premium-mode .history-table-container td {
@@ -1550,7 +1560,7 @@ body.premium-mode .top-bar {
   margin-bottom: 0 !important;
   padding: 10px 28px 10px 16px !important; /* 28px derecha para que hora/fecha no se corten */
   box-sizing: border-box !important;
-  background: rgba(6,13,26,0.97) !important;
+  background: var(--pm-s1) !important; /* usa superficie del tema (no azul fijo) */
   border-bottom: 1px solid rgba(var(--pm-green-rgb), 0.15) !important;
   backdrop-filter: blur(16px) !important;
   -webkit-backdrop-filter: blur(16px) !important;
@@ -1668,8 +1678,6 @@ body.premium-mode #live-date {
   color: var(--accent-main) !important;
   font-weight: 600 !important;
   letter-spacing: 0.5px !important;
-}
-
 }
 
 /* Ocultar mini-cronómetro del header en premium (FAB lo cubre) */
@@ -2038,13 +2046,13 @@ body.premium-mode .pm-diet-bar-fill {
   box-shadow: 0 0 8px rgba(var(--pm-green-rgb), 0.4);
 }
 
-/* ── PESTAÑAS DE DIETA ── */
+/* ── PESTAÑAS DE DIETA — usan colores del tema activo ── */
 body.premium-mode .pm-d-tabs {
   display: flex !important;
   margin-bottom: 20px !important;
-  background: rgba(45, 15, 80, 0.6) !important; /* Fondo morado translúcido más visible */
-  border: 1px solid rgba(184, 0, 255, 0.4) !important; /* Borde lila sutil */
-  border-radius: 50px !important; /* Forma perfectamente redondeada de píldora */
+  background: rgba(var(--pm-green-rgb), 0.06) !important; /* Fondo sutil del acento primario */
+  border: 1px solid rgba(var(--pm-green-rgb), 0.2) !important;
+  border-radius: 50px !important;
   padding: 4px !important;
   gap: 4px !important;
 }
@@ -2056,9 +2064,9 @@ body.premium-mode .pm-d-tab {
   font-weight: 600 !important;
   letter-spacing: 1.5px !important;
   padding: 8px 12px !important;
-  border-radius: 50px !important; /* Bordes internos redondeados de cápsula */
+  border-radius: 50px !important;
   cursor: pointer !important;
-  color: rgba(220, 200, 255, 0.7) !important; /* Letras color lila translúcido */
+  color: var(--pm-dim2) !important; /* texto dim empático al tema */
   background: transparent !important;
   border: none !important;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
@@ -2066,14 +2074,14 @@ body.premium-mode .pm-d-tab {
   margin-bottom: 0 !important;
 }
 body.premium-mode .pm-d-tab:hover {
-  color: #ffffff !important;
-  background: rgba(184, 0, 255, 0.1) !important;
+  color: var(--pm-white) !important;
+  background: rgba(var(--pm-green-rgb), 0.08) !important;
 }
 body.premium-mode .pm-d-tab.on {
-  background: linear-gradient(135deg, #8b3cff, #d156ff) !important; /* Gradiente morado a lila premium vibrante */
-  color: #ffffff !important; /* Letras blancas */
+  background: linear-gradient(135deg, var(--pm-green), var(--pm-cyan)) !important; /* degradado del tema */
+  color: #000000 !important; /* texto oscuro para contraste sobre acento brillante */
   font-weight: 700 !important;
-  box-shadow: 0 4px 12px rgba(184, 0, 255, 0.5) !important; /* Brillo de sombra lila intensa */
+  box-shadow: 0 4px 12px rgba(var(--pm-green-rgb), 0.4) !important;
 }
 body.premium-mode .pm-d-tab:active { transform: scale(0.97); }
 
@@ -2684,35 +2692,35 @@ body.premium-mode .ex-type-cardio {
   border-color: rgba(var(--pm-cyan-rgb), 0.3) !important;
 }
 
-/* HIIT — rojo/coral */
+/* HIIT — rojo/coral (semántico: intensidad alta) */
 body.premium-mode .ex-type-hiit {
-  background: rgba(255, 99, 107, 0.12) !important;
-  color: #ff636b !important;
-  border-color: rgba(255, 99, 107, 0.3) !important;
+  background: rgba(255, 99, 107, 0.10) !important;
+  color: rgba(255, 99, 107, 0.78) !important; /* semitransparente: menos agresivo en temas oscuros */
+  border-color: rgba(255, 99, 107, 0.22) !important;
 }
 
-/* PIERNA, PANTORRILLA — violeta */
+/* PIERNA, PANTORRILLA — violeta (semántico: tren inferior) */
 body.premium-mode .ex-type-pierna,
 body.premium-mode .ex-type-pantorrilla {
-  background: rgba(155, 127, 255, 0.12) !important;
-  color: #9b7fff !important;
-  border-color: rgba(155, 127, 255, 0.3) !important;
+  background: rgba(155, 127, 255, 0.10) !important;
+  color: rgba(155, 127, 255, 0.78) !important;
+  border-color: rgba(155, 127, 255, 0.22) !important;
 }
 
 /* GLÚTEO — rosa */
 body.premium-mode .ex-type-gluteo {
-  background: rgba(255, 107, 157, 0.12) !important;
-  color: #ff6b9d !important;
-  border-color: rgba(255, 107, 157, 0.3) !important;
+  background: rgba(255, 107, 157, 0.10) !important;
+  color: rgba(255, 107, 157, 0.78) !important;
+  border-color: rgba(255, 107, 157, 0.22) !important;
 }
 
 /* PECHO, HOMBROS, ESPALDA — ámbar/naranja (tren superior) */
 body.premium-mode .ex-type-pecho,
 body.premium-mode .ex-type-hombros,
 body.premium-mode .ex-type-espalda {
-  background: rgba(255, 153, 0, 0.12) !important;
-  color: #ff9900 !important;
-  border-color: rgba(255, 153, 0, 0.3) !important;
+  background: rgba(255, 153, 0, 0.10) !important;
+  color: rgba(255, 153, 0, 0.78) !important;
+  border-color: rgba(255, 153, 0, 0.22) !important;
 }
 
 /* BÍCEPS, TRÍCEPS — verde acento (brazos) */
@@ -2723,12 +2731,12 @@ body.premium-mode .ex-type-triceps {
   border-color: rgba(var(--pm-green-rgb), 0.3) !important;
 }
 
-/* CORE, CALISTENIA — lavanda eléctrica */
+/* CORE, CALISTENIA — lavanda (semitransparente) */
 body.premium-mode .ex-type-core,
 body.premium-mode .ex-type-calistenia {
-  background: rgba(191, 95, 255, 0.12) !important;
-  color: #bf5fff !important;
-  border-color: rgba(191, 95, 255, 0.3) !important;
+  background: rgba(191, 95, 255, 0.10) !important;
+  color: rgba(191, 95, 255, 0.78) !important;
+  border-color: rgba(191, 95, 255, 0.22) !important;
 }
 
 /* CARRERA — cyan ligeramente diferenciado */
@@ -3029,14 +3037,14 @@ body.premium-mode .pd-ach-streak-badge {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  background: rgba(255,153,0,0.12);
-  border: 1px solid rgba(255,153,0,0.28);
+  background: rgba(var(--pm-cyan-rgb), 0.12);
+  border: 1px solid rgba(var(--pm-cyan-rgb), 0.28);
   border-radius: 99px;
   padding: 3px 10px;
   font-family: 'Oswald', sans-serif;
   font-size: 0.62rem;
   font-weight: 700;
-  color: #ff9900;
+  color: var(--pm-cyan);
   letter-spacing: 0.5px;
 }
 body.premium-mode .pd-ach-pct-badge {
@@ -3054,11 +3062,11 @@ body.premium-mode .pd-ach-pct-badge {
   letter-spacing: 0.5px;
 }
 
-/* FAB: glow en hover ajustado para nuevo gradiente rosa+verde */
+/* FAB: glow en hover — usa colores del tema activo */
 .pm-fab-main:hover {
-  box-shadow: 0 8px 32px rgba(255,107,157,0.5), 0 4px 16px rgba(var(--pm-green-rgb), 0.3) !important;
+  box-shadow: 0 8px 32px rgba(var(--pm-green-rgb), 0.55), 0 4px 16px rgba(var(--pm-cyan-rgb), 0.3) !important;
 }
 .pm-fab-main.open {
   transform: rotate(45deg);
-  box-shadow: 0 8px 36px rgba(255,107,157,0.6), 0 4px 20px rgba(var(--pm-green-rgb), 0.35) !important;
+  box-shadow: 0 8px 36px rgba(var(--pm-green-rgb), 0.65), 0 4px 20px rgba(var(--pm-cyan-rgb), 0.35) !important;
 }
