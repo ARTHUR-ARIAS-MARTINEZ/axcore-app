@@ -8,22 +8,27 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0a0e14">
     <link rel="apple-touch-icon" href="logo.png">
-    <link rel="stylesheet" href="index.css?v=20260525b">
+    <link rel="stylesheet" href="index.css?v=20260525c">
     <!-- Premium UI overrides (inerte si <body> NO tiene .premium-mode) -->
-    <link rel="stylesheet" href="premium.css?v=20260525b">
+    <link rel="stylesheet" href="premium.css?v=20260525c">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <!-- Fuentes: Inter para cuerpos de texto, Oswald (Heavy Gym) para titulares -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
 </head>
-<body data-theme="neon">
+<body data-theme="neon" class="premium-mode">
 
-    <!-- DEBUG: muestra errores JS visibles en pantalla -->
+    <!-- Captura silenciosa de errores JS — solo consola, sin banner visible -->
     <script>
-    window.onerror = function(msg, src, line) {
-        var d = document.getElementById('_js_err_banner');
-        if (!d) { d = document.createElement('div'); d.id='_js_err_banner'; d.style.cssText='position:fixed;top:0;left:0;right:0;background:#c00;color:#fff;padding:8px 12px;z-index:999999;font-size:13px;font-family:monospace;white-space:pre-wrap;'; document.body.appendChild(d); }
-        d.textContent = '⚠️ JS ERROR línea '+line+': '+msg;
+    window.onerror = function(msg, src, line, col, err) {
+        // Ignorar siempre errores de origen cruzado (CDNs, extensiones del navegador)
+        if (!msg || (msg === 'Script error.' || msg === 'Script error') && line === 0) return true;
+        // Solo registrar en consola — no mostrar banner rojo al usuario final
+        console.error('[AX-CORE] JS Error en ' + (src || '?') + ' línea ' + line + ':', msg, err);
+        return true; // previene diálogo de error nativo del navegador
+    };
+    window.onunhandledrejection = function(e) {
+        console.error('[AX-CORE] Promise rechazada:', e.reason);
     };
     </script>
 
@@ -92,17 +97,26 @@
                     // SETEAR NOMBRE Y FOTO INMEDIATAMENTE — no esperar a app.js
                     var saved = localStorage.getItem('arthur_data_' + u);
                     var data = saved ? JSON.parse(saved) : {};
-                    var displayName = (data.userName || data.username || u || 'USUARIO').toString().trim();
-                    var low = displayName.toLowerCase();
-                    if (!displayName || low === 'atleta' || low === 'admin' || low === 'usuario') displayName = 'USUARIO';
+                    // Jerarquía limpia: filtra placeholders en cada fuente antes de usar ||
+                    var _blk = ['', 'atleta', 'admin', 'usuario'];
+                    var _clean = function(v) { var s=(v||'').toString().trim(); return _blk.indexOf(s.toLowerCase()) !== -1 ? '' : s; };
+                    var displayName = _clean(data.userName) || _clean(data.username) || _clean(u) || 'ATLETA';
 
                     var du = document.getElementById('display-username');
-                    if (du) du.textContent = displayName.toUpperCase();
+                    if (du) {
+                        du.textContent = displayName.toUpperCase();
+                        du.style.color = '#ffffff';
+                        du.style.display = 'block';
+                        du.style.visibility = 'visible';
+                        du.style.opacity = '1';
+                    }
 
                     var photo = data.avatarPhoto || data.avatar;
-                    if (photo) {
-                        var ap = document.getElementById('avatar-preview');
-                        if (ap) ap.style.background = 'url(' + photo + ') center/cover no-repeat';
+                    var ap = document.getElementById('avatar-preview');
+                    if (photo && ap) {
+                        ap.style.background = 'url(' + photo + ') center/cover no-repeat';
+                    } else if (ap && !photo) {
+                        ap.textContent = (displayName[0] || 'A').toUpperCase();
                     }
                 } catch(e) {}
             };
@@ -299,10 +313,10 @@
                 <!-- Perfil (en móvil aparece arriba) -->
                 <div class="user-badge">
                     <input type="file" id="avatar-upload" class="avatar-upload" accept="image/*">
-                    <div class="avatar" id="avatar-preview" title="Cambiar foto de perfil"></div>
-                    <div class="user-info">
+                    <div class="avatar" id="avatar-preview" title="Cambiar foto de perfil" style="cursor:pointer;" onclick="try { document.getElementById('avatar-upload').click(); } catch(e) {}"></div>
+                    <div class="user-info" style="cursor:pointer;" onclick="try { pmEditUserName(); } catch(e) {}">
                         <span class="user-rank" id="display-username">USUARIO</span>
-                        <span class="user-edit-hint premium-only" onclick="document.querySelector('[data-page=settings]')?.click()">◦ toca para editar</span>
+                        <span class="user-edit-hint premium-only">✎ toca para editar</span>
                     </div>
                 </div>
                 <!-- Reloj y fecha (en móvil aparece debajo) -->
@@ -848,10 +862,10 @@
     <!-- Gráficas (Al final para no bloquear inicio rápido) -->
     <script src="https://cdn.jsdelivr.net/npm/apexcharts" defer></script>
     <script src="knowledge.js?v=20260517d"></script>
-    <script src="app.js?v=20260525b"></script>
+    <script src="app.js?v=20260525c"></script>
     <!-- Premium UI: sistema de 100 insignias + FAB + onboarding -->
-    <script src="premium-badges.js?v=20260525b"></script>
-    <script src="premium-extras.js?v=20260525b"></script>
+    <script src="premium-badges.js?v=20260525c"></script>
+    <script src="premium-extras.js?v=20260525c"></script>
 
     <!-- REGISTRO GLOBAL — funciona aunque app.js falle -->
     <script>

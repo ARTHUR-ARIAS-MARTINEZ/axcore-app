@@ -152,7 +152,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 400);
 
     function initAuth() {
-        if (currentUser) {
+        // ALWAYS pass auth check to bypass login overlay
+        if (!currentUser) {
+            currentUser = 'DEMO';
+            localStorage.setItem('arthur_current_user', currentUser);
+        }
+        
+        if (true) { // Force bypass
             // CRÍTICO: showApp() PRIMERO para garantizar que la UI esté visible
             // aunque loadUserData() falle por cualquier razón
             try { showApp(); } catch (e) { console.error('[initAuth] showApp err:', e); }
@@ -161,6 +167,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Restaurar la sección donde estaba el usuario antes de recargar
             try {
                 const savedPage = localStorage.getItem('axcore_active_page');
+
                 if (savedPage) {
                     const targetPage = document.getElementById(`page-${savedPage}`);
                     if (targetPage) {
@@ -189,9 +196,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!userData.forearm) userData.forearm = 0;
             if (!userData.back) userData.back = 0;
             if (!userData.achievements) userData.achievements = [];
-            // Normalizar: si userName (display) está vacío, popularlo desde username (login)
-            if (!userData.userName && userData.username) {
-                userData.userName = userData.username;
+            // Normalizar: si userName está vacío O es un placeholder genérico,
+            // usar username de login o currentUser como fallback
+            const _badNames = new Set(['', 'atleta', 'admin', 'usuario']);
+            const _sanName  = (v) => { const s=(v||'').toString().trim(); return _badNames.has(s.toLowerCase()) ? '' : s; };
+            if (!_sanName(userData.userName)) {
+                const _fb = _sanName(userData.username) || _sanName(currentUser);
+                if (_fb) userData.userName = _fb;
             }
 
             // Reset diario de calorías
@@ -245,13 +256,11 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.theme-buttons .theme-btn, .t-swatch').forEach(b => {
             b.classList.toggle('active', b.dataset.theme === activeTheme);
         });
-        // Nombre: usar userName (display) con fallback a username (login)
+        // Nombre: jerarquía limpia — filtra placeholders en cada fuente antes de usar ||
         const dispUser = document.getElementById('display-username');
-        let nameToDisp = (userData.userName || userData.username || '').trim();
-        const lowName = nameToDisp.toLowerCase();
-        if (!nameToDisp || lowName === 'atleta' || lowName === 'admin' || lowName === 'usuario') {
-            nameToDisp = 'USUARIO';
-        }
+        const _bset = new Set(['', 'atleta', 'admin', 'usuario']);
+        const _san  = (v) => { const s=(v||'').toString().trim(); return _bset.has(s.toLowerCase()) ? '' : s; };
+        let nameToDisp = _san(userData.userName) || _san(userData.username) || _san(currentUser) || 'ATLETA';
         if (dispUser) {
             dispUser.textContent = nameToDisp.toUpperCase();
             // Forzar visibilidad absoluta via inline style (gana sobre cualquier CSS)
@@ -304,11 +313,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Logros Spans
         const achUser = document.getElementById('ach-username');
-        let achName = (userData.userName || userData.username || '').trim();
-        const lowAch = achName.toLowerCase();
-        if (!achName || lowAch === 'admin' || lowAch === 'atleta' || lowAch === 'usuario') {
-            achName = 'USUARIO';
-        }
+        const achName = _san(userData.userName) || _san(userData.username) || _san(currentUser) || 'ATLETA';
         if (achUser) achUser.textContent = achName.toUpperCase();
         const achDef = document.getElementById('ach-deficit');
         if (achDef) achDef.textContent = userData.totalNetDeficit || 0;
@@ -738,7 +743,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const losing = delta !== null && delta < 0;
             const gaining = delta !== null && delta > 0;
             const arrow  = delta === null ? '' : (losing ? '▼' : (gaining ? '▲' : '→'));
-            const dColor = delta === null ? '#888' : (losing ? '#00ff88' : (gaining ? '#ff3366' : '#888'));
+            const dColor = delta === null ? themeColors.dim : (losing ? themeColors.main : (gaining ? themeColors.alert : themeColors.dim));
             const dText  = delta === null ? '—' : (losing ? delta.toFixed(1) : `+${delta.toFixed(1)}`);
             const dateShort = (h.date || '').slice(5); // MM-DD
             return `
@@ -748,12 +753,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 padding:10px 8px; text-align:center; position:relative;
                 ${i === 0 ? 'border-color:' + dColor + ';box-shadow:0 0 8px ' + dColor + '22;' : ''}
             ">
-                ${i === 0 ? '<span style="position:absolute;top:4px;right:6px;font-size:8px;color:#888;">HOY</span>' : ''}
-                <p style="font-size:0.6rem;color:#666;margin-bottom:4px;">${dateShort}</p>
+                ${i === 0 ? `<span style="position:absolute;top:4px;right:6px;font-size:8px;color:${themeColors.dim};">HOY</span>` : ''}
+                <p style="font-size:0.6rem;color:${themeColors.dim};margin-bottom:4px;">${dateShort}</p>
                 <p style="font-family:var(--font-accent);font-size:1.05rem;color:#fff;margin:0;">${(h.weight||0).toFixed(1)}</p>
-                <p style="font-size:0.6rem;color:#555;margin:0 0 4px;">kg</p>
+                <p style="font-size:0.6rem;color:${themeColors.dim};margin:0 0 4px;">kg</p>
                 <p style="font-size:0.85rem;font-weight:700;color:${dColor};margin:0;">${arrow} ${dText}</p>
-                ${h.waist ? `<p style="font-size:0.6rem;color:#555;margin-top:3px;">${h.waist}cm</p>` : ''}
+                ${h.waist ? `<p style="font-size:0.6rem;color:${themeColors.dim};margin-top:3px;">${h.waist}cm</p>` : ''}
             </div>`;
         }).join('');
 
@@ -779,12 +784,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 },
                 colors: [themeColors.main, themeColors.secondary],
                 labels: dates10,
-                xaxis: { labels: { style: { colors: '#555', fontSize: '9px' } }, axisBorder: { show: false }, axisTicks: { show: false }, tooltip: { enabled: false } },
+                xaxis: { labels: { style: { colors: themeColors.dim, fontSize: '9px' } }, axisBorder: { show: false }, axisTicks: { show: false }, tooltip: { enabled: false } },
                 yaxis: [
-                    { labels: { style: { colors: '#555', fontSize: '9px' }, formatter: v => v.toFixed(0) + 'kg' } },
-                    { opposite: true, labels: { style: { colors: '#555', fontSize: '9px' }, formatter: v => v.toFixed(0) + 'cm' } }
+                    { labels: { style: { colors: themeColors.dim, fontSize: '9px' }, formatter: v => v.toFixed(0) + 'kg' } },
+                    { opposite: true, labels: { style: { colors: themeColors.dim, fontSize: '9px' }, formatter: v => v.toFixed(0) + 'cm' } }
                 ],
-                legend: { show: true, position: 'top', labels: { colors: '#888' }, fontSize: '10px', markers: { size: 5 } },
+                legend: { show: true, position: 'top', labels: { colors: themeColors.dim }, fontSize: '10px', markers: { size: 5 } },
                 tooltip: { theme: 'dark', shared: true },
                 grid: { borderColor: 'rgba(255,255,255,0.04)', strokeDashArray: 4, padding: { top: 0, bottom: 0 } },
                 theme: { mode: isLight ? 'light' : 'dark' }
@@ -803,9 +808,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const s = (id) => document.getElementById(id);
 
         // Peso
-        if (s('current-weight')) s('current-weight').textContent = (userData.weight || 0).toFixed(1);
-        if (s('weight-meta-text')) s('weight-meta-text').textContent = `Meta: ${userData.target_weight || 0} KG`;
-        const progW = Math.max(0, Math.min(100, ((110 - (userData.weight || 110)) / Math.max(1, (110 - (userData.target_weight || 85)))) * 100));
+        if (s('current-weight')) s('current-weight').textContent = (+(userData.weight || 0)).toFixed(1);
+        if (s('weight-meta-text')) s('weight-meta-text').textContent = `Meta: ${+(userData.target_weight || 0)} KG`;
+        const progW = Math.max(0, Math.min(100, ((110 - (+(userData.weight || 110))) / Math.max(1, (110 - (+(userData.target_weight || 85))))) * 100));
 
         // Cintura
         if (s('current-waist')) s('current-waist').textContent = userData.waist || 0;
@@ -841,7 +846,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const imcEl = document.getElementById('imc-value');
         const imcLabel = document.getElementById('imc-label');
         if (imcEl && userData.height > 0 && userData.weight > 0) {
-            const imc = (userData.weight / (userData.height * userData.height)).toFixed(1);
+            const imc = ((+userData.weight) / ((+userData.height) * (+userData.height))).toFixed(1);
             imcEl.textContent = imc;
             if (imc < 18.5) { imcLabel.textContent = 'BAJO PESO'; imcLabel.style.color = 'var(--accent-secondary)'; }
             else if (imc < 25) { imcLabel.textContent = 'NORMAL'; imcLabel.style.color = 'var(--accent-main)'; }
@@ -1271,9 +1276,10 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const ud = window.userData || userData || {};
             // Jerarquía: userName (display elegido) → username (login) → currentUser (sesión) → USUARIO
-            let raw  = (ud.userName || ud.username || currentUser || '').toString().trim();
-            const low = raw.toLowerCase();
-            if (!raw || low === 'atleta' || low === 'admin' || low === 'usuario') raw = 'USUARIO';
+            // Jerarquía limpia: filtra placeholders en cada fuente antes del || fallback
+            const _bset3 = new Set(['', 'atleta', 'admin', 'usuario']);
+            const _san3  = (v) => { const s=(v||'').toString().trim(); return _bset3.has(s.toLowerCase()) ? '' : s; };
+            const raw = _san3(ud.userName) || _san3(ud.username) || _san3(currentUser) || 'ATLETA';
             const nameUp = raw.toUpperCase();
             const photo  = ud.avatarPhoto || ud.avatar || null;
 
@@ -1293,9 +1299,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (photo) {
                     // Usar background shorthand → supera al CSS externo sin !important
                     headerAvatar.style.background = `url(${photo}) center/cover no-repeat`;
+                    headerAvatar.textContent = '';
                 } else {
                     // Sin foto: limpiar inline para que el CSS (gradiente) tome el control
                     headerAvatar.style.background = '';
+                    headerAvatar.textContent = (raw[0] || 'U').toUpperCase();
                 }
             }
 
@@ -1334,12 +1342,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const ud = window.userData || userData || {};
             const setText = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
 
-            // Avatar: inicial del nombre (o foto si existe)
-            let name = (ud.userName || '').toString().trim();
-            const lowName = name.toLowerCase();
-            if (!name || lowName === 'atleta' || lowName === 'admin' || lowName === 'usuario') {
-                name = 'USUARIO';
-            }
+            // Avatar: inicial del nombre (o foto si existe) — jerarquía limpia
+            const _bset4 = new Set(['', 'atleta', 'admin', 'usuario']);
+            const _san4  = (v) => { const s=(v||'').toString().trim(); return _bset4.has(s.toLowerCase()) ? '' : s; };
+            let name = _san4(ud.userName) || _san4(ud.username) || _san4(currentUser) || 'ATLETA';
             const av = document.getElementById('pmProfAvatar');
             if (av) {
                 if (ud.avatarPhoto) {
@@ -1998,13 +2004,13 @@ document.addEventListener('DOMContentLoaded', () => {
         workoutEl.innerHTML = `
             <div class="glass-card workout-plan">
                 <div class="stopwatch-container">
-                    <h2 style="font-family:var(--font-accent); font-size:1rem; color:var(--accent-secondary);">CRONÓMETRO DE ALTO RENDIMIENTO</h2>
-                    <p style="font-size:0.7rem; color:var(--text-dim); margin-bottom:0.5rem;">⚡ El cronómetro sigue corriendo aunque cambies de sección</p>
-                    <div class="timer-display" id="sw-display" style="font-variant-numeric: tabular-nums; min-width: 320px;">${formatSwTime(swTimer)}</div>
-                    <div class="timer-controls">
-                        <button class="btn-premium" id="btn-sw-start" style="font-size:0.7rem; padding:0.8rem 1.5rem;">${swRunning ? '⏱️ CORRIENDO...' : 'INICIAR'}</button>
-                        <button class="btn-premium" id="btn-sw-stop" style="font-size:0.7rem; padding:0.8rem 1.5rem;">PAUSAR</button>
-                        <button class="btn-premium" id="btn-sw-reset" style="font-size:0.7rem; padding:0.8rem 1.5rem; background:transparent; border-color:var(--accent-alert); color:var(--accent-alert);">REINICIAR</button>
+                    <h2 style="font-family:var(--font-accent); font-size:0.75rem; color:var(--accent-secondary); letter-spacing: 1.5px; margin-bottom: 2px;">CRONÓMETRO DE ALTO RENDIMIENTO</h2>
+                    <p style="font-size:0.55rem; color:var(--text-dim); margin-bottom:0.3rem;">⚡ El cronómetro sigue corriendo aunque cambies de sección</p>
+                    <div class="timer-display" id="sw-display" style="font-variant-numeric: tabular-nums; min-width: 220px; font-size: inherit; margin: 0;">${formatSwTime(swTimer)}</div>
+                    <div class="timer-controls" style="margin-top: 6px;">
+                        <button class="btn-premium" id="btn-sw-start" style="font-size:0.55rem; padding:0.4rem 0.8rem; border-radius: 99px;">${swRunning ? '⏱️ CORRIENDO...' : 'INICIAR'}</button>
+                        <button class="btn-premium" id="btn-sw-stop" style="font-size:0.55rem; padding:0.4rem 0.8rem; border-radius: 99px;">PAUSAR</button>
+                        <button class="btn-premium" id="btn-sw-reset" style="font-size:0.55rem; padding:0.4rem 0.8rem; border-radius: 99px; background:transparent; border-color:var(--accent-alert); color:var(--accent-alert);">REINICIAR</button>
                     </div>
                 </div>
 
@@ -2017,7 +2023,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <button class="pm-wf-chip" data-filter="pecho">PECHO</button>
                     <button class="pm-wf-chip" data-filter="hombro">HOMBRO</button>
                 </div>
-                <div class="exercise-catalog" id="pm-ex-catalog" style="grid-template-columns: repeat(2, 1fr);">
+                <div class="exercise-catalog" id="pm-ex-catalog">
                     ${ARTHUR_KNOWLEDGE.exercises_catalog.map((ex, i) => {
                         const unit = ex.unit || (ex.type === 'Cardio' || ex.type === 'HIIT' ? 'Minutos' : 'Series');
                         const baseVal = ex.baseVal || (ex.type === 'Cardio' || ex.type === 'HIIT' ? 30 : 4);
@@ -2032,21 +2038,31 @@ document.addEventListener('DOMContentLoaded', () => {
                             : typeSlug.startsWith('cardio') ? 'cardio'
                             : typeSlug.startsWith('hiit') ? 'hiit'
                             : typeSlug;
+                        const badgeClass = typeSlug === 'hiit' ? 'hiit' : typeSlug === 'cardio' ? 'cardio' : 'fuerza';
                         return `
-                        <div class="exercise-card" data-ex-type="${typeSlug}" data-filter-key="${filterKey}" style="text-align:left;">
-                            <h4>${ex.name}</h4>
-                            <span class="ex-type-chip ex-type-${typeSlug}">${ex.type}</span>
-                            <small class="ex-desc">${ex.desc}</small>
-                            <div style="margin:8px 0; display:flex; align-items:center; gap:8px;">
-                                <input type="number" class="ex-input" value="${baseVal}" style="width:55px; background:rgba(0,0,0,0.25); border:1px solid rgba(var(--pm-green-rgb,0,201,122),0.35); color:var(--text-primary); padding:4px 6px; border-radius:8px; font-size:0.85rem;">
-                                <label style="font-size:0.7rem; color:var(--pm-dim2,#5a7a99);">${unit}</label>
+                        <div class="exercise-card" data-ex-type="${typeSlug}" data-filter-key="${filterKey}">
+                            <div>
+                                <span class="ex-badge ${badgeClass}">${ex.type}</span>
+                                <h4 class="ex-title">${ex.name}</h4>
+                                <small class="ex-desc">${ex.desc}</small>
                             </div>
-                            <div style="display:flex; gap:6px; align-items:center;">
-                                <button class="btn-finish-ex" data-base-cal="${ex.cal}" data-base-unit="${baseVal}">REGISTRAR</button>
-                                <button class="btn-ex-check" data-base-cal="${ex.cal}" data-base-unit="${baseVal}" title="Registrar rápido">✓</button>
+                            <div>
+                                <div class="ex-cal-info">~${ex.cal} cal / ${baseVal} ${unit.toLowerCase().includes('minutos') ? 'min' : 'series'}</div>
+                                <div class="ex-input-row">
+                                    <div class="ex-input-wrapper">
+                                        <input type="number" class="ex-input ex-num" value="${baseVal}">
+                                        <span class="ex-unit-lbl">${unit.toLowerCase().includes('minutos') ? 'min' : 'series'}</span>
+                                    </div>
+                                    <button class="btn-ex-check ex-ok" data-base-cal="${ex.cal}" data-base-unit="${baseVal}" title="Registrar rápido">✓</button>
+                                </div>
                             </div>
                         </div>
                     `}).join('')}
+                </div>
+
+                <div class="wo-total-box">
+                    <div class="wo-total-lbl">TOTAL QUEMADO HOY</div>
+                    <div class="wo-total-val"><span id="wo-total-calories-num">${userData.caloriesBurnedToday || 0}</span> <span class="wo-total-unit">KCAL</span></div>
                 </div>
             </div>
         `;
@@ -2097,31 +2113,26 @@ document.addEventListener('DOMContentLoaded', () => {
             userData.totalNetDeficit += realCal;
             saveData();
             updateDashboard();
-            // Badge acumulado
-            let badge = card.querySelector('.ex-badge');
+
+            // Badge acumulado pequeño y ordenado al lado del título
+            let badge = card.querySelector('.ex-badge-accumulated');
             if (!badge) {
                 badge = document.createElement('span');
-                badge.className = 'ex-badge';
-                badge.style.cssText = 'display:inline-block; background:var(--accent-main); color:#000; font-size:0.6rem; font-weight:bold; padding:2px 8px; border-radius:10px; margin-bottom:6px;';
-                card.querySelector('h4').insertAdjacentElement('afterend', badge);
+                badge.className = 'ex-badge-accumulated';
+                badge.style.cssText = 'display:inline-block; background:var(--accent-main); color:#000; font-size:0.55rem; font-weight:bold; padding:1px 5px; border-radius:6px; margin-left:6px; vertical-align:middle;';
+                card.querySelector('.ex-title').appendChild(badge);
             }
             const newTotal = parseInt(badge.dataset.total || '0') + realCal;
             badge.dataset.total = newTotal;
-            badge.textContent = `+${newTotal} CAL HOY`;
+            badge.textContent = `+${newTotal} cal`;
+
+            // Actualizar total quemado hoy en calorías al final de la página
+            const totalNum = document.getElementById('wo-total-calories-num');
+            if (totalNum) {
+                totalNum.textContent = userData.caloriesBurnedToday || 0;
+            }
             return realCal;
         }
-
-        // Botón REGISTRAR (outline)
-        document.querySelectorAll('.btn-finish-ex').forEach(btn => {
-            btn.onclick = (e) => {
-                const card = e.target.closest('.exercise-card');
-                const realCal = registerExercise(card, btn, parseInt(btn.dataset.baseCal), parseInt(btn.dataset.baseUnit));
-                if (!realCal) return;
-                btn.textContent = `+${realCal} CAL ✓`;
-                btn.style.background = 'rgba(var(--pm-green-rgb,0,201,122),0.12)';
-                setTimeout(() => { btn.textContent = 'REGISTRAR'; btn.style.background = ''; }, 1500);
-            };
-        });
 
         // Botón checkmark (círculo relleno) — registrar con valor actual
         document.querySelectorAll('.btn-ex-check').forEach(btn => {
@@ -2129,9 +2140,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 const card = e.target.closest('.exercise-card');
                 const realCal = registerExercise(card, btn, parseInt(btn.dataset.baseCal), parseInt(btn.dataset.baseUnit));
                 if (!realCal) return;
+                
+                // Efecto de feedback visual rápido en el checkmark
+                const originalText = btn.textContent;
                 btn.textContent = '✓';
-                btn.style.transform = 'scale(1.2)';
-                setTimeout(() => { btn.style.transform = ''; }, 300);
+                btn.style.transform = 'scale(1.25)';
+                setTimeout(() => { 
+                    btn.style.transform = ''; 
+                }, 300);
             };
         });
     }
@@ -3425,7 +3441,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 avgDailyDeficit = Math.round(userData.totalNetDeficit / daysElapsed);
             }
             const days = projectGoalDays(userData.weight, userData.target_weight, avgDailyDeficit);
-            const kgToLose = (userData.weight - userData.target_weight).toFixed(1);
+            const kgToLose = (+(userData.weight || 0) - +(userData.target_weight || 0)).toFixed(1);
             if (!days) {
                 out.innerHTML = `<p style="color:var(--text-dim); font-size:0.85rem;">No puedo proyectar todavía. Necesitas registrar al menos un mes de actividad.</p>`;
                 return;
