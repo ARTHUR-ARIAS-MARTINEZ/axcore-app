@@ -124,22 +124,42 @@
     var AXProfile = {
         // Guarda el nombre (sanitizado). Retorna true/false.
         saveName: function(name) {
+            console.log('[AXProfile] saveName called with:', name);
             var clean = sanitizeName(name);
-            if (!clean) return false;
+            if (!clean) {
+                console.warn('[AXProfile] saveName rejected: empty after sanitize');
+                return false;
+            }
+            // FORZAR DOM INMEDIATAMENTE — no esperar a writeProfile (por si falla)
+            try {
+                var hdr = document.getElementById('display-username');
+                if (hdr) {
+                    hdr.textContent = clean.toUpperCase();
+                    hdr.style.setProperty('color', '#ffffff', 'important');
+                    hdr.style.setProperty('display', 'block', 'important');
+                    hdr.style.setProperty('visibility', 'visible', 'important');
+                    hdr.style.setProperty('opacity', '1', 'important');
+                }
+            } catch(_) {}
+            // Sincroniza con userData para compatibilidad con código viejo
+            try {
+                if (window.userData) {
+                    window.userData.userName = clean;
+                    window.userData.username = clean;
+                }
+            } catch(_) {}
+            // Persistir
             var profile = readProfile();
             profile.name = clean;
             profile.updatedAt = Date.now();
             var ok = writeProfile(profile);
-            if (ok) {
-                // Sincroniza con userData para compatibilidad con código viejo
-                try {
-                    if (window.userData) {
-                        window.userData.userName = clean;
-                        window.userData.username = clean;
-                    }
-                } catch(_) {}
-                AXProfile.applyToDOM();
-            }
+            console.log('[AXProfile] saveName persist ok=' + ok + ' name=' + clean);
+            // Aplicar al DOM siempre (incluso si writeProfile falló)
+            AXProfile.applyToDOM();
+            // Reforzar con varios timers
+            setTimeout(AXProfile.applyToDOM, 50);
+            setTimeout(AXProfile.applyToDOM, 200);
+            setTimeout(AXProfile.applyToDOM, 800);
             return ok;
         },
 
@@ -223,17 +243,18 @@
             var nameUpper = name.toUpperCase();
             var photo = AXProfile.getPhoto();
 
-            // 1. HEADER — display-username
+            // 1. HEADER — display-username  (SIEMPRE actualiza, sin check)
             var header = document.getElementById('display-username');
             if (header) {
-                if (header.textContent.trim() !== nameUpper) {
-                    header.textContent = nameUpper;
-                }
+                header.textContent = nameUpper;
+                header.setAttribute('data-axprofile-name', nameUpper);
                 header.style.setProperty('color', '#ffffff', 'important');
                 header.style.setProperty('display', 'block', 'important');
                 header.style.setProperty('visibility', 'visible', 'important');
                 header.style.setProperty('opacity', '1', 'important');
                 header.style.setProperty('min-height', '18px', 'important');
+                header.style.setProperty('font-size', '1rem', 'important');
+                header.style.setProperty('font-weight', '700', 'important');
             }
 
             // 2. HEADER — avatar
@@ -287,10 +308,11 @@
         init: function() {
             // Aplicar inmediatamente
             AXProfile.applyToDOM();
+            console.log('[AXProfile] init — name=' + AXProfile.getName() + ' photo=' + (AXProfile.getPhoto() ? 'sí' : 'no'));
 
-            // Watchdog: aplica continuamente cada 800ms
+            // Watchdog: aplica continuamente cada 300ms
             // Esto neutraliza CUALQUIER código que limpie el header por error
-            setInterval(AXProfile.applyToDOM, 800);
+            setInterval(AXProfile.applyToDOM, 300);
 
             // Reaplica cuando localStorage cambia (otra tab)
             window.addEventListener('storage', function(e) {

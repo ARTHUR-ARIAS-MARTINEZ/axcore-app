@@ -1,4 +1,4 @@
-const CACHE_NAME = 'axcore-v5.4-profile-persist';
+const CACHE_NAME = 'axcore-v5.5-name-fix';
 const urlsToCache = [
   './',
   './index.html',

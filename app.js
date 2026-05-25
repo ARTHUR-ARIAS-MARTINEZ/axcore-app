@@ -336,11 +336,13 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.theme-buttons .theme-btn, .t-swatch').forEach(b => {
             b.classList.toggle('active', b.dataset.theme === activeTheme);
         });
-        // Nombre: jerarquía limpia — filtra placeholders en cada fuente antes de usar ||
+        // Nombre: PRIORIDAD #1 es AXProfile (clave inmune); luego jerarquía clásica
         const dispUser = document.getElementById('display-username');
         const _bset = new Set(['', 'atleta', 'admin', 'usuario']);
         const _san  = (v) => { const s=(v||'').toString().trim(); return _bset.has(s.toLowerCase()) ? '' : s; };
-        let nameToDisp = _san(userData.userName) || _san(userData.username) || _san(currentUser) || 'ATLETA';
+        let _axName = '';
+        try { if (window.AXProfile && typeof window.AXProfile.getName === 'function') _axName = window.AXProfile.getName() || ''; } catch(_) {}
+        let nameToDisp = _san(_axName) || _san(userData.userName) || _san(userData.username) || _san(currentUser) || 'ATLETA';
         if (dispUser) {
             dispUser.textContent = nameToDisp.toUpperCase();
             // Forzar visibilidad absoluta via inline style (gana sobre cualquier CSS)
@@ -1150,7 +1152,10 @@ document.addEventListener('DOMContentLoaded', () => {
     window.pmEditUserName = function() {
         try {
             const ud = window.userData || userData || {};
-            let cur = (ud.userName || '').trim();
+            // PRIORIDAD: AXProfile (clave inmune) > userData
+            let cur = '';
+            try { if (window.AXProfile && typeof window.AXProfile.getName === 'function') cur = (window.AXProfile.getName() || '').trim(); } catch(_) {}
+            if (!cur || cur.toLowerCase() === 'atleta') cur = (ud.userName || '').trim();
             const low = cur.toLowerCase();
             if (!cur || low === 'admin' || low === 'atleta' || low === 'usuario') cur = '';
 
@@ -1373,18 +1378,24 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const ud = window.userData || userData || {};
             // Jerarquía: userName (display elegido) → username (login) → currentUser (sesión) → USUARIO
-            // Jerarquía limpia: filtra placeholders en cada fuente antes del || fallback
+            // Jerarquía: PRIORIDAD #1 AXProfile (clave inmune); luego clave separada legacy; luego userData
             const _bset3 = new Set(['', 'atleta', 'admin', 'usuario']);
             const _san3  = (v) => { const s=(v||'').toString().trim(); return _bset3.has(s.toLowerCase()) ? '' : s; };
-            // PRIORIDAD: clave separada (inmune a sync) > userData > currentUser
+            let _axName3 = '', _axPhoto3 = null;
+            try {
+                if (window.AXProfile) {
+                    if (typeof window.AXProfile.getName === 'function')  _axName3  = window.AXProfile.getName()  || '';
+                    if (typeof window.AXProfile.getPhoto === 'function') _axPhoto3 = window.AXProfile.getPhoto() || null;
+                }
+            } catch(_) {}
             const _persistName = currentUser ? localStorage.getItem('axcore_uname_' + currentUser) : null;
             const _globalName  = localStorage.getItem('axcore_uname_global');
-            const raw = _san3(_persistName) || _san3(_globalName) || _san3(ud.userName) || _san3(ud.username) || _san3(currentUser) || 'ATLETA';
+            const raw = _san3(_axName3) || _san3(_persistName) || _san3(_globalName) || _san3(ud.userName) || _san3(ud.username) || _san3(currentUser) || 'ATLETA';
             const nameUp = raw.toUpperCase();
-            // Foto: prioridad clave separada > userData
+            // Foto: AXProfile primero
             const _persistPhoto = currentUser ? localStorage.getItem('axcore_avatar_' + currentUser) : null;
             const _globalPhoto  = localStorage.getItem('axcore_avatar_global');
-            const photo  = _persistPhoto || _globalPhoto || ud.avatarPhoto || ud.avatar || null;
+            const photo  = _axPhoto3 || _persistPhoto || _globalPhoto || ud.avatarPhoto || ud.avatar || null;
 
             // 1. Header superior: nombre y avatar
             const headerName = document.getElementById('display-username');
