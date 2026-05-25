@@ -8,9 +8,9 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0a0e14">
     <link rel="apple-touch-icon" href="logo.png">
-    <link rel="stylesheet" href="index.css?v=20260525d">
+    <link rel="stylesheet" href="index.css?v=20260525e">
     <!-- Premium UI overrides (inerte si <body> NO tiene .premium-mode) -->
-    <link rel="stylesheet" href="premium.css?v=20260525d">
+    <link rel="stylesheet" href="premium.css?v=20260525e">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <!-- Fuentes: Inter para cuerpos de texto, Oswald (Heavy Gym) para titulares -->
@@ -100,7 +100,10 @@
                     // Jerarquía limpia: filtra placeholders en cada fuente antes de usar ||
                     var _blk = ['', 'atleta', 'admin', 'usuario'];
                     var _clean = function(v) { var s=(v||'').toString().trim(); return _blk.indexOf(s.toLowerCase()) !== -1 ? '' : s; };
-                    var displayName = _clean(data.userName) || _clean(data.username) || _clean(u) || 'ATLETA';
+                    // PERSISTENCIA INMUNE: lee de la clave separada primero (no se sobreescribe)
+                    var _pName  = localStorage.getItem('axcore_uname_' + u)
+                               || localStorage.getItem('axcore_uname_global');
+                    var displayName = _clean(_pName) || _clean(data.userName) || _clean(data.username) || _clean(u) || 'ATLETA';
 
                     var du = document.getElementById('display-username');
                     if (du) {
@@ -111,10 +114,17 @@
                         du.style.opacity = '1';
                     }
 
-                    var photo = data.avatarPhoto || data.avatar;
+                    // PERSISTENCIA INMUNE: lee la foto de la clave separada (no se sobreescribe)
+                    var _pPhoto = localStorage.getItem('axcore_avatar_' + u)
+                               || localStorage.getItem('axcore_avatar_global');
+                    var photo = _pPhoto || data.avatarPhoto || data.avatar;
                     var ap = document.getElementById('avatar-preview');
                     if (photo && ap) {
-                        ap.style.background = 'url(' + photo + ') center/cover no-repeat';
+                        ap.style.setProperty('background-image', 'url("' + photo + '")', 'important');
+                        ap.style.setProperty('background-size', 'cover', 'important');
+                        ap.style.setProperty('background-position', 'center', 'important');
+                        ap.style.setProperty('background-repeat', 'no-repeat', 'important');
+                        ap.textContent = '';
                     } else if (ap && !photo) {
                         ap.textContent = (displayName[0] || 'A').toUpperCase();
                     }
@@ -861,10 +871,10 @@
     <!-- Gráficas (Al final para no bloquear inicio rápido) -->
     <script src="https://cdn.jsdelivr.net/npm/apexcharts" defer></script>
     <script src="knowledge.js?v=20260517d"></script>
-    <script src="app.js?v=20260525d"></script>
+    <script src="app.js?v=20260525e"></script>
     <!-- Premium UI: sistema de 100 insignias + FAB + onboarding -->
-    <script src="premium-badges.js?v=20260525d"></script>
-    <script src="premium-extras.js?v=20260525d"></script>
+    <script src="premium-badges.js?v=20260525e"></script>
+    <script src="premium-extras.js?v=20260525e"></script>
 
     <!-- REGISTRO GLOBAL — funciona aunque app.js falle -->
     <script>

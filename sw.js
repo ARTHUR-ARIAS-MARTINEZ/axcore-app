@@ -1,4 +1,4 @@
-const CACHE_NAME = 'axcore-v5.2-header-edit-fix';
+const CACHE_NAME = 'axcore-v5.3-persistence';
 const urlsToCache = [
   './',
   './index.html',

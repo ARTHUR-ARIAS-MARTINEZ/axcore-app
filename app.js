@@ -151,6 +151,57 @@ document.addEventListener('DOMContentLoaded', () => {
         if (typeof window.syncProfileEverywhere === 'function') window.syncProfileEverywhere();
     }, 400);
 
+    // ═══════════════════════════════════════════════════════════════
+    // WATCHDOG del header: MutationObserver que detecta si display-username
+    // se queda vacío y lo restaura desde la persistencia separada.
+    // Esto neutraliza CUALQUIER código que limpie el header por error.
+    // ═══════════════════════════════════════════════════════════════
+    setTimeout(function installHeaderWatchdog() {
+        try {
+            const target = document.getElementById('display-username');
+            if (!target || typeof MutationObserver === 'undefined') return;
+            const restoreName = () => {
+                const persist = (currentUser ? localStorage.getItem('axcore_uname_' + currentUser) : null)
+                             || localStorage.getItem('axcore_uname_global');
+                const candidate = (persist || (window.userData && (window.userData.userName || window.userData.username)) || currentUser || 'ATLETA').toString().trim();
+                const low = candidate.toLowerCase();
+                const blocked = ['', 'atleta', 'admin', 'usuario'];
+                const finalName = blocked.includes(low) ? 'ATLETA' : candidate;
+                if (target.textContent.trim() !== finalName.toUpperCase()) {
+                    target.textContent = finalName.toUpperCase();
+                    target.style.setProperty('color', '#ffffff', 'important');
+                    target.style.setProperty('display', 'block', 'important');
+                    target.style.setProperty('visibility', 'visible', 'important');
+                    target.style.setProperty('opacity', '1', 'important');
+                }
+                // También restaura el avatar si está vacío y hay foto persistida
+                const ap = document.getElementById('avatar-preview');
+                if (ap) {
+                    const persistPhoto = (currentUser ? localStorage.getItem('axcore_avatar_' + currentUser) : null)
+                                      || localStorage.getItem('axcore_avatar_global')
+                                      || (window.userData && (window.userData.avatarPhoto || window.userData.avatar));
+                    const hasBg = ap.style.backgroundImage && ap.style.backgroundImage !== 'none' && ap.style.backgroundImage.indexOf('url') >= 0;
+                    if (persistPhoto && !hasBg) {
+                        ap.style.setProperty('background-image', `url("${persistPhoto}")`, 'important');
+                        ap.style.setProperty('background-size', 'cover', 'important');
+                        ap.style.setProperty('background-position', 'center', 'important');
+                        ap.style.setProperty('background-repeat', 'no-repeat', 'important');
+                        ap.textContent = '';
+                    }
+                }
+            };
+            // Restauración inicial
+            restoreName();
+            // Observa cambios en el contenido del span; si se vacía, restaura
+            const obs = new MutationObserver(() => {
+                if (!target.textContent || !target.textContent.trim()) restoreName();
+            });
+            obs.observe(target, { childList: true, characterData: true, subtree: true });
+            // Y un latido cada 2s como red de seguridad
+            setInterval(restoreName, 2000);
+        } catch(e) { console.warn('[header-watchdog]', e.message); }
+    }, 500);
+
     function initAuth() {
         // ALWAYS pass auth check to bypass login overlay
         if (!currentUser) {
@@ -197,12 +248,26 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!userData.back) userData.back = 0;
             if (!userData.achievements) userData.achievements = [];
             // Normalizar: si userName está vacío O es un placeholder genérico,
-            // usar username de login o currentUser como fallback
+            // usar username de login, persistencia separada, o currentUser como fallback
             const _badNames = new Set(['', 'atleta', 'admin', 'usuario']);
             const _sanName  = (v) => { const s=(v||'').toString().trim(); return _badNames.has(s.toLowerCase()) ? '' : s; };
-            if (!_sanName(userData.userName)) {
-                const _fb = _sanName(userData.username) || _sanName(currentUser);
+            // PRIORIDAD: clave separada (inmune a sync) > userName guardado > username login > currentUser
+            const _persistedName = currentUser ? localStorage.getItem('axcore_uname_' + currentUser) : null;
+            const _globalName = localStorage.getItem('axcore_uname_global');
+            if (_sanName(_persistedName)) {
+                userData.userName = _persistedName.trim();
+            } else if (!_sanName(userData.userName)) {
+                const _fb = _sanName(_globalName) || _sanName(userData.username) || _sanName(currentUser);
                 if (_fb) userData.userName = _fb;
+            }
+            // PRIORIDAD avatar: clave separada (inmune a sync) > avatarPhoto guardado > avatar
+            if (currentUser) {
+                const _persistedAvatar = localStorage.getItem('axcore_avatar_' + currentUser)
+                                      || localStorage.getItem('axcore_avatar_global');
+                if (_persistedAvatar && !userData.avatarPhoto) {
+                    userData.avatarPhoto = _persistedAvatar;
+                    userData.avatar = _persistedAvatar;
+                }
             }
 
             // Reset diario de calorías
@@ -221,20 +286,35 @@ document.addEventListener('DOMContentLoaded', () => {
         updateDashboard();
 
         // Pull remoto en background — sobreescribe local si remote es más reciente
+        // PERO preserva nombre y foto locales (son tan importantes que NUNCA se sobreescriben
+        // por sync remoto; el push los enviará al backend la próxima vez).
         if (apiToken()) {
             pullRemoteData().then(remote => {
                 if (!remote) return;
                 const remoteSync = remote.lastSync ? new Date(remote.lastSync).getTime() : 0;
                 const localSync  = userData.lastSync ? new Date(userData.lastSync).getTime() : 0;
                 if (remoteSync > localSync && remote.data && Object.keys(remote.data).length > 0) {
+                    // Capturar locales antes del merge
+                    const _localName   = userData.userName;
+                    const _localUser   = userData.username;
+                    const _localAvatar = userData.avatarPhoto || userData.avatar;
                     userData = { ...userData, ...remote.data };
+                    // Restaurar identidad local si remote viene vacío o con placeholder
+                    const _bad = new Set(['', 'atleta', 'admin', 'usuario']);
+                    const _ok  = v => v && !_bad.has(String(v).trim().toLowerCase());
+                    if (_ok(_localName))   userData.userName = _localName;
+                    if (_ok(_localUser))   userData.username = _localUser;
+                    if (_localAvatar) {
+                        userData.avatarPhoto = _localAvatar;
+                        userData.avatar      = _localAvatar;
+                    }
                     userData.lastSync = remote.lastSync;
                     if (Array.isArray(remote.achievements)) userData.achievements = remote.achievements;
                     window.userData = userData;
                     localStorage.setItem(getStorageKey(), JSON.stringify(userData));
                     applySettings();
                     updateDashboard();
-                    console.log('[sync] datos restaurados desde la nube.');
+                    console.log('[sync] datos restaurados desde la nube (identidad local preservada).');
                 }
             });
         }
@@ -1088,6 +1168,12 @@ document.addEventListener('DOMContentLoaded', () => {
             // Mantener window.userData en sincronía (otras funciones pueden leerlo)
             window.userData = userData;
             saveData();
+            // PERSISTENCIA INMUNE: guarda en clave separada que NO se ve afectada
+            // por pullRemoteData() ni por ningún otro overwrite de userData
+            try {
+                if (currentUser) localStorage.setItem('axcore_uname_' + currentUser, newName);
+                localStorage.setItem('axcore_uname_global', newName);
+            } catch(_) {}
             // Sincronizar TODO ahora y otra vez tras un tick para vencer cualquier
             // posible re-render asíncrono que podría sobreescribir el header
             if (typeof window.syncProfileEverywhere === 'function') {
@@ -1251,6 +1337,15 @@ document.addEventListener('DOMContentLoaded', () => {
         userData.avatar = dataUrl; // Mantener ambas propiedades sincronizadas
         window.userData = userData;
         saveData();
+        // PERSISTENCIA INMUNE: guarda foto en clave separada que NO se sobreescribe
+        // con pullRemoteData() ni con ningún reset de userData
+        try {
+            if (currentUser) localStorage.setItem('axcore_avatar_' + currentUser, dataUrl);
+            localStorage.setItem('axcore_avatar_global', dataUrl);
+        } catch(e) {
+            // Si excede cuota (foto muy grande), seguimos con userData ya guardado
+            console.warn('[pmSaveAvatar] localStorage cuota:', e.message);
+        }
         // Forzar update directo del avatar del header (gana a cualquier CSS)
         const headerAvatar = document.getElementById('avatar-preview');
         if (headerAvatar) {
@@ -1259,6 +1354,15 @@ document.addEventListener('DOMContentLoaded', () => {
             headerAvatar.style.setProperty('background-position', 'center', 'important');
             headerAvatar.style.setProperty('background-repeat', 'no-repeat', 'important');
             headerAvatar.textContent = '';
+        }
+        // Forzar update también del avatar de Ajustes
+        const pmAv = document.getElementById('pmProfAvatar');
+        if (pmAv) {
+            pmAv.style.setProperty('background-image', `url("${dataUrl}")`, 'important');
+            pmAv.style.setProperty('background-size', 'cover', 'important');
+            pmAv.style.setProperty('background-position', 'center', 'important');
+            pmAv.style.setProperty('background-repeat', 'no-repeat', 'important');
+            pmAv.textContent = '';
         }
         // Sincronizar TODO ahora y dos veces más para vencer re-renders asíncronos
         if (typeof window.syncProfileEverywhere === 'function') {
@@ -1296,9 +1400,15 @@ document.addEventListener('DOMContentLoaded', () => {
             // Jerarquía limpia: filtra placeholders en cada fuente antes del || fallback
             const _bset3 = new Set(['', 'atleta', 'admin', 'usuario']);
             const _san3  = (v) => { const s=(v||'').toString().trim(); return _bset3.has(s.toLowerCase()) ? '' : s; };
-            const raw = _san3(ud.userName) || _san3(ud.username) || _san3(currentUser) || 'ATLETA';
+            // PRIORIDAD: clave separada (inmune a sync) > userData > currentUser
+            const _persistName = currentUser ? localStorage.getItem('axcore_uname_' + currentUser) : null;
+            const _globalName  = localStorage.getItem('axcore_uname_global');
+            const raw = _san3(_persistName) || _san3(_globalName) || _san3(ud.userName) || _san3(ud.username) || _san3(currentUser) || 'ATLETA';
             const nameUp = raw.toUpperCase();
-            const photo  = ud.avatarPhoto || ud.avatar || null;
+            // Foto: prioridad clave separada > userData
+            const _persistPhoto = currentUser ? localStorage.getItem('axcore_avatar_' + currentUser) : null;
+            const _globalPhoto  = localStorage.getItem('axcore_avatar_global');
+            const photo  = _persistPhoto || _globalPhoto || ud.avatarPhoto || ud.avatar || null;
 
             // 1. Header superior: nombre y avatar
             const headerName = document.getElementById('display-username');
