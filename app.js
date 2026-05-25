@@ -270,32 +270,24 @@ document.addEventListener('DOMContentLoaded', () => {
             dispUser.style.setProperty('opacity', '1', 'important');
         }
         const photoSrc = userData.avatarPhoto || userData.avatar;
-        if (photoSrc) {
-            const ap = document.getElementById('avatar-preview');
-            // Usar background shorthand (inline style siempre supera CSS externo sin !important)
-            if (ap) ap.style.background = `url(${photoSrc}) center/cover no-repeat`;
+        const ap = document.getElementById('avatar-preview');
+        if (ap) {
+            if (photoSrc) {
+                ap.style.setProperty('background-image', `url("${photoSrc}")`, 'important');
+                ap.style.setProperty('background-size', 'cover', 'important');
+                ap.style.setProperty('background-position', 'center', 'important');
+                ap.style.setProperty('background-repeat', 'no-repeat', 'important');
+                ap.textContent = '';
+            } else {
+                ap.style.removeProperty('background-image');
+                ap.textContent = (nameToDisp[0] || 'A').toUpperCase();
+            }
         }
 
-        // Listener para avatar
-        const avatarEl = document.getElementById('avatar-preview');
-        const uploadEl = document.getElementById('avatar-upload');
-        if (avatarEl && uploadEl) {
-            avatarEl.onclick = () => uploadEl.click();
-            uploadEl.onchange = (e) => {
-                const file = e.target.files[0];
-                if (!file) return;
-                const reader = new FileReader();
-                reader.onload = (f) => {
-                    const base64 = f.target.result;
-                    userData.avatar = base64;
-                    userData.avatarPhoto = base64;
-                    saveData();
-                    // Sincronizar en toda la interfaz
-                    if (typeof window.syncProfileEverywhere === 'function') window.syncProfileEverywhere();
-                };
-                reader.readAsDataURL(file);
-            };
-        }
+        // NOTA: La edición de foto y nombre se hace SOLO desde la sección Ajustes.
+        // El avatar del header ya NO abre selector de archivos; el onclick de la badge
+        // navega a Ajustes (definido en index.html). No registramos onclick aquí porque
+        // sobrescribiría el del HTML.
 
         const unEl = document.getElementById('input-username');
         let initialInputVal = (userData.userName || userData.username || '').trim();
@@ -1093,9 +1085,20 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             userData.userName = newName;
             userData.username = newName;
+            // Mantener window.userData en sincronía (otras funciones pueden leerlo)
+            window.userData = userData;
             saveData();
-            // Sincronizar en toda la interfaz con una sola llamada
-            if (typeof window.syncProfileEverywhere === 'function') window.syncProfileEverywhere();
+            // Sincronizar TODO ahora y otra vez tras un tick para vencer cualquier
+            // posible re-render asíncrono que podría sobreescribir el header
+            if (typeof window.syncProfileEverywhere === 'function') {
+                window.syncProfileEverywhere();
+                setTimeout(window.syncProfileEverywhere, 50);
+                setTimeout(window.syncProfileEverywhere, 250);
+            }
+            // Forzar también applySettings (vuelve a poner el nombre con inline !important)
+            if (typeof applySettings === 'function') {
+                try { applySettings(); } catch(_) {}
+            }
             pmShowToast('✓ Nombre actualizado', 'green');
         } catch (e) { console.warn('[pmApplyNewName]', e.message); }
     }
@@ -1246,9 +1249,23 @@ document.addEventListener('DOMContentLoaded', () => {
     function pmSaveAvatar(dataUrl) {
         userData.avatarPhoto = dataUrl;
         userData.avatar = dataUrl; // Mantener ambas propiedades sincronizadas
+        window.userData = userData;
         saveData();
-        // Sincronizar en toda la interfaz con una sola llamada
-        if (typeof window.syncProfileEverywhere === 'function') window.syncProfileEverywhere();
+        // Forzar update directo del avatar del header (gana a cualquier CSS)
+        const headerAvatar = document.getElementById('avatar-preview');
+        if (headerAvatar) {
+            headerAvatar.style.setProperty('background-image', `url("${dataUrl}")`, 'important');
+            headerAvatar.style.setProperty('background-size', 'cover', 'important');
+            headerAvatar.style.setProperty('background-position', 'center', 'important');
+            headerAvatar.style.setProperty('background-repeat', 'no-repeat', 'important');
+            headerAvatar.textContent = '';
+        }
+        // Sincronizar TODO ahora y dos veces más para vencer re-renders asíncronos
+        if (typeof window.syncProfileEverywhere === 'function') {
+            window.syncProfileEverywhere();
+            setTimeout(window.syncProfileEverywhere, 50);
+            setTimeout(window.syncProfileEverywhere, 250);
+        }
         pmShowToast('✓ Foto actualizada', 'green');
     }
 
@@ -1297,13 +1314,19 @@ document.addEventListener('DOMContentLoaded', () => {
             const headerAvatar = document.getElementById('avatar-preview');
             if (headerAvatar) {
                 if (photo) {
-                    // Usar background shorthand → supera al CSS externo sin !important
-                    headerAvatar.style.background = `url(${photo}) center/cover no-repeat`;
+                    // Usar setProperty con !important para vencer cualquier regla CSS
+                    headerAvatar.style.setProperty('background-image', `url("${photo}")`, 'important');
+                    headerAvatar.style.setProperty('background-size', 'cover', 'important');
+                    headerAvatar.style.setProperty('background-position', 'center', 'important');
+                    headerAvatar.style.setProperty('background-repeat', 'no-repeat', 'important');
                     headerAvatar.textContent = '';
                 } else {
-                    // Sin foto: limpiar inline para que el CSS (gradiente) tome el control
-                    headerAvatar.style.background = '';
-                    headerAvatar.textContent = (raw[0] || 'U').toUpperCase();
+                    // Sin foto: limpiar inline para que el CSS (gradiente + inicial) tome el control
+                    headerAvatar.style.removeProperty('background-image');
+                    headerAvatar.style.removeProperty('background-size');
+                    headerAvatar.style.removeProperty('background-position');
+                    headerAvatar.style.removeProperty('background-repeat');
+                    headerAvatar.textContent = (raw[0] || 'A').toUpperCase();
                 }
             }
 
@@ -1423,6 +1446,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (pageId === 'settings' && typeof window.syncPremiumToggleVisual === 'function') window.syncPremiumToggleVisual();
             if (pageId === 'settings' && typeof window.updatePmProfileHero === 'function') window.updatePmProfileHero();
             if (pageId === 'settings' && typeof window.pmSyncInstallRow === 'function') window.pmSyncInstallRow();
+
+            // SIEMPRE re-sincronizar el header al cambiar de página — garantiza
+            // que el nombre y la foto del header reflejen los cambios hechos en Ajustes
+            if (typeof window.syncProfileEverywhere === 'function') window.syncProfileEverywhere();
 
             // Sincronizar bottom nav premium
             document.querySelectorAll('.pm-nav-btn').forEach(btn => {
