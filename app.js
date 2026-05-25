@@ -183,6 +183,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!userData.forearm) userData.forearm = 0;
             if (!userData.back) userData.back = 0;
             if (!userData.achievements) userData.achievements = [];
+            // Normalizar: si userName (display) está vacío, popularlo desde username (login)
+            if (!userData.userName && userData.username) {
+                userData.userName = userData.username;
+            }
 
             // Reset diario de calorías
             const today = new Date().toDateString();
@@ -235,8 +239,9 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.theme-buttons .theme-btn, .t-swatch').forEach(b => {
             b.classList.toggle('active', b.dataset.theme === activeTheme);
         });
+        // Nombre: usar userName (display) con fallback a username (login)
         const dispUser = document.getElementById('display-username');
-        let nameToDisp = (userData.userName || '').trim();
+        let nameToDisp = (userData.userName || userData.username || '').trim();
         const lowName = nameToDisp.toLowerCase();
         if (!nameToDisp || lowName === 'atleta' || lowName === 'admin' || lowName === 'usuario') {
             nameToDisp = 'USUARIO';
@@ -271,7 +276,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const unEl = document.getElementById('input-username');
-        let initialInputVal = (userData.userName || '').trim();
+        let initialInputVal = (userData.userName || userData.username || '').trim();
         const lowInputVal = initialInputVal.toLowerCase();
         if (lowInputVal === 'admin' || lowInputVal === 'atleta' || lowInputVal === 'usuario') {
             initialInputVal = '';
@@ -286,7 +291,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Logros Spans
         const achUser = document.getElementById('ach-username');
-        let achName = (userData.userName || '').trim();
+        let achName = (userData.userName || userData.username || '').trim();
         const lowAch = achName.toLowerCase();
         if (!achName || lowAch === 'admin' || lowAch === 'atleta' || lowAch === 'usuario') {
             achName = 'USUARIO';
@@ -296,6 +301,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (achDef) achDef.textContent = userData.totalNetDeficit || 0;
         const achWaist = document.getElementById('ach-waist');
         if (achWaist) achWaist.textContent = userData.waist || 0;
+
+        // Sincronizar nombre y avatar en toda la interfaz (usa ambas propiedades userName/username)
+        if (typeof window.syncProfileEverywhere === 'function') window.syncProfileEverywhere();
     }
 
     // ============================================================
