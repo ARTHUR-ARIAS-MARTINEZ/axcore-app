@@ -260,10 +260,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 reader.onload = (f) => {
                     const base64 = f.target.result;
                     userData.avatar = base64;
-                    userData.avatarPhoto = base64; // Sincronización para ajustes premium
-                    avatarEl.style.backgroundImage = `url(${base64})`;
+                    userData.avatarPhoto = base64;
                     saveData();
-                    if (typeof window.updatePmProfileHero === 'function') window.updatePmProfileHero();
+                    // Sincronizar en toda la interfaz
+                    if (typeof window.syncProfileEverywhere === 'function') window.syncProfileEverywhere();
                 };
                 reader.readAsDataURL(file);
             };
@@ -1067,14 +1067,8 @@ document.addEventListener('DOMContentLoaded', () => {
             userData.userName = newName;
             userData.username = newName;
             saveData();
-            let nameToDisp = newName;
-            const low = nameToDisp.toLowerCase();
-            if (!nameToDisp || low === 'atleta' || low === 'admin' || low === 'usuario') nameToDisp = 'USUARIO';
-            if (typeof window.updatePmProfileHero === 'function') window.updatePmProfileHero();
-            const row = document.getElementById('pmSRowName');
-            if (row) row.textContent = nameToDisp.toUpperCase() + ' ›';
-            const du = document.getElementById('display-username');
-            if (du) du.textContent = nameToDisp.toUpperCase();
+            // Sincronizar en toda la interfaz con una sola llamada
+            if (typeof window.syncProfileEverywhere === 'function') window.syncProfileEverywhere();
             pmShowToast('✓ Nombre actualizado', 'green');
         } catch (e) { console.warn('[pmApplyNewName]', e.message); }
     }
@@ -1224,11 +1218,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function pmSaveAvatar(dataUrl) {
         userData.avatarPhoto = dataUrl;
+        userData.avatar = dataUrl; // Mantener ambas propiedades sincronizadas
         saveData();
-        if (typeof window.updatePmProfileHero === 'function') window.updatePmProfileHero();
-        // Actualizar también el avatar del header
-        const ap = document.getElementById('avatar-preview');
-        if (ap) { ap.style.backgroundImage = `url(${dataUrl})`; ap.style.backgroundSize = 'cover'; }
+        // Sincronizar en toda la interfaz con una sola llamada
+        if (typeof window.syncProfileEverywhere === 'function') window.syncProfileEverywhere();
         pmShowToast('✓ Foto actualizada', 'green');
     }
 
@@ -1244,6 +1237,65 @@ document.addEventListener('DOMContentLoaded', () => {
             val.textContent = 'NO DISPONIBLE ›';
             val.classList.remove('available');
         }
+    };
+
+    // ═══════════════ SINCRONIZACIÓN DE PERFIL EN TODA LA INTERFAZ ═══════════════
+    /**
+     * syncProfileEverywhere — actualiza nombre y foto de perfil en TODOS los
+     * elementos visuales de la app: header, hero de ajustes, logros, etc.
+     * Llámala siempre que el nombre o la foto cambie.
+     */
+    window.syncProfileEverywhere = function() {
+        try {
+            const ud = window.userData || userData || {};
+            let raw  = (ud.userName || ud.username || '').toString().trim();
+            const low = raw.toLowerCase();
+            if (!raw || low === 'atleta' || low === 'admin' || low === 'usuario') raw = 'USUARIO';
+            const nameUp = raw.toUpperCase();
+            const photo  = ud.avatarPhoto || ud.avatar || null;
+
+            // 1. Header superior: nombre y avatar
+            const headerName = document.getElementById('display-username');
+            if (headerName) headerName.textContent = nameUp;
+
+            const headerAvatar = document.getElementById('avatar-preview');
+            if (headerAvatar) {
+                if (photo) {
+                    headerAvatar.style.backgroundImage = `url(${photo})`;
+                    headerAvatar.style.backgroundSize  = 'cover';
+                } else {
+                    headerAvatar.style.backgroundImage = '';
+                    headerAvatar.style.backgroundSize  = '';
+                }
+            }
+
+            // 2. Hero del perfil en Ajustes
+            const pmAvatar = document.getElementById('pmProfAvatar');
+            if (pmAvatar) {
+                if (photo) {
+                    pmAvatar.style.background = `url(${photo}) center/cover`;
+                    pmAvatar.textContent = '';
+                } else {
+                    pmAvatar.style.background = '';
+                    pmAvatar.textContent = (raw[0] || 'A').toUpperCase();
+                }
+            }
+            const pmName = document.getElementById('pmProfName');
+            if (pmName) pmName.textContent = nameUp + ' ✎';
+
+            // 3. Fila iOS de nombre en Ajustes
+            const pmRowName = document.getElementById('pmSRowName');
+            if (pmRowName) pmRowName.textContent = nameUp + ' ›';
+
+            // 4. Sección de Logros
+            const achUser = document.getElementById('ach-username');
+            if (achUser) achUser.textContent = nameUp;
+
+            // 5. Input de nombre en ajustes legacy (solo si no es el nombre placeholder)
+            const legacyInput = document.getElementById('input-username');
+            if (legacyInput && raw !== 'USUARIO') legacyInput.value = raw;
+
+        } catch (e) { console.warn('[syncProfileEverywhere]', e.message); }
     };
 
     // ═══════════════ PROFILE HERO (Ajustes premium) ═══════════════
@@ -2122,18 +2174,46 @@ document.addEventListener('DOMContentLoaded', () => {
     // SHARE BUTTONS
     const btnShareApp = document.getElementById('btn-share-app');
     if (btnShareApp) {
-        btnShareApp.onclick = () => {
-            if (navigator.share) {
-                navigator.share({
-                    title: 'AX-CORE By Arthur',
-                    text: 'Únete a la vanguardia de la optimización biológica con AX-CORE.',
-                    url: 'https://arthur-arias-martinez.github.io/axcore-app/'
-                }).catch(err => console.error("Error share app:", err));
-            } else {
-                alert("Tu dispositivo no soporta compartir nativo. Copia este enlace: https://arthur-arias-martinez.github.io/axcore-app/");
-            }
-        };
+        btnShareApp.onclick = () => pmShareApp();
     }
+
+    // ── Funciones globales de compartir e instalar (llamadas desde ajustes) ──
+    window.pmShareApp = function() {
+        const APP_URL = 'https://arthur-arias-martinez.github.io/axcore-app/';
+        if (navigator.share) {
+            navigator.share({
+                title: 'AX-CORE By Arthur',
+                text: 'Únete a la vanguardia de la optimización biológica con AX-CORE.',
+                url: APP_URL
+            }).catch(err => console.warn('[pmShareApp]', err));
+        } else {
+            // Fallback: copiar al portapapeles
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(APP_URL).then(() => {
+                    pmShowToast('🔗 Enlace copiado', 'blue');
+                }).catch(() => pmShowToast('Enlace: ' + APP_URL, 'blue'));
+            } else {
+                pmShowToast('Enlace: ' + APP_URL, 'blue');
+            }
+        }
+    };
+
+    window.pmInstallApp = function() {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then(result => {
+                if (result.outcome === 'accepted') {
+                    pmShowToast('✓ App instalada', 'green');
+                } else {
+                    pmShowToast('Instalación cancelada', 'blue');
+                }
+                deferredPrompt = null;
+                if (typeof window.pmSyncInstallRow === 'function') window.pmSyncInstallRow();
+            });
+        } else {
+            pmShowToast('Ya está instalada o no disponible', 'blue');
+        }
+    };
 
     // Helper para cargar imágenes
     async function loadCanvasImage(src) {
@@ -3102,16 +3182,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 const newName = unInput.value.trim();
                 userData.username = newName;
                 userData.userName = newName;
-                let nameToDisp = newName;
-                const low = nameToDisp.toLowerCase();
-                if (!nameToDisp || low === 'atleta' || low === 'admin' || low === 'usuario') nameToDisp = 'USUARIO';
-                const du = document.getElementById('display-username');
-                if (du) du.textContent = nameToDisp.toUpperCase();
-                if (typeof window.updatePmProfileHero === 'function') window.updatePmProfileHero();
-                const row = document.getElementById('pmSRowName');
-                if (row) row.textContent = nameToDisp.toUpperCase() + ' ›';
             }
             saveData();
+            // Sincronizar en toda la interfaz
+            if (typeof window.syncProfileEverywhere === 'function') window.syncProfileEverywhere();
         };
     }
 

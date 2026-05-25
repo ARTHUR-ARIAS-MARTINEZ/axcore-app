@@ -1,4 +1,4 @@
-const CACHE_NAME = 'axcore-v4.4-temas-fix';
+const CACHE_NAME = 'axcore-v4.5-profile-sync';
 const urlsToCache = [
   './',
   './index.html',
