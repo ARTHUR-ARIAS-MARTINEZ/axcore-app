@@ -38,72 +38,76 @@
     --text-dim: #9aa58c;
 }
 
+/* ── FEMENINO 1: HOT PINK ÉLITE — fucsia profundo ── */
 [data-theme="pink"] {
-    --bg-dark: #12091c;
-    --accent-main: #ff6b9d;
-    --accent-secondary: #ffc857;
+    --bg-dark: #130816;
+    --accent-main: #f72585;
+    --accent-secondary: #ff9de2;
     --accent-alert: #ff4757;
-    --glass: rgba(255, 107, 157, 0.08);
-    --glass-border: rgba(255, 107, 157, 0.35);
-    --neon-glow: 0 0 8px rgba(255, 107, 157, 0.4), 0 0 16px rgba(255, 200, 87, 0.2);
-    --text-dim: #c49aaf;
+    --glass: rgba(247, 37, 133, 0.08);
+    --glass-border: rgba(247, 37, 133, 0.35);
+    --neon-glow: 0 0 12px rgba(247, 37, 133, 0.5), 0 0 24px rgba(255, 157, 226, 0.2);
+    --text-dim: #c48aaf;
 }
 
+/* ── FEMENINO 2: VIOLETA ÉLITE — morado eléctrico ── */
 [data-theme="salmon"] {
-    --bg-dark: #1a0f0d;
-    --accent-main: #ff7e67;
-    --accent-secondary: #ff9985;
-    --accent-alert: #d32f2f;
-    --glass: rgba(255, 126, 103, 0.08);
-    --glass-border: rgba(255, 126, 103, 0.35);
-    --neon-glow: 0 0 8px rgba(255, 126, 103, 0.4), 0 0 16px rgba(255, 153, 133, 0.2);
-    --text-dim: #c29d95;
+    --bg-dark: #07040f;
+    --accent-main: #9b5de5;
+    --accent-secondary: #f15bb5;
+    --accent-alert: #ff4488;
+    --glass: rgba(155, 93, 229, 0.08);
+    --glass-border: rgba(155, 93, 229, 0.35);
+    --neon-glow: 0 0 12px rgba(155, 93, 229, 0.5), 0 0 24px rgba(241, 91, 181, 0.25);
+    --text-dim: #9d7abf;
 }
 
+/* ── FEMENINO 3: AURORA BOREALIS — teal-violeta oscuro ── */
 [data-theme="pastel"] {
-    --bg-dark: #f5f7fb; 
-    --accent-main: #ffb6c1;       
-    --accent-secondary: #add8e6;  
-    --accent-alert: #ff9999;      
-    --glass: rgba(255, 255, 255, 0.9);
-    --glass-border: rgba(255, 182, 193, 0.4);
-    --neon-glow: 0 8px 25px rgba(0, 0, 0, 0.05); 
-    --text-primary: #333333;      
-    --text-dim: #777777;
-    --glass-bg: rgba(255, 255, 255, 0.6);
+    --bg-dark: #060d14;
+    --accent-main: #00d4aa;
+    --accent-secondary: #c77dff;
+    --accent-alert: #ff6b9d;
+    --glass: rgba(0, 212, 170, 0.08);
+    --glass-border: rgba(0, 212, 170, 0.30);
+    --neon-glow: 0 0 12px rgba(0, 212, 170, 0.45), 0 0 24px rgba(199, 125, 255, 0.25);
+    --text-dim: #7aacb0;
 }
 
+/* ── LGBTQ+ 1: PRIDE FIRE — arcoíris cálido, naranja-dorado ── */
 [data-theme="pride"] {
-    --bg-dark: #110e1a;
-    --accent-main: #ff0000;
-    --accent-secondary: #00e5ff;
-    --accent-alert: #ffff00;
-    --glass: rgba(255, 255, 255, 0.08);
-    --glass-border: rgba(255, 255, 255, 0.3);
-    --neon-glow: 0 0 10px rgba(255, 0, 0, 0.4), 0 0 20px rgba(0, 229, 255, 0.2);
-    --text-dim: #c2c0d1;
+    --bg-dark: #0e0600;
+    --accent-main: #ff6b00;
+    --accent-secondary: #ffd000;
+    --accent-alert: #ff2222;
+    --glass: rgba(255, 107, 0, 0.09);
+    --glass-border: rgba(255, 107, 0, 0.35);
+    --neon-glow: 0 0 12px rgba(255, 107, 0, 0.5), 0 0 24px rgba(255, 208, 0, 0.3);
+    --text-dim: #c2a070;
 }
 
+/* ── LGBTQ+ 2: TRANS AZURE — azul cielo + rosa intenso ── */
 [data-theme="trans"] {
-    --bg-dark: #0a111a;
-    --accent-main: #5bcefa;
-    --accent-secondary: #f5a9b8;
+    --bg-dark: #020c1b;
+    --accent-main: #00b4d8;
+    --accent-secondary: #ff70a6;
     --accent-alert: #ffffff;
-    --glass: rgba(91, 206, 250, 0.08);
-    --glass-border: rgba(245, 169, 184, 0.35);
-    --neon-glow: 0 0 10px rgba(91, 206, 250, 0.4), 0 0 15px rgba(245, 169, 184, 0.2);
-    --text-dim: #9ab4c2;
+    --glass: rgba(0, 180, 216, 0.08);
+    --glass-border: rgba(0, 180, 216, 0.35);
+    --neon-glow: 0 0 12px rgba(0, 180, 216, 0.5), 0 0 24px rgba(255, 112, 166, 0.3);
+    --text-dim: #70aec2;
 }
 
+/* ── LGBTQ+ 3: NEON BI — rojo-magenta + azul eléctrico ── */
 [data-theme="neon-bi"] {
-    --bg-dark: #0f0514;
-    --accent-main: #d60270;
-    --accent-secondary: #0038a8;
+    --bg-dark: #090010;
+    --accent-main: #e8185d;
+    --accent-secondary: #4361ee;
     --accent-alert: #9b4f96;
-    --glass: rgba(214, 2, 112, 0.08);
-    --glass-border: rgba(155, 79, 150, 0.35);
-    --neon-glow: 0 0 10px rgba(214, 2, 112, 0.4), 0 0 20px rgba(0, 56, 168, 0.3);
-    --text-dim: #a98fb3;
+    --glass: rgba(232, 24, 93, 0.09);
+    --glass-border: rgba(232, 24, 93, 0.35);
+    --neon-glow: 0 0 12px rgba(232, 24, 93, 0.5), 0 0 24px rgba(67, 97, 238, 0.35);
+    --text-dim: #a870a8;
 }
 
 * {

@@ -1166,8 +1166,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const toastFn = typeof pmShowToast === 'function' ? pmShowToast : null;
             if (toastFn) {
                 const nombres = { black:'ULTRA DARK', cyberpunk:'CYBERPUNK', military:'MILITAR',
-                                  pink:'PREMIUM ROSA', salmon:'SALMÓN', pastel:'PASTELES',
-                                  pride:'PRIDE', trans:'TRANS PRIDE', 'neon-bi':'NEON BI',
+                                  pink:'HOT PINK', salmon:'VIOLETA', pastel:'AURORA',
+                                  pride:'PRIDE FIRE', trans:'TRANS AZURE', 'neon-bi':'NEON BI',
                                   neon:'NEON', original:'GOLD ELITE', fuchsia:'CORAL GLOW',
                                   dark:'DARK', natural:'ZEN', tactical:'TACTICAL', rainbow:'RAINBOW' };
                 toastFn('✦ Tema: ' + (nombres[themeName] || themeName.toUpperCase()), 'green');
@@ -3094,31 +3094,26 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    saveSettingsBtn.onclick = () => {
-        // Guardar nombre de usuario
-        const unInput = document.getElementById('input-username');
-        if (unInput) {
-            const newName = unInput.value.trim();
-            userData.username = newName;
-            userData.userName = newName;
-            
-            let nameToDisp = newName;
-            const low = nameToDisp.toLowerCase();
-            if (!nameToDisp || low === 'atleta' || low === 'admin' || low === 'usuario') {
-                nameToDisp = 'USUARIO';
+    // saveSettingsBtn puede ser null si el elemento legacy fue eliminado del HTML
+    if (saveSettingsBtn) {
+        saveSettingsBtn.onclick = () => {
+            const unInput = document.getElementById('input-username');
+            if (unInput) {
+                const newName = unInput.value.trim();
+                userData.username = newName;
+                userData.userName = newName;
+                let nameToDisp = newName;
+                const low = nameToDisp.toLowerCase();
+                if (!nameToDisp || low === 'atleta' || low === 'admin' || low === 'usuario') nameToDisp = 'USUARIO';
+                const du = document.getElementById('display-username');
+                if (du) du.textContent = nameToDisp.toUpperCase();
+                if (typeof window.updatePmProfileHero === 'function') window.updatePmProfileHero();
+                const row = document.getElementById('pmSRowName');
+                if (row) row.textContent = nameToDisp.toUpperCase() + ' ›';
             }
-            
-            // Sync visual
-            const du = document.getElementById('display-username');
-            if (du) du.textContent = nameToDisp.toUpperCase();
-            
-            if (typeof window.updatePmProfileHero === 'function') window.updatePmProfileHero();
-            const row = document.getElementById('pmSRowName');
-            if (row) row.textContent = nameToDisp.toUpperCase() + ' ›';
-        }
-        saveData();
-        alert("Configuración guardada.");
-    };
+            saveData();
+        };
+    }
 
     saveMeasurementsBtn.onclick = () => {
         const h = parseFloat(document.getElementById('input-height').value);
