@@ -616,23 +616,24 @@ body.premium-mode .workout-plan {
   background: rgba(13,24,38,0.7) !important;
   border: 1px solid var(--pm-border) !important;
   border-radius: var(--pm-r) !important;
+  padding: 1rem !important; /* Reducido un poco para dar más espacio */
 }
 
 body.premium-mode .stopwatch-container {
   background: linear-gradient(135deg, var(--pm-s2), var(--pm-s1)) !important;
   border: 1px solid var(--pm-border2) !important;
   border-radius: var(--pm-r) !important;
-  padding: 2rem 1.5rem !important;
+  padding: 1.1rem 1rem !important; /* Reducido de 2rem 1.5rem (30%) */
   text-align: center !important;
-  box-shadow: 0 0 40px rgba(var(--pm-green-rgb), 0.06), 0 16px 40px rgba(0,0,0,0.3) !important;
+  box-shadow: 0 0 30px rgba(var(--pm-green-rgb), 0.05), 0 12px 30px rgba(0,0,0,0.3) !important;
 }
 body.premium-mode #sw-display {
   font-family: 'Oswald', sans-serif !important;
-  font-size: 2.4rem !important;
+  font-size: 1.68rem !important; /* Reducido ~30% de 2.4rem */
   font-weight: 700 !important;
   letter-spacing: 2px !important;
   color: var(--pm-white) !important;
-  text-shadow: 0 0 20px rgba(var(--pm-green-rgb), 0.3) !important;
+  text-shadow: 0 0 15px rgba(var(--pm-green-rgb), 0.25) !important;
   font-variant-numeric: tabular-nums !important;
 }
 body.premium-mode #btn-sw-start {
@@ -641,7 +642,7 @@ body.premium-mode #btn-sw-start {
   border-radius: 99px !important;
   font-family: 'Oswald', sans-serif !important;
   letter-spacing: 2px !important;
-  box-shadow: 0 4px 16px rgba(var(--pm-green-rgb), 0.35) !important;
+  box-shadow: 0 4px 12px rgba(var(--pm-green-rgb), 0.25) !important;
 }
 body.premium-mode #btn-sw-stop {
   background: rgba(var(--pm-cyan-rgb), 0.1) !important;
@@ -665,14 +666,16 @@ body.premium-mode .pm-workout-filters {
   scrollbar-width: none;
   -ms-overflow-style: none;
   flex-shrink: 0;
+  flex-wrap: nowrap !important;
+  white-space: nowrap !important;
 }
 body.premium-mode .pm-workout-filters::-webkit-scrollbar { display: none; }
 body.premium-mode .pm-wf-chip {
   flex-shrink: 0;
-  padding: 6px 14px;
+  padding: 5px 12px; /* Más compacto */
   border-radius: 99px;
   font-family: 'Oswald', sans-serif;
-  font-size: 11px;
+  font-size: 10px; /* Reducido de 11px */
   font-weight: 600;
   letter-spacing: 1px;
   text-transform: uppercase;
@@ -692,56 +695,74 @@ body.premium-mode .pm-wf-chip.active-pecho   { background: #ff9900; color: #000;
 body.premium-mode .pm-wf-chip.active-hombro  { background: #ff9900; color: #000; border-color: #ff9900; }
 
 /* Catálogo de ejercicios — cards premium */
+body.premium-mode .exercise-catalog {
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: 8px !important;
+  margin-top: 0.8rem !important;
+}
 body.premium-mode .exercise-card {
   background: var(--pm-s1) !important;
   border: 1px solid var(--pm-border) !important;
   border-radius: var(--pm-r2) !important;
-  padding: 10px !important;
+  padding: 8px 10px !important; /* Reducido padding un ~30% */
   transition: border-color .2s !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  text-align: left !important;
 }
 body.premium-mode .exercise-card:hover {
   border-color: var(--pm-border2) !important;
 }
-body.premium-mode .exercise-card h4 {
-  font-family: 'Oswald', sans-serif !important;
-  letter-spacing: 1px !important;
-  font-size: 0.9rem !important;
-  color: var(--pm-white) !important;
+body.premium-mode .ex-badge {
+  font-size: 7.5px !important;
   margin-bottom: 4px !important;
 }
-body.premium-mode .exercise-card small,
-body.premium-mode .exercise-card .ex-desc {
-  font-size: 11px !important;
-  color: var(--pm-dim2) !important;
-  line-height: 1.4 !important;
-  display: block !important;
-  margin-bottom: 8px !important;
-}
-/* Botón REGISTRAR — outline */
-body.premium-mode .btn-finish-ex {
-  background: transparent !important;
-  border: 1px solid var(--accent-main) !important;
-  color: var(--accent-main) !important;
-  border-radius: 99px !important;
+body.premium-mode .ex-badge.cardio  { background: rgba(var(--pm-cyan-rgb, 0, 229, 255), 0.12) !important; color: var(--pm-cyan) !important; }
+body.premium-mode .ex-badge.hiit    { background: rgba(255, 51, 102, 0.12) !important; color: #ff3366 !important; }
+body.premium-mode .ex-badge.pierna,
+body.premium-mode .ex-badge.gluteo,
+body.premium-mode .ex-badge.pecho,
+body.premium-mode .ex-badge.hombro  { background: rgba(155, 127, 255, 0.12) !important; color: #9b7fff !important; }
+
+body.premium-mode .ex-title {
   font-family: 'Oswald', sans-serif !important;
-  font-size: 0.65rem !important;
-  letter-spacing: 1.5px !important;
-  font-weight: 600 !important;
-  padding: 7px 14px !important;
-  cursor: pointer !important;
-  transition: all .18s !important;
-  flex: 1 !important;
+  font-size: 11px !important; /* Reducido ~30% */
+  color: var(--pm-white) !important;
+  margin-bottom: 2px !important;
 }
-body.premium-mode .btn-finish-ex:hover { background: rgba(var(--pm-green-rgb),0.08) !important; }
-body.premium-mode .btn-finish-ex:active { transform: scale(0.96) !important; }
-/* Botón checkmark — círculo relleno */
-body.premium-mode .btn-ex-check {
-  width: 28px !important;
-  height: 28px !important;
+body.premium-mode .ex-desc {
+  font-size: 8px !important; /* Reducido ~30% */
+  color: var(--pm-dim) !important;
+  line-height: 1.3 !important;
+  margin-bottom: 4px !important;
+}
+body.premium-mode .ex-cal-info {
+  font-size: 8px !important;
+  color: var(--pm-dim2) !important;
+  margin-bottom: 6px !important;
+}
+body.premium-mode .ex-input-wrapper {
+  background: rgba(0, 0, 0, 0.4) !important;
+  border: 1px solid var(--pm-border) !important;
+  border-radius: var(--pm-r3) !important;
+  padding: 4px 6px !important;
+}
+body.premium-mode .ex-num {
+  color: var(--pm-white) !important;
+  font-size: 11px !important;
+}
+body.premium-mode .ex-unit-lbl {
+  color: var(--pm-dim2) !important;
+  font-size: 8px !important;
+}
+body.premium-mode .ex-ok {
+  width: 24px !important;
+  height: 24px !important;
   border-radius: 50% !important;
-  background: var(--accent-main) !important;
+  background: var(--accent-main) !important; /* Usa acento del tema seleccionado */
   color: #000 !important;
-  font-size: 14px !important;
+  font-size: 11px !important;
   border: none !important;
   cursor: pointer !important;
   display: flex !important;
@@ -750,7 +771,36 @@ body.premium-mode .btn-ex-check {
   flex-shrink: 0 !important;
   transition: transform .18s !important;
 }
-body.premium-mode .btn-ex-check:active { transform: scale(0.9) !important; }
+body.premium-mode .ex-ok:active {
+  transform: scale(0.9) !important;
+}
+
+/* Totalizador premium */
+body.premium-mode .wo-total-box {
+  background: rgba(var(--pm-green-rgb, 0, 201, 122), 0.08) !important;
+  border: 1px solid rgba(var(--pm-green-rgb, 0, 201, 122), 0.2) !important;
+  border-radius: var(--pm-r2) !important;
+  padding: 10px !important;
+  margin: 15px 0 10px !important;
+  text-align: center !important;
+}
+body.premium-mode .wo-total-lbl {
+  font-size: 8px !important;
+  color: var(--pm-dim2) !important;
+  letter-spacing: 1.5px !important;
+  margin-bottom: 2px !important;
+}
+body.premium-mode .wo-total-val {
+  font-family: 'Oswald', sans-serif !important;
+  font-size: 22px !important;
+  font-weight: 700 !important;
+  color: var(--accent-main) !important; /* Acento dinámico */
+}
+body.premium-mode .wo-total-unit {
+  font-size: 10px !important;
+  color: var(--pm-dim2) !important;
+}
+
 
 /* ───────── CALCULADORA (page-assistant) ───────── */
 body.premium-mode #page-assistant .glass-card {
@@ -1600,6 +1650,16 @@ body.premium-mode .avatar {
   /* SIN !important en background-color: para que el style inline de JS (foto) lo pueda sobreescribir */
   background-color: rgba(var(--pm-green-rgb), 0.25);
   background-image: linear-gradient(135deg,rgba(var(--pm-green-rgb), 0.3),rgba(var(--pm-cyan-rgb), 0.2));
+  /* Centrado de inicial */
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-family: 'Oswald', sans-serif !important;
+  font-size: 17px !important;
+  font-weight: 700 !important;
+  color: #ffffff !important;
+  text-transform: uppercase !important;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.6) !important;
 }
 
 /* Contenedor de nombre + subtítulo (al lado del avatar) */
@@ -1976,12 +2036,14 @@ body.premium-mode .pm-diet-wrap {
 
 body.premium-mode .pm-diet-h2 {
   font-family: 'Oswald', sans-serif;
-  font-size: 1.3rem;
-  font-weight: 700;
+  font-size: 0.75rem; /* Ajustado de 1.3rem (más pequeña) */
+  font-weight: 600; /* Ajustado de 700 (más delgada) */
   letter-spacing: 3px;
-  color: var(--pm-green);
-  text-align: center;
-  margin-bottom: 14px;
+  color: var(--accent-main); /* Usar variable de acento del tema seleccionado */
+  text-align: left; /* Alineado a la izquierda */
+  margin-left: 4px; /* Pequeño margen para alinear con las tarjetas */
+  margin-bottom: 12px;
+  text-transform: uppercase;
 }
 
 /* ── BARRA DE CALORÍAS HOY ── */
@@ -2097,12 +2159,12 @@ body.premium-mode .pm-d-meal {
   background: var(--pm-s1) !important;
   border: 1px solid var(--pm-border) !important;
   border-radius: var(--pm-r2) !important;
-  padding: 16px 16px !important;
-  margin-bottom: 12px !important;
+  padding: 10px 12px !important; /* Reducido de 16px 16px (30% menos) */
+  margin-bottom: 8px !important; /* Reducido de 12px */
   cursor: pointer !important;
   transition: transform .15s, border-color .2s !important;
   display: flex !important;
-  flex-direction: column !important; /* Estructura vertical */
+  flex-direction: column !important;
   justify-content: flex-start !important;
   align-items: stretch !important;
   position: relative !important;
@@ -2113,35 +2175,35 @@ body.premium-mode .pm-d-meal.has-content {
 }
 body.premium-mode .pm-d-meal-hdr {
   display: flex !important;
-  justify-content: space-between !important; /* Nombre izquierda, icono derecha */
+  justify-content: space-between !important;
   align-items: center !important;
   width: 100% !important;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
-  padding-bottom: 8px !important;
-  margin-bottom: 8px !important;
+  padding-bottom: 4px !important; /* Reducido de 8px */
+  margin-bottom: 6px !important; /* Reducido de 8px */
 }
 body.premium-mode .pm-d-meal-name {
   font-family: 'Oswald', sans-serif !important;
-  font-size: 1.05rem !important;
-  font-weight: 700 !important;
+  font-size: 0.78rem !important; /* Reducido de 1.05rem (30% menos) */
+  font-weight: 600 !important; /* Más delgada */
   letter-spacing: 1px !important;
-  color: var(--accent-main) !important; /* Toma el color de acento activo actual */
+  color: var(--accent-main) !important;
   text-align: left !important;
   text-transform: uppercase !important;
 }
 body.premium-mode .pm-d-meal-icon {
   position: static !important;
-  font-size: 1rem !important;
+  font-size: 0.75rem !important; /* Reducido de 1rem */
   color: var(--pm-dim2) !important;
-  opacity: 0.8 !important;
+  opacity: 0.7 !important;
 }
 body.premium-mode .pm-d-meal-body {
-  font-size: 0.88rem !important;
-  line-height: 1.5 !important;
-  color: rgba(255, 255, 255, 0.85) !important;
+  font-size: 0.75rem !important; /* Reducido de 0.88rem (30% menos) */
+  line-height: 1.4 !important; /* Más compacto */
+  color: rgba(255, 255, 255, 0.75) !important;
   text-align: left !important;
   white-space: normal !important;
-  padding: 2px 0 !important;
+  padding: 1px 0 !important;
 }
 body.premium-mode .d-meal-preview {
   display: none !important;
@@ -2987,6 +3049,10 @@ body.premium-mode .nav-logo-mobile { display: none !important; }
     padding: 10px 28px 10px 16px !important; /* Consistente con la regla base */
     box-sizing: border-box !important;
     width: 100% !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 1000 !important;
+    background: #0a0e14 !important; /* background base para que no sea transparente al hacer scroll */
   }
   body.premium-mode .user-badge {
     margin: 0 !important;

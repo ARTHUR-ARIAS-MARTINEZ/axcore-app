@@ -199,8 +199,8 @@
 
 <header>
     <div class="logo">AX</div>
-    <h1>VISOR MÓVIL — VISTA EN VIVO</h1>
-    <div class="badge-live"><span class="dot"></span> EN VIVO</div>
+    <h1>VISOR MÓVIL — VISTA LOCAL</h1>
+    <div class="badge-live" style="background:rgba(0,229,255,0.1); border-color:rgba(0,229,255,0.3); color:var(--accent);"><span class="dot" style="background:var(--accent); animation:none;"></span> VISTA LOCAL</div>
     <button class="btn primary" onclick="forceReload()">↺ Recargar app</button>
     <button class="btn" onclick="openInBrowser()">🌐 Abrir en pestaña</button>
 </header>
@@ -226,32 +226,32 @@
 </main>
 
 <div class="help-msg">
-    Esta vista carga <b>la app real desde internet</b> (GitHub Pages). Lo que veas aquí es lo que ven tus atletas.
+    Esta vista carga <b>tu código local</b> de desarrollo. Todos los cambios aplicados en tus archivos locales se visualizarán aquí inmediatamente.
 </div>
 
 <script>
-    const LIVE_URL = 'https://arthur-arias-martinez.github.io/axcore-app/';
+    const LOCAL_URL = './index.html';
     const frame = document.getElementById('frame');
     const loading = document.getElementById('loading');
 
-    // Cargar la app con cache-busting para SIEMPRE ver la última versión
+    // Cargar la app con cache-busting para evitar almacenar en cache local
     function loadApp() {
-        const url = LIVE_URL + '?t=' + Date.now();
+        const url = LOCAL_URL + '?t=' + Date.now();
         loading.classList.remove('hidden');
         frame.src = url;
     }
+
+    frame.addEventListener('load', () => {
+        setTimeout(() => loading.classList.add('hidden'), 300);
+    });
 
     function forceReload() {
         loadApp();
     }
 
     function openInBrowser() {
-        window.open(LIVE_URL, '_blank');
+        window.open(LOCAL_URL, '_blank');
     }
-
-    frame.addEventListener('load', () => {
-        setTimeout(() => loading.classList.add('hidden'), 300);
-    });
 
     // Reloj en tiempo real
     function updateClock() {
@@ -273,9 +273,6 @@
         const wrap = document.getElementById('phoneWrap');
         // Aplicar escala desde el centro
         wrap.style.transform = `scale(${scale})`;
-        // El elemento sigue ocupando el tamaño original en el flujo de layout.
-        // Con el phone-stage en position:absolute centrado, el transform ya lo
-        // posiciona correctamente desde el centro — no necesitamos compensar márgenes.
     }
     autoFit();
     window.addEventListener('resize', autoFit);
