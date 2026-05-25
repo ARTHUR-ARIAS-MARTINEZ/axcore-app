@@ -1558,9 +1558,9 @@ body.premium-mode .top-bar {
   top: 0 !important;
   width: 100% !important;
   z-index: 1000 !important;
-  height: 52px !important;
-  min-height: 52px !important;
-  gap: 10px !important;
+  height: 66px !important; /* +14px para acomodar avatar de 44px */
+  min-height: 66px !important;
+  gap: 12px !important;
 }
 
 /* User badge compacto */
@@ -1576,52 +1576,65 @@ body.premium-mode .user-badge {
   margin-left: 4px !important; /* El padding del top-bar ya da el espacio izquierdo */
 }
 
-/* Avatar premium pequeño */
+/* Avatar premium — tamaño visible (44px) parecido al prototipo */
 body.premium-mode .avatar {
-  width: 32px !important;
-  height: 32px !important;
+  width: 44px !important;
+  height: 44px !important;
   border-radius: 50% !important;
-  border: 1.5px solid var(--accent-main) !important;
-  box-shadow: 0 0 8px rgba(var(--pm-green-rgb), 0.3) !important;
+  border: 2px solid var(--accent-main) !important;
+  box-shadow: 0 0 12px rgba(var(--pm-green-rgb), 0.45) !important;
   flex-shrink: 0 !important;
-  /* SIN !important para que el style inline de JS (foto de usuario) lo pueda sobreescribir */
-  background: linear-gradient(135deg,rgba(var(--pm-green-rgb), 0.3),rgba(var(--pm-cyan-rgb), 0.2));
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  background-size: cover !important;
+  /* SIN !important en background-color: para que el style inline de JS (foto) lo pueda sobreescribir */
+  background-color: rgba(var(--pm-green-rgb), 0.25);
+  background-image: linear-gradient(135deg,rgba(var(--pm-green-rgb), 0.3),rgba(var(--pm-cyan-rgb), 0.2));
 }
 
 /* Contenedor de nombre + subtítulo (al lado del avatar) */
 body.premium-mode .user-info {
   display: flex !important;
   flex-direction: column !important;
-  gap: 1px !important;
+  justify-content: center !important;
+  gap: 2px !important;
   min-width: 0 !important;
-  overflow: hidden !important;
+  flex: 1 !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
-/* Nombre de usuario compacto */
-body.premium-mode .user-rank {
+/* Nombre de usuario — VISIBLE y prominente */
+body.premium-mode .user-rank,
+body.premium-mode #display-username {
   font-family: 'Oswald', sans-serif !important;
-  font-size: 0.9rem !important;
+  font-size: 1rem !important;
   font-weight: 700 !important;
-  letter-spacing: 1px !important;
+  letter-spacing: 1.2px !important;
   color: #ffffff !important;
   white-space: nowrap !important;
   overflow: hidden !important;
   text-overflow: ellipsis !important;
-  max-width: 160px !important;
-  display: block !important; /* inline-block para que max-width funcione */
-  line-height: 1.15 !important;
+  max-width: 180px !important;
+  display: block !important;
+  line-height: 1.2 !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5) !important;
 }
 
-/* Subtítulo "toca para editar" */
+/* Subtítulo "◦ toca para editar" */
 body.premium-mode .user-edit-hint {
   font-family: 'Oswald', sans-serif !important;
-  font-size: 0.6rem !important;
-  color: var(--accent-secondary) !important;
-  letter-spacing: 0.5px !important;
+  font-size: 0.62rem !important;
+  font-weight: 500 !important;
+  color: var(--accent-main) !important;
+  letter-spacing: 0.8px !important;
   white-space: nowrap !important;
   cursor: pointer !important;
-  opacity: 0.85 !important;
+  opacity: 0.9 !important;
   transition: opacity .15s !important;
+  display: block !important;
 }
 body.premium-mode .user-edit-hint:hover { opacity: 1 !important; }
 
@@ -2951,14 +2964,9 @@ body.premium-mode .pm-calc-sub strong {
 /* HEADER MÓVIL: ocultar logo AX-CORE, dejar solo avatar + nombre */
 body.premium-mode .nav-logo-mobile { display: none !important; }
 
-/* NOMBRE DE USUARIO — tipografía premium */
-body.premium-mode .user-rank {
-  font-family: 'Oswald', sans-serif !important;
-  font-weight: 700 !important;
-  letter-spacing: 1.5px !important;
-  color: var(--pm-white) !important;
-  font-size: 0.85rem !important;
-}
+/* Regla duplicada eliminada — la definición canónica de .user-rank
+   está en la sección "Nombre de usuario — VISIBLE y prominente" más arriba.
+   Mantener esto eliminado evita conflicto de cascada que ocultaba el nombre. */
 
 /* TOP-BAR MÓVIL: layout horizontal en modo premium */
 @media (max-width: 900px) {
@@ -2978,11 +2986,17 @@ body.premium-mode .user-rank {
     flex-shrink: 1 !important;
     min-width: 0 !important;
   }
-  body.premium-mode .user-rank {
-    max-width: 130px !important;
+  body.premium-mode .user-rank,
+  body.premium-mode #display-username {
+    max-width: 160px !important;
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
+    font-size: 1rem !important;
+    color: #ffffff !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
   }
   body.premium-mode .live-stats {
     text-align: right !important;

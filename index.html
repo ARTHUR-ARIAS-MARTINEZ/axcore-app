@@ -8,9 +8,9 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0a0e14">
     <link rel="apple-touch-icon" href="logo.png">
-    <link rel="stylesheet" href="index.css?v=20260518w">
+    <link rel="stylesheet" href="index.css?v=20260525a">
     <!-- Premium UI overrides (inerte si <body> NO tiene .premium-mode) -->
-    <link rel="stylesheet" href="premium.css?v=20260521w">
+    <link rel="stylesheet" href="premium.css?v=20260525a">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <!-- Fuentes: Inter para cuerpos de texto, Oswald (Heavy Gym) para titulares -->
@@ -88,6 +88,22 @@
                     if (lo) lo.classList.add('hidden');
                     if (ro) ro.classList.add('hidden');
                     if (ac) ac.classList.remove('hidden');
+
+                    // SETEAR NOMBRE Y FOTO INMEDIATAMENTE — no esperar a app.js
+                    var saved = localStorage.getItem('arthur_data_' + u);
+                    var data = saved ? JSON.parse(saved) : {};
+                    var displayName = (data.userName || data.username || u || 'USUARIO').toString().trim();
+                    var low = displayName.toLowerCase();
+                    if (!displayName || low === 'atleta' || low === 'admin' || low === 'usuario') displayName = 'USUARIO';
+
+                    var du = document.getElementById('display-username');
+                    if (du) du.textContent = displayName.toUpperCase();
+
+                    var photo = data.avatarPhoto || data.avatar;
+                    if (photo) {
+                        var ap = document.getElementById('avatar-preview');
+                        if (ap) ap.style.background = 'url(' + photo + ') center/cover no-repeat';
+                    }
                 } catch(e) {}
             };
             if (document.readyState === 'loading') {
