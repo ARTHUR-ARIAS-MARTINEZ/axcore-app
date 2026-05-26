@@ -359,6 +359,33 @@ body {
     border: 1px solid var(--glass-border);
 }
 
+.user-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 2px;
+}
+
+#display-username {
+    font-family: 'Oswald', sans-serif !important;
+    font-size: 18px !important;
+    font-weight: 700 !important;
+    letter-spacing: 1px !important;
+    text-transform: uppercase !important;
+    color: #ffffff !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    display: block !important;
+}
+
+.user-edit-hint {
+    font-size: 0.65rem;
+    opacity: 0.7;
+    display: block;
+    color: #fff;
+}
+
 .user-rank {
     font-size: 0.8rem;
     font-weight: bold;
@@ -1850,6 +1877,834 @@ body {
     background: rgba(0,255,136,0.12);
     border-color: var(--accent-main);
     color: var(--accent-main);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   STUDIO PREMIUM REDESIGN — sx-* namespace
+   Mobile-first · Canva+CapCut+Nike Training Club aesthetic
+   NO ROMPE funcionalidad JS existente
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── Base page reset — escape del padding de .content-area ── */
+#page-studio {
+    padding: 0 !important;
+    /* Mobile: .content-area tiene padding: 1rem; padding-bottom: 6rem */
+    margin: -1rem -1rem -6rem -1rem !important;
+    background: #080c14;
+    overflow-x: hidden;
+}
+@media (min-width: 601px) {
+    /* Desktop: .content-area tiene padding: 2rem */
+    #page-studio {
+        margin: -2rem !important;
+    }
+}
+
+/* ────────────────────────────────────────────────────────────
+   ACHIEVEMENTS BAR — acordeón colapsable
+   ──────────────────────────────────────────────────────────── */
+.sx-ach-bar {
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    background: rgba(5,8,16,0.6);
+}
+.sx-ach-toggle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 13px 18px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    -webkit-tap-highlight-color: transparent;
+}
+.sx-ach-lbl {
+    font-family: var(--font-accent, 'Oswald', sans-serif);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: rgba(255,255,255,0.65);
+    text-transform: uppercase;
+}
+.sx-ach-chevron {
+    font-size: 1.3rem;
+    color: var(--accent-main, #00c97a);
+    transition: transform 0.32s cubic-bezier(0.34,1.56,0.64,1);
+    line-height: 1;
+}
+.sx-ach-bar.sx-ach-open .sx-ach-chevron { transform: rotate(90deg); }
+.sx-ach-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease;
+}
+.sx-ach-bar.sx-ach-open .sx-ach-body {
+    max-height: 360px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+.sx-ach-bar.sx-ach-open .sx-ach-body::-webkit-scrollbar { width: 4px; }
+.sx-ach-bar.sx-ach-open .sx-ach-body::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.15); border-radius: 4px;
+}
+
+/* ────────────────────────────────────────────────────────────
+   STUDIO CORE — contenedor principal full-bleed
+   Fluye natural: hero + sheet uno tras otro, sin calc viewport
+   ──────────────────────────────────────────────────────────── */
+.sx-core {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+/* ────────────────────────────────────────────────────────────
+   HEADER COMPACTO
+   ──────────────────────────────────────────────────────────── */
+.sx-hdr {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 18px;
+    height: 54px;
+    background: rgba(6,10,20,0.92);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    position: relative;
+    z-index: 3;
+}
+.sx-hdr::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, var(--accent-main,#00c97a) 40%, var(--accent-secondary,#00e5ff) 60%, transparent 100%);
+    opacity: 0.35;
+}
+.sx-hdr-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.sx-hdr-ico { font-size: 1.15rem; }
+.sx-hdr-title {
+    font-family: var(--font-accent, 'Oswald', sans-serif);
+    font-size: 0.88rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: rgba(255,255,255,0.95);
+    text-transform: uppercase;
+    line-height: 1.1;
+}
+.sx-hdr-title em {
+    color: var(--accent-main, #00c97a);
+    font-style: normal;
+}
+.sx-hdr-sub {
+    font-family: var(--font-accent);
+    font-size: 0.6rem;
+    letter-spacing: 2.5px;
+    color: rgba(255,255,255,0.28);
+    text-transform: uppercase;
+    margin-top: 1px;
+}
+.sx-hdr-badge {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 10px;
+    border-radius: 99px;
+    background: rgba(0,201,122,0.1);
+    border: 1px solid rgba(0,201,122,0.22);
+    color: var(--accent-main, #00c97a);
+    font-family: var(--font-accent);
+    font-size: 0.6rem;
+    font-weight: 900;
+    letter-spacing: 1.5px;
+}
+.sx-hdr-badge svg { stroke: var(--accent-main, #00c97a); }
+
+/* ────────────────────────────────────────────────────────────
+   HERO — preview zone (60-70% del viewport — DOMINANTE)
+   ──────────────────────────────────────────────────────────── */
+.sx-hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 18px 14px;
+    gap: 14px;
+    background:
+        radial-gradient(ellipse 80% 60% at 50% 30%, rgba(0,201,122,0.06) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 40% at 80% 80%, rgba(0,229,255,0.04) 0%, transparent 60%);
+    position: relative;
+}
+
+/* ── Botones flotantes superiores (glassmorphism, icon-only) ── */
+.sx-float-bar {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    width: 100%;
+    max-width: 480px;
+    padding: 0 2px;
+}
+.sx-fab {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(20,28,42,0.55);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    color: rgba(255,255,255,0.78);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.18s cubic-bezier(0.34,1.56,0.64,1),
+                background 0.2s, border-color 0.2s, box-shadow 0.2s;
+    -webkit-tap-highlight-color: transparent;
+    padding: 0;
+}
+.sx-fab:hover {
+    transform: translateY(-2px) scale(1.05);
+    background: rgba(0,201,122,0.12);
+    border-color: rgba(0,201,122,0.35);
+    color: var(--accent-main, #00c97a);
+}
+.sx-fab:active { transform: scale(0.92); }
+.sx-fab svg { stroke: currentColor; flex-shrink: 0; }
+.sx-fab-primary {
+    background: linear-gradient(135deg, rgba(0,201,122,0.85), rgba(0,229,255,0.7));
+    color: #000;
+    border-color: rgba(0,201,122,0.6);
+    box-shadow: 0 4px 14px rgba(0,201,122,0.32);
+}
+.sx-fab-primary:hover {
+    color: #000;
+    background: linear-gradient(135deg, var(--accent-main,#00c97a), var(--accent-secondary,#00e5ff));
+    box-shadow: 0 8px 22px rgba(0,201,122,0.45);
+}
+
+/* Marco del canvas con glow sutil */
+.sx-canvas-frame {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+.sx-canvas-glow {
+    position: absolute;
+    inset: -12px;
+    border-radius: 24px;
+    background: transparent;
+    box-shadow:
+        0 0 60px rgba(0,201,122,0.06),
+        0 0 120px rgba(0,229,255,0.03),
+        inset 0 0 0 0 transparent;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Canvas principal — DOMINANTE (60-65% del viewport) */
+#studio-preview-canvas {
+    display: block;
+    max-width: 100%;
+    /* CANVAS GRANDE — máx 62vh o 540px en mobile */
+    max-height: min(62vh, 540px);
+    width: auto !important;
+    height: auto !important;
+    border-radius: 18px;
+    position: relative;
+    z-index: 1;
+    box-shadow:
+        0 24px 72px rgba(0,0,0,0.72),
+        0 10px 36px rgba(0,0,0,0.55),
+        0 2px 0 rgba(255,255,255,0.07),
+        0 0 0 1px rgba(255,255,255,0.05);
+    transition: box-shadow 0.3s ease, transform 0.25s ease;
+}
+@media (max-width: 380px) {
+    /* Pantallas muy pequeñas — un poco menos para que entre el sheet */
+    #studio-preview-canvas { max-height: 56vh; }
+}
+#studio-preview-canvas:hover {
+    box-shadow:
+        0 28px 80px rgba(0,0,0,0.75),
+        0 10px 40px rgba(0,0,0,0.55),
+        0 2px 0 rgba(255,255,255,0.08),
+        0 0 20px rgba(0,201,122,0.06);
+}
+
+/* ── CTA Share Row ── */
+.sx-cta-row {
+    flex-shrink: 0;
+    width: 100%;
+    max-width: 420px;
+}
+.sx-share-btn {
+    width: 100%;
+    padding: 14px 24px;
+    border: none;
+    border-radius: 50px;
+    background: linear-gradient(135deg, var(--accent-main,#00c97a) 0%, var(--accent-secondary,#00e5ff) 100%);
+    color: #000;
+    font-family: var(--font-accent, 'Oswald', sans-serif);
+    font-size: 0.82rem;
+    font-weight: 900;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: transform 0.18s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.18s ease, opacity 0.18s;
+    box-shadow: 0 6px 28px rgba(0,201,122,0.38), 0 2px 10px rgba(0,0,0,0.35);
+    display: block;
+    text-align: center;
+    -webkit-tap-highlight-color: transparent;
+}
+.sx-share-btn:hover {
+    transform: translateY(-2px) scale(1.01);
+    box-shadow: 0 12px 36px rgba(0,201,122,0.48), 0 4px 14px rgba(0,0,0,0.4);
+}
+.sx-share-btn:active { transform: scale(0.96); opacity: 0.88; }
+.sx-share-btn:disabled { opacity: 0.55; pointer-events: none; }
+
+/* ────────────────────────────────────────────────────────────
+   BOTTOM SHEET — panel de edición premium
+   ──────────────────────────────────────────────────────────── */
+.sx-sheet {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    background: rgba(6,10,20,0.97);
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
+    border-radius: 28px 28px 0 0;
+    border-top: 1px solid rgba(255,255,255,0.09);
+    box-shadow: 0 -14px 60px rgba(0,0,0,0.65), 0 -4px 20px rgba(0,0,0,0.4);
+    overflow: hidden;
+    /* Altura del sheet — el scroll va en sx-tabscroll */
+    max-height: 42vh;
+    min-height: 200px;
+    margin-top: -28px; /* solapa ligeramente con el hero — efecto floating */
+    position: relative;
+    z-index: 2;
+}
+/* Resplandor superior del sheet (separador premium) */
+.sx-sheet::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 18%;
+    right: 18%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent-main,#00c97a), transparent);
+    opacity: 0.25;
+    pointer-events: none;
+}
+/* Pill/notch visual */
+.sx-notch {
+    flex-shrink: 0;
+    width: 40px;
+    height: 4px;
+    background: rgba(255,255,255,0.16);
+    border-radius: 99px;
+    margin: 10px auto 2px;
+}
+
+/* ────────────────────────────────────────────────────────────
+   TAB BAR — 5 tabs modernos
+   ──────────────────────────────────────────────────────────── */
+.sx-tabbar {
+    flex-shrink: 0 !important;
+    display: flex !important;
+    gap: 0 !important;
+    background: rgba(0,0,0,0.3) !important;
+    border-bottom: 1px solid rgba(255,255,255,0.06) !important;
+    border-top: none !important;
+    position: static !important; /* reset sticky del original */
+    padding: 0 !important;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+.sx-tabbar::-webkit-scrollbar { display: none; }
+
+/* Override de .studio-pro-tab dentro de sx-tabbar */
+.sx-tabbar .studio-pro-tab {
+    flex: 1 0 auto !important;
+    min-width: 54px !important;
+    padding: 10px 6px 9px !important;
+    font-size: 0.56rem !important;
+    letter-spacing: 1px !important;
+    font-weight: 800 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 4px !important;
+    color: rgba(255,255,255,0.32) !important;
+    border: none !important;
+    background: transparent !important;
+    transition: color 0.2s, background 0.2s !important;
+    position: relative !important;
+    -webkit-tap-highlight-color: transparent;
+    cursor: pointer !important;
+}
+.sx-tabbar .studio-pro-tab svg {
+    stroke: rgba(255,255,255,0.28);
+    transition: stroke 0.2s, filter 0.2s;
+    flex-shrink: 0;
+}
+.sx-tabbar .studio-pro-tab span { line-height: 1; }
+.sx-tabbar .studio-pro-tab:hover {
+    color: rgba(255,255,255,0.65) !important;
+    background: rgba(255,255,255,0.04) !important;
+}
+.sx-tabbar .studio-pro-tab.active {
+    color: var(--accent-main, #00c97a) !important;
+    background: rgba(0,201,122,0.06) !important;
+}
+.sx-tabbar .studio-pro-tab.active svg {
+    stroke: var(--accent-main, #00c97a);
+    filter: drop-shadow(0 0 4px rgba(0,201,122,0.5));
+}
+.sx-tabbar .studio-pro-tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 18%; right: 18%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent-main,#00c97a), transparent);
+    border-radius: 2px;
+    box-shadow: 0 0 8px var(--accent-main,#00c97a);
+}
+
+/* ────────────────────────────────────────────────────────────
+   TAB SCROLL BODY
+   ──────────────────────────────────────────────────────────── */
+.sx-tabscroll {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    overscroll-behavior: contain;
+}
+.sx-tabscroll::-webkit-scrollbar { display: none; }
+
+/* Tab content — fade-in al cambiar */
+#page-studio .studio-pro-tab-content {
+    display: none;
+    padding: 16px 16px 28px;
+}
+#page-studio .studio-pro-tab-content.active {
+    display: block;
+    animation: sxTabIn 0.2s ease both;
+}
+@keyframes sxTabIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Section Labels ── */
+.sx-sec-lbl {
+    font-family: var(--font-accent, 'Oswald', sans-serif);
+    font-size: 9.5px;
+    letter-spacing: 2.5px;
+    color: rgba(255,255,255,0.38);
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.sx-val-badge {
+    background: rgba(0,201,122,0.12);
+    color: var(--accent-main, #00c97a);
+    font-family: 'SF Mono', Monaco, monospace;
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 99px;
+    border: 1px solid rgba(0,201,122,0.22);
+}
+
+/* ────────────────────────────────────────────────────────────
+   PLANTILLAS — carousel horizontal premium
+   ──────────────────────────────────────────────────────────── */
+#page-studio .studio-templates {
+    display: flex !important;
+    gap: 10px !important;
+    overflow-x: auto !important;
+    padding: 4px 2px 12px !important;
+    margin: 0 !important;
+    scroll-snap-type: x mandatory !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+}
+#page-studio .studio-templates::-webkit-scrollbar { display: none; }
+
+#page-studio .studio-tpl-card {
+    flex: 0 0 auto !important;
+    width: 90px !important;
+    height: 120px !important;
+    border-radius: 14px !important;
+    border: 2px solid rgba(255,255,255,0.1) !important;
+    scroll-snap-align: start;
+    cursor: pointer !important;
+    position: relative !important;
+    overflow: hidden !important;
+    transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1),
+                border-color 0.2s ease,
+                box-shadow 0.2s ease !important;
+    background: rgba(10,14,24,0.8);
+}
+#page-studio .studio-tpl-card:hover { transform: scale(1.05) !important; }
+#page-studio .studio-tpl-card.selected {
+    border-color: var(--accent-main, #00c97a) !important;
+    box-shadow: 0 0 22px rgba(0,201,122,0.28), 0 6px 20px rgba(0,0,0,0.5) !important;
+    transform: scale(1.07) !important;
+}
+#page-studio .studio-tpl-card canvas {
+    position: absolute !important;
+    top: 0; left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 12px !important;
+    object-fit: cover;
+}
+#page-studio .studio-tpl-card > span {
+    position: absolute !important;
+    bottom: 0; left: 0; right: 0 !important;
+    padding: 22px 5px 6px !important;
+    background: linear-gradient(transparent, rgba(0,0,0,0.88)) !important;
+    text-align: center !important;
+    font-size: 8.5px !important;
+    color: #fff !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.8px !important;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.95) !important;
+    z-index: 2;
+    text-transform: uppercase;
+}
+
+/* ────────────────────────────────────────────────────────────
+   FORMAT SEGMENTED CONTROL — iOS style
+   ──────────────────────────────────────────────────────────── */
+.sx-fmt-seg {
+    display: flex !important;
+    gap: 0 !important;
+    background: rgba(255,255,255,0.05) !important;
+    border-radius: 14px !important;
+    padding: 4px !important;
+    border: 1px solid rgba(255,255,255,0.09) !important;
+    overflow: hidden;
+}
+.sx-fmt-seg button {
+    flex: 1 !important;
+    background: transparent !important;
+    border: none !important;
+    border-radius: 11px !important;
+    padding: 11px 8px !important;
+    color: rgba(255,255,255,0.45) !important;
+    font-family: var(--font-accent) !important;
+    font-size: 0.68rem !important;
+    letter-spacing: 1px !important;
+    font-weight: 700 !important;
+    cursor: pointer !important;
+    transition: all 0.22s cubic-bezier(0.34,1.56,0.64,1) !important;
+    -webkit-tap-highlight-color: transparent;
+}
+.sx-fmt-seg button.active {
+    background: rgba(0,201,122,0.16) !important;
+    color: var(--accent-main, #00c97a) !important;
+    box-shadow: inset 0 0 0 1px rgba(0,201,122,0.32) !important;
+}
+.sx-fmt-hint {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 10px;
+    padding: 0 4px;
+}
+.sx-fmt-hint-item {
+    font-family: var(--font-accent);
+    font-size: 8px;
+    letter-spacing: 1.5px;
+    color: rgba(255,255,255,0.2);
+    text-transform: uppercase;
+}
+
+/* ────────────────────────────────────────────────────────────
+   METRIC CHIPS — elegantes, más grandes
+   ──────────────────────────────────────────────────────────── */
+#page-studio .studio-metrics {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+    grid-template-columns: unset !important;
+}
+#page-studio .studio-metric-toggle {
+    padding: 10px 16px !important;
+    font-size: 0.72rem !important;
+    font-weight: 600 !important;
+    border-radius: 24px !important;
+    border: 1px solid rgba(255,255,255,0.12) !important;
+    background: rgba(255,255,255,0.04) !important;
+    color: rgba(255,255,255,0.55) !important;
+    min-height: auto !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 7px !important;
+    -webkit-tap-highlight-color: transparent;
+}
+#page-studio .studio-metric-toggle:hover {
+    background: rgba(255,255,255,0.08) !important;
+    color: rgba(255,255,255,0.8) !important;
+}
+#page-studio .studio-metric-toggle.on {
+    border-color: var(--accent-main, #00c97a) !important;
+    background: rgba(0,201,122,0.1) !important;
+    color: #fff !important;
+    box-shadow: 0 0 14px rgba(0,201,122,0.15) !important;
+}
+#page-studio .studio-metric-toggle .dot {
+    width: 8px !important;
+    height: 8px !important;
+    border-radius: 50% !important;
+    border: 2px solid currentColor !important;
+    flex-shrink: 0 !important;
+    transition: background 0.2s, box-shadow 0.2s !important;
+}
+#page-studio .studio-metric-toggle.on .dot {
+    background: var(--accent-main, #00c97a) !important;
+    border-color: var(--accent-main, #00c97a) !important;
+    box-shadow: 0 0 7px rgba(0,201,122,0.7) !important;
+}
+
+/* ────────────────────────────────────────────────────────────
+   PILLS — botones de opciones mejorados
+   ──────────────────────────────────────────────────────────── */
+#page-studio .studio-pro-pills {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+}
+/* Pills genéricos (card style, filter, HUD, hero metric)
+   NOTA: bg/color/border SIN !important — el JS _makeStyleBtns los maneja
+   inline para active/inactive states */
+#page-studio .studio-pro-pills .sx-btn,
+#page-studio .sx-card-pills .sx-btn {
+    padding: 9px 15px !important;
+    font-size: 0.68rem !important;
+    border-radius: 22px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.8px !important;
+    font-family: var(--font-accent, 'Oswald') !important;
+    cursor: pointer !important;
+    transition: all 0.2s cubic-bezier(0.4,0,0.2,1) !important;
+    -webkit-tap-highlight-color: transparent;
+    text-transform: uppercase;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+}
+#page-studio .studio-pro-pills .sx-btn:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.1);
+}
+#page-studio .studio-pro-pills .sx-btn:active { transform: scale(0.97); }
+
+/* Acento pills — más grandes y con buen padding */
+#page-studio .sx-accent-pills {
+    gap: 10px !important;
+}
+#page-studio .sx-accent-pills .sx-btn {
+    padding: 11px 18px !important;
+    border-radius: 28px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    font-size: 0.7rem !important;
+    letter-spacing: 1.2px !important;
+}
+#page-studio .sx-accent-pills .sx-btn span {
+    width: 11px; height: 11px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    box-shadow: 0 0 10px currentColor, inset 0 0 4px rgba(255,255,255,0.2);
+}
+
+/* Font pills — preview tipográfico (la fuente se aplica al texto) */
+#page-studio .sx-font-pills .sx-btn {
+    padding: 12px 18px !important;
+    font-size: 0.78rem !important;
+    border-radius: 14px !important;
+    letter-spacing: 0.5px !important;
+    text-transform: none !important;
+}
+/* IMPACT */
+#page-studio .sx-font-pills .sx-btn[data-val="bold-impact"] {
+    font-family: Impact, 'Arial Narrow', sans-serif !important;
+    font-weight: 900 !important;
+    letter-spacing: 2px !important;
+    text-transform: uppercase !important;
+}
+/* MONO */
+#page-studio .sx-font-pills .sx-btn[data-val="tech-mono"] {
+    font-family: 'Courier New', Courier, monospace !important;
+    font-weight: 700 !important;
+}
+/* ELEGANT */
+#page-studio .sx-font-pills .sx-btn[data-val="elegant-sans"] {
+    font-family: 'Trebuchet MS', Arial, sans-serif !important;
+    font-style: italic !important;
+    font-weight: 600 !important;
+}
+
+/* ────────────────────────────────────────────────────────────
+   COLOR SWATCHES
+   ──────────────────────────────────────────────────────────── */
+#page-studio .sx-swatches,
+#page-studio .studio-pro-swatches {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 9px !important;
+    align-items: center !important;
+}
+#page-studio .studio-pro-swatches button {
+    transition: transform 0.18s cubic-bezier(0.34,1.56,0.64,1),
+                box-shadow 0.18s ease !important;
+}
+#page-studio .studio-pro-swatches button:hover {
+    transform: scale(1.25) !important;
+}
+
+/* ────────────────────────────────────────────────────────────
+   SLIDER — iOS style, grueso y animado
+   ──────────────────────────────────────────────────────────── */
+#page-studio .sx-slider,
+#page-studio .studio-pro-slider {
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    width: 100% !important;
+    height: 6px !important;
+    background: rgba(255,255,255,0.1) !important;
+    border-radius: 10px !important;
+    outline: none !important;
+    cursor: pointer !important;
+    margin-top: 6px !important;
+    transition: background 0.2s;
+}
+#page-studio .sx-slider::-webkit-slider-thumb,
+#page-studio .studio-pro-slider::-webkit-slider-thumb {
+    -webkit-appearance: none !important;
+    width: 24px !important;
+    height: 24px !important;
+    border-radius: 50% !important;
+    background: linear-gradient(135deg,
+        var(--accent-main, #00c97a),
+        var(--accent-secondary, #00e5ff)) !important;
+    cursor: pointer !important;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.45),
+                0 0 0 4px rgba(0,201,122,0.16) !important;
+    transition: transform 0.18s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.18s !important;
+}
+#page-studio .sx-slider::-webkit-slider-thumb:active,
+#page-studio .studio-pro-slider::-webkit-slider-thumb:active {
+    transform: scale(1.28) !important;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.55),
+                0 0 0 6px rgba(0,201,122,0.22) !important;
+}
+#page-studio .sx-slider::-moz-range-thumb,
+#page-studio .studio-pro-slider::-moz-range-thumb {
+    width: 24px !important;
+    height: 24px !important;
+    border: none !important;
+    border-radius: 50% !important;
+    background: linear-gradient(135deg,
+        var(--accent-main, #00c97a),
+        var(--accent-secondary, #00e5ff)) !important;
+    cursor: pointer !important;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.45) !important;
+}
+
+/* ────────────────────────────────────────────────────────────
+   DESKTOP — layout de 2 columnas cuando hay espacio
+   ──────────────────────────────────────────────────────────── */
+@media (min-width: 681px) {
+    .sx-core {
+        display: grid !important;
+        grid-template-rows: 54px 1fr !important;
+        grid-template-columns: 1fr 300px !important;
+        min-height: calc(100vh - 64px);
+        overflow: hidden;
+    }
+    .sx-hdr {
+        grid-column: 1 / -1;
+        grid-row: 1;
+    }
+    .sx-hero {
+        grid-column: 1;
+        grid-row: 2;
+        padding: 24px;
+        min-height: 500px;
+    }
+    .sx-sheet {
+        grid-column: 2;
+        grid-row: 2;
+        border-radius: 0 !important;
+        border-top: none !important;
+        border-left: 1px solid rgba(255,255,255,0.07) !important;
+        margin-top: 0 !important;
+        box-shadow: none !important;
+        max-height: none !important;
+        min-height: 0 !important;
+    }
+    .sx-notch { display: none; }
+    .sx-tabscroll { max-height: none !important; }
+}
+
+/* ────────────────────────────────────────────────────────────
+   PREMIUM MODE overrides específicos del Studio
+   ──────────────────────────────────────────────────────────── */
+body.premium-mode #page-studio { background: #06090f; }
+body.premium-mode .sx-hdr {
+    background: rgba(5,8,18,0.96);
+}
+body.premium-mode .sx-sheet {
+    background: rgba(5,8,18,0.98);
+}
+body.premium-mode #page-studio .studio-pro-tab-content {
+    background: transparent;
+}
+/* Neutralizar [data-stab] de premium.css en los nuevos tabs */
+body.premium-mode #page-studio .sx-tabbar .studio-pro-tab,
+body.premium-mode #page-studio .sx-tabbar [data-stab] {
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    font-family: var(--font-accent, 'Oswald', sans-serif) !important;
+    letter-spacing: 1px !important;
+    padding: 10px 6px 9px !important;
+}
+body.premium-mode #page-studio .sx-tabbar .studio-pro-tab.active,
+body.premium-mode #page-studio .sx-tabbar [data-stab].active {
+    background: rgba(0,201,122,0.07) !important;
+    border: none !important;
+    color: var(--accent-main, #00c97a) !important;
+}
+/* btn-studio-share ya es .sx-share-btn, mantener estilo premium */
+body.premium-mode #btn-studio-share.sx-share-btn {
+    background: linear-gradient(135deg, var(--pm-green, #00c97a), var(--accent-secondary, #00e5ff)) !important;
+    color: #000 !important;
+    border-radius: 50px !important;
+    box-shadow: 0 6px 28px rgba(0,201,122,0.42), 0 2px 10px rgba(0,0,0,0.35) !important;
+    padding: 14px 24px !important;
+    letter-spacing: 2.5px !important;
 }
 
 /* === EDITOR MOVIL — INICIO (no borrar marcadores) === */

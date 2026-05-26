@@ -161,25 +161,44 @@ document.addEventListener('DOMContentLoaded', () => {
             const target = document.getElementById('display-username');
             if (!target || typeof MutationObserver === 'undefined') return;
             const restoreName = () => {
-                const persist = (currentUser ? localStorage.getItem('axcore_uname_' + currentUser) : null)
-                             || localStorage.getItem('axcore_uname_global');
-                const candidate = (persist || (window.userData && (window.userData.userName || window.userData.username)) || currentUser || 'ATLETA').toString().trim();
+                let candidate = '';
+                try {
+                    if (window.AXProfile && typeof window.AXProfile.getName === 'function') {
+                        candidate = window.AXProfile.getName();
+                    }
+                } catch(_) {}
+                if (!candidate) {
+                    const persist = (currentUser ? localStorage.getItem('axcore_uname_' + currentUser) : null)
+                                 || localStorage.getItem('axcore_uname_global');
+                    candidate = (persist || (window.userData && (window.userData.userName || window.userData.username)) || currentUser || 'ATLETA').toString().trim();
+                }
                 const low = candidate.toLowerCase();
                 const blocked = ['', 'atleta', 'admin', 'usuario'];
                 const finalName = blocked.includes(low) ? 'ATLETA' : candidate;
-                if (target.textContent.trim() !== finalName.toUpperCase()) {
-                    target.textContent = finalName.toUpperCase();
-                    target.style.setProperty('color', '#ffffff', 'important');
-                    target.style.setProperty('display', 'block', 'important');
-                    target.style.setProperty('visibility', 'visible', 'important');
-                    target.style.setProperty('opacity', '1', 'important');
+                const nameUpper = finalName.toUpperCase();
+                if (target.textContent.trim() !== nameUpper) {
+                    target.textContent = nameUpper;
                 }
+                // Reforzar estilos para garantizar visibilidad absoluta en cualquier tema
+                target.style.setProperty('color', '#ffffff', 'important');
+                target.style.setProperty('display', 'block', 'important');
+                target.style.setProperty('visibility', 'visible', 'important');
+                target.style.setProperty('opacity', '1', 'important');
+
                 // También restaura el avatar si está vacío y hay foto persistida
                 const ap = document.getElementById('avatar-preview');
                 if (ap) {
-                    const persistPhoto = (currentUser ? localStorage.getItem('axcore_avatar_' + currentUser) : null)
-                                      || localStorage.getItem('axcore_avatar_global')
-                                      || (window.userData && (window.userData.avatarPhoto || window.userData.avatar));
+                    let persistPhoto = null;
+                    try {
+                        if (window.AXProfile && typeof window.AXProfile.getPhoto === 'function') {
+                            persistPhoto = window.AXProfile.getPhoto();
+                        }
+                    } catch(_) {}
+                    if (!persistPhoto) {
+                        persistPhoto = (currentUser ? localStorage.getItem('axcore_avatar_' + currentUser) : null)
+                                          || localStorage.getItem('axcore_avatar_global')
+                                          || (window.userData && (window.userData.avatarPhoto || window.userData.avatar));
+                    }
                     const hasBg = ap.style.backgroundImage && ap.style.backgroundImage !== 'none' && ap.style.backgroundImage.indexOf('url') >= 0;
                     if (persistPhoto && !hasBg) {
                         ap.style.setProperty('background-image', `url("${persistPhoto}")`, 'important');
@@ -345,11 +364,6 @@ document.addEventListener('DOMContentLoaded', () => {
         let nameToDisp = _san(_axName) || _san(userData.userName) || _san(userData.username) || _san(currentUser) || 'ATLETA';
         if (dispUser) {
             dispUser.textContent = nameToDisp.toUpperCase();
-            // Forzar visibilidad absoluta via inline style (gana sobre cualquier CSS)
-            dispUser.style.setProperty('color', '#ffffff', 'important');
-            dispUser.style.setProperty('display', 'block', 'important');
-            dispUser.style.setProperty('visibility', 'visible', 'important');
-            dispUser.style.setProperty('opacity', '1', 'important');
         }
         const photoSrc = userData.avatarPhoto || userData.avatar;
         const ap = document.getElementById('avatar-preview');
@@ -1401,7 +1415,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const headerName = document.getElementById('display-username');
             if (headerName) {
                 headerName.textContent = nameUp;
-                // Forzar visibilidad: inline style !important gana sobre cualquier CSS externo
                 headerName.style.setProperty('color', '#ffffff', 'important');
                 headerName.style.setProperty('display', 'block', 'important');
                 headerName.style.setProperty('visibility', 'visible', 'important');
@@ -2442,7 +2455,8 @@ document.addEventListener('DOMContentLoaded', () => {
         fontStyle: 'bold-impact',  // bold-impact | tech-mono | elegant-sans
         overlayFilter: 'clear',    // clear | glitch | grain | vignette
         cardStyle: 'hud-tactical', // hud-tactical | carbon-elite | data-panel | editorial | split-hero | nordic-dark
-        heroMetric: 'deficit'      // métrica principal (número grande)
+        heroMetric: 'deficit',     // métrica principal (número grande)
+        activeTab: 'diseno'        // tab activo — persiste entre renderStudioPage() calls
     };
 
     const STUDIO_BG_IMAGES = {};
@@ -2941,117 +2955,143 @@ document.addEventListener('DOMContentLoaded', () => {
         const earned = new Set(userData.achievements || []);
         const earnedCount = [...earned].filter(id => ACHIEVEMENTS_DEF.find(a => a.id === id)).length;
         el.innerHTML = `
-            <style>
-                #studio-split { display:flex; gap:14px; align-items:flex-start; }
-                #studio-controls { flex:1; min-width:0; }
-                #studio-sticky-panel {
-                    width:240px; flex-shrink:0;
-                    position:sticky; top:60px;
-                    display:flex; flex-direction:column; gap:10px;
-                }
-                @media (max-width:680px) {
-                    #studio-split { flex-direction:column; }
-                    #studio-sticky-panel {
-                        order:-1;
-                        position:sticky; top:0; width:100%; z-index:10;
-                        background:var(--bg-dark,#0a0a0a);
-                        padding:6px 0 10px;
-                        border-bottom:1px solid rgba(255,255,255,0.08);
-                    }
-                    #studio-sticky-panel .studio-preview-wrap canvas { max-height:44vw; }
-                }
-            </style>
 
-            <div class="glass-card" style="padding:1rem 1.2rem; margin-bottom:1rem;">
-                <h2 style="color:var(--accent-main); margin-bottom:0.3rem; font-size:1.1rem;">🎖 MIS INSIGNIAS</h2>
-                <p style="font-size:0.70rem; color:var(--text-dim); margin-bottom:0.8rem;">${earnedCount} de ${ACHIEVEMENTS_DEF.length} desbloqueadas</p>
-                <div id="achievements-panel" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(80px,1fr)); gap:8px;"></div>
+            <!-- ═══ INSIGNIAS (acordeón colapsable) ═══ -->
+            <div class="sx-ach-bar">
+                <button class="sx-ach-toggle" onclick="this.closest('.sx-ach-bar').classList.toggle('sx-ach-open')">
+                    <span class="sx-ach-lbl">🎖 INSIGNIAS &nbsp;·&nbsp; <span style="color:var(--accent-main)">${earnedCount}</span><span style="color:rgba(255,255,255,0.35)">/${ACHIEVEMENTS_DEF.length}</span> desbloqueadas</span>
+                    <span class="sx-ach-chevron">›</span>
+                </button>
+                <div class="sx-ach-body">
+                    <div id="achievements-panel" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(78px,1fr)); gap:7px; padding:12px 14px 16px;"></div>
+                </div>
             </div>
 
-            <div class="glass-card studio-pro" style="padding:0; margin-bottom:1rem; overflow:hidden;">
+            <!-- ═══ STUDIO CORE ═══ -->
+            <div class="sx-core">
 
-                <!-- HEADER -->
-                <div class="studio-pro-header">
-                    <h2>🏆 ESTUDIO DE LOGROS</h2>
+                <!-- HEADER COMPACTO -->
+                <div class="sx-hdr">
+                    <div class="sx-hdr-left">
+                        <span class="sx-hdr-ico">🏆</span>
+                        <div>
+                            <div class="sx-hdr-title">ESTUDIO <em>DE LOGROS</em></div>
+                            <div class="sx-hdr-sub">AX-CORE BY ARTHUR</div>
+                        </div>
+                    </div>
+                    <div class="sx-hdr-badge">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                        PRO
+                    </div>
                 </div>
 
-                <!-- PREVIEW EN VIVO -->
-                <div class="studio-pro-preview">
-                    <span class="studio-pro-eyebrow">VISTA PREVIA EN VIVO</span>
-                    <div class="studio-preview-wrap">
+                <!-- PREVIEW HERO -->
+                <div class="sx-hero">
+
+                    <!-- BOTONES FLOTANTES SUPERIORES (glassmorphism, icon-only) -->
+                    <div class="sx-float-bar">
+                        <button class="sx-fab" id="sx-fab-preview" title="Vista previa" onclick="document.getElementById('btn-studio-share').click()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        </button>
+                        <button class="sx-fab" id="sx-fab-save" title="Guardar HD" onclick="document.getElementById('btn-studio-share').click()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        </button>
+                        <button class="sx-fab sx-fab-primary" id="sx-fab-share" title="Compartir" onclick="document.getElementById('btn-studio-share').click()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+                        </button>
+                    </div>
+
+                    <div class="sx-canvas-frame">
+                        <div class="sx-canvas-glow"></div>
                         <canvas id="studio-preview-canvas"></canvas>
                     </div>
-                    <button class="btn-premium" id="btn-studio-share">📤 COMPARTIR HD</button>
-                </div>
-
-                <!-- PLANTILLAS (siempre visible) -->
-                <div class="studio-pro-section">
-                    <div class="studio-pro-label">PLANTILLAS</div>
-                    <div class="studio-templates" id="studio-tpl-list"></div>
-                </div>
-
-                <!-- FORMATO (siempre visible) -->
-                <div class="studio-pro-section">
-                    <div class="studio-pro-label">FORMATO</div>
-                    <div class="studio-format-btns" id="studio-fmt-btns"></div>
-                </div>
-
-                <!-- TABS -->
-                <div class="studio-pro-tabs">
-                    <button class="studio-pro-tab active" data-stab="diseno">DISEÑO</button>
-                    <button class="studio-pro-tab" data-stab="metricas">MÉTRICAS</button>
-                    <button class="studio-pro-tab" data-stab="efectos">EFECTOS</button>
-                </div>
-
-                <!-- TAB: DISEÑO -->
-                <div class="studio-pro-tab-content active" id="stab-diseno">
-                    <div class="studio-pro-section">
-                        <div class="studio-pro-label">🎨 ESTILO DE TARJETA</div>
-                        <div id="studio-card-style-btns" class="studio-pro-pills"></div>
-                    </div>
-                    <div class="studio-pro-section">
-                        <div class="studio-pro-label">ACENTO</div>
-                        <div id="studio-accent-btns" class="studio-pro-pills"></div>
-                    </div>
-                    <div class="studio-pro-section">
-                        <div class="studio-pro-label">TIPOGRAFÍA</div>
-                        <div id="studio-font-btns" class="studio-pro-pills"></div>
-                    </div>
-                    <div class="studio-pro-section">
-                        <div class="studio-pro-label">COLOR LETRA</div>
-                        <div id="studio-color-swatches" class="studio-pro-swatches"></div>
-                    </div>
-                    <div class="studio-pro-section">
-                        <div class="studio-pro-label"><span>TAMAÑO LETRA</span><span class="studio-pro-val" id="studio-size-val">${Math.round(studioState.textSize*100)}%</span></div>
-                        <input type="range" id="studio-size-picker" class="studio-pro-slider" min="0.5" max="2.5" step="0.1" value="${studioState.textSize}">
+                    <div class="sx-cta-row">
+                        <button class="sx-share-btn" id="btn-studio-share">📤 COMPARTIR HD</button>
                     </div>
                 </div>
 
-                <!-- TAB: MÉTRICAS -->
-                <div class="studio-pro-tab-content" id="stab-metricas">
-                    <div class="studio-pro-section">
-                        <div class="studio-pro-label">MÉTRICAS A MOSTRAR</div>
-                        <div class="studio-metrics" id="studio-met-list"></div>
-                    </div>
-                    <div class="studio-pro-section">
-                        <div class="studio-pro-label">⭐ MÉTRICA PRINCIPAL</div>
-                        <div id="studio-hero-metric-btns" class="studio-pro-pills"></div>
-                    </div>
-                </div>
+                <!-- BOTTOM SHEET -->
+                <div class="sx-sheet">
+                    <div class="sx-notch"></div>
 
-                <!-- TAB: EFECTOS -->
-                <div class="studio-pro-tab-content" id="stab-efectos">
-                    <div class="studio-pro-section">
-                        <div class="studio-pro-label">OVERLAY</div>
-                        <div id="studio-filter-btns" class="studio-pro-pills"></div>
+                    <!-- TAB BAR (clases originales preservadas para JS) -->
+                    <div class="studio-pro-tabs sx-tabbar">
+                        <button class="studio-pro-tab active" data-stab="diseno">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                            <span>DISEÑO</span>
+                        </button>
+                        <button class="studio-pro-tab" data-stab="metricas">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                            <span>DATOS</span>
+                        </button>
+                        <button class="studio-pro-tab" data-stab="estilo">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/></svg>
+                            <span>ESTILO</span>
+                        </button>
+                        <button class="studio-pro-tab" data-stab="fondo">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18"/></svg>
+                            <span>FONDO</span>
+                        </button>
+                        <button class="studio-pro-tab" data-stab="fx">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                            <span>FX</span>
+                        </button>
                     </div>
-                    <div class="studio-pro-section">
-                        <div class="studio-pro-label">ESTILO HUD</div>
-                        <div id="studio-hud-btns" class="studio-pro-pills"></div>
-                    </div>
-                </div>
 
-            </div>
+                    <!-- CONTENIDO DE TABS -->
+                    <div class="sx-tabscroll">
+
+                        <!-- DISEÑO: plantillas + estilo de tarjeta -->
+                        <div class="studio-pro-tab-content active" id="stab-diseno">
+                            <div class="sx-sec-lbl">PLANTILLAS</div>
+                            <div class="studio-templates" id="studio-tpl-list"></div>
+                            <div class="sx-sec-lbl" style="margin-top:20px">ESTILO DE TARJETA</div>
+                            <div id="studio-card-style-btns" class="studio-pro-pills sx-card-pills"></div>
+                        </div>
+
+                        <!-- DATOS: métricas + hero metric -->
+                        <div class="studio-pro-tab-content" id="stab-metricas">
+                            <div class="sx-sec-lbl">MÉTRICAS A MOSTRAR</div>
+                            <div class="studio-metrics" id="studio-met-list"></div>
+                            <div class="sx-sec-lbl" style="margin-top:20px">⭐ MÉTRICA PRINCIPAL</div>
+                            <div id="studio-hero-metric-btns" class="studio-pro-pills"></div>
+                        </div>
+
+                        <!-- ESTILO: acento · tipografía · colores · tamaño -->
+                        <div class="studio-pro-tab-content" id="stab-estilo">
+                            <div class="sx-sec-lbl">ACENTO DE COLOR</div>
+                            <div id="studio-accent-btns" class="studio-pro-pills sx-accent-pills"></div>
+                            <div class="sx-sec-lbl" style="margin-top:20px">TIPOGRAFÍA</div>
+                            <div id="studio-font-btns" class="studio-pro-pills sx-font-pills"></div>
+                            <div class="sx-sec-lbl" style="margin-top:20px">COLOR DE TEXTO</div>
+                            <div id="studio-color-swatches" class="studio-pro-swatches sx-swatches"></div>
+                            <div class="sx-sec-lbl" style="margin-top:20px">TAMAÑO DE TEXTO <span class="sx-val-badge" id="studio-size-val">${Math.round(studioState.textSize*100)}%</span></div>
+                            <input type="range" id="studio-size-picker" class="studio-pro-slider sx-slider" min="0.5" max="2.5" step="0.1" value="${studioState.textSize}">
+                        </div>
+
+                        <!-- FONDO: formato de tarjeta -->
+                        <div class="studio-pro-tab-content" id="stab-fondo">
+                            <div class="sx-sec-lbl">FORMATO DE TARJETA</div>
+                            <div class="studio-format-btns sx-fmt-seg" id="studio-fmt-btns"></div>
+                            <div class="sx-fmt-hint">
+                                <span class="sx-fmt-hint-item">STORY · 4:5</span>
+                                <span class="sx-fmt-hint-item">CUADRADO · 1:1</span>
+                                <span class="sx-fmt-hint-item">PAISAJE · 16:9</span>
+                            </div>
+                        </div>
+
+                        <!-- FX: overlay + HUD -->
+                        <div class="studio-pro-tab-content" id="stab-fx">
+                            <div class="sx-sec-lbl">FILTRO OVERLAY</div>
+                            <div id="studio-filter-btns" class="studio-pro-pills"></div>
+                            <div class="sx-sec-lbl" style="margin-top:20px">ESTILO HUD</div>
+                            <div id="studio-hud-btns" class="studio-pro-pills"></div>
+                        </div>
+
+                    </div><!-- /.sx-tabscroll -->
+                </div><!-- /.sx-sheet -->
+
+            </div><!-- /.sx-core -->
         `;
 
         // Pintar medallas
@@ -3119,25 +3159,44 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // --- Format buttons ---
         const fmtBtns = document.getElementById('studio-fmt-btns');
+        const allFmtBtns = [];
+        const refreshFmtBtns = () => {
+            allFmtBtns.forEach(({ btn, fmt }) => {
+                btn.classList.toggle('active', studioState.fmt === fmt.id);
+            });
+        };
         STUDIO_FORMATS.forEach(fmt => {
             const btn = document.createElement('button');
             btn.textContent = fmt.label;
             if(studioState.fmt===fmt.id) btn.classList.add('active');
-            btn.onclick = () => { studioState.fmt = fmt.id; renderStudioPage(); };
+            btn.onclick = () => {
+                studioState.fmt = fmt.id;
+                // Actualizar botones activos en-lugar y redibujar canvas
+                refreshFmtBtns();
+                renderStudioCard(previewCanvas, studioState.tpl, studioState.fmt, studioState.metrics, true);
+            };
+            allFmtBtns.push({ btn, fmt });
             fmtBtns.appendChild(btn);
         });
 
         // --- Metric toggles ---
         const metList = document.getElementById('studio-met-list');
         STUDIO_METRICS.forEach(m => {
-            const isOn = studioState.metrics.includes(m.key);
             const tog = document.createElement('div');
-            tog.className = 'studio-metric-toggle' + (isOn ? ' on' : '');
+            // Leer estado en tiempo real (no closure) para que sea correcto tras renders
+            const getOn = () => studioState.metrics.includes(m.key);
+            tog.className = 'studio-metric-toggle' + (getOn() ? ' on' : '');
             tog.innerHTML = `<div class="dot"></div> ${m.label}: <strong>${m.val()}</strong>`;
             tog.onclick = () => {
-                if (isOn) studioState.metrics = studioState.metrics.filter(k=>k!==m.key);
-                else studioState.metrics.push(m.key);
-                renderStudioPage();
+                if (getOn()) {
+                    studioState.metrics = studioState.metrics.filter(k => k !== m.key);
+                } else {
+                    studioState.metrics.push(m.key);
+                }
+                // Actualizar clase en-lugar SIN reconstruir toda la página
+                tog.classList.toggle('on', getOn());
+                // Solo redibujar el canvas de preview
+                renderStudioCard(previewCanvas, studioState.tpl, studioState.fmt, studioState.metrics, true);
             };
             metList.appendChild(tog);
         });
@@ -3175,6 +3234,20 @@ document.addEventListener('DOMContentLoaded', () => {
             { c:'#ffb6c1', bg:'#ffb6c1' },
         ];
         
+        const allSwatchBtns = [];
+        const refreshSwatches = () => {
+            allSwatchBtns.forEach(({ btn, p }) => {
+                if (studioState.textColor === p.c) {
+                    btn.style.outline = '3px solid var(--accent-main)';
+                    btn.style.transform = 'scale(1.18)';
+                    btn.style.border = '';
+                } else {
+                    btn.style.outline = '';
+                    btn.style.transform = '';
+                    btn.style.border = '1px solid rgba(255,255,255,0.18)';
+                }
+            });
+        };
         palette.forEach(p => {
             const btn = document.createElement('button');
             btn.style.width = '28px'; btn.style.height = '28px';
@@ -3188,7 +3261,13 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 btn.style.border = '1px solid rgba(255,255,255,0.18)';
             }
-            btn.onclick = () => { studioState.textColor = p.c; renderStudioPage(); };
+            btn.onclick = () => {
+                studioState.textColor = p.c;
+                // Actualizar selección visual en-lugar SIN reconstruir toda la página
+                refreshSwatches();
+                renderStudioCard(previewCanvas, studioState.tpl, studioState.fmt, studioState.metrics, true);
+            };
+            allSwatchBtns.push({ btn, p });
             swatchesContainer.appendChild(btn);
         });
 
@@ -3204,6 +3283,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.studio-pro-tab').forEach(tab => {
             tab.onclick = () => {
                 const target = tab.dataset.stab;
+                studioState.activeTab = target; // persistir para sobrevivir re-renders
                 document.querySelectorAll('.studio-pro-tab').forEach(t => t.classList.remove('active'));
                 tab.classList.add('active');
                 document.querySelectorAll('.studio-pro-tab-content').forEach(c => c.classList.remove('active'));
@@ -3211,6 +3291,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (content) content.classList.add('active');
             };
         });
+
+        // Restaurar el tab activo si renderStudioPage() fue llamado desde un botón interno
+        if (studioState.activeTab && studioState.activeTab !== 'diseno') {
+            const savedTabBtn = document.querySelector(`#page-studio .studio-pro-tab[data-stab="${studioState.activeTab}"]`);
+            if (savedTabBtn) {
+                document.querySelectorAll('#page-studio .studio-pro-tab').forEach(t => t.classList.remove('active'));
+                savedTabBtn.classList.add('active');
+                document.querySelectorAll('#page-studio .studio-pro-tab-content').forEach(c => c.classList.remove('active'));
+                const savedContent = document.getElementById('stab-' + studioState.activeTab);
+                if (savedContent) savedContent.classList.add('active');
+            }
+        }
 
         // --- Selectores de Estilo Avanzado ---
         const _makeStyleBtns = (containerId, options, stateKey) => {
@@ -3426,7 +3518,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const status = document.getElementById('calc-status-line');
         if (status) {
             const tone = remaining < 0 ? '⛔' : remaining < 200 ? '⚠️' : '✅';
-            status.innerHTML = `${tone} Hoy llevas <strong style="color:var(--accent-main)">${consumed} kcal</strong> ingeridas / <strong>${limit} kcal</strong> límite. Quemaste ${burned} kcal con ejercicio. Te quedan <strong style="color:${remaining < 0 ? '#ff3366' : '#00ff88'};">${remaining} kcal</strong> hoy.`;
+            status.innerHTML = `${tone} Hoy llevas <strong style="color:var(--accent-main)">${consumed} kcal</strong> ingeridas / <strong>${limit} kcal</strong> límite. Quemaste ${burned} kcal con ejercicio. Te quedan <strong style="color:${remaining < 0 ? 'var(--accent-alert)' : 'var(--accent-main)'};">${remaining} kcal</strong> hoy.`;
         }
         const ageEl = document.getElementById('calc-age');
         if (ageEl && userData.age && !ageEl.value) ageEl.value = userData.age;
