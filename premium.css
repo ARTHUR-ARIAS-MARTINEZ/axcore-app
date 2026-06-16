@@ -92,10 +92,10 @@ body.premium-mode[data-theme="black"] {
 }
 /* ── MASCULINO 2: CYBERPUNK ── */
 body.premium-mode[data-theme="cyberpunk"] {
-  --pm-green-rgb: 0,229,255;
-  --pm-cyan-rgb:  255,234,0;
+  --pm-green-rgb: 0,212,170;
+  --pm-cyan-rgb:  0,255,102;
   --pm-s1: #06091a; --pm-s2: #0a1028; --pm-s3: #111834; --pm-dim: #1a2a4a;
-  --pm-border: rgba(0,229,255,0.12);
+  --pm-border: rgba(0,212,170,0.12);
   background: #050a1f !important;
 }
 /* ── MASCULINO 3: MILITAR ── */
@@ -120,12 +120,12 @@ body.premium-mode[data-theme="salmon"] {
   --pm-s1: #100818; --pm-s2: #160e22; --pm-s3: #1c122c; --pm-dim: #3a1860;
   background: #07040f !important;
 }
-/* ── FEMENINO 3: AURORA BOREALIS — teal-violeta oscuro ── */
+/* ── FEMENINO 3: LGBT PASTEL — lila y rosa pastel ── */
 body.premium-mode[data-theme="pastel"] {
-  --pm-green-rgb: 0,212,170;
-  --pm-cyan-rgb:  199,125,255;
-  --pm-s1: #091018; --pm-s2: #0e1820; --pm-s3: #14202a; --pm-dim: #1e4040;
-  background: #060d14 !important;
+  --pm-green-rgb: 255,158,226;
+  --pm-cyan-rgb:  181,226,255;
+  --pm-s1: #130f1d; --pm-s2: #191426; --pm-s3: #221c32; --pm-dim: #352a4e;
+  background: #0f0b18 !important;
 }
 
 /* ── LGBTQ+ 1: PRIDE FIRE — arcoíris cálido, naranja-dorado ── */

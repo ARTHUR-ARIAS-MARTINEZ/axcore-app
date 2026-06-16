@@ -236,7 +236,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Restaurar la sección donde estaba el usuario antes de recargar
             try {
-                const savedPage = localStorage.getItem('axcore_active_page');
+                const savedPage = sessionStorage.getItem('axcore_active_page');
 
                 if (savedPage) {
                     const targetPage = document.getElementById(`page-${savedPage}`);
@@ -245,6 +245,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         targetPage.classList.add('active');
                         navLinks.forEach(l => {
                             l.classList.toggle('active', l.dataset.page === savedPage);
+                        });
+                        // Sincronizar bottom nav premium
+                        document.querySelectorAll('.pm-nav-btn').forEach(btn => {
+                            btn.classList.toggle('active', btn.dataset.pmPage === savedPage);
                         });
                         if (savedPage === 'diet' && typeof renderDietPage === 'function') renderDietPage();
                         if (savedPage === 'workout' && typeof renderWorkoutPage === 'function') renderWorkoutPage();
@@ -1322,7 +1326,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     black: 'ULTRA DARK', 
                     cyberpunk: 'CYBERPUNK', 
                     pink: 'FEMENINO', 
-                    pastel: 'NEUTRAL',
+                    pastel: 'LGBT',
                     neon: 'NEON' 
                 };
                 toastFn('✦ Tema: ' + (nombres[themeName] || themeName.toUpperCase()), 'green');
@@ -1556,7 +1560,7 @@ document.addEventListener('DOMContentLoaded', () => {
             navLinks.forEach(l => l.classList.remove('active'));
             link.classList.add('active');
             // Persistir sección activa para que sobreviva al refrescar
-            localStorage.setItem('axcore_active_page', pageId);
+            sessionStorage.setItem('axcore_active_page', pageId);
             
             if (pageId === 'diet') renderDietPage();
             if (pageId === 'workout') renderWorkoutPage();
