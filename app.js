@@ -1220,6 +1220,14 @@ document.addEventListener('DOMContentLoaded', () => {
             userData.username = newName;
             window.userData = userData;
             try { saveData(); } catch(e) { console.warn('[pmApplyNewName] saveData:', e.message); }
+
+            // Actualizar la interfaz de forma inmediata sin recargar la página
+            if (typeof window.syncProfileEverywhere === 'function') {
+                window.syncProfileEverywhere();
+            } else if (typeof applySettings === 'function') {
+                applySettings();
+            }
+
             pmShowToast('✓ Nombre actualizado', 'green');
         } catch (e) { console.warn('[pmApplyNewName]', e.message); }
     }
@@ -1310,11 +1318,13 @@ document.addEventListener('DOMContentLoaded', () => {
             // Toast de confirmación (usa la función local o la existente)
             const toastFn = typeof pmShowToast === 'function' ? pmShowToast : null;
             if (toastFn) {
-                const nombres = { black:'ULTRA DARK', cyberpunk:'CYBERPUNK', military:'MILITAR',
-                                  pink:'HOT PINK', salmon:'VIOLETA', pastel:'AURORA',
-                                  pride:'PRIDE FIRE', trans:'TRANS AZURE', 'neon-bi':'NEON BI',
-                                  neon:'NEON', original:'GOLD ELITE', fuchsia:'CORAL GLOW',
-                                  dark:'DARK', natural:'ZEN', tactical:'TACTICAL', rainbow:'RAINBOW' };
+                const nombres = { 
+                    black: 'ULTRA DARK', 
+                    cyberpunk: 'CYBERPUNK', 
+                    pink: 'FEMENINO', 
+                    pastel: 'NEUTRAL',
+                    neon: 'NEON' 
+                };
                 toastFn('✦ Tema: ' + (nombres[themeName] || themeName.toUpperCase()), 'green');
             }
         } catch (e) {
@@ -3609,7 +3619,7 @@ document.addEventListener('DOMContentLoaded', () => {
             userData.age = age;
             saveData();
             out.innerHTML = `
-                <div style="padding:1rem; background:rgba(255,215,0,0.05); border-radius:10px; border:1px solid rgba(255,215,0,0.3);">
+                <div style="padding:1rem; background:rgba(var(--pm-green-rgb, 0,201,122),0.05); border-radius:10px; border:1px solid rgba(var(--pm-green-rgb, 0,201,122),0.25);">
                     <div style="display:flex; justify-content:space-between; padding:0.4rem 0; border-bottom:1px solid rgba(255,255,255,0.05);">
                         <span style="color:var(--text-dim); font-size:0.8rem;">BMR (metabolismo basal)</span>
                         <strong style="color:#fff;">${bmr} kcal</strong>
@@ -3618,7 +3628,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <span style="color:var(--text-dim); font-size:0.8rem;">TDEE (gasto total diario)</span>
                         <strong style="color:#fff;">${tdee} kcal</strong>
                     </div>
-                    <div style="display:flex; justify-content:space-between; margin-top:0.3rem; background:rgba(0,255,136,0.08); border-radius:6px; padding:0.6rem 0.8rem;">
+                    <div style="display:flex; justify-content:space-between; margin-top:0.3rem; background:rgba(var(--pm-green-rgb, 0,201,122),0.08); border-radius:6px; padding:0.6rem 0.8rem;">
                         <span style="color:var(--accent-main); font-size:0.85rem; font-weight:bold;">LÍMITE RECOMENDADO</span>
                         <strong style="color:var(--accent-main); font-size:1.1rem;">${limit} kcal/día</strong>
                     </div>
@@ -3665,10 +3675,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const goalDate = new Date();
             goalDate.setDate(goalDate.getDate() + days);
             out.innerHTML = `
-                <div style="padding:1rem; background:rgba(0,212,255,0.05); border-radius:10px; border:1px solid rgba(0,212,255,0.3);">
+                <div style="padding:1rem; background:rgba(var(--pm-green-rgb, 0,201,122),0.05); border-radius:10px; border:1px solid rgba(var(--pm-green-rgb, 0,201,122),0.25);">
                     <div style="text-align:center; margin-bottom:1rem;">
                         <div style="font-size:0.75rem; color:var(--text-dim);">FALTAN</div>
-                        <div style="font-size:2rem; font-family:var(--font-accent); color:#00d4ff; font-weight:bold;">${days}</div>
+                        <div style="font-size:2rem; font-family:var(--font-accent); color:var(--accent-main); font-weight:bold;">${days}</div>
                         <div style="font-size:0.75rem; color:var(--text-dim);">DÍAS PARA TU META</div>
                     </div>
                     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.6rem;">

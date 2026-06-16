@@ -3,6 +3,15 @@
     --font-accent: 'Oswald', sans-serif; /* Fitness / Gym feeling */
     --text-primary: #ffffff;
     --text-dim: #b0b0b0;
+
+    /* Variables de acento y tema por defecto (Neon) */
+    --bg-dark: #0a0e14;
+    --accent-main: #00c97a;
+    --accent-secondary: #00e5ff;
+    --accent-alert: #ff0055;
+    --glass: rgba(0, 201, 122, 0.07);
+    --glass-border: rgba(0, 201, 122, 0.25);
+    --neon-glow: 0 0 10px rgba(0, 201, 122, 0.45), 0 0 20px rgba(0, 229, 255, 0.15);
 }
 
 [data-theme="black"] {

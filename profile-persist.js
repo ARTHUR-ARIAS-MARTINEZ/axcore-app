@@ -248,13 +248,6 @@
             if (header) {
                 header.textContent = nameUpper;
                 header.setAttribute('data-axprofile-name', nameUpper);
-                header.style.setProperty('color', '#ffffff', 'important');
-                header.style.setProperty('display', 'block', 'important');
-                header.style.setProperty('visibility', 'visible', 'important');
-                header.style.setProperty('opacity', '1', 'important');
-                header.style.setProperty('min-height', '18px', 'important');
-                header.style.setProperty('font-size', '1rem', 'important');
-                header.style.setProperty('font-weight', '700', 'important');
             }
 
             // 2. HEADER — avatar

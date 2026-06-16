@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(\\(Get-Content \"c:\\\\Users\\\\Default.DESKTOP-4UKPMTS\\\\Desktop\\\\1 Antigravity\\\\App Control de Peso\\\\app.js\" | Measure-Object -Line\\).Lines)",
+      "PowerShell(\\(Get-Content \"c:\\\\Users\\\\Default.DESKTOP-4UKPMTS\\\\Desktop\\\\1 Antigravity\\\\App Control de Peso\\\\premium.css\" | Measure-Object -Line\\).Lines)"
+    ]
+  }
+}

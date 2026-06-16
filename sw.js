@@ -1,4 +1,4 @@
-const CACHE_NAME = 'axcore-v5.6-username-visible';
+const CACHE_NAME = 'axcore-v5.7-themes-fixed';
 const urlsToCache = [
   './',
   './index.html',
