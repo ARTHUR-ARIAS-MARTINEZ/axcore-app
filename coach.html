@@ -10,7 +10,8 @@
     <link rel="icon" href="logo_coach.png" type="image/png">
     <!-- Fuentes -->
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="index.css?v=20260517b">
+    <link rel="stylesheet" href="index.css?v=20260616b">
+    <link rel="stylesheet" href="premium.css?v=20260616b">
     <style>
         /* ============================
            COACH TERMINAL VIP
@@ -22,20 +23,21 @@
             height: auto !important;
         }
         body {
-            background: #0a0e14;
+            background: var(--bg-dark, #0a0e14) !important;
             overflow-x: hidden !important;
             overflow-y: auto !important;
             height: auto !important;
             min-height: 100vh;
             position: static !important;
+            transition: background 0.3s ease;
         }
         body::before {
             content: '';
             position: fixed; inset: 0; z-index: -1;
             background:
-                radial-gradient(ellipse 60% 50% at 15% 10%, rgba(0,255,136,0.07), transparent),
-                radial-gradient(ellipse 50% 40% at 85% 85%, rgba(0,212,255,0.05), transparent),
-                radial-gradient(ellipse 40% 30% at 50% 50%, rgba(0,255,136,0.03), transparent);
+                radial-gradient(ellipse 60% 50% at 15% 10%, rgba(var(--pm-green-rgb, 0,255,136), 0.07), transparent),
+                radial-gradient(ellipse 50% 40% at 85% 85%, rgba(var(--pm-cyan-rgb, 0,212,255), 0.05), transparent),
+                radial-gradient(ellipse 40% 30% at 50% 50%, rgba(var(--pm-green-rgb, 0,255,136), 0.03), transparent);
             animation: bgPulse 12s ease-in-out infinite alternate;
         }
         @keyframes bgPulse {
@@ -44,7 +46,7 @@
         }
 
         .gradient-text {
-            background: linear-gradient(135deg, #00ff88 0%, #00d4ff 40%, #00ff88 100%);
+            background: linear-gradient(135deg, var(--accent-main, #00ff88) 0%, var(--accent-secondary, #00d4ff) 40%, var(--accent-main, #00ff88) 100%);
             background-size: 200% auto;
             -webkit-background-clip: text;
             background-clip: text;
@@ -89,7 +91,7 @@
             font-size: 3.8rem;
             letter-spacing: 4px;
             line-height: 1;
-            text-shadow: 0 0 40px rgba(0,255,136,0.4);
+            text-shadow: 0 0 40px rgba(var(--pm-green-rgb, 0,255,136), 0.4);
         }
         .header-brand p {
             font-family: 'Orbitron', sans-serif;
@@ -103,7 +105,7 @@
             content: '';
             display: block;
             width: 120px; height: 2px;
-            background: linear-gradient(90deg, transparent, #00ff88, transparent);
+            background: linear-gradient(90deg, transparent, var(--accent-main, #00ff88), transparent);
             margin: 18px auto 0;
         }
 
@@ -114,10 +116,10 @@
             width: 100%;
             background: rgba(12,16,24,0.85);
             backdrop-filter: blur(20px);
-            border: 1px solid rgba(0,255,136,0.2);
+            border: 1px solid var(--glass-border, rgba(0,255,136,0.2));
             border-radius: 20px;
             padding: 2.5rem 2rem;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 30px rgba(0,255,136,0.06);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.6), var(--neon-glow);
             position: relative;
             overflow: hidden;
         }
@@ -125,7 +127,7 @@
             content: '';
             position: absolute; top: 0; left: 0; right: 0;
             height: 2px;
-            background: linear-gradient(90deg, transparent, #00ff88, #00d4ff, transparent);
+            background: linear-gradient(90deg, transparent, var(--accent-main, #00ff88), var(--accent-secondary, #00d4ff), transparent);
         }
         #login-section h2 {
             text-align: center;
@@ -146,7 +148,7 @@
             backdrop-filter: blur(20px);
             padding: 1.5rem 2rem;
             border-radius: 12px;
-            border: 1px solid rgba(0,255,136,0.15);
+            border: 1px solid var(--glass-border, rgba(0,255,136,0.15));
             flex-wrap: wrap;
             gap: 16px;
             box-shadow: 0 8px 32px rgba(0,0,0,0.4);
@@ -156,7 +158,7 @@
             content: '';
             position: absolute; bottom: 0; left: 20px; right: 20px;
             height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(0,255,136,0.3), transparent);
+            background: linear-gradient(90deg, transparent, rgba(var(--pm-green-rgb, 0,255,136), 0.3), transparent);
         }
         .dashboard-header h2 {
             font-family: 'Orbitron', sans-serif;
@@ -167,28 +169,28 @@
         }
         .dashboard-header p {
             margin: 4px 0 0 0;
-            color: rgba(0,255,136,0.5);
+            color: rgba(var(--pm-green-rgb, 0,255,136), 0.6);
             font-size: 0.75rem;
             letter-spacing: 2px;
             font-family: 'Orbitron', sans-serif;
         }
 
         .stats-badge {
-            background: rgba(0,255,136,0.08);
-            color: #00ff88;
+            background: rgba(var(--pm-green-rgb, 0,255,136), 0.08);
+            color: var(--accent-main, #00ff88);
             padding: 0.6rem 1.2rem;
             border-radius: 30px;
             font-weight: 700;
             font-size: 0.85rem;
-            border: 1px solid rgba(0,255,136,0.25);
-            box-shadow: 0 0 15px rgba(0,255,136,0.1);
+            border: 1px solid rgba(var(--pm-green-rgb, 0,255,136), 0.25);
+            box-shadow: 0 0 15px rgba(var(--pm-green-rgb, 0,255,136), 0.1);
             letter-spacing: 0.5px;
             transition: all 0.3s;
             font-family: 'Orbitron', sans-serif;
         }
         .stats-badge.alert {
             background: rgba(255,50,70,0.08);
-            color: #ff4757;
+            color: var(--accent-alert, #ff4757);
             border-color: rgba(255,50,70,0.3);
             box-shadow: 0 0 18px rgba(255,50,70,0.15);
             animation: alertPulse 2s ease-in-out infinite;
@@ -206,10 +208,10 @@
         }
 
         .client-card {
-            background: rgba(14,14,24,0.75);
+            background: var(--glass, rgba(14,14,24,0.75)) !important;
             backdrop-filter: blur(16px);
-            border: 1px solid rgba(255,255,255,0.06);
-            border-left: 4px solid #00ff88;
+            border: 1px solid var(--glass-border, rgba(255,255,255,0.06)) !important;
+            border-left: 4px solid var(--accent-main, #00ff88) !important;
             border-radius: 14px;
             padding: 1rem 1.2rem;
             display: flex;
@@ -221,16 +223,16 @@
         }
         .client-card:hover {
             transform: translateY(-6px);
-            box-shadow: 0 16px 48px rgba(0,0,0,0.5), 0 0 20px rgba(0,255,136,0.08);
-            border-color: rgba(0,255,136,0.15);
+            box-shadow: 0 16px 48px rgba(0,0,0,0.5), 0 0 20px rgba(var(--pm-green-rgb, 0,255,136), 0.08);
+            border-color: rgba(var(--pm-green-rgb, 0,255,136), 0.15);
         }
         .client-card.paused {
-            border-left-color: #ff4757;
+            border-left-color: var(--accent-alert, #ff4757) !important;
             opacity: 0.65;
         }
         .client-card.paused:hover {
-            box-shadow: 0 16px 48px rgba(0,0,0,0.5), 0 0 20px rgba(255,71,87,0.1);
-            border-color: rgba(255,71,87,0.15);
+            box-shadow: 0 16px 48px rgba(0,0,0,0.5), 0 0 20px rgba(var(--pm-green-rgb, 0,255,136), 0.1);
+            border-color: rgba(var(--pm-green-rgb, 0,255,136), 0.15);
         }
 
         .client-card h3 {
@@ -262,31 +264,31 @@
         }
         .btn-delete-x:hover {
             transform: scale(1.15);
-            color: #ff4757;
+            color: var(--accent-alert, #ff4757);
             background: rgba(255,71,87,0.15);
             box-shadow: 0 0 12px rgba(255,71,87,0.3);
         }
 
         .code-box {
             font-family: 'Orbitron', monospace, 'Courier New';
-            background: rgba(0,255,136,0.08);
+            background: rgba(var(--pm-green-rgb, 0,255,136), 0.08);
             padding: 4px 10px;
             border-radius: 8px;
-            color: #00ff88;
+            color: var(--accent-main, #00ff88);
             letter-spacing: 3px;
             font-size: 0.9rem;
             font-weight: 700;
-            border: 1px solid rgba(0,255,136,0.2);
+            border: 1px solid rgba(var(--pm-green-rgb, 0,255,136), 0.2);
         }
 
         /* TOAST */
         .toast {
             position: fixed; top: 24px; left: 50%; transform: translateX(-50%);
-            background: linear-gradient(135deg, #00ff88, #00cc6a);
+            background: linear-gradient(135deg, var(--accent-main, #00ff88), var(--accent-secondary, #00cc6a));
             color: #000; padding: 16px 32px;
             font-size: 0.95rem; font-weight: 800;
             border-radius: 14px; z-index: 2000;
-            box-shadow: 0 8px 32px rgba(0,255,136,0.4), 0 0 60px rgba(0,255,136,0.2);
+            box-shadow: 0 8px 32px rgba(var(--pm-green-rgb, 0,255,136), 0.4), 0 0 60px rgba(var(--pm-green-rgb, 0,255,136), 0.2);
             opacity: 0;
             transition: opacity 0.5s ease-in-out, transform 0.5s;
             pointer-events: none;
@@ -296,7 +298,7 @@
 
         /* BUTTONS */
         .btn-premium {
-            background: linear-gradient(135deg, #00ff88, #00cc6a);
+            background: linear-gradient(135deg, var(--accent-main, #00ff88), var(--accent-secondary, #00cc6a));
             color: #000;
             font-weight: 800;
             border: none;
@@ -310,7 +312,7 @@
             padding: 0.9rem 1.6rem;
         }
         .btn-premium:hover {
-            box-shadow: 0 6px 24px rgba(0,255,136,0.4);
+            box-shadow: 0 6px 24px rgba(var(--pm-green-rgb, 0,255,136), 0.4);
             transform: translateY(-2px);
             filter: brightness(1.1);
         }
@@ -318,7 +320,7 @@
 
         .btn-cancel {
             background: transparent;
-            border: 1px solid;
+            border: 1px solid var(--accent-alert, #ff4757);
             border-radius: 12px;
             cursor: pointer;
             font-weight: 700;
@@ -327,8 +329,12 @@
             font-size: 0.78rem;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            color: var(--accent-alert, #ff4757);
         }
-        .btn-cancel:hover { transform: translateY(-1px); }
+        .btn-cancel:hover {
+            transform: translateY(-1px);
+            background: rgba(255,71,87,0.08);
+        }
 
         /* INPUT */
         .input-group { margin-bottom: 0; }
@@ -352,12 +358,27 @@
             outline: none;
         }
         .input-group input:focus {
-            border-color: rgba(0,255,136,0.5);
-            box-shadow: 0 0 16px rgba(0,255,136,0.15);
+            border-color: var(--accent-main, rgba(0,255,136,0.5));
+            box-shadow: 0 0 16px rgba(var(--pm-green-rgb, 0,255,136), 0.15);
             outline: none;
         }
 
         #dashboard { display: none; margin-top: -3vh; }
+
+        /* Swatches de Temas */
+        .t-swatch {
+            transition: all 0.3s;
+        }
+        .t-swatch:hover {
+            transform: translateY(-2px);
+            background: rgba(255,255,255,0.05) !important;
+            border-color: rgba(var(--pm-green-rgb, 0,255,136), 0.2) !important;
+        }
+        .t-swatch.active {
+            background: rgba(var(--pm-green-rgb, 0,255,136), 0.1) !important;
+            border-color: var(--accent-main, #00ff88) !important;
+            box-shadow: 0 0 15px rgba(var(--pm-green-rgb, 0,255,136), 0.25);
+        }
 
         /* Responsive */
         @media (max-width: 600px) {
@@ -371,13 +392,13 @@
         }
     </style>
 </head>
-<body data-theme="dark">
+<body class="premium-mode" data-theme="cyberpunk">
 
 <div class="coach-container pb-transition" id="main-container">
     <div class="header-brand" style="position:relative;">
-        <h1 style="background: linear-gradient(135deg, #00ff88, #00d4ff, #00ff88); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; text-shadow: none;"><span>AX-CORE</span></h1>
+        <h1 style="background: linear-gradient(135deg, var(--accent-main, #00ff88), var(--accent-secondary, #00d4ff), var(--accent-main, #00ff88)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; text-shadow: none;"><span>AX-CORE</span></h1>
         <p style="font-family: 'Orbitron', sans-serif; font-size: 0.85rem; color:rgba(255,255,255,0.6); letter-spacing: 4px; margin-top:5px; text-transform:uppercase;">COACH TERMINAL VIP</p>
-        <a id="btn-install-coach" href="#" style="position:absolute; right:16px; top:16px; font-size:1.5rem; color:#00ff88; text-decoration:none; cursor:pointer;" title="Instalar App">⬇</a>
+        <a id="btn-install-coach" href="#" style="position:absolute; right:16px; top:16px; font-size:1.5rem; color:var(--accent-main, #00ff88); text-decoration:none; cursor:pointer;" title="Instalar App">⬇</a>
     </div>
 
     <!-- Login -->
@@ -403,17 +424,46 @@
         <div class="dashboard-header" style="flex-wrap: wrap; gap:8px;">
             <div>
                 <h2 style="font-family: 'Orbitron', sans-serif; color:#fff; margin:0; font-size:0.95rem; letter-spacing:2px;" id="gym-name-display">GIMNASIO...</h2>
-                <p style="margin:3px 0 0 0; color:rgba(0,255,136,0.5); font-size:0.65rem; font-family:'Orbitron',sans-serif; letter-spacing:2px;" id="gym-code-display">ID: ---</p>
+                <p style="margin:3px 0 0 0; color:var(--accent-secondary, #00ff88); opacity:0.75; font-size:0.65rem; font-family:'Orbitron',sans-serif; letter-spacing:2px;" id="gym-code-display">ID: ---</p>
             </div>
             <div style="display:flex; flex-direction:column; gap:6px; align-items:flex-end;">
                 <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
                     <div id="stats-users" class="stats-badge" style="font-size:0.7rem; padding:0.4rem 0.8rem;">CARGANDO...</div>
                     <button class="btn-premium" style="margin:0; font-size:0.7rem; padding:0.5rem 0.9rem;" id="btn-new-code">+ PASE NUEVO</button>
                 </div>
-                <button class="btn-cancel" style="padding:0.4rem 0.8rem; color:#ff4757; border-color:rgba(255,71,87,0.3); font-size:0.65rem;" onclick="logout()">CERRAR SESIÓN</button>
+                <button class="btn-cancel" style="padding:0.4rem 0.8rem; font-size:0.65rem;" onclick="logout()">CERRAR SESIÓN</button>
             </div>
         </div>
-        
+
+        <!-- Selector de Temas Coach -->
+        <div class="glass-card" style="margin-bottom: 24px; padding: 1.2rem; width: 100%; border: 1px solid var(--glass-border); background: var(--glass); box-shadow: var(--neon-glow); border-radius: 12px; transition: all 0.3s ease;">
+            <div style="font-family: 'Orbitron', sans-serif; font-size: 0.72rem; letter-spacing: 2px; color: var(--accent-main); margin-bottom: 12px; text-transform: uppercase; text-align: center; font-weight: bold;">
+                ESTILO VISUAL DEL TERMINAL
+            </div>
+            <div class="theme-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
+                <!-- CYBERPUNK -->
+                <div class="t-swatch" data-theme="cyberpunk" onclick="setCoachTheme('cyberpunk')" style="cursor: pointer; text-align: center; background: rgba(255,255,255,0.02); padding: 8px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); transition: all 0.3s;">
+                    <div style="background: linear-gradient(135deg, #00d4aa, #00ff66); border: 2px solid rgba(0,212,170,0.3); width: 20px; height: 20px; border-radius: 50%; margin: 0 auto 6px;"></div>
+                    <div style="font-size: 0.58rem; font-family: 'Orbitron', sans-serif; letter-spacing: 1px; color: #fff; font-weight: bold;">CYBERPUNK</div>
+                </div>
+                <!-- ULTRA DARK -->
+                <div class="t-swatch" data-theme="black" onclick="setCoachTheme('black')" style="cursor: pointer; text-align: center; background: rgba(255,255,255,0.02); padding: 8px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); transition: all 0.3s;">
+                    <div style="background: linear-gradient(135deg, #ffffff, #1a1a1a); border: 2px solid rgba(255,255,255,0.2); width: 20px; height: 20px; border-radius: 50%; margin: 0 auto 6px;"></div>
+                    <div style="font-size: 0.58rem; font-family: 'Orbitron', sans-serif; letter-spacing: 1px; color: #fff; font-weight: bold;">ULTRA DARK</div>
+                </div>
+                <!-- FEMENINO -->
+                <div class="t-swatch" data-theme="pink" onclick="setCoachTheme('pink')" style="cursor: pointer; text-align: center; background: rgba(255,255,255,0.02); padding: 8px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); transition: all 0.3s;">
+                    <div style="background: linear-gradient(135deg, #f72585, #ff9de2); border: 2px solid rgba(247,37,133,0.3); width: 20px; height: 20px; border-radius: 50%; margin: 0 auto 6px;"></div>
+                    <div style="font-size: 0.58rem; font-family: 'Orbitron', sans-serif; letter-spacing: 1px; color: #fff; font-weight: bold;">FEMENINO</div>
+                </div>
+                <!-- LGBT -->
+                <div class="t-swatch" data-theme="pastel" onclick="setCoachTheme('pastel')" style="cursor: pointer; text-align: center; background: rgba(255,255,255,0.02); padding: 8px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); transition: all 0.3s;">
+                    <div style="background: linear-gradient(135deg, #ff9ee2, #b5e2ff); border: 2px solid rgba(255,158,226,0.3); width: 20px; height: 20px; border-radius: 50%; margin: 0 auto 6px;"></div>
+                    <div style="font-size: 0.58rem; font-family: 'Orbitron', sans-serif; letter-spacing: 1px; color: #fff; font-weight: bold;">LGBT</div>
+                </div>
+            </div>
+        </div>
+
         <div id="client-list" class="client-grid">
             <div class="glass-card" style="grid-column: 1/-1; text-align:center; padding: 3rem;">
                 <p style="color:#aaa; font-size: 1.2rem;">Sincronizando con base de datos global de AX-CORE...</p>
@@ -426,6 +476,18 @@
 <script>
     // URL DEL BACKEND (Local si estás tu computadora, Render si está hospedado)
     const API_URL = location.hostname === 'localhost' || location.hostname === '127.0.0.1' ? 'http://localhost:3000' : 'https://axcore-appax-core-backend.onrender.com';
+
+    // Manejo de Temas del Coach
+    window.setCoachTheme = function(themeName) {
+        document.body.setAttribute('data-theme', themeName);
+        document.querySelectorAll('.theme-grid .t-swatch').forEach(btn => {
+            if (btn.dataset.theme === themeName) btn.classList.add('active');
+            else btn.classList.remove('active');
+        });
+        localStorage.setItem('coach_theme', themeName);
+    };
+    // Inicializar con el tema guardado o Cyberpunk por defecto
+    setCoachTheme(localStorage.getItem('coach_theme') || 'cyberpunk');
 
     const loginSection = document.getElementById('login-section');
     const dashboard = document.getElementById('dashboard');
