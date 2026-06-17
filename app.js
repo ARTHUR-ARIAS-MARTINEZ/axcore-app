@@ -3841,9 +3841,10 @@ document.addEventListener('DOMContentLoaded', () => {
     window._activateCalculator = activateCalculator;
 
     function startClock() {
-        setInterval(() => {
+        const tick = () => {
+            if (!liveTimeEl || !liveDateEl) return;
             const now = new Date();
-            
+
             if (document.body.classList.contains('premium-mode')) {
                 // Modo premium: Reloj de 24 horas y fecha en español en mayúsculas (Día de la semana, fecha y hora con segundos)
                 const h24 = now.getHours().toString().padStart(2, '0');
@@ -3873,7 +3874,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 liveDateEl.textContent = words.join(' ');
             }
-        }, 1000);
+        };
+        tick();              // pinta de inmediato (evita el "00:00:00" tras recargar)
+        setInterval(tick, 1000);
     }
 
     // ============================================================

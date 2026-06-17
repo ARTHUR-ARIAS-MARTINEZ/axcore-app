@@ -1728,6 +1728,9 @@ body.premium-mode .live-stats {
   letter-spacing: 0.5px !important;
   white-space: nowrap !important;
   flex-shrink: 0 !important;
+  /* width:auto evita que herede el width:100% de la regla móvil no-premium
+     (index.css) que empujaba el reloj/fecha fuera de la pantalla a la derecha. */
+  width: auto !important;
   display: flex !important;
   flex-direction: column !important;
   align-items: flex-end !important;
@@ -3072,25 +3075,30 @@ body.premium-mode .nav-logo-mobile { display: none !important; }
   body.premium-mode .user-badge {
     margin: 0 !important;
     margin-left: 10px !important; /* Separación extra para que el avatar respire */
-    flex-shrink: 0 !important; /* No encoger en móviles */
-    min-width: max-content !important;
+    /* Toma el espacio disponible pero puede encoger para que el reloj/fecha
+       de la derecha SIEMPRE quepa en pantalla (antes con min-width:max-content
+       empujaba el reloj fuera del viewport). */
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
     padding: 4px 10px 4px 6px !important;
     border-radius: 999px !important;
     display: flex !important;
     align-items: center !important;
   }
   body.premium-mode .user-info {
-    min-width: max-content !important; /* Garantizar ancho mínimo */
-    flex-shrink: 0 !important;
+    min-width: 0 !important; /* permite que el nombre se recorte si hace falta */
+    flex: 1 1 auto !important;
+    overflow: hidden !important;
     display: flex !important;
     flex-direction: column !important;
     justify-content: center !important;
   }
   body.premium-mode .user-rank,
   body.premium-mode #display-username {
-    max-width: none !important;
+    max-width: 100% !important;
     white-space: nowrap !important;
-    overflow: visible !important; /* No recortar con ellipsis */
+    overflow: hidden !important;
+    text-overflow: ellipsis !important; /* nombres largos: elipsis en vez de empujar el reloj */
     font-size: 1rem !important;
     color: #ffffff !important;
     display: block !important;
@@ -3102,6 +3110,7 @@ body.premium-mode .nav-logo-mobile { display: none !important; }
     font-size: 0.6rem !important;
     font-weight: 600 !important;
     flex-shrink: 0 !important;
+    width: auto !important; /* nunca 100%: mantiene el reloj dentro del viewport */
     margin-right: 0 !important; /* padding-right del top-bar ya da el margen */
   }
 }

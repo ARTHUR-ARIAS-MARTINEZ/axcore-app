@@ -501,6 +501,15 @@
 
     let currentGym = "";
     let gymData = {};
+    let coachToken = localStorage.getItem('coach_vip_token') || "";
+
+    // Cabeceras con el token de coach (emitido en /api/coach/login).
+    function coachAuthHeaders(withJson) {
+        const h = {};
+        if (withJson) h['Content-Type'] = 'application/json';
+        if (coachToken) h['Authorization'] = 'Bearer ' + coachToken;
+        return h;
+    }
 
     btnLogin.onclick = async () => {
         const gid = document.getElementById('gym-id').value.toUpperCase().trim();
@@ -521,10 +530,12 @@
                 currentGym = gid;
                 gymData = data.gym;
                 gymData.currentUsers = data.currentUsers;
+                coachToken = data.token || "";
 
                 // Guardar sesión para persistencia
                 localStorage.setItem('coach_vip_gym', gid);
                 localStorage.setItem('coach_vip_pass', psw);
+                if (coachToken) localStorage.setItem('coach_vip_token', coachToken);
 
                 document.getElementById('login-wrapper').style.display = 'none';
                 dashboard.style.display = 'block';
@@ -571,7 +582,7 @@
 
     async function loadClients() {
         try {
-            const res = await fetch(`${API_URL}/api/coach/codes/${currentGym}`);
+            const res = await fetch(`${API_URL}/api/coach/codes/${currentGym}`, { headers: coachAuthHeaders(false) });
             const codes = await res.json();
 
             gymData.currentUsers = codes.length;
@@ -655,7 +666,7 @@
         if (_giftGenerating) return;
         // Verificar primero si ya existe (defensa extra contra dobles clicks)
         try {
-            const check = await fetch(`${API_URL}/api/coach/codes/${currentGym}`);
+            const check = await fetch(`${API_URL}/api/coach/codes/${currentGym}`, { headers: coachAuthHeaders(false) });
             const existing = await check.json();
             if (existing.find(c => isGiftUser(c.user))) {
                 alert('Tu código de regalo ya está generado. Lo verás en la sección VIP.');
@@ -670,7 +681,7 @@
         try {
             const res = await fetch(`${API_URL}/api/coach/generate`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: coachAuthHeaders(true),
                 body: JSON.stringify({ gymId: currentGym, user: `🎁 Coach ${gymData.name || ''}`.trim() })
             });
             const data = await res.json();
@@ -715,7 +726,7 @@
         try {
             const res = await fetch(`${API_URL}/api/coach/generate`, {
                 method: 'POST',
-                headers:{ 'Content-Type': 'application/json' },
+                headers: coachAuthHeaders(true),
                 body: JSON.stringify({ gymId: currentGym, user: userName })
             });
             const data = await res.json();
@@ -742,7 +753,7 @@
         try {
             await fetch(`${API_URL}/api/coach/toggle`, {
                 method: 'POST',
-                headers:{ 'Content-Type': 'application/json' },
+                headers: coachAuthHeaders(true),
                 body: JSON.stringify({ code, status: newStatus })
             });
             loadClients();
@@ -756,7 +767,8 @@
         
         try {
             await fetch(`${API_URL}/api/coach/users/${code}`, {
-                method: 'DELETE'
+                method: 'DELETE',
+                headers: coachAuthHeaders(false)
             });
             loadClients();
         } catch(e) {
@@ -784,6 +796,8 @@
     window.logout = () => {
         localStorage.removeItem('coach_vip_gym');
         localStorage.removeItem('coach_vip_pass');
+        localStorage.removeItem('coach_vip_token');
+        coachToken = "";
         location.reload();
     };
 

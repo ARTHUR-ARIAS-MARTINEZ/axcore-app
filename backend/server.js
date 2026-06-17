@@ -165,6 +165,24 @@ async function requireUserAuth(req, res, next) {
     }
 }
 
+// Autenticación del panel de COACH — token JWT emitido en /api/coach/login.
+// Limita cada coach a operar SOLO sobre su propio gimnasio (req.coach.gymCode).
+function requireCoachAuth(req, res, next) {
+    const auth = req.header('Authorization') || '';
+    const token = auth.startsWith('Bearer ') ? auth.slice(7) : '';
+    if (!token) return res.status(401).json({ success: false, message: 'Token de coach requerido.' });
+    try {
+        const payload = jwt.verify(token, JWT_SECRET);
+        if (payload.role !== 'coach' || !payload.gymCode) {
+            return res.status(401).json({ success: false, message: 'Token de coach inválido.' });
+        }
+        req.coach = payload; // { role:'coach', gymCode }
+        next();
+    } catch {
+        return res.status(401).json({ success: false, message: 'Sesión de coach inválida o expirada.' });
+    }
+}
+
 async function hashPassword(plain) {
     if (!plain) return '';
     if (String(plain).startsWith('$2')) return plain;
@@ -279,22 +297,28 @@ app.post('/api/coach/login', loginLimiter, async (req, res) => {
         }
 
         const currentUsers = await Code.countDocuments({ gymCode: gymCodeUp });
-        res.json({ success: true, gym: stripPassword(gym), currentUsers });
+        // Token de coach (7 días) — necesario para operar los endpoints del panel.
+        const token = jwt.sign({ role: 'coach', gymCode: gymCodeUp }, JWT_SECRET, { expiresIn: '7d' });
+        res.json({ success: true, gym: stripPassword(gym), currentUsers, token });
     } catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
-app.get('/api/coach/codes/:gymCode', async (req, res) => {
+app.get('/api/coach/codes/:gymCode', requireCoachAuth, async (req, res) => {
     try {
         const gymCode = String(req.params.gymCode).toUpperCase();
+        if (gymCode !== req.coach.gymCode) {
+            return res.status(403).json({ success: false, message: 'No autorizado para este gimnasio.' });
+        }
         const codes = await Code.find({ gymCode });
         res.json(codes.map(c => c.toObject()));
     } catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
-app.post('/api/coach/generate', async (req, res) => {
+app.post('/api/coach/generate', requireCoachAuth, async (req, res) => {
     try {
-        const { gymId, user } = req.body || {};
-        const gymCode = String(gymId || '').toUpperCase();
+        const { user } = req.body || {};
+        // El gymCode SIEMPRE proviene del token, nunca del body (evita generar para otros gimnasios).
+        const gymCode = req.coach.gymCode;
         const gym = await Gym.findOne({ gymCode });
         if (!gym)        return res.json({ success: false, message: 'Franquicia no encontrada.' });
         if (!gym.active) return res.json({ success: false, message: 'SISTEMA PAUSADO POR AX-CORE.' });
@@ -326,19 +350,25 @@ app.post('/api/coach/generate', async (req, res) => {
     } catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
-app.post('/api/coach/toggle', async (req, res) => {
+app.post('/api/coach/toggle', requireCoachAuth, async (req, res) => {
     try {
         const { code, status } = req.body || {};
-        await Code.updateOne({ code }, { active: !!status });
+        // Solo puede togglear códigos de SU propio gimnasio.
+        const result = await Code.updateOne({ code, gymCode: req.coach.gymCode }, { active: !!status });
+        if (result.matchedCount === 0) return res.status(404).json({ success: false, message: 'Código no encontrado en tu gimnasio.' });
         res.json({ success: true });
     } catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
-app.delete('/api/coach/users/:code', async (req, res) => {
+app.delete('/api/coach/users/:code', requireCoachAuth, async (req, res) => {
     try {
         const code = req.params.code;
-        const result = await Code.deleteOne({ code });
-        if (result.deletedCount === 0) return res.status(404).json({ success: false, message: 'No encontrado.' });
+        // Verificar que el código pertenezca al gimnasio del coach antes de borrar.
+        const codeDoc = await Code.findOne({ code });
+        if (!codeDoc || codeDoc.gymCode !== req.coach.gymCode) {
+            return res.status(404).json({ success: false, message: 'No encontrado.' });
+        }
+        await Code.deleteOne({ code });
         // También borrar datos del User si ya se había registrado
         await User.deleteOne({ code });
         res.json({ success: true, message: 'Usuario eliminado.' });
@@ -662,9 +692,11 @@ app.post('/api/push/send', requireAdminAuth, async (req, res) => {
 });
 
 // ============================================================
-// POC SETUP (sin autenticación, solo para testing)
+// POC SETUP (solo testing) — protegido con token admin.
+// Crea un gimnasio de prueba con contraseña conocida, así que NO debe
+// quedar expuesto públicamente. Requiere header X-Admin-Token.
 // ============================================================
-app.post('/api/poc/setup', async (req, res) => {
+app.post('/api/poc/setup', requireAdminAuth, async (req, res) => {
     try {
         // Limpiar datos de PoC previos si existen
         await Gym.deleteOne({ gymCode: 'POCGYM' });

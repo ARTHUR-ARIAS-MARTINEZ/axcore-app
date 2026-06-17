@@ -1,12 +1,12 @@
-const CACHE_NAME = 'axcore-v5.12-header-fixes';
+const CACHE_NAME = 'axcore-v5.13-reloj-seguridad';
 const urlsToCache = [
   './',
-  './index.html?v=20260617b',
-  './index.css?v=20260617b',
-  './premium.css?v=20260617b',
-  './profile-persist.js?v=20260617b',
-  './app.js?v=20260617b',
-  './knowledge.js?v=20260617b',
+  './index.html?v=20260617c',
+  './index.css?v=20260617c',
+  './premium.css?v=20260617c',
+  './profile-persist.js?v=20260617c',
+  './app.js?v=20260617c',
+  './knowledge.js?v=20260617c',
   './logo.png',
   './logo_coach.png',
   './manifest_vip.json',
