@@ -2966,6 +2966,19 @@ body.premium-mode .pm-calc-row {
   gap: 6px;
   margin-bottom: 8px;
 }
+@media (max-width: 480px) {
+  body.premium-mode .pm-calc-row {
+    flex-direction: column !important;
+  }
+  body.premium-mode .pm-calc-row .pm-calc-input {
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  body.premium-mode .pm-calc-row .pm-calc-btn {
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+}
 body.premium-mode .pm-calc-input {
   flex: 1;
   background: rgba(0,0,0,0.3) !important;

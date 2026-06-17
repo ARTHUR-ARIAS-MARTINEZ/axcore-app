@@ -8,9 +8,9 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0a0e14">
     <link rel="apple-touch-icon" href="logo.png">
-    <link rel="stylesheet" href="index.css?v=20260616d">
+    <link rel="stylesheet" href="index.css?v=20260617a">
     <!-- Premium UI overrides (inerte si <body> NO tiene .premium-mode) -->
-    <link rel="stylesheet" href="premium.css?v=20260616d">
+    <link rel="stylesheet" href="premium.css?v=20260617a">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <!-- Fuentes: Inter para cuerpos de texto, Oswald (Heavy Gym) para titulares -->
@@ -702,7 +702,7 @@
                     </div>
                     <p class="pm-calc-desc">Escribe un alimento o pega cuántas kcal vas a meter. Te digo calorías, ejercicio para compensar y alternativas.</p>
                     <div class="pm-calc-row">
-                        <input type="number" id="calc-extra-cal" class="pm-calc-input" placeholder="Ej. taco al pastor / pizza / 300">
+                        <input type="text" id="calc-extra-cal" class="pm-calc-input" placeholder="Ej. taco al pastor, pizza o 300">
                         <button class="pm-calc-btn pm-calc-btn-green" id="btn-calc-compensate">ANALIZAR</button>
                     </div>
                     <div class="pm-calc-sub">o escribe directamente cuántas kcal (ej. <strong>300</strong>)</div>
@@ -864,12 +864,12 @@
 
     <!-- Gráficas (Al final para no bloquear inicio rápido) -->
     <script src="https://cdn.jsdelivr.net/npm/apexcharts" defer></script>
-    <script src="profile-persist.js?v=20260616d"></script>
-    <script src="knowledge.js?v=20260616d"></script>
-    <script src="app.js?v=20260616d"></script>
+    <script src="profile-persist.js?v=20260617a"></script>
+    <script src="knowledge.js?v=20260617a"></script>
+    <script src="app.js?v=20260617a"></script>
     <!-- Premium UI: sistema de 100 insignias + FAB + onboarding -->
-    <script src="premium-badges.js?v=20260616d"></script>
-    <script src="premium-extras.js?v=20260616d"></script>
+    <script src="premium-badges.js?v=20260617a"></script>
+    <script src="premium-extras.js?v=20260617a"></script>
 
     <!-- REGISTRO GLOBAL — funciona aunque app.js falle -->
     <script>
@@ -944,11 +944,29 @@
     </script>
 
     <script>
-        // Desregistrar SW antiguos para evitar caché stale durante desarrollo
+        // Registro del Service Worker de PWA unificado con detección de actualizaciones y auto-refresco
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.getRegistrations().then(function(regs){
-                for (var i=0; i<regs.length; i++) regs[i].unregister();
-            }).catch(function(){});
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js?v=20260617a').then(reg => {
+                    console.log('[AX-CORE] Service Worker registrado con éxito:', reg.scope);
+                    
+                    // Detectar si hay una actualización de Service Worker esperando
+                    reg.onupdatefound = () => {
+                        const newWorker = reg.installing;
+                        if (newWorker) {
+                            newWorker.onstatechange = () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    // Nuevo Service Worker disponible. Recargar página para activar cambios instantáneamente
+                                    console.log('[AX-CORE] Nueva versión de la app detectada. Actualizando...');
+                                    window.location.reload();
+                                }
+                            };
+                        }
+                    };
+                }).catch(err => {
+                    console.error('[AX-CORE] Error al registrar el Service Worker:', err);
+                });
+            });
         }
     </script>
     <!-- Modal de Comida Premium a Pantalla Completa -->

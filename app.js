@@ -1318,7 +1318,6 @@ document.addEventListener('DOMContentLoaded', () => {
             saveData();
             if (typeof updateDashboard === 'function') updateDashboard();
             if (typeof applySettings === 'function') applySettings();
-            // Toast de confirmación (usa la función local o la existente)
             const toastFn = typeof pmShowToast === 'function' ? pmShowToast : null;
             if (toastFn) {
                 const nombres = { 
@@ -3635,18 +3634,44 @@ document.addEventListener('DOMContentLoaded', () => {
         const btn = document.getElementById('btn-calc-compensate');
         if (!btn) return;
         btn.onclick = () => {
-            const extra = parseInt(document.getElementById('calc-extra-cal').value);
+            const raw = document.getElementById('calc-extra-cal').value.trim();
             const out = document.getElementById('calc-compensate-result');
-            if (!extra || extra <= 0) {
-                out.innerHTML = `<p style="color:var(--accent-alert); font-size:0.85rem;">Escribe un número válido de kcal.</p>`;
+            if (!raw) {
+                out.innerHTML = `<p style="color:var(--accent-alert); font-size:0.85rem;">Escribe un alimento o número de kcal.</p>`;
                 return;
             }
+            
+            let extra = 0;
+            let foodName = '';
+
+            // Detectar si es un número directo
+            const asNum = parseInt(raw);
+            if (!isNaN(asNum) && asNum > 0 && /^\d+$/.test(raw)) {
+                extra = asNum;
+            } else {
+                // Es un texto, buscar el alimento en la base de datos
+                const found = (typeof findFood === 'function') ? findFood(raw) : null;
+                if (!found) {
+                    out.innerHTML = `<p style="color:var(--accent-alert); font-size:0.85rem;">No encontré "${raw}" en mi base. Intenta con "pizza", "taco al pastor", etc., o escribe un número de kcal.</p>`;
+                    return;
+                }
+                extra = found.cal;
+                foodName = found.name;
+            }
+
             const opts = (typeof findCompensationOptions === 'function') ? findCompensationOptions(extra, 6) : [];
             if (opts.length === 0) {
                 out.innerHTML = `<p style="color:var(--text-dim); font-size:0.85rem;">No encontré ejercicios óptimos. Prueba con un valor menor.</p>`;
                 return;
             }
+
+            let foodInfoHtml = '';
+            if (foodName) {
+                foodInfoHtml = `<p style="font-size:0.85rem; color:#fff; margin-bottom:0.4rem;">🍔 Encontré <strong>${foodName}</strong> con <strong style="color:var(--accent-main)">${extra} kcal</strong>.</p>`;
+            }
+
             out.innerHTML = `
+                ${foodInfoHtml}
                 <p style="font-size:0.8rem; color:var(--text-dim); margin-bottom:0.6rem;">Para quemar <strong style="color:var(--accent-main)">${extra} kcal</strong>, haz cualquiera:</p>
                 <div style="display:grid; gap:0.5rem;">
                     ${opts.map(o => `
@@ -4062,14 +4087,3 @@ document.addEventListener('DOMContentLoaded', () => {
     startClock();
 
 });
-
-// --- PWA: REGISTRAR SERVICE WORKER ---
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js').then(registration => {
-            console.log('AX-CORE PWA lista para instalar en celular: ', registration.scope);
-        }).catch(err => {
-            console.log('AX-CORE PWA Error: ', err);
-        });
-    });
-}

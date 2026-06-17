@@ -2314,7 +2314,7 @@ body {
 /* Tab content — fade-in al cambiar */
 #page-studio .studio-pro-tab-content {
     display: none;
-    padding: 16px 16px 28px;
+    padding: 16px 16px 100px !important;
 }
 #page-studio .studio-pro-tab-content.active {
     display: block;
