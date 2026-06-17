@@ -1735,12 +1735,13 @@ body.premium-mode .live-stats {
 }
 body.premium-mode .live-stats .separator { display: none !important; }
 body.premium-mode #live-time {
-  font-size: 11px !important;
+  font-size: 14px !important;
   color: #ffffff !important;
   font-weight: 600 !important;
+  line-height: 1.2 !important;
 }
 body.premium-mode #live-date {
-  font-size: 9px !important;
+  font-size: 11px !important;
   color: var(--accent-main) !important;
   font-weight: 600 !important;
   letter-spacing: 0.5px !important;

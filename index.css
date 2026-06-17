@@ -352,7 +352,7 @@ body {
     align-items: center;
     margin-bottom: 2rem;
     position: sticky;
-    top: -2rem;
+    top: 0;
     z-index: 1000;
     background: var(--bg);
     padding: 1rem 0;

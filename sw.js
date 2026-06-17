@@ -1,12 +1,12 @@
-const CACHE_NAME = 'axcore-v5.11-fixes';
+const CACHE_NAME = 'axcore-v5.12-header-fixes';
 const urlsToCache = [
   './',
-  './index.html?v=20260617a',
-  './index.css?v=20260617a',
-  './premium.css?v=20260617a',
-  './profile-persist.js?v=20260617a',
-  './app.js?v=20260617a',
-  './knowledge.js?v=20260617a',
+  './index.html?v=20260617b',
+  './index.css?v=20260617b',
+  './premium.css?v=20260617b',
+  './profile-persist.js?v=20260617b',
+  './app.js?v=20260617b',
+  './knowledge.js?v=20260617b',
   './logo.png',
   './logo_coach.png',
   './manifest_vip.json',

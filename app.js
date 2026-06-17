@@ -255,6 +255,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (savedPage === 'studio' && typeof renderStudioPage === 'function') renderStudioPage();
                     }
                 }
+                // Reset de scroll tras restaurar la página (timeout para asegurar render)
+                setTimeout(() => {
+                    const contentArea = document.querySelector('.content-area');
+                    if (contentArea) contentArea.scrollTop = 0;
+                }, 100);
             } catch (e) { console.error('[initAuth] savedPage err:', e); }
         } else {
             showLogin();
@@ -1553,6 +1558,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const pageId = link.dataset.page;
             if (!pageId) return;
+
+            // Reset de scroll al cambiar de sección
+            const contentArea = document.querySelector('.content-area');
+            if (contentArea) contentArea.scrollTop = 0;
+
             pages.forEach(p => p.classList.remove('active'));
             document.getElementById(`page-${pageId}`).classList.add('active');
             navLinks.forEach(l => l.classList.remove('active'));
