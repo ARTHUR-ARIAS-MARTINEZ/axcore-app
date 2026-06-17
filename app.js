@@ -142,8 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // --- INICIALIZACIÓN ---
-    initAuth();
-    startClock();
+    // (Inicialización pospuesta al final del DOMContentLoaded para evitar errores de TDZ)
 
     // Garantizar que el nombre y foto quedan sincronizados DESPUÉS de que
     // todos los scripts (premium-badges.js, premium-extras.js) hayan terminado
@@ -1648,9 +1647,19 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!el) return false;
             // Range inputs capturan el swipe para cambiar valor
             if (el.tagName === 'INPUT' && el.type === 'range') return true;
-            // Contenedores con scroll horizontal (plantillas, etc.)
-            const style = window.getComputedStyle(el);
-            if ((style.overflowX === 'auto' || style.overflowX === 'scroll') && el.scrollWidth > el.clientWidth + 4) return true;
+            // Comprobación ultra-rápida por clases de contenedores con scroll horizontal en nuestra app
+            // Esto evita llamar a getComputedStyle (provoca layout thrashing extremo en touchstart)
+            if (el.classList) {
+                if (el.classList.contains('studio-templates') || 
+                    el.classList.contains('studio-metrics') ||
+                    el.classList.contains('studio-pro-pills') ||
+                    el.classList.contains('studio-pro-swatches') ||
+                    el.classList.contains('studio-pro-tabs') ||
+                    el.classList.contains('sx-tabbar') ||
+                    el.classList.contains('theme-grid')) {
+                    return true;
+                }
+            }
             return false;
         }
 
@@ -2484,21 +2493,40 @@ document.addEventListener('DOMContentLoaded', () => {
         if (_studioLoadPromise) return _studioLoadPromise;
 
         _studioLoadPromise = (async () => {
-            // Carga del logo
-            await new Promise((r) => {
-                const l = new Image(); l.crossOrigin = 'anonymous';
-                l.onload = () => { STUDIO_LOGO_IMG = l; _studioTryRedraw(); r(); };
-                l.onerror = () => { r(); };
-                l.src = 'logo.png';
-            });
-            // Carga paralela de fondos — cada imagen redibuja al cargar
-            await Promise.all(STUDIO_TEMPLATES.map(tpl => new Promise((r) => {
-                const img = new Image();
-                img.crossOrigin = 'anonymous';
-                img.onload = () => { STUDIO_BG_IMAGES[tpl.id] = img; _studioTryRedraw(tpl.id); r(); };
-                img.onerror = () => { r(); };
-                img.src = tpl.bg;
-            })));
+            // 1. Cargar el logo y la imagen del fondo activo en paralelo (dibujo inmediato de la preview)
+            const activeTplId = studioState.tpl;
+            const activeTpl = STUDIO_TEMPLATES.find(t => t.id === activeTplId) || STUDIO_TEMPLATES[0];
+
+            await Promise.all([
+                new Promise((r) => {
+                    const l = new Image(); l.crossOrigin = 'anonymous';
+                    l.onload = () => { STUDIO_LOGO_IMG = l; _studioTryRedraw(); r(); };
+                    l.onerror = () => { r(); };
+                    l.src = 'logo.png';
+                }),
+                new Promise((r) => {
+                    if (activeTplId === 'custom') { r(); return; }
+                    const img = new Image(); img.crossOrigin = 'anonymous';
+                    img.onload = () => { STUDIO_BG_IMAGES[activeTplId] = img; _studioTryRedraw(activeTplId); r(); };
+                    img.onerror = () => { r(); };
+                    img.src = activeTpl.bg;
+                })
+            ]);
+
+            // 2. Cargar las demás imágenes en segundo plano de forma progresiva con delay
+            // Esto permite que el canvas principal pinte de inmediato y la UI no tenga lag
+            setTimeout(() => {
+                STUDIO_TEMPLATES.forEach(tpl => {
+                    if (tpl.id === activeTplId) return;
+                    const img = new Image(); img.crossOrigin = 'anonymous';
+                    img.onload = () => {
+                        STUDIO_BG_IMAGES[tpl.id] = img;
+                        _studioTryRedraw(tpl.id);
+                    };
+                    img.onerror = () => {};
+                    img.src = tpl.bg;
+                });
+            }, 300);
         })();
 
         return _studioLoadPromise;
@@ -3958,6 +3986,10 @@ document.addEventListener('DOMContentLoaded', () => {
             } catch(_) {}
         }
     };
+
+    // --- INICIALIZACIÓN ---
+    initAuth();
+    startClock();
 
 });
 

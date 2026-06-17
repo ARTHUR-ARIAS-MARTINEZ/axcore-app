@@ -1,4 +1,4 @@
-const CACHE_NAME = 'axcore-v5.8-lgbt-update';
+const CACHE_NAME = 'axcore-v5.9-performance-fix';
 const urlsToCache = [
   './',
   './index.html',
