@@ -1666,9 +1666,18 @@ document.addEventListener('DOMContentLoaded', () => {
         function shouldBlock(target) {
             // Bloqueamos inputs de texto y textareas (el usuario escribe)
             if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT') return true;
-            // Recorremos hacia arriba buscando un scroller horizontal
+            // Recorremos hacia arriba buscando un scroller horizontal, la Bottom Sheet de Ajustes/Estudio o el panel de insignias
             let el = target;
             for (let i = 0; i < 8 && el; i++) {
+                if (el.classList && (
+                    el.classList.contains('sx-sheet') || 
+                    el.classList.contains('sx-ach-bar') || 
+                    el.classList.contains('sx-ach-body') || 
+                    el.classList.contains('studio-modal-overlay') || 
+                    el.classList.contains('studio-modal-container')
+                )) {
+                    return true;
+                }
                 if (isHorizontalScroller(el)) return true;
                 el = el.parentElement;
             }
@@ -2659,17 +2668,17 @@ document.addEventListener('DOMContentLoaded', () => {
         };
         const footer = (fy) => {
             ctx.fillStyle='#181818'; ctx.fillRect(pad,fy-20,W-pad*2,1);
-            ctx.font=`700 ${Math.floor(10*tS)}px ${fd.fam}`; ctx.textAlign='start';
-            ctx.fillStyle=accent; ctx.shadowColor=accent; ctx.shadowBlur=6;
-            ctx.fillText('AX-CORE BY ARTHUR',pad,fy); ctx.shadowBlur=0;
-            ctx.textAlign='end'; ctx.fillStyle='#2a2a2a';
-            ctx.fillText('MÉXICO · 2025',W-pad,fy);
+            ctx.font=`300 ${Math.floor(9.5*tS)}px sans-serif`; ctx.textAlign='start';
+            ctx.fillStyle='rgba(255,255,255,0.4)';
+            ctx.fillText('✦ AX-CORE · PREMIUM LOGROS',pad,fy);
+            ctx.textAlign='end'; ctx.fillStyle='rgba(255,255,255,0.2)';
+            ctx.fillText('BY ARTHUR',W-pad,fy);
             [0,10,20].forEach((dx,i)=>{
                 ctx.beginPath(); ctx.arc(pad+dx,fy+16,2.5,0,Math.PI*2);
-                ctx.fillStyle=ac(0.8-i*0.3); ctx.fill();
+                ctx.fillStyle=ac(0.5-i*0.15); ctx.fill();
             });
             ctx.fillStyle=accent; ctx.fillRect(0,H-8,W,8);
-            ctx.fillStyle='rgba(255,255,255,0.2)'; ctx.fillRect(0,H-8,W*.3,8);
+            ctx.fillStyle='rgba(255,255,255,0.15)'; ctx.fillRect(0,H-8,W*.3,8);
         };
         const grid = () => {
             ctx.save(); ctx.lineWidth=0.4; ctx.strokeStyle=ac(0.055);
@@ -3032,13 +3041,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     <!-- BOTONES FLOTANTES SUPERIORES (glassmorphism, icon-only) -->
                     <div class="sx-float-bar">
-                        <button class="sx-fab" id="sx-fab-preview" title="Vista previa" onclick="document.getElementById('btn-studio-share').click()">
+                        <button class="sx-fab" id="sx-fab-preview" title="Vista previa en pantalla completa" onclick="window.openStudioFullscreenPreview()">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                         </button>
-                        <button class="sx-fab" id="sx-fab-save" title="Guardar HD" onclick="document.getElementById('btn-studio-share').click()">
+                        <button class="sx-fab" id="sx-fab-save" title="Guardar en descargas" onclick="window.downloadStudioCardHD()">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                         </button>
-                        <button class="sx-fab sx-fab-primary" id="sx-fab-share" title="Compartir" onclick="document.getElementById('btn-studio-share').click()">
+                        <button class="sx-fab sx-fab-primary" id="sx-fab-share" title="Compartir logros" onclick="window.shareStudioCard()">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
                         </button>
                     </div>
@@ -3046,9 +3055,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="sx-canvas-frame">
                         <div class="sx-canvas-glow"></div>
                         <canvas id="studio-preview-canvas"></canvas>
-                    </div>
-                    <div class="sx-cta-row">
-                        <button class="sx-share-btn" id="btn-studio-share">📤 COMPARTIR HD</button>
                     </div>
                 </div>
 
@@ -3444,34 +3450,93 @@ document.addEventListener('DOMContentLoaded', () => {
             { l:'VIÑETA', v:'vignette' }
         ], 'overlayFilter');
 
-        // --- Share button ---
-        document.getElementById('btn-studio-share').onclick = async () => {
-            const btn = document.getElementById('btn-studio-share');
-            btn.textContent = '⏱️ GENERANDO HD...';
-            btn.disabled = true;
+        // --- Funciones de Interacción del Estudio ---
+        window.openStudioFullscreenPreview = function() {
+            const previewCanvas = document.getElementById('studio-preview-canvas');
+            if (!previewCanvas) return;
+            
+            // Generar imagen en alta resolución
+            const imgData = previewCanvas.toDataURL('image/png');
+            
+            // Crear modal si no existe
+            let modal = document.getElementById('studio-preview-modal');
+            if (!modal) {
+                modal = document.createElement('div');
+                modal.id = 'studio-preview-modal';
+                modal.className = 'studio-modal-overlay';
+                modal.innerHTML = `
+                    <div class="studio-modal-container">
+                        <button class="studio-modal-close" onclick="window.closeStudioPreviewModal()">&times;</button>
+                        <img id="studio-modal-image" src="" alt="Vista previa de logros">
+                        <p class="studio-modal-tip">Toca la X para volver a la edición</p>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+                // Cerrar al hacer clic fuera de la imagen
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal || e.target.classList.contains('studio-modal-container')) {
+                        window.closeStudioPreviewModal();
+                    }
+                });
+            }
+            
+            // Cargar imagen y abrir modal con delay mínimo para animación
+            document.getElementById('studio-modal-image').src = imgData;
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('active'), 10);
+        };
 
+        window.closeStudioPreviewModal = function() {
+            const modal = document.getElementById('studio-preview-modal');
+            if (modal) {
+                modal.classList.remove('active');
+                setTimeout(() => modal.style.display = 'none', 250);
+            }
+        };
+
+        window.downloadStudioCardHD = function() {
             const hdCanvas = document.createElement('canvas');
             renderStudioCard(hdCanvas, studioState.tpl, studioState.fmt, studioState.metrics, false);
+            
+            const link = document.createElement('a');
+            link.download = 'AX-CORE_Logros.png';
+            link.href = hdCanvas.toDataURL('image/png');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            if (typeof pmShowToast === 'function') {
+                pmShowToast('📥 ¡Tarjeta guardada en descargas!', 'green');
+            }
+        };
 
+        window.shareStudioCard = async function() {
+            const hdCanvas = document.createElement('canvas');
+            renderStudioCard(hdCanvas, studioState.tpl, studioState.fmt, studioState.metrics, false);
+            
             hdCanvas.toBlob(async (blob) => {
-                btn.textContent = '📤 COMPARTIR TARJETA HD';
-                btn.disabled = false;
-                if (!blob) { alert('Error al generar.'); return; }
-
+                if (!blob) {
+                    alert('Error al generar la imagen.');
+                    return;
+                }
                 const file = new File([blob], 'AX-CORE_Logros.png', { type: 'image/png' });
+                
                 if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-                    await navigator.share({
-                        files: [file],
-                        title: 'Mis Logros en AX-CORE',
-                        text: `¡Déficit de ${userData.totalNetDeficit||0} kcal con AX-CORE! 🔥`
-                    }).catch(()=>{});
+                    try {
+                        await navigator.share({
+                            files: [file],
+                            title: 'Mis Logros en AX-CORE',
+                            text: `¡Déficit de ${userData.totalNetDeficit||0} kcal con AX-CORE! 🔥`
+                        });
+                    } catch (e) {
+                        console.log('Share cancelado o fallido', e);
+                    }
                 } else {
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url; a.download = 'AX-CORE_Logros.png';
-                    document.body.appendChild(a); a.click();
-                    document.body.removeChild(a); URL.revokeObjectURL(url);
-                    alert('¡Tarjeta descargada! Compártela manualmente.');
+                    // Fallback a descarga
+                    window.downloadStudioCardHD();
+                    if (typeof pmShowToast === 'function') {
+                        pmShowToast('📲 Compártela desde tus descargas.', 'blue');
+                    }
                 }
             }, 'image/png');
         };
@@ -3745,13 +3810,18 @@ document.addEventListener('DOMContentLoaded', () => {
             const now = new Date();
             
             if (document.body.classList.contains('premium-mode')) {
-                // Modo premium: Reloj de 24 horas blanca brillante y fecha en inglés mayúsculas sin punto
+                // Modo premium: Reloj de 24 horas y fecha en español en mayúsculas (Día de la semana, fecha y hora con segundos)
                 const h24 = now.getHours().toString().padStart(2, '0');
                 const m = now.getMinutes().toString().padStart(2, '0');
-                liveTimeEl.textContent = `${h24}:${m}`;
+                const s = now.getSeconds().toString().padStart(2, '0');
+                liveTimeEl.textContent = `${h24}:${m}:${s}`;
                 
-                const dateStr = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase().replace('.', '');
-                liveDateEl.textContent = dateStr;
+                const weekday = now.toLocaleDateString('es-MX', { weekday: 'long' }).toUpperCase();
+                const day = now.getDate();
+                const month = now.toLocaleDateString('es-MX', { month: 'short' }).toUpperCase().replace('.', '');
+                const year = now.getFullYear();
+                
+                liveDateEl.textContent = `${weekday}, ${day} ${month} ${year}`;
             } else {
                 // Reloj 12 horas sin AM/PM
                 let h = now.getHours();

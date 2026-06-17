@@ -129,7 +129,7 @@
 
     // ─── INIT ─────────────────────────────────────────────────────
     function init() {
-        injectFAB();
+        // injectFAB(); // (FAB global "+" eliminado por ser redundante e innecesario)
         syncFABVisibility();
 
         // Mostrar onboarding sólo cuando la app está visible (usuario logueado)

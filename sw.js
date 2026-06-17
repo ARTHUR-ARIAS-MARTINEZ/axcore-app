@@ -1,4 +1,4 @@
-const CACHE_NAME = 'axcore-v5.9-performance-fix';
+const CACHE_NAME = 'axcore-v5.10-studio-redesign';
 const urlsToCache = [
   './',
   './index.html',
