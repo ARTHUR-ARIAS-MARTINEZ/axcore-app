@@ -8,9 +8,9 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0a0e14">
     <link rel="apple-touch-icon" href="logo.png">
-    <link rel="stylesheet" href="index.css?v=20260704b">
+    <link rel="stylesheet" href="index.css?v=20260704c">
     <!-- Premium UI overrides (inerte si <body> NO tiene .premium-mode) -->
-    <link rel="stylesheet" href="premium.css?v=20260704b">
+    <link rel="stylesheet" href="premium.css?v=20260704c">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <!-- Fuentes: Inter para cuerpos de texto, Oswald (Heavy Gym) para titulares -->
@@ -823,26 +823,51 @@
                 <!-- ═══ THEMES ═══ -->
                 <div class="premium-only" style="margin-bottom:12px;">
                     <div class="pm-section-title" style="margin-left:5px; margin-bottom:8px; font-family:var(--font-accent); font-size:10px; letter-spacing:2px; color:var(--text-dim);">ESTILO VISUAL</div>
-                    <div class="theme-grid" id="theme-grid" style="display:grid; grid-template-columns: repeat(4, 1fr); gap:7px;">
-                        <!-- CYBERPUNK -->
+                    <div class="theme-grid" id="theme-grid" style="display:grid; grid-template-columns: repeat(3, 1fr); gap:7px;">
+                        <!-- VERDE -->
                         <div class="t-swatch" data-theme="cyberpunk" onclick="pmSetTheme('cyberpunk')">
                             <div class="t-dot" style="background:linear-gradient(135deg,#00d4aa,#00ff66); border:2px solid rgba(0,212,170,.3); width:26px; height:26px; border-radius:50%; margin:0 auto 6px;"></div>
-                            <div class="t-name">CYBERPUNK</div>
+                            <div class="t-name">VERDE</div>
                         </div>
-                        <!-- ULTRA DARK -->
+                        <!-- NEGRO -->
                         <div class="t-swatch" data-theme="black" onclick="pmSetTheme('black')">
                             <div class="t-dot" style="background:linear-gradient(135deg,#ffffff,#1a1a1a); border:2px solid rgba(255,255,255,.2); width:26px; height:26px; border-radius:50%; margin:0 auto 6px;"></div>
-                            <div class="t-name">ULTRA DARK</div>
+                            <div class="t-name">NEGRO</div>
                         </div>
-                        <!-- FEMENINO -->
+                        <!-- ROSA -->
                         <div class="t-swatch" data-theme="pink" onclick="pmSetTheme('pink')">
                             <div class="t-dot" style="background:linear-gradient(135deg,#f72585,#ff9de2); border:2px solid rgba(247,37,133,.3); width:26px; height:26px; border-radius:50%; margin:0 auto 6px;"></div>
-                            <div class="t-name">FEMENINO</div>
+                            <div class="t-name">ROSA</div>
                         </div>
-                        <!-- LGBT -->
+                        <!-- LILA -->
                         <div class="t-swatch" data-theme="pastel" onclick="pmSetTheme('pastel')">
                             <div class="t-dot" style="background:linear-gradient(135deg,#ff9ee2,#b5e2ff); border:2px solid rgba(255,158,226,.3); width:26px; height:26px; border-radius:50%; margin:0 auto 6px;"></div>
-                            <div class="t-name">LGBT</div>
+                            <div class="t-name">LILA</div>
+                        </div>
+                        <!-- AZUL -->
+                        <div class="t-swatch" data-theme="azul" onclick="pmSetTheme('azul')">
+                            <div class="t-dot" style="background:linear-gradient(135deg,#2979ff,#00c8ff); border:2px solid rgba(41,121,255,.3); width:26px; height:26px; border-radius:50%; margin:0 auto 6px;"></div>
+                            <div class="t-name">AZUL</div>
+                        </div>
+                        <!-- AMARILLO -->
+                        <div class="t-swatch" data-theme="amarillo" onclick="pmSetTheme('amarillo')">
+                            <div class="t-dot" style="background:linear-gradient(135deg,#ffd600,#ffa000); border:2px solid rgba(255,214,0,.3); width:26px; height:26px; border-radius:50%; margin:0 auto 6px;"></div>
+                            <div class="t-name">AMARILLO</div>
+                        </div>
+                        <!-- NARANJA -->
+                        <div class="t-swatch" data-theme="naranja" onclick="pmSetTheme('naranja')">
+                            <div class="t-dot" style="background:linear-gradient(135deg,#ff6d00,#ff3d00); border:2px solid rgba(255,109,0,.3); width:26px; height:26px; border-radius:50%; margin:0 auto 6px;"></div>
+                            <div class="t-name">NARANJA</div>
+                        </div>
+                        <!-- ROJO -->
+                        <div class="t-swatch" data-theme="rojo" onclick="pmSetTheme('rojo')">
+                            <div class="t-dot" style="background:linear-gradient(135deg,#ff1744,#b71c1c); border:2px solid rgba(255,23,68,.3); width:26px; height:26px; border-radius:50%; margin:0 auto 6px;"></div>
+                            <div class="t-name">ROJO</div>
+                        </div>
+                        <!-- DORADO -->
+                        <div class="t-swatch" data-theme="dorado" onclick="pmSetTheme('dorado')">
+                            <div class="t-dot" style="background:linear-gradient(135deg,#e8c04c,#fff4d6); border:2px solid rgba(232,192,76,.3); width:26px; height:26px; border-radius:50%; margin:0 auto 6px;"></div>
+                            <div class="t-name">DORADO</div>
                         </div>
                     </div>
                 </div>
@@ -910,12 +935,12 @@
 
     <!-- Gráficas (Al final para no bloquear inicio rápido) -->
     <script src="https://cdn.jsdelivr.net/npm/apexcharts" defer></script>
-    <script src="profile-persist.js?v=20260704b"></script>
-    <script src="knowledge.js?v=20260704b"></script>
-    <script src="app.js?v=20260704b"></script>
+    <script src="profile-persist.js?v=20260704c"></script>
+    <script src="knowledge.js?v=20260704c"></script>
+    <script src="app.js?v=20260704c"></script>
     <!-- Premium UI: catálogo de insignias + FAB + onboarding -->
-    <script src="premium-badges.js?v=20260704b"></script>
-    <script src="premium-extras.js?v=20260704b"></script>
+    <script src="premium-badges.js?v=20260704c"></script>
+    <script src="premium-extras.js?v=20260704c"></script>
 
     <!-- REGISTRO GLOBAL — funciona aunque app.js falle -->
     <script>
@@ -993,7 +1018,7 @@
         // Registro del Service Worker de PWA unificado con detección de actualizaciones y auto-refresco
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=20260704b').then(reg => {
+                navigator.serviceWorker.register('sw.js?v=20260704c').then(reg => {
                     console.log('[AX-CORE] Service Worker registrado con éxito:', reg.scope);
                     
                     // Detectar si hay una actualización de Service Worker esperando

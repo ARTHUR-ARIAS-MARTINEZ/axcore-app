@@ -1339,12 +1339,17 @@ document.addEventListener('DOMContentLoaded', () => {
             if (typeof applySettings === 'function') applySettings();
             const toastFn = typeof pmShowToast === 'function' ? pmShowToast : null;
             if (toastFn) {
-                const nombres = { 
-                    black: 'ULTRA DARK', 
-                    cyberpunk: 'CYBERPUNK', 
-                    pink: 'FEMENINO', 
-                    pastel: 'LGBT',
-                    neon: 'NEON' 
+                const nombres = {
+                    cyberpunk: 'VERDE',
+                    black: 'NEGRO',
+                    pink: 'ROSA',
+                    pastel: 'LILA',
+                    azul: 'AZUL',
+                    amarillo: 'AMARILLO',
+                    naranja: 'NARANJA',
+                    rojo: 'ROJO',
+                    dorado: 'DORADO',
+                    neon: 'NEON'
                 };
                 toastFn('✦ Tema: ' + (nombres[themeName] || themeName.toUpperCase()), 'green');
             }
@@ -1638,8 +1643,8 @@ document.addEventListener('DOMContentLoaded', () => {
             hint.innerHTML = '<span>← Desliza con el pulgar para cambiar de sección →</span>';
             hint.style.cssText = `
                 position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
-                background: rgba(0,229,255,0.12); color: var(--accent-main);
-                border: 1px solid rgba(0,229,255,0.4); border-radius: 30px;
+                background: rgba(var(--accent-secondary-rgb),0.12); color: var(--accent-main);
+                border: 1px solid rgba(var(--accent-secondary-rgb),0.4); border-radius: 30px;
                 padding: 10px 20px; font-size: 0.8rem; font-weight: 700;
                 letter-spacing: 0.5px; z-index: 9999;
                 backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);

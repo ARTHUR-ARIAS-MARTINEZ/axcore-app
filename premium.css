@@ -150,6 +150,48 @@ body.premium-mode[data-theme="neon-bi"] {
   background: #090010 !important;
 }
 
+/* ══ NUEVOS TEMAS DE COLOR — mismo estilo, degradado propio por tema ══ */
+/* ── AZUL ── */
+body.premium-mode[data-theme="azul"] {
+  --pm-green-rgb: 41,121,255;
+  --pm-cyan-rgb:  0,200,255;
+  --pm-s1: #060c1a; --pm-s2: #0a1428; --pm-s3: #101c34; --pm-dim: #24406a;
+  --pm-border: rgba(41,121,255,0.14);
+  background: #030a18 !important;
+}
+/* ── AMARILLO ── */
+body.premium-mode[data-theme="amarillo"] {
+  --pm-green-rgb: 255,214,0;
+  --pm-cyan-rgb:  255,160,0;
+  --pm-s1: #14100a; --pm-s2: #1c1610; --pm-s3: #262016; --pm-dim: #4a3c1a;
+  --pm-border: rgba(255,214,0,0.14);
+  background: #141005 !important;
+}
+/* ── NARANJA ── */
+body.premium-mode[data-theme="naranja"] {
+  --pm-green-rgb: 255,109,0;
+  --pm-cyan-rgb:  255,61,0;
+  --pm-s1: #170e08; --pm-s2: #201410; --pm-s3: #2a1c16; --pm-dim: #4a2c18;
+  --pm-border: rgba(255,109,0,0.14);
+  background: #170a02 !important;
+}
+/* ── ROJO ── */
+body.premium-mode[data-theme="rojo"] {
+  --pm-green-rgb: 255,23,68;
+  --pm-cyan-rgb:  183,28,28;
+  --pm-s1: #180a0c; --pm-s2: #220e10; --pm-s3: #2c1416; --pm-dim: #4a1c22;
+  --pm-border: rgba(255,23,68,0.14);
+  background: #180307 !important;
+}
+/* ── DORADO ── */
+body.premium-mode[data-theme="dorado"] {
+  --pm-green-rgb: 232,192,76;
+  --pm-cyan-rgb:  255,244,214;
+  --pm-s1: #14120a; --pm-s2: #1c1810; --pm-s3: #262016; --pm-dim: #4a4020;
+  --pm-border: rgba(232,192,76,0.16);
+  background: #14120a !important;
+}
+
 /* TARJETAS — glass premium */
 body.premium-mode .glass-card {
   background: var(--pm-s2) !important;

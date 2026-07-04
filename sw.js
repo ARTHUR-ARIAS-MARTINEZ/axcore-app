@@ -1,12 +1,12 @@
-const CACHE_NAME = 'axcore-v5.15-100insignias-20260704';
+const CACHE_NAME = 'axcore-v5.16-temas-20260704';
 const urlsToCache = [
   './',
-  './index.html?v=20260704b',
-  './index.css?v=20260704b',
-  './premium.css?v=20260704b',
-  './profile-persist.js?v=20260704b',
-  './app.js?v=20260704b',
-  './knowledge.js?v=20260704b',
+  './index.html?v=20260704c',
+  './index.css?v=20260704c',
+  './premium.css?v=20260704c',
+  './profile-persist.js?v=20260704c',
+  './app.js?v=20260704c',
+  './knowledge.js?v=20260704c',
   './logo.png',
   './logo_coach.png',
   './manifest_vip.json',
