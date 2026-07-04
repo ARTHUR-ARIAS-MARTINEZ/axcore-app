@@ -2702,6 +2702,7 @@ body.premium-mode .pm-d-food-add {
 
 /* Botón peligroso (borrar datos) — estilo prototipo .danger-btn */
 body.premium-mode #btn-reset-all,
+body.premium-mode #btn-reset-measurements,
 body.premium-mode .danger-btn {
   background: transparent !important;
   border: 1px solid rgba(255, 51, 102, 0.25) !important;
@@ -2718,11 +2719,13 @@ body.premium-mode .danger-btn {
   transition: all .2s;
 }
 body.premium-mode #btn-reset-all:hover,
+body.premium-mode #btn-reset-measurements:hover,
 body.premium-mode .danger-btn:hover {
   background: rgba(255, 51, 102, 0.06) !important;
   border-color: rgba(255, 51, 102, 0.5) !important;
 }
 body.premium-mode #btn-reset-all:active,
+body.premium-mode #btn-reset-measurements:active,
 body.premium-mode .danger-btn:active { transform: scale(0.97); }
 
 /* Etiquetas de sección — uniformes en TODA la app premium */
@@ -3211,4 +3214,104 @@ body.premium-mode .pd-ach-pct-badge {
 .pm-fab-main.open {
   transform: rotate(45deg);
   box-shadow: 0 8px 36px rgba(var(--pm-green-rgb), 0.65), 0 4px 20px rgba(var(--pm-cyan-rgb), 0.35) !important;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   EVOLUCIÓN / PERFIL ANTROPOMÉTRICO — más contraste, menos monotonía
+   ───────────────────────────────────────────────────────────────────
+   Antes: cada etiqueta, cada borde de campo (16 en total), el título
+   y el encabezado de la tabla usaban EXACTAMENTE el mismo color del
+   tema al 100% de saturación → se veía todo "de un solo color".
+   Ahora: etiquetas y encabezados en blanco suave (neutral, siempre
+   legible, sin importar el tema); los campos descansan en un borde
+   neutro y solo se iluminan con el color del tema al escribir en
+   ellos; las tarjetas ganan profundidad (degradado + brillo suave,
+   alternando verde/cian entre paneles, igual que el Tablero).
+   ══════════════════════════════════════════════════════════════════ */
+
+/* Tarjetas con profundidad (degradado sutil + brillo), en vez de un
+   panel plano de un solo tono. Brillo alterna verde/cian entre los
+   dos paneles para que no se vean "iguales". */
+body.premium-mode #page-evolution .settings-panel,
+body.premium-mode #page-evolution .evolution-panel {
+  background: linear-gradient(135deg, var(--pm-s2) 0%, var(--pm-s1) 100%) !important;
+  border: 1px solid var(--pm-border2, rgba(var(--pm-green-rgb),0.2)) !important;
+  box-shadow: 0 0 40px rgba(var(--pm-green-rgb), 0.07), 0 16px 36px rgba(0,0,0,0.35) !important;
+  position: relative;
+  overflow: hidden;
+}
+body.premium-mode #page-evolution .settings-panel::before {
+  content: '';
+  position: absolute; top: -60px; right: -60px;
+  width: 200px; height: 200px;
+  background: radial-gradient(circle, rgba(var(--pm-green-rgb), 0.10) 0%, transparent 70%);
+  pointer-events: none;
+}
+body.premium-mode #page-evolution .evolution-panel::before {
+  content: '';
+  position: absolute; top: -60px; right: -60px;
+  width: 220px; height: 220px;
+  background: radial-gradient(circle, rgba(var(--pm-cyan-rgb), 0.09) 0%, transparent 70%);
+  pointer-events: none;
+}
+/* Barra superior en degradado (reemplaza el borde lateral plano de un
+   solo color) — el mismo detalle de dos tonos que usa la barra de
+   progreso del Tablero. */
+body.premium-mode #page-evolution .evolution-panel {
+  border-left: none !important;
+}
+body.premium-mode #page-evolution .evolution-panel::after {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--pm-cyan), var(--pm-green));
+}
+/* Segundo título con el acento secundario — distingue visualmente
+   los dos paneles en vez de repetir el mismo color en ambos. */
+body.premium-mode #page-evolution .evolution-panel > h2 {
+  color: var(--accent-secondary) !important;
+}
+
+/* Etiquetas de cada campo (ALTURA, PESO, CINTURA...) — antes eran
+   del color saturado del tema, repetido 16 veces. Ahora en blanco
+   suave: siempre legibles y sin "empapar" la pantalla de un color. */
+body.premium-mode #page-evolution .input-group label {
+  color: rgba(255,255,255,0.72) !important;
+  font-size: 0.68rem !important;
+  letter-spacing: 1.3px !important;
+  font-weight: 600 !important;
+}
+
+/* Campos: en reposo, borde neutro y discreto (no los 16 al 100% del
+   color del tema a la vez). Al tocar un campo, ESE campo se ilumina
+   con el color del tema — el contraste vuelve, pero uno a la vez. */
+body.premium-mode #page-evolution .input-group input:not([type="checkbox"]) {
+  border: 1px solid rgba(255,255,255,0.14) !important;
+  background: rgba(255,255,255,0.035) !important;
+  transition: border-color .2s ease, box-shadow .2s ease, background .2s ease, transform .15s ease;
+}
+body.premium-mode #page-evolution .input-group input:not([type="checkbox"]):hover {
+  border-color: rgba(255,255,255,0.26) !important;
+}
+body.premium-mode #page-evolution .input-group input:not([type="checkbox"]):focus {
+  border-color: var(--accent-main) !important;
+  transform: translateY(-1px);
+}
+
+/* Encabezado de la tabla de historial: blanco suave en vez del color
+   del tema repetido en las 15 columnas; una línea en degradado marca
+   el corte con las filas de datos. */
+body.premium-mode #page-evolution .history-table-container thead tr {
+  color: rgba(255,255,255,0.62) !important;
+}
+body.premium-mode #page-evolution .history-table-container thead {
+  border-bottom: 2px solid transparent !important;
+  border-image: linear-gradient(90deg, var(--pm-green), var(--pm-cyan)) 1 !important;
+}
+/* Filas: resalte sutil al pasar el cursor, para que la tabla se sienta
+   viva e interactiva en vez de una cuadrícula plana. */
+body.premium-mode #page-evolution .history-table-container tbody tr {
+  transition: background .15s ease;
+}
+body.premium-mode #page-evolution .history-table-container tbody tr:hover {
+  background: rgba(var(--pm-green-rgb), 0.05);
 }

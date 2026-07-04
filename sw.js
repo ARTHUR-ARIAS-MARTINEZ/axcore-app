@@ -1,12 +1,12 @@
-const CACHE_NAME = 'axcore-v5.16-temas-20260704';
+const CACHE_NAME = 'axcore-v5.17-evolucion-contraste-20260704';
 const urlsToCache = [
   './',
-  './index.html?v=20260704c',
-  './index.css?v=20260704c',
-  './premium.css?v=20260704c',
-  './profile-persist.js?v=20260704c',
-  './app.js?v=20260704c',
-  './knowledge.js?v=20260704c',
+  './index.html?v=20260704d',
+  './index.css?v=20260704d',
+  './premium.css?v=20260704d',
+  './profile-persist.js?v=20260704d',
+  './app.js?v=20260704d',
+  './knowledge.js?v=20260704d',
   './logo.png',
   './logo_coach.png',
   './manifest_vip.json',
