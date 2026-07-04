@@ -8,9 +8,9 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0a0e14">
     <link rel="apple-touch-icon" href="logo.png">
-    <link rel="stylesheet" href="index.css?v=20260617c">
+    <link rel="stylesheet" href="index.css?v=20260704b">
     <!-- Premium UI overrides (inerte si <body> NO tiene .premium-mode) -->
-    <link rel="stylesheet" href="premium.css?v=20260617c">
+    <link rel="stylesheet" href="premium.css?v=20260704b">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <!-- Fuentes: Inter para cuerpos de texto, Oswald (Heavy Gym) para titulares -->
@@ -29,6 +29,30 @@
     };
     window.onunhandledrejection = function(e) {
         console.error('[AX-CORE] Promise rechazada:', e.reason);
+    };
+    </script>
+
+    <!-- Seguridad: la contraseña NUNCA se guarda legible en el dispositivo.
+         Se guarda como un código irreconocible (hash SHA-256). El servidor
+         sigue recibiendo la contraseña real para su propia validación. -->
+    <script>
+    window.axPassHash = async function(p){
+        try {
+            var enc = new TextEncoder().encode('AXCORE_v1|' + String(p == null ? '' : p));
+            var buf = await crypto.subtle.digest('SHA-256', enc);
+            return 'h1$' + Array.from(new Uint8Array(buf)).map(function(b){ return b.toString(16).padStart(2,'0'); }).join('');
+        } catch(e) {
+            // Contexto sin cripto seguro (raro): no se puede hashear, se deja marcado.
+            return 'p0$' + String(p == null ? '' : p);
+        }
+    };
+    // Verifica una contraseña contra el valor guardado. Acepta cuentas viejas
+    // que aún tengan la contraseña en texto plano (migración transparente).
+    window.axPassVerify = async function(stored, p){
+        var s = (stored == null) ? '' : String(stored);
+        if (s.indexOf('h1$') === 0) return s === (await window.axPassHash(p));
+        if (s.indexOf('p0$') === 0) return s.slice(3) === String(p == null ? '' : p);
+        return s === String(p == null ? '' : p); // legado: texto plano
     };
     </script>
 
@@ -236,7 +260,8 @@
                 if (d.success) {
                     localStorage.setItem('axcore_token', d.token || '');
                     var finalName = d.username || displayName;
-                    var merged = Object.assign({}, d.data || {}, { username: finalName, password: p, gymCode: code, privacyAccepted: true });
+                    var merged = Object.assign({}, d.data || {}, { username: finalName, passHash: await window.axPassHash(p), gymCode: code, privacyAccepted: true });
+                    delete merged.password;
                     merged.achievements = d.achievements || [];
                     localStorage.setItem('arthur_data_' + finalName, JSON.stringify(merged));
                     localStorage.setItem('arthur_current_user', finalName);
@@ -258,7 +283,8 @@
         var localRaw = localStorage.getItem('arthur_data_' + input);
         var local = localRaw ? JSON.parse(localRaw) : null;
         if (!local) { resetBtn(); alert('Sin conexión y sin datos locales para este usuario.'); return; }
-        if (local.password !== p) { resetBtn(); alert('Contraseña incorrecta.'); return; }
+        var storedCred = (local.passHash != null) ? local.passHash : local.password;
+        if (!(await window.axPassVerify(storedCred, p))) { resetBtn(); alert('Contraseña incorrecta.'); return; }
         localStorage.setItem('arthur_current_user', input);
         window.axcoreShowApp(input);
     };
@@ -474,7 +500,7 @@
 
                     <!-- INSIGNIAS scroll -->
                     <div class="pd-badges-header">
-                        <div class="pd-section-title" style="margin-bottom:0;">INSIGNIAS · <span id="pd-badges-count" style="color:var(--accent-main);">0</span><span style="color:var(--text-dim);">/100</span></div>
+                        <div class="pd-section-title" style="margin-bottom:0;">INSIGNIAS · <span id="pd-badges-count" style="color:var(--accent-main);">0</span><span id="pd-badges-total" style="color:var(--text-dim);">/100</span></div>
                         <span class="pd-badges-link" style="font-size:0.7rem;cursor:pointer;letter-spacing:1px;" onclick="window.pmOpenBadges && window.pmOpenBadges()">Ver todas →</span>
                     </div>
                     <div class="pd-badges-scroll" id="pd-badges-scroll"></div>
@@ -884,12 +910,12 @@
 
     <!-- Gráficas (Al final para no bloquear inicio rápido) -->
     <script src="https://cdn.jsdelivr.net/npm/apexcharts" defer></script>
-    <script src="profile-persist.js?v=20260617c"></script>
-    <script src="knowledge.js?v=20260617c"></script>
-    <script src="app.js?v=20260617c"></script>
-    <!-- Premium UI: sistema de 100 insignias + FAB + onboarding -->
-    <script src="premium-badges.js?v=20260617c"></script>
-    <script src="premium-extras.js?v=20260617c"></script>
+    <script src="profile-persist.js?v=20260704b"></script>
+    <script src="knowledge.js?v=20260704b"></script>
+    <script src="app.js?v=20260704b"></script>
+    <!-- Premium UI: catálogo de insignias + FAB + onboarding -->
+    <script src="premium-badges.js?v=20260704b"></script>
+    <script src="premium-extras.js?v=20260704b"></script>
 
     <!-- REGISTRO GLOBAL — funciona aunque app.js falle -->
     <script>
@@ -923,7 +949,7 @@
 
         if (gc === 'AXV-DEMO') {
             localStorage.setItem('arthur_current_user', u);
-            localStorage.setItem('arthur_data_' + u, JSON.stringify({username:u, password:p, gymCode:gc, privacyAccepted:true, achievements:[]}));
+            localStorage.setItem('arthur_data_' + u, JSON.stringify({username:u, passHash: await window.axPassHash(p), gymCode:gc, privacyAccepted:true, achievements:[]}));
             showErr('✅ Modo DEMO activado. Entrando a la app...', true);
             setTimeout(function(){ window.axcoreShowApp(u); }, 800);
             return;
@@ -943,7 +969,7 @@
             if (d.success) {
                 localStorage.setItem('axcore_token', d.token || '');
                 localStorage.setItem('arthur_current_user', u);
-                localStorage.setItem('arthur_data_' + u, JSON.stringify({username:u, password:p, gymCode:gc, privacyAccepted:true, achievements:[]}));
+                localStorage.setItem('arthur_data_' + u, JSON.stringify({username:u, passHash: await window.axPassHash(p), gymCode:gc, privacyAccepted:true, achievements:[]}));
                 localStorage.setItem('axcore_first_run', '1');
                 showErr('✅ Cuenta creada. Entrando a AX-CORE...', true);
                 // Mostrar app directamente — sin reload (evita loop a login)
@@ -967,7 +993,7 @@
         // Registro del Service Worker de PWA unificado con detección de actualizaciones y auto-refresco
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=20260617c').then(reg => {
+                navigator.serviceWorker.register('sw.js?v=20260704b').then(reg => {
                     console.log('[AX-CORE] Service Worker registrado con éxito:', reg.scope);
                     
                     // Detectar si hay una actualización de Service Worker esperando

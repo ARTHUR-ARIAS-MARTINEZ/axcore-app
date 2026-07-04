@@ -81,7 +81,7 @@
     const OB_STEPS = [
         { e:'🎯', t:'BIENVENIDO A AX-CORE', d:'Tu sistema de evolución personal premium.\nControla peso, dieta y entrenamiento desde una sola app.' },
         { e:'📊', t:'REGISTRA TU PROGRESO', d:'Cada día mide tu peso, cintura y calorías.\nVerás tu evolución en tiempo real.' },
-        { e:'🏆', t:'GANA 100 INSIGNIAS', d:'Completa retos y desbloquea insignias de bronce a legendaria.\nComparte tu progreso con tarjetas HD.' }
+        { e:'🏆', t:'GANA INSIGNIAS', d:'Completa retos y desbloquea insignias por tu constancia y tus logros.\nComparte tu progreso con tarjetas HD.' }
     ];
     let obStep = 0;
 

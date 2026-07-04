@@ -511,6 +511,19 @@
         return h;
     }
 
+    // Sesión vencida/ inválida: regresar limpio a la pantalla de inicio de sesión.
+    function coachForceLogin(msg) {
+        coachToken = "";
+        localStorage.removeItem('coach_vip_token');
+        localStorage.removeItem('coach_vip_pass'); // legado
+        try {
+            dashboard.style.display = 'none';
+            document.getElementById('login-wrapper').style.display = '';
+            const pw = document.getElementById('gym-pass'); if (pw) pw.value = '';
+        } catch(e) {}
+        if (msg) alert(msg);
+    }
+
     btnLogin.onclick = async () => {
         const gid = document.getElementById('gym-id').value.toUpperCase().trim();
         const psw = document.getElementById('gym-pass').value.trim();
@@ -532,9 +545,11 @@
                 gymData.currentUsers = data.currentUsers;
                 coachToken = data.token || "";
 
-                // Guardar sesión para persistencia
+                // Guardar sesión para persistencia. NO se guarda la contraseña:
+                // la reconexión automática usa el token (más seguro).
                 localStorage.setItem('coach_vip_gym', gid);
-                localStorage.setItem('coach_vip_pass', psw);
+                localStorage.setItem('coach_vip_name', (gymData && gymData.name) || gid);
+                localStorage.removeItem('coach_vip_pass'); // limpiar dato legado en texto plano
                 if (coachToken) localStorage.setItem('coach_vip_token', coachToken);
 
                 document.getElementById('login-wrapper').style.display = 'none';
@@ -584,6 +599,9 @@
         try {
             const res = await fetch(`${API_URL}/api/coach/codes/${currentGym}`, { headers: coachAuthHeaders(false) });
             const codes = await res.json();
+
+            // Token vencido o inválido: el servidor no devuelve la lista de atletas.
+            if (!res.ok || !Array.isArray(codes)) { coachForceLogin('Tu sesión expiró. Vuelve a iniciar sesión.'); return; }
 
             gymData.currentUsers = codes.length;
             updateStatsBadge();
@@ -795,20 +813,30 @@
     // --- Cerrar sesión ---
     window.logout = () => {
         localStorage.removeItem('coach_vip_gym');
-        localStorage.removeItem('coach_vip_pass');
+        localStorage.removeItem('coach_vip_pass');   // legado
+        localStorage.removeItem('coach_vip_name');
         localStorage.removeItem('coach_vip_token');
         coachToken = "";
         location.reload();
     };
 
-    // --- Auto-login si hay sesión guardada ---
+    // --- Auto-login si hay sesión guardada (por TOKEN, no por contraseña) ---
     (function autoLogin() {
-        const storedGym = localStorage.getItem('coach_vip_gym');
-        const storedPass = localStorage.getItem('coach_vip_pass');
-        if (storedGym && storedPass) {
+        const storedGym   = localStorage.getItem('coach_vip_gym');
+        const storedToken = localStorage.getItem('coach_vip_token');
+        // Limpiar cualquier contraseña guardada por versiones anteriores.
+        localStorage.removeItem('coach_vip_pass');
+        if (storedGym && storedToken) {
+            currentGym = storedGym;
+            coachToken = storedToken;
+            const storedName = localStorage.getItem('coach_vip_name') || storedGym;
+            gymData = { name: storedName, gymCode: storedGym };
             document.getElementById('gym-id').value = storedGym;
-            document.getElementById('gym-pass').value = storedPass;
-            btnLogin.click();
+            document.getElementById('login-wrapper').style.display = 'none';
+            dashboard.style.display = 'block';
+            document.getElementById('gym-name-display').textContent = String(storedName).toUpperCase();
+            document.getElementById('gym-code-display').textContent = `ID SUCURSAL: ${storedGym}`;
+            loadClients(); // valida el token; si expiró, vuelve al login automáticamente
         }
     })();
 

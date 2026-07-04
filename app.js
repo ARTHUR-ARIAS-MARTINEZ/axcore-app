@@ -131,11 +131,16 @@ document.addEventListener('DOMContentLoaded', () => {
         dailyCalLimit: 0,
         caloriesConsumedToday: 0,
         caloriesBurnedToday: 0,
-        totalNetDeficit: 0, 
+        totalNetDeficit: 0,
+        totalCaloriesBurned: 0,
+        totalWorkouts: 0,
+        usedCalc: false,
+        sharedCard: false,
         apiKey: '',
         theme: 'neon',
-        history: [], 
-        foodLogToday: [], 
+        history: [],
+        foodLogToday: [],
+        workoutLogToday: [],
         recommendedDiet: { breakfast: '', lunch: '', dinner: '', snacks: '' },
         customDietRules: null,
         lastUpdateDate: new Date().toDateString()
@@ -271,6 +276,7 @@ document.addEventListener('DOMContentLoaded', () => {
             userData = { ...userData, ...JSON.parse(saved) };
             window.userData = userData;
             if (!userData.foodLogToday) userData.foodLogToday = [];
+            if (!userData.workoutLogToday) userData.workoutLogToday = [];
             if (!userData.forearm) userData.forearm = 0;
             if (!userData.back) userData.back = 0;
             if (!userData.achievements) userData.achievements = [];
@@ -305,6 +311,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 userData.caloriesConsumedToday = 0;
                 userData.caloriesBurnedToday = 0;
                 userData.foodLogToday = [];
+                userData.workoutLogToday = [];
                 userData.lastUpdateDate = today;
                 saveData();
             }
@@ -587,7 +594,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (gc === "AXV-DEMO") {
             currentUser = u;
             userData.username = u;
-            userData.password = p;
+            userData.passHash = await window.axPassHash(p);
+            delete userData.password;
             userData.gymCode = gc;
             userData.privacyAccepted = true;
             userData.achievements = userData.achievements || [];
@@ -624,7 +632,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 setApiToken(data.token);
                 currentUser = u;
                 userData.username = u;
-                userData.password = p;
+                userData.passHash = await window.axPassHash(p);
+                delete userData.password;
                 userData.gymCode = gc;
                 userData.privacyAccepted = true;
                 userData.privacyDate = new Date().toISOString();
@@ -686,7 +695,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Merge: priorizar data remota si es más nueva
                     const merged = { ...(savedLocal || {}), ...(data.data || {}) };
                     merged.username = u;
-                    merged.password = p;
+                    merged.passHash = await window.axPassHash(p);
+                    delete merged.password;
                     merged.gymCode = localCode;
                     merged.achievements = data.achievements || merged.achievements || [];
                     localStorage.setItem(`arthur_data_${u}`, JSON.stringify(merged));
@@ -713,7 +723,8 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.textContent = originalText; btn.disabled = false;
             return;
         }
-        if (savedLocal.password !== p) {
+        const storedCred = (savedLocal.passHash != null) ? savedLocal.passHash : savedLocal.password;
+        if (!(await window.axPassVerify(storedCred, p))) {
             alert("Contraseña incorrecta.");
             btn.textContent = originalText; btn.disabled = false;
             return;
@@ -870,7 +881,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const arrow  = delta === null ? '' : (losing ? '▼' : (gaining ? '▲' : '→'));
             const dColor = delta === null ? themeColors.dim : (losing ? themeColors.main : (gaining ? themeColors.alert : themeColors.dim));
             const dText  = delta === null ? '—' : (losing ? delta.toFixed(1) : `+${delta.toFixed(1)}`);
-            const dateShort = (h.date || '').slice(5); // MM-DD
+            const dateShort = formatShortDate(h.date); // dd/mm
             return `
             <div style="
                 flex-shrink:0; width:88px; background:rgba(255,255,255,0.04);
@@ -889,7 +900,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Sparkline compacto (últimas 10 entradas)
         const last10    = historyData.slice(-10);
-        const dates10   = last10.map(h => (h.date || '').slice(5));
+        const dates10   = last10.map(h => formatShortDate(h.date));
         const weights10 = last10.map(h => h.weight || 0);
         const waists10  = last10.map(h => h.waist || 0);
         const sparkEl   = document.querySelector('#chart-history');
@@ -1022,8 +1033,8 @@ document.addEventListener('DOMContentLoaded', () => {
         set('pd-progress-goal', tw + ' kg');
         set('pd-progress-pct-label', pct + '% completado');
 
-        // RACHA — del state si existe, si no calcular
-        const streak = userData.streak || (userData.history?.length || 0);
+        // RACHA — días CONSECUTIVOS reales registrando peso (no total de registros)
+        const streak = (typeof streakDays === 'function') ? streakDays() : (userData.history?.length || 0);
         set('pd-streak-days', streak);
         set('pd-ach-streak-days', streak);
 
@@ -1074,7 +1085,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     else if (+diff > 0) { delta = `▲ +${diff}`; dClass = 'up'; }
                     else { delta = `— 0.0`; dClass = 'eq'; }
                 }
-                const label = i === 0 ? 'HOY' : entry.date.split('-').slice(1).join('/');
+                const label = i === 0 ? 'HOY' : formatShortDate(entry.date);
                 return `<div class="pd-evol-card${i===0?' first':''}">
                     <div class="pd-evol-date">${label}</div>
                     <div class="pd-evol-w">${(+entry.weight).toFixed(1)}</div>
@@ -1142,6 +1153,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ).join('');
         }
         set('pd-badges-count', ach.length);
+        set('pd-badges-total', '/' + (ACHIEVEMENT_DEFS.length || allBadges.length)); // total honesto (insignias reales)
 
         // PRÓXIMO LOGRO — calcular siguiente insignia y actualizar card
         try {
@@ -1269,12 +1281,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const showErr = (msg) => { if (errDiv) { errDiv.textContent = msg; errDiv.style.display = 'block'; } };
 
         if (!cur) { showErr('⚠️ Escribe tu contraseña actual.'); return; }
-        const savedPass = (userData.password || '').toString();
-        if (cur !== savedPass) { showErr('⚠️ Contraseña actual incorrecta.'); return; }
+        const storedCred = (userData.passHash != null) ? userData.passHash : userData.password;
+        if (!(await window.axPassVerify(storedCred, cur))) { showErr('⚠️ Contraseña actual incorrecta.'); return; }
         if (nw.length < 4) { showErr('⚠️ La nueva contraseña debe tener al menos 4 caracteres.'); return; }
         if (nw !== nw2)   { showErr('⚠️ Las contraseñas nuevas no coinciden.'); return; }
 
-        userData.password = nw;
+        userData.passHash = await window.axPassHash(nw);
+        delete userData.password;
         saveData();
 
         // Intentar actualizar en el backend si hay token
@@ -1309,6 +1322,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.pmSetTheme = function(themeName) {
         try {
             userData.theme = themeName;
+            if (typeof checkAchievements === 'function') checkAchievements();
             document.body.setAttribute('data-theme', themeName);
             // Marcar el swatch activo
             document.querySelectorAll('.t-swatch').forEach(btn => {
@@ -1516,7 +1530,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Stats: días, kg perdidos, insignias
             const history = Array.isArray(ud.history) ? ud.history : [];
-            const days = history.length || (ud.streak || 0);
+            // "días" = días CALENDARIO distintos con registro (no cuenta doble si registras 2 veces el mismo día)
+            const days = (typeof parseAppDate === 'function')
+                ? new Set(history.map(h => parseAppDate(h.date).toDateString())).size
+                : history.length;
             setText('pmProfDays', days);
 
             let lost = 0;
@@ -1551,6 +1568,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                     localStorage.removeItem('arthur_current_user');
                     clearApiToken();
+                    // Limpiar el PERFIL (nombre/foto) para no filtrarlo al siguiente
+                    // usuario en dispositivos compartidos (ej. una tablet del gimnasio).
+                    // NO se borran los datos del atleta (arthur_data_*) para no perder
+                    // cuentas DEMO ni el historial guardado localmente.
+                    try {
+                        ['axcore_profile_v1', 'axcore_avatar_global', 'axcore_uname_global'].forEach(k => localStorage.removeItem(k));
+                        Object.keys(localStorage).forEach(k => {
+                            if (k.indexOf('axcore_avatar_') === 0 || k.indexOf('axcore_uname_') === 0) localStorage.removeItem(k);
+                        });
+                    } catch (_) {}
                     location.reload();
                 }
                 return;
@@ -1759,8 +1786,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
         let filtered = [...(userData.history || [])]; // Copia para no mutar
-        if (filter === 'week') filtered = filtered.filter(h => new Date(h.date) >= startOfWeek);
-        if (filter === 'month') filtered = filtered.filter(h => new Date(h.date) >= startOfMonth);
+        if (filter === 'week') filtered = filtered.filter(h => parseAppDate(h.date) >= startOfWeek);
+        if (filter === 'month') filtered = filtered.filter(h => parseAppDate(h.date) >= startOfMonth);
 
         body.innerHTML = filtered.reverse().map((h, i, arr) => {
             const prev = arr[i+1];
@@ -1953,7 +1980,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="pm-d-food-log" id="pmFoodLogList">
                         ${foodLog.length === 0
                             ? '<div class="pm-d-food-empty">Sin registros hoy. Agrega tu primera comida arriba ↑</div>'
-                            : foodLog.map(f => `<div class="pm-d-food-item"><span class="pm-d-food-name">${(f.desc || '').toString().replace(/</g,'&lt;')}</span><span class="pm-d-food-cal">${f.cal || 0}<small>kcal</small></span></div>`).join('')
+                            : foodLog.map((f, i) => `<div class="pm-d-food-item"><span class="pm-d-food-name">${(f.desc || '').toString().replace(/</g,'&lt;')}</span><span class="pm-d-food-cal">${f.cal || 0}<small>kcal</small></span><button class="pm-d-food-del" onclick="window.deleteFoodLog(${i})" title="Quitar este registro" aria-label="Quitar" style="background:transparent;border:none;color:#ff5c6c;font-size:1rem;line-height:1;cursor:pointer;padding:2px 8px;margin-left:6px;flex-shrink:0;">✕</button></div>`).join('')
                         }
                     </div>
                 </div>
@@ -2106,6 +2133,23 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         };
 
+        // Quitar una comida ya registrada hoy y DESHACER su efecto en el contador
+        // de calorías y en el déficit (revierte exactamente lo que hizo registerFood).
+        window.deleteFoodLog = function(i) {
+            const list = Array.isArray(userData.foodLogToday) ? userData.foodLogToday : [];
+            const item = list[i];
+            if (!item) return;
+            if (!confirm(`¿Quitar "${item.desc}" (${item.cal || 0} kcal) del registro de hoy?`)) return;
+            const cal = +item.cal || 0;
+            userData.caloriesConsumedToday = Math.max(0, (+userData.caloriesConsumedToday || 0) - cal);
+            userData.totalNetDeficit = (+userData.totalNetDeficit || 0) + Math.round(cal * 0.15); // revierte el ajuste de registerFood
+            userData.totalFoodLogs = Math.max(0, (+userData.totalFoodLogs || 0) - 1);
+            list.splice(i, 1);
+            saveData();
+            updateDashboard();
+            renderDietPage();
+        };
+
         function registerFood(desc, estimatedCal, calLimit, calUsed) {
             const newTotal = calUsed + estimatedCal;
             const remaining = calLimit - newTotal;
@@ -2179,6 +2223,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- WORKOUT PAGE ---
     function renderWorkoutPage() {
         const workoutEl = document.getElementById('page-workout');
+        const woLog = Array.isArray(userData.workoutLogToday) ? userData.workoutLogToday : [];
+        // Construye la lista de ejercicios registrados hoy (con botón para quitar).
+        const woLogHtml = (list) => (list.length === 0
+            ? '<div style="text-align:center;color:var(--text-dim);font-size:0.72rem;padding:12px;">Aún no registras ejercicios hoy. Pulsa ✓ en un ejercicio para sumarlo.</div>'
+            : list.map((w, i) => `<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 12px;border-bottom:1px solid rgba(255,255,255,0.06);">
+                    <span style="font-size:0.8rem;color:var(--text-main);flex:1;min-width:0;">${(w.name || '').toString().replace(/</g,'&lt;')} <small style="color:var(--text-dim);">${(w.detail || '').toString().replace(/</g,'&lt;')} · ${w.time || ''}</small></span>
+                    <span style="font-family:var(--font-accent);color:var(--accent-secondary);font-size:0.8rem;white-space:nowrap;">-${w.cal || 0} kcal</span>
+                    <button onclick="window.deleteWorkoutLog(${i})" title="Quitar este ejercicio" aria-label="Quitar" style="background:transparent;border:none;color:#ff5c6c;font-size:1rem;line-height:1;cursor:pointer;padding:2px 8px;flex-shrink:0;">✕</button>
+                </div>`).join('')
+        );
         workoutEl.innerHTML = `
             <div class="glass-card workout-plan">
                 <div class="stopwatch-container">
@@ -2218,7 +2272,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             : typeSlug;
                         const badgeClass = typeSlug === 'hiit' ? 'hiit' : typeSlug === 'cardio' ? 'cardio' : 'fuerza';
                         return `
-                        <div class="exercise-card" data-ex-type="${typeSlug}" data-filter-key="${filterKey}">
+                        <div class="exercise-card" data-ex-type="${typeSlug}" data-filter-key="${filterKey}" data-ex-name="${ex.name}">
                             <div>
                                 <span class="ex-badge ${badgeClass}">${ex.type}</span>
                                 <h4 class="ex-title">${ex.name}</h4>
@@ -2241,6 +2295,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="wo-total-box">
                     <div class="wo-total-lbl">TOTAL QUEMADO HOY</div>
                     <div class="wo-total-val"><span id="wo-total-calories-num">${userData.caloriesBurnedToday || 0}</span> <span class="wo-total-unit">KCAL</span></div>
+                </div>
+
+                <div class="glass-card" style="margin-top:14px; padding:6px 4px;">
+                    <div style="font-family:var(--font-accent); font-size:0.7rem; color:var(--accent-secondary); letter-spacing:1.5px; text-align:center; padding:8px;">EJERCICIOS DE HOY</div>
+                    <div id="woLogList">${woLogHtml(woLog)}</div>
                 </div>
             </div>
         `;
@@ -2282,6 +2341,31 @@ document.addEventListener('DOMContentLoaded', () => {
             };
         });
 
+        // Refresca solo la lista de ejercicios registrados (sin re-render total).
+        function renderWoLogList() {
+            const box = document.getElementById('woLogList');
+            if (box) box.innerHTML = woLogHtml(Array.isArray(userData.workoutLogToday) ? userData.workoutLogToday : []);
+        }
+
+        // Quitar un ejercicio registrado hoy y DESHACER las calorías quemadas.
+        window.deleteWorkoutLog = function(i) {
+            const list = Array.isArray(userData.workoutLogToday) ? userData.workoutLogToday : [];
+            const item = list[i];
+            if (!item) return;
+            if (!confirm(`¿Quitar "${item.name}" (-${item.cal || 0} kcal) del registro de hoy?`)) return;
+            const cal = +item.cal || 0;
+            userData.caloriesBurnedToday = Math.max(0, (+userData.caloriesBurnedToday || 0) - cal);
+            userData.totalNetDeficit = (+userData.totalNetDeficit || 0) - cal; // revierte el += de registerExercise
+            userData.totalCaloriesBurned = Math.max(0, (+userData.totalCaloriesBurned || 0) - cal);
+            userData.totalWorkouts = Math.max(0, (+userData.totalWorkouts || 0) - 1);
+            list.splice(i, 1);
+            saveData();
+            updateDashboard();
+            renderWoLogList();
+            const totalNum = document.getElementById('wo-total-calories-num');
+            if (totalNum) totalNum.textContent = userData.caloriesBurnedToday || 0;
+        };
+
         // Helper para registrar calorías desde una tarjeta
         function registerExercise(card, btn, baseCal, baseUnit) {
             const val = parseFloat(card.querySelector('.ex-input').value) || 0;
@@ -2289,8 +2373,22 @@ document.addEventListener('DOMContentLoaded', () => {
             const realCal = Math.round((baseCal / baseUnit) * val);
             userData.caloriesBurnedToday += realCal;
             userData.totalNetDeficit += realCal;
+            // Contadores acumulados (para las insignias de ejercicio).
+            userData.totalCaloriesBurned = (+userData.totalCaloriesBurned || 0) + realCal;
+            userData.totalWorkouts = (+userData.totalWorkouts || 0) + 1;
+            // Guardar el ejercicio en el registro del día (para poder verlo/quitarlo).
+            if (!Array.isArray(userData.workoutLogToday)) userData.workoutLogToday = [];
+            const unitLbl = (card.querySelector('.ex-unit-lbl')?.textContent || '').trim();
+            userData.workoutLogToday.push({
+                time: new Date().toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' }),
+                name: card.dataset.exName || 'Ejercicio',
+                detail: `${val} ${unitLbl}`.trim(),
+                cal: realCal
+            });
             saveData();
             updateDashboard();
+            renderWoLogList();
+            if (typeof checkAchievements === 'function') checkAchievements();
 
             // Badge acumulado pequeño y ordenado al lado del título
             let badge = card.querySelector('.ex-badge-accumulated');
@@ -2384,6 +2482,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (themeBtn) {
             const theme = themeBtn.dataset.theme;
             userData.theme = theme;
+            if (typeof checkAchievements === 'function') checkAchievements();
             applySettings();
             // Destruir gráficas previas para que se recreen con el color del tema
             try { if (chartWeight) { chartWeight.destroy(); chartWeight = null; } } catch(_){}
@@ -3513,7 +3612,14 @@ document.addEventListener('DOMContentLoaded', () => {
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            
+
+            // Marcar que compartió/creó una tarjeta (insignia COMPARTIDOR).
+            if (!userData.sharedCard) {
+                userData.sharedCard = true;
+                saveData();
+                if (typeof checkAchievements === 'function') checkAchievements();
+            }
+
             if (typeof pmShowToast === 'function') {
                 pmShowToast('📥 ¡Tarjeta guardada en descargas!', 'green');
             }
@@ -3529,7 +3635,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     return;
                 }
                 const file = new File([blob], 'AX-CORE_Logros.png', { type: 'image/png' });
-                
+
+                // Marcar que compartió una tarjeta (insignia COMPARTIDOR).
+                if (!userData.sharedCard) {
+                    userData.sharedCard = true;
+                    saveData();
+                    if (typeof checkAchievements === 'function') checkAchievements();
+                }
+
                 if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
                     try {
                         await navigator.share({
@@ -3606,7 +3719,8 @@ document.addEventListener('DOMContentLoaded', () => {
             userData.caloriesConsumedToday = 0;
             userData.caloriesBurnedToday = 0;
             userData.foodLogToday = [];
-            
+            userData.workoutLogToday = [];
+
             saveData();
             applySettings();
             updateDashboard();
@@ -3837,6 +3951,12 @@ document.addEventListener('DOMContentLoaded', () => {
         setupCalcSwap();
         setupCalcTDEE();
         setupCalcProjection();
+        // Marcar que usó la calculadora (insignia CALCULADOR).
+        if (!userData.usedCalc) {
+            userData.usedCalc = true;
+            saveData();
+            if (typeof checkAchievements === 'function') checkAchievements();
+        }
     }
     window._activateCalculator = activateCalculator;
 
@@ -3882,26 +4002,157 @@ document.addEventListener('DOMContentLoaded', () => {
     // ============================================================
     // SISTEMA DE LOGROS / MEDALLAS
     // ============================================================
+    // ── 100 INSIGNIAS REALES ──────────────────────────────────────────────
+    // Cada una tiene una condición (check) que se evalúa contra los datos del
+    // usuario. Progresivas: entre más avanzas, más difíciles. t = nivel visual
+    // (1 bronce → 5 leyenda), cat = categoría para el filtro del catálogo.
+    // Se conservan los IDs de la versión anterior para no perder lo ya ganado.
+    const H = () => userData.history || [];
+    const FL = () => userData.totalFoodLogs || 0;
+    const DEF = () => userData.totalNetDeficit || 0;
+    const BURN = () => userData.totalCaloriesBurned || 0;
+    const WK = () => userData.totalWorkouts || 0;
+    const dietConfigured = () => {
+        const rd = userData.recommendedDiet || {};
+        return !!(rd.breakfast || rd.lunch || rd.dinner || rd.snacks) ||
+               (Array.isArray(userData.customDietRules) && userData.customDietRules.length > 0);
+    };
     const ACHIEVEMENTS_DEF = [
-        { id: 'first_login',   icon: '🎯', title: 'PRIMER ACCESO',     desc: 'Bienvenido a AX-CORE.',                      check: () => !!userData.username },
-        { id: 'first_weigh',   icon: '⚖️', title: 'PRIMER REGISTRO',  desc: 'Registraste tu peso por primera vez.',       check: () => (userData.history || []).length >= 1 },
-        { id: 'streak_3',      icon: '🔥', title: 'RACHA DE 3 DÍAS',  desc: '3 días consecutivos registrando peso.',      check: () => streakDays() >= 3 },
-        { id: 'streak_7',      icon: '🔥', title: 'RACHA DE 7 DÍAS',  desc: 'Una semana completa de constancia.',         check: () => streakDays() >= 7 },
-        { id: 'streak_30',     icon: '👑', title: 'RACHA DE 30 DÍAS', desc: 'Un mes entero sin fallar. Élite.',           check: () => streakDays() >= 30 },
-        { id: 'lose_1kg',      icon: '🔻', title: 'PRIMER KG ABAJO',  desc: 'Bajaste tu primer kilo. ¡Vamos!',            check: () => kilosLost() >= 1 },
-        { id: 'lose_5kg',      icon: '💪', title: '5 KG MENOS',       desc: 'Cinco kilos menos. Estás transformándote.',  check: () => kilosLost() >= 5 },
-        { id: 'lose_10kg',     icon: '🏆', title: '10 KG MENOS',      desc: 'Diez kilos menos. Otro nivel.',              check: () => kilosLost() >= 10 },
-        { id: 'goal_reached',  icon: '🌟', title: 'META ALCANZADA',   desc: 'Llegaste a tu peso objetivo.',               check: () => userData.weight > 0 && userData.target_weight > 0 && userData.weight <= userData.target_weight },
-        { id: 'food_log_50',   icon: '🥗', title: '50 ALIMENTOS',     desc: 'Registraste 50 alimentos en tu historial.',  check: () => (userData.totalFoodLogs || 0) >= 50 },
-        { id: 'deficit_3500',  icon: '⚡', title: 'DÉFICIT DE 3500',  desc: 'Acumulaste un déficit de 3500 kcal (~½ kg).', check: () => (userData.totalNetDeficit || 0) >= 3500 },
-        { id: 'deficit_7700',  icon: '🚀', title: 'DÉFICIT DE 7700',  desc: 'Déficit equivalente a 1 kg quemado.',         check: () => (userData.totalNetDeficit || 0) >= 7700 }
+        // ─── INICIO (10) ───
+        { id:'first_login',   icon:'🎯', title:'PRIMER ACCESO',    desc:'Entraste a AX-CORE.',                 t:1, cat:'inicio', check:()=>!!userData.username },
+        { id:'first_weigh',   icon:'⚖️', title:'PRIMER PESO',      desc:'Registraste tu peso por 1ª vez.',      t:1, cat:'inicio', check:()=>H().length>=1 },
+        { id:'first_food',    icon:'🍽️', title:'PRIMER ALIMENTO',  desc:'Registraste tu 1ª comida.',            t:1, cat:'inicio', check:()=>FL()>=1 },
+        { id:'first_workout', icon:'🏃', title:'PRIMER EJERCICIO', desc:'Registraste tu 1er ejercicio.',        t:1, cat:'inicio', check:()=>WK()>=1 },
+        { id:'first_waist',   icon:'📏', title:'PRIMERA CINTURA',  desc:'Registraste tu cintura.',              t:1, cat:'inicio', check:()=>H().some(h=>+h.waist>0) },
+        { id:'profile_photo', icon:'📸', title:'CON ROSTRO',       desc:'Pusiste foto de perfil.',              t:1, cat:'inicio', check:()=>!!(userData.avatarPhoto||userData.avatar) },
+        { id:'theme_change',  icon:'🎨', title:'ESTILO PROPIO',    desc:'Cambiaste el color de la app.',        t:1, cat:'inicio', check:()=>!!userData.theme && userData.theme!=='neon' },
+        { id:'diet_set',      icon:'🥗', title:'PLAN LISTO',       desc:'Configuraste tu dieta.',               t:1, cat:'inicio', check:()=>dietConfigured() },
+        { id:'used_calc',     icon:'🧮', title:'CALCULADOR',       desc:'Usaste la calculadora.',               t:1, cat:'inicio', check:()=>!!userData.usedCalc },
+        { id:'first_share',   icon:'🌟', title:'COMPARTIDOR',      desc:'Creaste tu 1ª tarjeta de logros.',     t:1, cat:'inicio', check:()=>!!userData.sharedCard },
+        // ─── RACHA (18) — días CONSECUTIVOS registrando peso ───
+        { id:'streak_2',   icon:'🔥', title:'RACHA 2',   desc:'2 días seguidos.',            t:1, cat:'racha', check:()=>streakDays()>=2 },
+        { id:'streak_3',   icon:'🔥', title:'RACHA 3',   desc:'3 días seguidos.',            t:1, cat:'racha', check:()=>streakDays()>=3 },
+        { id:'streak_5',   icon:'🔥', title:'RACHA 5',   desc:'5 días seguidos.',            t:1, cat:'racha', check:()=>streakDays()>=5 },
+        { id:'streak_7',   icon:'⚡', title:'RACHA 7',   desc:'Una semana completa.',        t:2, cat:'racha', check:()=>streakDays()>=7 },
+        { id:'streak_10',  icon:'⚡', title:'RACHA 10',  desc:'10 días seguidos.',           t:2, cat:'racha', check:()=>streakDays()>=10 },
+        { id:'streak_14',  icon:'⚡', title:'RACHA 14',  desc:'Dos semanas.',                t:2, cat:'racha', check:()=>streakDays()>=14 },
+        { id:'streak_21',  icon:'🌙', title:'RACHA 21',  desc:'Hábito formado (21 días).',   t:3, cat:'racha', check:()=>streakDays()>=21 },
+        { id:'streak_30',  icon:'💫', title:'RACHA 30',  desc:'Un mes entero.',              t:3, cat:'racha', check:()=>streakDays()>=30 },
+        { id:'streak_40',  icon:'💫', title:'RACHA 40',  desc:'40 días.',                    t:3, cat:'racha', check:()=>streakDays()>=40 },
+        { id:'streak_50',  icon:'💫', title:'RACHA 50',  desc:'50 días.',                    t:3, cat:'racha', check:()=>streakDays()>=50 },
+        { id:'streak_60',  icon:'🌟', title:'RACHA 60',  desc:'Dos meses.',                  t:4, cat:'racha', check:()=>streakDays()>=60 },
+        { id:'streak_75',  icon:'🌟', title:'RACHA 75',  desc:'75 días.',                    t:4, cat:'racha', check:()=>streakDays()>=75 },
+        { id:'streak_90',  icon:'💎', title:'RACHA 90',  desc:'Tres meses élite.',           t:4, cat:'racha', check:()=>streakDays()>=90 },
+        { id:'streak_120', icon:'💎', title:'RACHA 120', desc:'Cuatro meses.',               t:4, cat:'racha', check:()=>streakDays()>=120 },
+        { id:'streak_150', icon:'💎', title:'RACHA 150', desc:'Cinco meses.',                t:5, cat:'racha', check:()=>streakDays()>=150 },
+        { id:'streak_180', icon:'👑', title:'RACHA 180', desc:'Medio año sin fallar.',       t:5, cat:'racha', check:()=>streakDays()>=180 },
+        { id:'streak_270', icon:'👑', title:'RACHA 270', desc:'Nueve meses.',                t:5, cat:'racha', check:()=>streakDays()>=270 },
+        { id:'streak_365', icon:'👑', title:'RACHA 365', desc:'UN AÑO. Leyenda viva.',       t:5, cat:'racha', check:()=>streakDays()>=365 },
+        // ─── PESO (14) — kilos perdidos desde tu inicio ───
+        { id:'lose_05',   icon:'🔻', title:'-0.5 KG',  desc:'Primera bajada.',              t:1, cat:'peso', check:()=>kilosLost()>=0.5 },
+        { id:'lose_1kg',  icon:'🔻', title:'-1 KG',    desc:'Tu primer kilo.',              t:1, cat:'peso', check:()=>kilosLost()>=1 },
+        { id:'lose_2',    icon:'🔻', title:'-2 KG',    desc:'Dos kilos menos.',             t:1, cat:'peso', check:()=>kilosLost()>=2 },
+        { id:'lose_3',    icon:'🏅', title:'-3 KG',    desc:'Tres kilos.',                  t:2, cat:'peso', check:()=>kilosLost()>=3 },
+        { id:'lose_4',    icon:'🏅', title:'-4 KG',    desc:'Cuatro kilos.',                t:2, cat:'peso', check:()=>kilosLost()>=4 },
+        { id:'lose_5kg',  icon:'🥉', title:'-5 KG',    desc:'Cinco kilos. Bronce.',         t:2, cat:'peso', check:()=>kilosLost()>=5 },
+        { id:'lose_7',    icon:'🥈', title:'-7 KG',    desc:'Siete kilos. Plata.',          t:3, cat:'peso', check:()=>kilosLost()>=7 },
+        { id:'lose_10kg', icon:'🥇', title:'-10 KG',   desc:'Diez kilos. Oro.',             t:3, cat:'peso', check:()=>kilosLost()>=10 },
+        { id:'lose_12',   icon:'🥇', title:'-12 KG',   desc:'Doce kilos.',                  t:3, cat:'peso', check:()=>kilosLost()>=12 },
+        { id:'lose_15',   icon:'💫', title:'-15 KG',   desc:'Quince kilos.',                t:4, cat:'peso', check:()=>kilosLost()>=15 },
+        { id:'lose_18',   icon:'💫', title:'-18 KG',   desc:'Dieciocho kilos.',             t:4, cat:'peso', check:()=>kilosLost()>=18 },
+        { id:'lose_20',   icon:'🦅', title:'-20 KG',   desc:'Veinte kilos.',                t:4, cat:'peso', check:()=>kilosLost()>=20 },
+        { id:'lose_25',   icon:'🦅', title:'-25 KG',   desc:'Veinticinco kilos.',           t:5, cat:'peso', check:()=>kilosLost()>=25 },
+        { id:'lose_30',   icon:'🔱', title:'-30 KG',   desc:'Treinta kilos. Increíble.',    t:5, cat:'peso', check:()=>kilosLost()>=30 },
+        // ─── MEDIDAS (12) — cintura reducida y # de mediciones ───
+        { id:'waist_1',   icon:'📏', title:'CINTURA -1',  desc:'1 cm menos de cintura.',    t:1, cat:'medidas', check:()=>waistLost()>=1 },
+        { id:'waist_2',   icon:'📏', title:'CINTURA -2',  desc:'2 cm menos.',               t:1, cat:'medidas', check:()=>waistLost()>=2 },
+        { id:'waist_3',   icon:'📏', title:'CINTURA -3',  desc:'3 cm menos.',               t:2, cat:'medidas', check:()=>waistLost()>=3 },
+        { id:'waist_5',   icon:'📏', title:'CINTURA -5',  desc:'5 cm menos.',               t:2, cat:'medidas', check:()=>waistLost()>=5 },
+        { id:'waist_7',   icon:'📏', title:'CINTURA -7',  desc:'7 cm menos.',               t:3, cat:'medidas', check:()=>waistLost()>=7 },
+        { id:'waist_10',  icon:'📏', title:'CINTURA -10', desc:'10 cm menos.',              t:4, cat:'medidas', check:()=>waistLost()>=10 },
+        { id:'waist_15',  icon:'📏', title:'CINTURA -15', desc:'15 cm menos. Cambio total.',t:5, cat:'medidas', check:()=>waistLost()>=15 },
+        { id:'meas_5',    icon:'📐', title:'5 MEDICIONES',  desc:'Mediste tu cuerpo 5 veces.', t:1, cat:'medidas', check:()=>H().length>=5 },
+        { id:'meas_10',   icon:'📐', title:'10 MEDICIONES', desc:'10 mediciones.',          t:2, cat:'medidas', check:()=>H().length>=10 },
+        { id:'meas_25',   icon:'📐', title:'25 MEDICIONES', desc:'25 mediciones.',          t:3, cat:'medidas', check:()=>H().length>=25 },
+        { id:'meas_50',   icon:'📐', title:'50 MEDICIONES', desc:'50 mediciones.',          t:4, cat:'medidas', check:()=>H().length>=50 },
+        { id:'meas_full', icon:'🧍', title:'CUERPO COMPLETO', desc:'Registraste todas tus medidas en un día.', t:3, cat:'medidas', check:()=>H().some(h=>+h.bicep>0&&+h.tricep>0&&+h.leg>0&&+h.chest>0&&+h.hip>0&&+h.calf>0&&+h.glute>0&&+h.neck>0&&+h.forearm>0&&+h.back>0) },
+        // ─── EJERCICIO (16) — calorías quemadas acumuladas y # de ejercicios ───
+        { id:'burn_100',    icon:'🔥', title:'100 KCAL',    desc:'Quemaste 100 kcal.',       t:1, cat:'ejercicio', check:()=>BURN()>=100 },
+        { id:'burn_500',    icon:'🔥', title:'500 KCAL',    desc:'Quemaste 500 kcal.',       t:1, cat:'ejercicio', check:()=>BURN()>=500 },
+        { id:'burn_1000',   icon:'🔥', title:'1,000 KCAL',  desc:'Quemaste 1,000 kcal.',     t:2, cat:'ejercicio', check:()=>BURN()>=1000 },
+        { id:'burn_2500',   icon:'🔥', title:'2,500 KCAL',  desc:'Quemaste 2,500 kcal.',     t:2, cat:'ejercicio', check:()=>BURN()>=2500 },
+        { id:'burn_5000',   icon:'🔥', title:'5,000 KCAL',  desc:'Quemaste 5,000 kcal.',     t:3, cat:'ejercicio', check:()=>BURN()>=5000 },
+        { id:'burn_10000',  icon:'🔥', title:'10,000 KCAL', desc:'Quemaste 10,000 kcal.',    t:3, cat:'ejercicio', check:()=>BURN()>=10000 },
+        { id:'burn_25000',  icon:'🔥', title:'25,000 KCAL', desc:'Quemaste 25,000 kcal.',    t:4, cat:'ejercicio', check:()=>BURN()>=25000 },
+        { id:'burn_50000',  icon:'🔥', title:'50,000 KCAL', desc:'Quemaste 50,000 kcal.',    t:4, cat:'ejercicio', check:()=>BURN()>=50000 },
+        { id:'burn_100000', icon:'🔥', title:'100,000 KCAL',desc:'Quemaste 100,000 kcal.',   t:5, cat:'ejercicio', check:()=>BURN()>=100000 },
+        { id:'workouts_5',   icon:'💪', title:'5 EJERCICIOS',   desc:'Registraste 5 ejercicios.',   t:1, cat:'ejercicio', check:()=>WK()>=5 },
+        { id:'workouts_10',  icon:'💪', title:'10 EJERCICIOS',  desc:'10 ejercicios.',              t:1, cat:'ejercicio', check:()=>WK()>=10 },
+        { id:'workouts_25',  icon:'💪', title:'25 EJERCICIOS',  desc:'25 ejercicios.',              t:2, cat:'ejercicio', check:()=>WK()>=25 },
+        { id:'workouts_50',  icon:'💪', title:'50 EJERCICIOS',  desc:'50 ejercicios.',              t:2, cat:'ejercicio', check:()=>WK()>=50 },
+        { id:'workouts_100', icon:'💪', title:'100 EJERCICIOS', desc:'100 ejercicios.',             t:3, cat:'ejercicio', check:()=>WK()>=100 },
+        { id:'workouts_250', icon:'💪', title:'250 EJERCICIOS', desc:'250 ejercicios.',             t:4, cat:'ejercicio', check:()=>WK()>=250 },
+        { id:'workouts_500', icon:'💪', title:'500 EJERCICIOS', desc:'500 ejercicios. Bestia.',     t:5, cat:'ejercicio', check:()=>WK()>=500 },
+        // ─── COMIDA (10) — total de alimentos registrados ───
+        { id:'food_5',      icon:'🥗', title:'5 ALIMENTOS',   desc:'Registraste 5 comidas.',   t:1, cat:'comida', check:()=>FL()>=5 },
+        { id:'food_10',     icon:'🥗', title:'10 ALIMENTOS',  desc:'10 comidas.',              t:1, cat:'comida', check:()=>FL()>=10 },
+        { id:'food_25',     icon:'🥗', title:'25 ALIMENTOS',  desc:'25 comidas.',              t:1, cat:'comida', check:()=>FL()>=25 },
+        { id:'food_log_50', icon:'🥗', title:'50 ALIMENTOS',  desc:'50 comidas.',              t:2, cat:'comida', check:()=>FL()>=50 },
+        { id:'food_100',    icon:'🥗', title:'100 ALIMENTOS', desc:'100 comidas.',             t:2, cat:'comida', check:()=>FL()>=100 },
+        { id:'food_200',    icon:'🥗', title:'200 ALIMENTOS', desc:'200 comidas.',             t:3, cat:'comida', check:()=>FL()>=200 },
+        { id:'food_350',    icon:'🥗', title:'350 ALIMENTOS', desc:'350 comidas.',             t:3, cat:'comida', check:()=>FL()>=350 },
+        { id:'food_500',    icon:'🥗', title:'500 ALIMENTOS', desc:'500 comidas.',             t:4, cat:'comida', check:()=>FL()>=500 },
+        { id:'food_750',    icon:'🥗', title:'750 ALIMENTOS', desc:'750 comidas.',             t:4, cat:'comida', check:()=>FL()>=750 },
+        { id:'food_1000',   icon:'🥗', title:'MAESTRO NUTRICIÓN', desc:'1,000 comidas registradas.', t:5, cat:'comida', check:()=>FL()>=1000 },
+        // ─── DÉFICIT (10) — déficit calórico acumulado ───
+        { id:'deficit_1000',   icon:'📉', title:'DÉFICIT 1,000',   desc:'1,000 kcal acumuladas.',   t:1, cat:'deficit', check:()=>DEF()>=1000 },
+        { id:'deficit_3500',   icon:'📉', title:'DÉFICIT 3,500',   desc:'≈ ½ kg de grasa.',         t:2, cat:'deficit', check:()=>DEF()>=3500 },
+        { id:'deficit_7700',   icon:'📉', title:'DÉFICIT 7,700',   desc:'≈ 1 kg de grasa.',         t:2, cat:'deficit', check:()=>DEF()>=7700 },
+        { id:'deficit_15000',  icon:'📉', title:'DÉFICIT 15,000',  desc:'≈ 2 kg de grasa.',         t:3, cat:'deficit', check:()=>DEF()>=15000 },
+        { id:'deficit_23000',  icon:'📉', title:'DÉFICIT 23,000',  desc:'≈ 3 kg de grasa.',         t:3, cat:'deficit', check:()=>DEF()>=23000 },
+        { id:'deficit_38000',  icon:'📉', title:'DÉFICIT 38,000',  desc:'≈ 5 kg de grasa.',         t:4, cat:'deficit', check:()=>DEF()>=38000 },
+        { id:'deficit_50000',  icon:'📉', title:'DÉFICIT 50,000',  desc:'≈ 6.5 kg de grasa.',       t:4, cat:'deficit', check:()=>DEF()>=50000 },
+        { id:'deficit_77000',  icon:'📉', title:'DÉFICIT 77,000',  desc:'≈ 10 kg de grasa.',        t:5, cat:'deficit', check:()=>DEF()>=77000 },
+        { id:'deficit_100000', icon:'📉', title:'DÉFICIT 100,000', desc:'Seis cifras de déficit.',  t:5, cat:'deficit', check:()=>DEF()>=100000 },
+        { id:'deficit_150000', icon:'📉', title:'DÉFICIT 150,000', desc:'≈ 19 kg de grasa.',        t:5, cat:'deficit', check:()=>DEF()>=150000 },
+        // ─── CONSTANCIA (7) — días distintos con registro ───
+        { id:'days_3',   icon:'📅', title:'3 DÍAS ACTIVO',   desc:'Registraste en 3 días distintos.',   t:1, cat:'constancia', check:()=>distinctDaysLogged()>=3 },
+        { id:'days_7',   icon:'📅', title:'7 DÍAS ACTIVO',   desc:'7 días distintos.',                  t:1, cat:'constancia', check:()=>distinctDaysLogged()>=7 },
+        { id:'days_15',  icon:'📅', title:'15 DÍAS ACTIVO',  desc:'15 días distintos.',                 t:2, cat:'constancia', check:()=>distinctDaysLogged()>=15 },
+        { id:'days_30',  icon:'📅', title:'30 DÍAS ACTIVO',  desc:'30 días distintos.',                 t:2, cat:'constancia', check:()=>distinctDaysLogged()>=30 },
+        { id:'days_60',  icon:'📅', title:'60 DÍAS ACTIVO',  desc:'60 días distintos.',                 t:3, cat:'constancia', check:()=>distinctDaysLogged()>=60 },
+        { id:'days_100', icon:'📅', title:'100 DÍAS ACTIVO', desc:'100 días distintos.',                t:4, cat:'constancia', check:()=>distinctDaysLogged()>=100 },
+        { id:'days_200', icon:'📅', title:'200 DÍAS ACTIVO', desc:'200 días distintos.',                t:5, cat:'constancia', check:()=>distinctDaysLogged()>=200 },
+        // ─── ESPECIALES (3) ───
+        { id:'goal_halfway', icon:'🎯', title:'MEDIO CAMINO', desc:'Llegaste a la mitad de tu meta de peso.', t:3, cat:'especial', check:()=>{ const h=H(); const start=(h[0]&&+h[0].weight)||+userData.weight||0; const tw=+userData.target_weight||0; return tw>0 && start>tw && kilosLost()>=(start-tw)/2; } },
+        { id:'goal_reached', icon:'🔱', title:'META ALCANZADA', desc:'Llegaste a tu peso objetivo.',           t:5, cat:'especial', check:()=>userData.weight>0 && userData.target_weight>0 && userData.weight<=userData.target_weight },
+        { id:'legend',       icon:'👑', title:'LEYENDA AX',     desc:'Desbloqueaste 75 insignias.',            t:5, cat:'especial', check:()=>(userData.achievements||[]).length>=75 }
     ];
+
+    // ── Fechas: lee CUALQUIER formato guardado sin confundir día con mes ──
+    // Soporta "d/m/aaaa" (es-MX, formato viejo) y "aaaa-mm-dd" (ISO). Evita que
+    // "4/7/2026" se lea como 7-abril (formato EEUU) y rompa racha/filtros/logros.
+    function parseAppDate(str) {
+        if (str instanceof Date) return str;
+        const s = String(str || '').trim();
+        let m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);           // ISO aaaa-mm-dd
+        if (m) return new Date(+m[1], +m[2] - 1, +m[3]);
+        m = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})/);   // d/m/aaaa
+        if (m) { let y = +m[3]; if (y < 100) y += 2000; return new Date(y, +m[2] - 1, +m[1]); }
+        return new Date(s);                                        // último recurso
+    }
+    // Etiqueta corta "dd/mm" a partir de la fecha guardada (para tarjetas y sparkline)
+    function formatShortDate(str) {
+        const d = parseAppDate(str);
+        if (isNaN(d.getTime())) return String(str || '');
+        return String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0');
+    }
 
     function streakDays() {
         const h = userData.history || [];
         if (h.length === 0) return 0;
         // h debe estar ordenado por fecha; buscar último registro y contar consecutivos
-        const dates = h.map(r => new Date(r.date).toDateString());
+        const dates = h.map(r => parseAppDate(r.date).toDateString());
         const unique = [...new Set(dates)].map(d => new Date(d)).sort((a,b) => b-a);
         let streak = 1;
         for (let i = 1; i < unique.length; i++) {
@@ -3922,6 +4173,22 @@ document.addEventListener('DOMContentLoaded', () => {
         return Math.max(0, start - cur);
     }
 
+    // Centímetros de cintura reducidos desde el primer registro con cintura.
+    function waistLost() {
+        const h = userData.history || [];
+        const firstWithWaist = h.find(r => +r.waist > 0);
+        if (!firstWithWaist) return 0;
+        const start = +firstWithWaist.waist;
+        const cur = +userData.waist || (+h[h.length - 1].waist || start);
+        return Math.max(0, start - cur);
+    }
+
+    // Cantidad de días de calendario DISTINTOS en los que hubo registro.
+    function distinctDaysLogged() {
+        const h = userData.history || [];
+        return new Set(h.map(r => parseAppDate(r.date).toDateString())).size;
+    }
+
     function checkAchievements() {
         if (!userData.achievements) userData.achievements = [];
         const earned = new Set(userData.achievements);
@@ -3940,6 +4207,9 @@ document.addEventListener('DOMContentLoaded', () => {
         renderAchievementsPanel();
     }
     window.checkAchievements = checkAchievements;
+    // Exponer las insignias REALES (las que de verdad se pueden desbloquear) para
+    // que el catálogo premium muestre solo estas y el conteo sea honesto.
+    window.AXCORE_ACHIEVEMENTS = ACHIEVEMENTS_DEF;
 
     function showAchievementToast(a) {
         const t = document.createElement('div');
