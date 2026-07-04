@@ -8,9 +8,9 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0a0e14">
     <link rel="apple-touch-icon" href="logo.png">
-    <link rel="stylesheet" href="index.css?v=20260704d">
+    <link rel="stylesheet" href="index.css?v=20260704e">
     <!-- Premium UI overrides (inerte si <body> NO tiene .premium-mode) -->
-    <link rel="stylesheet" href="premium.css?v=20260704d">
+    <link rel="stylesheet" href="premium.css?v=20260704e">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <!-- Fuentes: Inter para cuerpos de texto, Oswald (Heavy Gym) para titulares -->
@@ -807,16 +807,19 @@
                 <!-- Input de archivo oculto para cambio de foto -->
                 <input type="file" id="pm-avatar-file-input" accept="image/*" style="display:none;" onchange="pmHandlePhotoChange(this)">
                 <div class="premium-only pm-profile-hero" id="pmProfileHero">
-                    <label for="pm-avatar-file-input" style="cursor:pointer; flex-shrink:0;" title="Cambiar foto de perfil">
-                        <div class="pm-prof-av" id="pmProfAvatar">A</div>
-                    </label>
-                    <div class="pm-prof-info">
-                        <div class="pm-prof-name" id="pmProfName" onclick="pmEditUserName()" style="cursor:pointer;" title="Clic para editar nombre">USUARIO ✎</div>
-                        <div class="pm-prof-stats">
-                            <div class="pm-prof-stat"><strong id="pmProfDays">0</strong> días</div>
-                            <div class="pm-prof-stat"><strong id="pmProfLost">0.0</strong> kg perdidos</div>
-                            <div class="pm-prof-stat"><strong id="pmProfBadges">0</strong> insignias</div>
+                    <div class="pm-prof-top">
+                        <label for="pm-avatar-file-input" style="cursor:pointer; flex-shrink:0;" title="Cambiar foto de perfil">
+                            <div class="pm-prof-av" id="pmProfAvatar">A</div>
+                        </label>
+                        <div class="pm-prof-info">
+                            <div class="pm-prof-name" id="pmProfName" onclick="pmEditUserName()" style="cursor:pointer;" title="Clic para editar nombre">USUARIO ✎</div>
+                            <div class="pm-prof-tag">ATLETA · AX-CORE</div>
                         </div>
+                    </div>
+                    <div class="pm-prof-stats">
+                        <div class="pm-prof-stat"><strong id="pmProfDays">0</strong><span>DÍAS</span></div>
+                        <div class="pm-prof-stat"><strong id="pmProfLost">0.0</strong><span>KG PERDIDOS</span></div>
+                        <div class="pm-prof-stat"><strong id="pmProfBadges">0</strong><span>INSIGNIAS</span></div>
                     </div>
                 </div>
 
@@ -873,27 +876,30 @@
                 </div>
 
                 <!-- ═══ LISTA iOS-STYLE (premium only) ═══ -->
+                <div class="pm-section-title pm-settings-hdr">CUENTA Y APP</div>
                 <div class="premium-only pm-settings-block" id="pmSettingsBlock">
                     <div class="pm-s-row" onclick="pmChangePassword()">
+                        <span class="pm-s-ico">🔒</span>
                         <span class="pm-s-row-lbl">Cambiar contraseña</span>
                         <span class="pm-s-row-val">›</span>
                     </div>
                     <div class="pm-s-row" onclick="window.open('MANUAL_ATLETA.html', '_blank')">
+                        <span class="pm-s-ico">📖</span>
                         <span class="pm-s-row-lbl">Guía de uso (Manual del Atleta)</span>
                         <span class="pm-s-row-val">Leer guía ›</span>
                     </div>
                     <div class="pm-s-row" onclick="pmShareApp()">
+                        <span class="pm-s-ico">🔗</span>
                         <span class="pm-s-row-lbl">Compartir app</span>
                         <span class="pm-s-row-val">Copiar link ›</span>
                     </div>
                     <div class="pm-s-row" id="pmInstallRow" onclick="pmInstallApp()">
+                        <span class="pm-s-ico">📲</span>
                         <span class="pm-s-row-lbl">Instalar en dispositivo</span>
                         <span class="pm-s-row-val pm-s-row-disp" id="pmInstallVal">NO DISPONIBLE ›</span>
                     </div>
                 </div>
-                <div class="glass-card" style="margin-top:2rem; text-align:center;">
-                    <button id="btn-reset-all" style="background:transparent; border:none; color:var(--accent-alert); cursor:pointer; font-size:0.8rem;">BORRAR TODOS LOS DATOS Y REINICIAR APP</button>
-                </div>
+                <button id="btn-reset-all" class="pm-danger-wide">BORRAR TODOS LOS DATOS Y REINICIAR APP</button>
             </div>
         </section>
 
@@ -935,12 +941,12 @@
 
     <!-- Gráficas (Al final para no bloquear inicio rápido) -->
     <script src="https://cdn.jsdelivr.net/npm/apexcharts" defer></script>
-    <script src="profile-persist.js?v=20260704d"></script>
-    <script src="knowledge.js?v=20260704d"></script>
-    <script src="app.js?v=20260704d"></script>
+    <script src="profile-persist.js?v=20260704e"></script>
+    <script src="knowledge.js?v=20260704e"></script>
+    <script src="app.js?v=20260704e"></script>
     <!-- Premium UI: catálogo de insignias + FAB + onboarding -->
-    <script src="premium-badges.js?v=20260704d"></script>
-    <script src="premium-extras.js?v=20260704d"></script>
+    <script src="premium-badges.js?v=20260704e"></script>
+    <script src="premium-extras.js?v=20260704e"></script>
 
     <!-- REGISTRO GLOBAL — funciona aunque app.js falle -->
     <script>
@@ -1018,7 +1024,7 @@
         // Registro del Service Worker de PWA unificado con detección de actualizaciones y auto-refresco
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=20260704d').then(reg => {
+                navigator.serviceWorker.register('sw.js?v=20260704e').then(reg => {
                     console.log('[AX-CORE] Service Worker registrado con éxito:', reg.scope);
                     
                     // Detectar si hay una actualización de Service Worker esperando

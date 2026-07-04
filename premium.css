@@ -3315,3 +3315,219 @@ body.premium-mode #page-evolution .history-table-container tbody tr {
 body.premium-mode #page-evolution .history-table-container tbody tr:hover {
   background: rgba(var(--pm-green-rgb), 0.05);
 }
+
+/* ══════════════════════════════════════════════════════════════════
+   REDISEÑO AJUSTES — "centro de control" premium (basado en spec JSON)
+   Roles de color: acento=--accent-main/--pm-green · acento2=--accent-secondary
+   superficie1=--pm-s1 · superficie2=--pm-s2 · texto=#fff · etiqueta=--pm-dim2
+   Nota de criterio: el hero NO usa fondo de acento a full (rompería la
+   legibilidad en temas claros como AMARILLO/DORADO). Usa base oscura +
+   brillo/detalles de acento, como el Hero del Tablero → legible en los 9.
+   ══════════════════════════════════════════════════════════════════ */
+
+/* ---- HERO DE PERFIL ---- */
+body.premium-mode #page-settings .pm-profile-hero {
+  display: block !important;
+  background: linear-gradient(135deg, var(--pm-s2) 0%, var(--pm-s1) 100%) !important;
+  border: 1px solid var(--pm-border2) !important;
+  border-radius: 26px !important;
+  padding: 20px 20px 16px !important;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 0 46px rgba(var(--pm-green-rgb), 0.09), 0 18px 40px rgba(0,0,0,0.4) !important;
+}
+body.premium-mode #page-settings .pm-profile-hero::before {
+  content: ''; position: absolute; top: -70px; right: -50px;
+  width: 220px; height: 220px;
+  background: radial-gradient(circle, rgba(var(--pm-green-rgb), 0.16) 0%, transparent 70%);
+  pointer-events: none;
+}
+body.premium-mode #page-settings .pm-profile-hero::after {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--pm-green), var(--pm-cyan));
+}
+body.premium-mode #page-settings .pm-prof-top {
+  display: flex; align-items: center; gap: 15px; position: relative;
+}
+body.premium-mode #page-settings .pm-prof-av {
+  width: 66px !important; height: 66px !important;
+  border: 2px solid rgba(255,255,255,0.12) !important;
+  box-shadow: 0 0 0 4px rgba(var(--pm-green-rgb),0.10), var(--pm-glow) !important;
+  font-size: 24px !important;
+}
+body.premium-mode #page-settings .pm-prof-name {
+  font-size: 21px !important; letter-spacing: 1px !important;
+}
+body.premium-mode #page-settings .pm-prof-tag {
+  font-family: 'Inter', sans-serif; font-size: 10.5px; letter-spacing: 2px;
+  color: var(--pm-green); margin-top: 4px; font-weight: 600;
+}
+/* Stats como 3 mini-tarjetas debajo */
+body.premium-mode #page-settings .pm-prof-stats {
+  display: grid !important; grid-template-columns: repeat(3, 1fr) !important;
+  gap: 8px !important; margin-top: 16px !important;
+}
+body.premium-mode #page-settings .pm-prof-stat {
+  flex-direction: column !important; align-items: center !important;
+  gap: 2px !important; text-align: center;
+  background: rgba(0,0,0,0.22); border: 1px solid var(--pm-border);
+  border-radius: 14px; padding: 11px 6px 9px; position: relative; overflow: hidden;
+}
+body.premium-mode #page-settings .pm-prof-stat::before {
+  content: '' !important; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: var(--pm-green); margin: 0 !important;
+}
+body.premium-mode #page-settings .pm-prof-stat:nth-child(2)::before { background: var(--pm-cyan); }
+body.premium-mode #page-settings .pm-prof-stat:nth-child(3)::before { background: rgba(var(--pm-green-rgb),0.6); }
+body.premium-mode #page-settings .pm-prof-stat strong {
+  font-size: 23px !important; color: #fff !important;
+}
+body.premium-mode #page-settings .pm-prof-stat span {
+  font-size: 8.5px; letter-spacing: 1px; color: var(--pm-dim2); font-weight: 600;
+}
+
+/* ---- SELECTOR DE TEMA (galería de tarjetas) ---- */
+body.premium-mode #page-settings #theme-grid {
+  background: var(--pm-s1); border: 1px solid var(--pm-border);
+  border-radius: 22px; padding: 14px !important; gap: 9px !important;
+}
+body.premium-mode #page-settings .t-swatch {
+  background: var(--pm-s2) !important; border: 1px solid var(--pm-border) !important;
+  border-radius: 15px !important; padding: 12px 6px 9px !important; position: relative;
+}
+body.premium-mode #page-settings .t-swatch .t-dot {
+  width: 30px !important; height: 30px !important;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.4);
+}
+body.premium-mode #page-settings .t-swatch.active {
+  border-color: var(--accent-main) !important;
+  box-shadow: 0 0 0 1px var(--accent-main), 0 0 16px rgba(var(--pm-green-rgb),0.35) !important;
+  background: rgba(var(--pm-green-rgb),0.07) !important;
+}
+body.premium-mode #page-settings .t-swatch.active::after {
+  content: '✓'; position: absolute; top: 5px; right: 7px;
+  font-size: 10px; font-weight: 900; color: var(--accent-main); line-height: 1;
+}
+
+/* ---- ETIQUETA DE SECCIÓN (encabezados) ---- */
+body.premium-mode #page-settings .pm-settings-hdr {
+  margin: 20px 5px 8px !important;
+}
+
+/* ---- LISTA DE OPCIONES (con iconos + divisores sutiles) ---- */
+body.premium-mode #page-settings .pm-settings-block {
+  background: var(--pm-s1) !important; border: 1px solid var(--pm-border) !important;
+  border-radius: 20px !important; box-shadow: 0 10px 26px rgba(0,0,0,0.28) !important;
+}
+body.premium-mode #page-settings .pm-s-row {
+  gap: 13px; padding: 15px 16px !important;
+}
+body.premium-mode #page-settings .pm-s-ico {
+  flex-shrink: 0; width: 34px; height: 34px; border-radius: 11px;
+  display: flex; align-items: center; justify-content: center; font-size: 15px;
+  background: rgba(var(--pm-green-rgb),0.10); border: 1px solid rgba(var(--pm-green-rgb),0.20);
+}
+body.premium-mode #page-settings .pm-s-row-lbl { flex: 1; }
+body.premium-mode #page-settings .pm-s-row:hover .pm-s-ico {
+  background: rgba(var(--pm-green-rgb),0.16);
+}
+
+/* ---- BOTÓN REINICIAR (peligro, ancho, separado) ---- */
+body.premium-mode .pm-danger-wide {
+  display: block; width: 100%; max-width: 800px; margin: 22px auto 8px !important;
+  background: var(--pm-s1) !important; border: 1px solid rgba(255,51,102,0.35) !important;
+  color: var(--accent-alert) !important; border-radius: 18px !important;
+  padding: 15px !important; font-family: 'Oswald', sans-serif !important;
+  font-size: 0.78rem !important; font-weight: 700 !important; letter-spacing: 1.5px !important;
+  cursor: pointer; transition: all .2s;
+}
+body.premium-mode .pm-danger-wide:hover {
+  background: rgba(255,51,102,0.07) !important; border-color: rgba(255,51,102,0.55) !important;
+}
+body.premium-mode .pm-danger-wide:active { transform: scale(0.98); }
+
+/* ══════════════════════════════════════════════════════════════════
+   REDISEÑO ESTUDIO — herramienta creativa premium (basado en spec JSON)
+   Se conserva la estructura (JS intacto); se sube la jerarquía visual:
+   cabecera con presencia, panel de insignias tipo tarjeta, canvas más
+   dominante, y los controles agrupados en tarjetas (menos densidad).
+   ══════════════════════════════════════════════════════════════════ */
+
+/* ---- CABECERA con presencia (antes: barra fina de 54px) ---- */
+body.premium-mode #page-studio .sx-hdr {
+  height: auto !important;
+  padding: 15px 18px !important;
+  background:
+    radial-gradient(ellipse 70% 120% at 12% 0%, rgba(var(--pm-green-rgb),0.12) 0%, transparent 60%),
+    linear-gradient(135deg, var(--pm-s2), var(--pm-s1)) !important;
+}
+body.premium-mode #page-studio .sx-hdr-title { font-size: 1.05rem !important; letter-spacing: 2.5px !important; }
+body.premium-mode #page-studio .sx-hdr-ico { font-size: 1.35rem !important; }
+body.premium-mode #page-studio .sx-hdr::after { opacity: 0.6 !important; height: 2px !important; }
+
+/* ---- PANEL DE INSIGNIAS tipo tarjeta con franja de acento ---- */
+body.premium-mode #page-studio .sx-ach-bar {
+  background: linear-gradient(135deg, var(--pm-s2), var(--pm-s1)) !important;
+  border: none !important;
+  border-bottom: 1px solid var(--pm-border) !important;
+  position: relative;
+}
+body.premium-mode #page-studio .sx-ach-bar::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--pm-green), var(--pm-cyan)); opacity: 0.7;
+}
+body.premium-mode #page-studio .sx-ach-toggle { padding: 15px 18px !important; }
+body.premium-mode #page-studio .sx-ach-lbl { font-size: 0.75rem !important; }
+/* El número de insignias desbloqueadas, más grande/protagonista */
+body.premium-mode #page-studio .sx-ach-lbl span[style*="accent-main"] {
+  font-family: 'Oswald', sans-serif; font-size: 1.15rem; font-weight: 700; vertical-align: -1px;
+}
+
+/* ---- CANVAS más dominante + marco luminoso ---- */
+body.premium-mode #page-studio #studio-preview-canvas {
+  max-height: min(36vh, 330px) !important;
+  border-radius: 20px !important;
+}
+body.premium-mode #page-studio .sx-canvas-glow {
+  box-shadow:
+    0 0 60px rgba(var(--pm-green-rgb),0.12),
+    0 0 120px rgba(var(--pm-cyan-rgb),0.06) !important;
+}
+
+/* ---- SHEET: un poco más alto y con notch más vivo ---- */
+body.premium-mode #page-studio .sx-sheet { max-height: 46vh !important; }
+body.premium-mode #page-studio .sx-notch {
+  width: 46px !important; height: 5px !important;
+  background: linear-gradient(90deg, var(--pm-green), var(--pm-cyan)) !important; opacity: 0.5;
+}
+
+/* ---- ETIQUETAS DE SECCIÓN con barrita de acento (look "software") ---- */
+body.premium-mode #page-studio .sx-sec-lbl {
+  display: flex; align-items: center; gap: 8px;
+  color: var(--pm-dim2) !important;
+}
+body.premium-mode #page-studio .sx-sec-lbl::before {
+  content: ''; width: 3px; height: 12px; border-radius: 2px;
+  background: linear-gradient(var(--pm-green), var(--pm-cyan)); flex-shrink: 0;
+}
+
+/* ---- GRUPOS DE CONTROLES como tarjetas (reduce densidad visual) ---- */
+body.premium-mode #page-studio .studio-pro-pills,
+body.premium-mode #page-studio .studio-metrics,
+body.premium-mode #page-studio .studio-format-btns,
+body.premium-mode #page-studio .studio-pro-swatches {
+  background: rgba(0,0,0,0.20); border: 1px solid var(--pm-border);
+  border-radius: 16px; padding: 12px !important;
+}
+/* Miniaturas de plantilla: estado seleccionado con acento claro.
+   (Las píldoras individuales .sx-btn ya marcan su estado activo con el
+   color del tema mediante estilo en línea, así que no se tocan aquí.) */
+body.premium-mode #page-studio .studio-tpl-card.selected {
+  outline: 2px solid var(--accent-main) !important; outline-offset: 1px;
+  box-shadow: 0 0 16px rgba(var(--pm-green-rgb),0.4) !important;
+}
+
+/* ---- Botón compartir flotante: que resalte más como acción principal ---- */
+body.premium-mode #page-studio .sx-fab-primary {
+  box-shadow: 0 6px 20px rgba(var(--pm-green-rgb),0.5) !important;
+}
