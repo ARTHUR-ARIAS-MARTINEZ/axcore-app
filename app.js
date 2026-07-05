@@ -110,6 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!found) return { error: `No encontré "${raw}" en mi base. Prueba con otro nombre o escribe las kcal (ej. 300).` };
         return {
             name: found.name, qty,
+            u: (typeof foodUnit === 'function') ? foodUnit(found) : 'porción',
             cal: Math.round((found.cal || 0) * qty),
             p: Math.round((found.p || 0) * qty),
             c: Math.round((found.c || 0) * qty),
@@ -117,6 +118,57 @@ document.addEventListener('DOMContentLoaded', () => {
             isNumber: false
         };
     }
+    // Plural de la unidad: "2 piezas", "3 platos"...
+    function unitPlural(u, qty) {
+        u = u || 'porción';
+        if (qty === 1) return u;
+        if (u === 'porción') return 'porciones';
+        if (u === '100g') return '×100g';
+        return /[aeiou]$/.test(u) ? u + 's' : u + 'es';
+    }
+    // Autocompletado tipo Google: sugiere alimentos mientras escribes.
+    function setupFoodAutocomplete(inputId, unitLabelId) {
+        const inp = document.getElementById(inputId);
+        if (!inp || inp._axSuggest) return;
+        inp._axSuggest = true;
+        inp.setAttribute('autocomplete', 'off');
+        let box = null;
+        const close = () => { if (box) { box.remove(); box = null; } };
+        const setUnitLbl = (f) => {
+            const lbl = document.getElementById(unitLabelId);
+            if (!lbl) return;
+            const u = f && typeof foodUnit === 'function' ? foodUnit(f) : null;
+            lbl.textContent = u ? `Cantidad (${unitPlural(u, 2)})` : 'Cantidad';
+        };
+        const render = () => {
+            close();
+            const q = inp.value.trim();
+            if (q.length < 2 || /^\d+$/.test(q)) { setUnitLbl(null); return; }
+            const sugs = (typeof findFoodSuggestions === 'function') ? findFoodSuggestions(q, 8) : [];
+            if (!sugs.length) return;
+            box = document.createElement('div');
+            box.className = 'ax-suggest';
+            sugs.forEach(f => {
+                const row = document.createElement('div');
+                row.className = 'ax-suggest-item';
+                const nm = document.createElement('span'); nm.textContent = f.name;
+                const info = document.createElement('small'); info.textContent = `${f.cal} kcal`;
+                row.appendChild(nm); row.appendChild(info);
+                row.onmousedown = (e) => { e.preventDefault(); inp.value = f.name; setUnitLbl(f); close(); };
+                box.appendChild(row);
+            });
+            const r = inp.getBoundingClientRect();
+            box.style.left = r.left + 'px';
+            box.style.top = (r.bottom + 4) + 'px';
+            box.style.width = r.width + 'px';
+            document.body.appendChild(box);
+        };
+        inp.addEventListener('input', render);
+        inp.addEventListener('blur', () => setTimeout(close, 150));
+        window.addEventListener('scroll', close, true);
+    }
+    // Activar autocompletado en el Asistente de comida (HTML estático)
+    setupFoodAutocomplete('calc-extra-cal', 'calc-unit-lbl');
     function macrosRowHtml(a) {
         if (a.isNumber) return '';
         const cell = (lbl, val, col) => `<div style="flex:1; min-width:78px; text-align:center; background:rgba(255,255,255,0.05); border-radius:10px; padding:0.5rem 0.3rem;"><div style="font-size:1.1rem; font-weight:bold; color:${col};">${val}<small style="font-size:0.6rem;">g</small></div><div style="font-size:0.58rem; color:var(--text-dim); letter-spacing:0.5px;">${lbl}</div></div>`;
@@ -181,6 +233,32 @@ document.addEventListener('DOMContentLoaded', () => {
             renderDietPage();
         }
         closeMealModal();
+    }
+
+    // Ventana de vista de una comida: título centrado arriba, contenido abajo.
+    function openMealViewModal(key) {
+        const slot = MEAL_SLOTS.find(s => s.key === key);
+        const diet = userData.recommendedDiet || {};
+        const txt = (diet[key] || '').trim();
+        const ov = document.createElement('div');
+        ov.className = 'ax-view-ov';
+        ov.innerHTML =
+            '<div class="ax-view">' +
+                '<div class="ax-view-title"></div>' +
+                '<div class="ax-view-body"></div>' +
+                '<div class="ax-view-btns">' +
+                    '<button class="ax-modal-btn ax-view-edit">✎ EDITAR</button>' +
+                    '<button class="ax-modal-btn ax-ok">CERRAR</button>' +
+                '</div>' +
+            '</div>';
+        ov.querySelector('.ax-view-title').textContent = slot ? `${slot.icon} ${slot.name}` : 'COMIDA';
+        ov.querySelector('.ax-view-body').textContent = txt || 'Sin contenido todavía. Pulsa ✎ EDITAR para agregarlo, o pega tu dieta completa en MI PLAN.';
+        document.body.appendChild(ov);
+        requestAnimationFrame(() => ov.classList.add('show'));
+        const close = () => { ov.classList.remove('show'); setTimeout(() => ov.remove(), 200); };
+        ov.querySelector('.ax-ok').onclick = close;
+        ov.querySelector('.ax-view-edit').onclick = () => { close(); openMealModal(key); };
+        ov.onclick = (e) => { if (e.target === ov) close(); };
     }
 
     const mBack = document.getElementById('meal-modal-back');
@@ -2036,40 +2114,69 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- DIET PAGE ---
+    // ── "IA sin IA": distancia de edición (Levenshtein) para tolerar errores
+    //    de dedo en los encabezados de la dieta ("desalluno", "colasion"...).
+    function _lev(a, b) {
+        if (a === b) return 0;
+        const m = a.length, n = b.length;
+        if (Math.abs(m - n) > 2) return 3;
+        const dp = [];
+        for (let i = 0; i <= m; i++) { dp[i] = [i]; }
+        for (let j = 0; j <= n; j++) { dp[0][j] = j; }
+        for (let i = 1; i <= m; i++)
+            for (let j = 1; j <= n; j++)
+                dp[i][j] = Math.min(dp[i - 1][j] + 1, dp[i][j - 1] + 1, dp[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+        return dp[m][n];
+    }
+    // ¿La palabra escrita "suena" a la clave? Tolerancia según el largo de la clave.
+    function _fuzzyWord(w, k) {
+        if (w === k) return true;
+        const tol = k.length >= 8 ? 2 : k.length >= 5 ? 1 : 0;
+        return tol > 0 && _lev(w, k) <= tol;
+    }
+    function _phraseHit(phrase, tokens) {
+        return phrase.every(k => tokens.some(t => _fuzzyWord(t, k)));
+    }
+
     function parseDietText(text) {
-        // Detectores de encabezado en ORDEN DE PRIORIDAD. Los específicos van
-        // primero para que "media mañana" no caiga en "mañana", "snack opcional
-        // (noche)" no caiga en "cena", "post entreno" no caiga en "entreno", etc.
+        // Detectores en ORDEN DE PRIORIDAD (los específicos primero, para que
+        // "media mañana" no caiga en desayuno ni "snack opcional (noche)" en cena).
+        // Cada frase se compara palabra por palabra con tolerancia a errores.
         const MATCHERS = [
-            { key: 'midmorning',      re: /media\s*ma(?:ñ|n)ana|colaci(?:o|ó)n\s*matutina/ },
-            { key: 'midafternoon',    re: /media\s*tarde|colaci(?:o|ó)n\s*vespertina/ },
-            { key: 'preworkout',      re: /pre[\s-]*entren|pre[\s-]*workout|antes\s*de\s*entrenar/ },
-            { key: 'postworkout',     re: /post[\s-]*entren|post[\s-]*workout|despu(?:e|é)s\s*de\s*entrenar|post[\s-]*ejercicio/ },
-            { key: 'snacks',          re: /snack\s*opcional|snack|colaci(?:o|ó)n|merienda|tentempi(?:e|é)|refrigerio|botana|extras/ },
-            { key: 'breakfast',       re: /desayuno|breakfast|en\s*ayunas|ma(?:ñ|n)ana/ },
-            { key: 'lunch',           re: /comida\s*fuerte|comida|almuerzo|lunch|mediod(?:i|í)a/ },
-            { key: 'dinner',          re: /cena|dinner|noche/ },
-            { key: 'recommendations', re: /recomend|regla|consejo|tips|indicacion|protocolo|importante/ }
+            { key: 'midmorning',      phrases: [['media', 'manana'], ['colacion', 'matutina']] },
+            { key: 'midafternoon',    phrases: [['media', 'tarde'], ['colacion', 'vespertina']] },
+            { key: 'preworkout',      phrases: [['pre', 'entreno'], ['preentreno'], ['pre', 'workout'], ['antes', 'entrenar']] },
+            { key: 'postworkout',     phrases: [['post', 'entreno'], ['postentreno'], ['post', 'workout'], ['despues', 'entrenar'], ['post', 'ejercicio']] },
+            { key: 'snacks',          phrases: [['snack', 'opcional'], ['snack'], ['colacion'], ['merienda'], ['tentempie'], ['refrigerio'], ['botana'], ['extras']] },
+            { key: 'breakfast',       phrases: [['desayuno'], ['breakfast'], ['ayunas']] },
+            { key: 'lunch',           phrases: [['comida', 'fuerte'], ['comida'], ['almuerzo'], ['lunch'], ['mediodia']] },
+            { key: 'dinner',          phrases: [['cena'], ['dinner'], ['noche']] },
+            { key: 'recommendations', phrases: [['recomendaciones'], ['recomendacion'], ['reglas'], ['regla'], ['consejos'], ['tips'], ['indicaciones'], ['protocolo'], ['importante'], ['notas']] }
         ];
+        const normLine = (s) => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
         const result = {};
         MATCHERS.forEach(m => { result[m.key] = ''; });
         const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
         let current = null;
         for (const line of lines) {
-            const low = line.toLowerCase();
-            const head = low.slice(0, 30);
-            // Una línea es ENCABEZADO si la palabra clave aparece al inicio Y además
-            // la línea es corta (título suelto) o trae separador ":"/"-" (Título: contenido).
-            const sep = line.match(/^(.{0,30}?)\s*[:：\-–—]\s*(.*)$/);
-            const isShort = line.length <= 26;
+            // Encabezado = línea corta (título suelto) o con separador ":"/"-".
+            const sep = line.match(/^(.{0,34}?)\s*[:：\-–—]\s*(.*)$/);
+            const isShort = line.length <= 30;
             let matched = false;
-            for (const m of MATCHERS) {
-                if (m.re.test(head) && (sep || isShort)) {
-                    current = m.key;
-                    const rest = sep ? sep[2].trim() : '';
-                    if (rest) result[m.key] += rest + '\n';
-                    matched = true;
-                    break;
+            if (sep || isShort) {
+                const headTokens = normLine(sep ? sep[1] : line)
+                    .replace(/[^a-z0-9ñ\s]/g, ' ')
+                    .split(/\s+/).filter(Boolean).slice(0, 6);
+                if (headTokens.length) {
+                    for (const m of MATCHERS) {
+                        if (m.phrases.some(ph => _phraseHit(ph, headTokens))) {
+                            current = m.key;
+                            const rest = sep ? sep[2].trim() : '';
+                            if (rest) result[m.key] += rest + '\n';
+                            matched = true;
+                            break;
+                        }
+                    }
                 }
             }
             if (matched) continue;
@@ -2102,9 +2209,15 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderDietPage() {
         const diet = userData.recommendedDiet || { breakfast: '', lunch: '', dinner: '', snacks: '' };
         const hasCustomRules = userData.customDietRules && userData.customDietRules.length > 0;
-        const rules = hasCustomRules
-            ? userData.customDietRules
-            : (typeof ARTHUR_KNOWLEDGE !== 'undefined' && ARTHUR_KNOWLEDGE.diet_rules ? ARTHUR_KNOWLEDGE.diet_rules : []);
+        const rules = hasCustomRules ? userData.customDietRules : [];
+        // Ejemplos sombreados (NO son reglas reales): se muestran mientras no haya reglas propias.
+        const RULE_EXAMPLES = [
+            '3 litros de agua al día',
+            'Nada de refresco ni azúcar entre semana',
+            'Ayuno de 8 PM a 7 AM',
+            'Verduras libres: come sin contar',
+            '1 comida libre a la semana'
+        ];
         const dietEl = document.getElementById('page-diet');
 
         // Datos para barra de calorías
@@ -2147,19 +2260,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 <!-- ─── TAB MI PLAN ─── -->
                 <div class="pm-d-panel on" id="pmDt-plan">
-                    <div class="pm-d-plan-hint">Toca una comida para ver su contenido · el lápiz ✎ para editarla</div>
+                    <div class="pm-d-plan-hint">Toca una comida para abrirla · el lápiz ✎ para editarla</div>
                     ${MEAL_SLOTS.map(m => {
                         const has = (diet[m.key] || '').trim();
                         return `
                     <div class="pm-d-meal ${has ? 'has-content' : ''}" data-meal="${m.key}">
-                        <div class="pm-d-meal-hdr">
-                            <span class="pm-d-meal-name">${m.icon} ${m.name}</span>
-                            <span class="pm-d-meal-actions">
-                                <button class="pm-d-meal-edit" data-edit="${m.key}" title="Editar" aria-label="Editar">✎</button>
-                                <span class="pm-d-meal-chev">▸</span>
-                            </span>
+                        <div class="pm-d-meal-center">
+                            <span class="pm-d-meal-name-c">${m.icon} ${m.name}</span>
+                            <button class="pm-d-meal-edit" data-edit="${m.key}" title="Editar" aria-label="Editar">✎</button>
                         </div>
-                        <div class="pm-d-meal-body" hidden>${formatMealText(diet[m.key])}</div>
                     </div>`;
                     }).join('')}
 
@@ -2176,7 +2285,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <!-- ─── TAB REGISTRAR ALIMENTO ─── -->
                 <div class="pm-d-panel" id="pmDt-log">
                     <div class="pm-d-reg-title">🍽️ REGISTRA LO QUE COMES HOY</div>
-                    <div class="pm-d-reg-sub">Escribe el alimento y la cantidad. Suma calorías y macros (proteína, carbos, grasa) a tu día.</div>
+                    <div class="pm-d-reg-sub">Solo escribe el alimento (te sugiero mientras escribes) y cuántas piezas, platos o tazas. Las calorías y macros se calculan SOLAS.</div>
 
                     <div class="pm-d-reg-totals">
                         <div><strong>${macroTot.cal.toLocaleString()}</strong><span>KCAL HOY</span></div>
@@ -2185,9 +2294,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div><strong style="color:#ff9f43">${macroTot.f}g</strong><span>GRASA</span></div>
                     </div>
 
-                    <input type="text" id="food-desc" class="pm-d-reg-input" placeholder="Ej. taco de adobada, lentejas, pizza con salami...">
+                    <input type="text" id="food-desc" class="pm-d-reg-input" placeholder="Ej. taco de adobada, sushi, caldo de pollo...">
                     <div class="pm-d-reg-qtyrow">
-                        <label>Cantidad</label>
+                        <label id="food-unit-lbl">Cantidad</label>
                         <div class="ax-qty">
                             <button type="button" class="ax-qty-btn" data-qty="food-qty" data-dir="-1">−</button>
                             <input type="number" id="food-qty" class="ax-qty-input" value="1" min="1" step="1">
@@ -2206,17 +2315,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 <!-- ─── TAB REGLAS ─── -->
                 <div class="pm-d-panel" id="pmDt-rules">
-                    <div class="pm-d-log-hint">Reglas de tu plan + protocolo base AX-CORE</div>
+                    <div class="pm-d-log-hint">${hasCustomRules ? 'Las reglas de TU plan' : 'Aún no tienes reglas propias: se llenan SOLAS al pegar tu dieta completa (la parte de "Recomendaciones") o con ✏️ EDITAR REGLAS. Estos son solo ejemplos:'}</div>
                     <div class="pm-d-rules-list" id="rules-list-display">
-                        ${rules.length > 0
+                        ${hasCustomRules
                             ? rules.map((r, i) => `<div class="pm-d-rule"><div class="pm-d-rule-num">${i+1}</div><div class="pm-d-rule-txt">${r}</div></div>`).join('')
-                            : '<div class="pm-d-rule"><div class="pm-d-rule-num">!</div><div class="pm-d-rule-txt" style="opacity:.6;font-style:italic;">Sin reglas aún. Pulsa EDITAR REGLAS para agregar.</div></div>'
+                            : RULE_EXAMPLES.map((r, i) => `<div class="pm-d-rule ax-example"><div class="pm-d-rule-num">${i+1}</div><div class="pm-d-rule-txt">Ej. ${r}</div></div>`).join('')
                         }
                     </div>
                     <button class="btn-premium" id="btn-edit-rules" style="width:100%; margin-top:14px;">✏️ EDITAR REGLAS</button>
                 </div>
             </div>
         `;
+
+        // Autocompletado en el registro de alimentos
+        setupFoodAutocomplete('food-desc', 'food-unit-lbl');
 
         // ─── Lógica de pestañas ───
         dietEl.querySelectorAll('.pm-d-tab').forEach(tab => {
@@ -2227,14 +2339,11 @@ document.addEventListener('DOMContentLoaded', () => {
             };
         });
 
-        // ─── Acordeón: el encabezado despliega/oculta el contenido; el lápiz edita ───
-        dietEl.querySelectorAll('.pm-d-meal-hdr').forEach(hdr => {
-            hdr.onclick = (e) => {
-                if (e.target.closest('.pm-d-meal-edit')) return; // el lápiz no despliega
-                const card = hdr.closest('.pm-d-meal');
-                const body = card.querySelector('.pm-d-meal-body');
-                if (body.hasAttribute('hidden')) { body.removeAttribute('hidden'); card.classList.add('open'); }
-                else { body.setAttribute('hidden', ''); card.classList.remove('open'); }
+        // ─── Tocar la comida abre su ventana; el lápiz abre el editor ───
+        dietEl.querySelectorAll('.pm-d-meal').forEach(card => {
+            card.onclick = (e) => {
+                if (e.target.closest('.pm-d-meal-edit')) return;
+                openMealViewModal(card.dataset.meal);
             };
         });
         dietEl.querySelectorAll('.pm-d-meal-edit').forEach(btn => {
@@ -2318,7 +2427,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (!Array.isArray(userData.customFoods)) userData.customFoods = [];
                 userData.customFoods.push({ name: desc.toLowerCase(), cal: per, p: 0, c: 0, f: 0 });
                 const q = Math.max(1, parseInt(qty) || 1);
-                a = { name: desc, qty: q, cal: per * q, p: 0, c: 0, f: 0, isNumber: false };
+                a = { name: desc, qty: q, u: 'porción', cal: per * q, p: 0, c: 0, f: 0, isNumber: false };
             }
             registerFood(a);
         };
@@ -2347,7 +2456,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!Array.isArray(userData.foodLogToday)) userData.foodLogToday = [];
             userData.foodLogToday.push({
                 time: new Date().toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' }),
-                desc: a.name + (a.qty > 1 ? ` × ${a.qty}` : ''),
+                desc: a.name + (a.qty > 1 ? ` × ${a.qty} ${unitPlural(a.u, a.qty)}` : ''),
                 cal: a.cal, p: a.p, c: a.c, f: a.f
             });
             saveData();
@@ -3924,13 +4033,19 @@ document.addEventListener('DOMContentLoaded', () => {
         const burned = userData.caloriesBurnedToday || 0;
         const limit = userData.dailyCalLimit || 0;
         const remaining = limit - consumed + burned;
-        const status = document.getElementById('calc-status-line');
-        if (status) {
-            const tone = remaining < 0 ? '⛔' : remaining < 200 ? '⚠️' : '✅';
-            status.innerHTML = `${tone} Hoy llevas <strong style="color:var(--accent-main)">${consumed} kcal</strong> ingeridas / <strong>${limit} kcal</strong> límite. Quemaste ${burned} kcal con ejercicio. Te quedan <strong style="color:${remaining < 0 ? 'var(--accent-alert)' : 'var(--accent-main)'};">${remaining} kcal</strong> hoy.`;
+        const log = Array.isArray(userData.foodLogToday) ? userData.foodLogToday : [];
+        const m = log.reduce((t, f) => { t.p += (+f.p || 0); t.c += (+f.c || 0); t.f += (+f.f || 0); return t; }, { p: 0, c: 0, f: 0 });
+        const box = document.getElementById('calc-today-tiles');
+        if (box) {
+            const tile = (lbl, val, col) => `<div class="ax-tile"><strong style="color:${col};">${val}</strong><span>${lbl}</span></div>`;
+            box.innerHTML =
+                tile('CALORÍAS', consumed.toLocaleString(), '#fff') +
+                tile('PROTEÍNA', m.p + 'g', '#00c97a') +
+                tile('CARBOS', m.c + 'g', '#2979ff') +
+                tile('GRASA', m.f + 'g', '#ff9f43') +
+                tile('QUEMADAS', burned.toLocaleString(), '#ff5c6c') +
+                tile('TE QUEDAN', limit > 0 ? remaining.toLocaleString() : '—', remaining < 0 ? '#ff5c6c' : 'var(--accent-main)');
         }
-        const ageEl = document.getElementById('calc-age');
-        if (ageEl && userData.age && !ageEl.value) ageEl.value = userData.age;
     }
 
     function setupCalcCompensate() {
@@ -3948,7 +4063,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             out.innerHTML = `
                 <div style="padding:0.9rem 1rem; background:rgba(0,201,122,0.08); border:1px solid rgba(0,201,122,0.25); border-radius:12px;">
-                    <div style="font-size:0.9rem; color:#fff;">🍽️ <strong>${a.name}</strong>${a.qty > 1 ? ` × ${a.qty}` : ''}</div>
+                    <div style="font-size:0.9rem; color:#fff;">🍽️ <strong>${a.name}</strong>${a.qty > 1 ? ` × ${a.qty} ${unitPlural(a.u, a.qty)}` : ''}</div>
                     <div style="font-size:1.6rem; font-weight:bold; color:var(--accent-main); margin-top:0.15rem;">${a.cal.toLocaleString()} <small style="font-size:0.8rem; color:var(--text-dim);">kcal</small></div>
                     ${macrosRowHtml(a)}
                 </div>
@@ -4047,46 +4162,66 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!btn) return;
         btn.onclick = () => {
             const out = document.getElementById('calc-projection-result');
-            if (!userData.weight || !userData.target_weight || userData.weight <= userData.target_weight) {
-                out.innerHTML = `<p style="color:var(--accent-alert); font-size:0.85rem;">Necesito tu peso actual y meta. Configúralos en Ajustes.</p>`;
+            const w = +userData.weight || 0;
+            const tw = +userData.target_weight || 0;
+            if (!w || !tw) {
+                out.innerHTML = `<p style="color:var(--accent-alert); font-size:0.85rem;">Necesito tu peso actual y tu meta. Configúralos en Evolución → Perfil Antropométrico.</p>`;
                 return;
             }
-            const history = userData.history || [];
-            let avgDailyDeficit = 500;
-            if (userData.totalNetDeficit > 0 && history.length > 1) {
-                const firstDate = new Date(history[0].date);
-                const today = new Date();
-                const daysElapsed = Math.max(1, Math.floor((today - firstDate) / (1000 * 60 * 60 * 24)));
-                avgDailyDeficit = Math.round(userData.totalNetDeficit / daysElapsed);
-            }
-            const days = projectGoalDays(userData.weight, userData.target_weight, avgDailyDeficit);
-            const kgToLose = (+(userData.weight || 0) - +(userData.target_weight || 0)).toFixed(1);
-            if (!days) {
-                out.innerHTML = `<p style="color:var(--text-dim); font-size:0.85rem;">No puedo proyectar todavía. Necesitas registrar al menos un mes de actividad.</p>`;
+            if (w <= tw) {
+                out.innerHTML = `<div style="padding:1rem; text-align:center; background:rgba(0,201,122,0.08); border:1px solid rgba(0,201,122,0.3); border-radius:12px;"><div style="font-size:1.6rem;">🎯</div><strong style="color:var(--accent-main);">¡Ya estás en tu meta (o por debajo)!</strong><p style="font-size:0.78rem; color:var(--text-dim); margin-top:0.4rem;">Ajusta una nueva meta en tu perfil para seguir proyectando.</p></div>`;
                 return;
             }
-            const goalDate = new Date();
-            goalDate.setDate(goalDate.getDate() + days);
+            const kgToLose = w - tw;
+
+            // Método 1 (el más real): ritmo de TU báscula (primer vs. último registro con peso).
+            const hist = (userData.history || []).filter(h => +h.weight > 0);
+            let ratePerDay = 0, method = '';
+            if (hist.length >= 2) {
+                const d1 = parseAppDate(hist[0].date), d2 = parseAppDate(hist[hist.length - 1].date);
+                const days = Math.max(1, Math.round((d2 - d1) / 86400000));
+                const lost = (+hist[0].weight) - (+hist[hist.length - 1].weight);
+                if (lost > 0 && days >= 3) { ratePerDay = lost / days; method = 'tu ritmo real de báscula'; }
+            }
+            // Método 2 (respaldo): tu déficit calórico registrado (7,700 kcal ≈ 1 kg de grasa).
+            if (!ratePerDay && userData.totalNetDeficit > 0 && hist.length >= 1) {
+                const d1 = parseAppDate(hist[0].date);
+                const daysElapsed = Math.max(1, Math.round((new Date() - d1) / 86400000));
+                const avgDef = userData.totalNetDeficit / daysElapsed;
+                if (avgDef > 0) { ratePerDay = avgDef / 7700; method = 'tu déficit calórico registrado'; }
+            }
+            // Escenario alternativo fijo: déficit disciplinado de 500 kcal/día.
+            const days500 = Math.ceil(kgToLose / (500 / 7700));
+            const date500 = new Date(); date500.setDate(date500.getDate() + days500);
+            const fmt = (d) => d.toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric' });
+
+            if (!ratePerDay) {
+                out.innerHTML = `
+                    <div style="padding:1rem; background:rgba(0,0,0,0.2); border-radius:12px; border:1px solid var(--glass-border);">
+                        <p style="font-size:0.82rem; color:var(--text-dim); line-height:1.5;">Aún no tengo datos suficientes de TU ritmo (pésate al menos 2 veces, con unos días de diferencia, en Evolución).</p>
+                        <p style="font-size:0.85rem; color:#fff; margin-top:0.6rem;">📌 Pero con un déficit de <strong>500 kcal/día</strong> (comer bien + ejercicio), tus <strong>${kgToLose.toFixed(1)} kg</strong> caerían en <strong style="color:var(--accent-main)">${days500} días</strong> — alrededor del <strong style="color:var(--accent-main)">${fmt(date500)}</strong>.</p>
+                    </div>`;
+                return;
+            }
+            const days = Math.ceil(kgToLose / ratePerDay);
+            const goalDate = new Date(); goalDate.setDate(goalDate.getDate() + days);
+            const gramsDay = Math.round(ratePerDay * 1000);
+            const kgWeek = (ratePerDay * 7).toFixed(2);
+            const t = (lbl, val) => `<div style="text-align:center; padding:0.6rem 0.3rem; background:rgba(0,0,0,0.2); border-radius:8px;"><div style="font-size:0.62rem; color:var(--text-dim);">${lbl}</div><strong style="color:#fff; font-size:0.95rem;">${val}</strong></div>`;
             out.innerHTML = `
-                <div style="padding:1rem; background:rgba(var(--pm-green-rgb, 0,201,122),0.05); border-radius:10px; border:1px solid rgba(var(--pm-green-rgb, 0,201,122),0.25);">
-                    <div style="text-align:center; margin-bottom:1rem;">
-                        <div style="font-size:0.75rem; color:var(--text-dim);">FALTAN</div>
-                        <div style="font-size:2rem; font-family:var(--font-accent); color:var(--accent-main); font-weight:bold;">${days}</div>
-                        <div style="font-size:0.75rem; color:var(--text-dim);">DÍAS PARA TU META</div>
+                <div style="padding:1rem; background:rgba(var(--pm-green-rgb, 0,201,122),0.05); border-radius:12px; border:1px solid rgba(var(--pm-green-rgb, 0,201,122),0.25);">
+                    <div style="text-align:center; margin-bottom:0.9rem;">
+                        <div style="font-size:0.72rem; color:var(--text-dim);">A TU RITMO ACTUAL FALTAN</div>
+                        <div style="font-size:2.2rem; font-family:var(--font-accent); color:var(--accent-main); font-weight:bold; line-height:1;">${days}</div>
+                        <div style="font-size:0.72rem; color:var(--text-dim);">DÍAS · llegas el <strong style="color:var(--accent-main)">${fmt(goalDate)}</strong></div>
                     </div>
-                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.6rem;">
-                        <div style="text-align:center; padding:0.6rem; background:rgba(0,0,0,0.2); border-radius:8px;">
-                            <div style="font-size:0.7rem; color:var(--text-dim);">A BAJAR</div>
-                            <strong style="color:#fff;">${kgToLose} kg</strong>
-                        </div>
-                        <div style="text-align:center; padding:0.6rem; background:rgba(0,0,0,0.2); border-radius:8px;">
-                            <div style="font-size:0.7rem; color:var(--text-dim);">DÉFICIT/DÍA</div>
-                            <strong style="color:#fff;">${avgDailyDeficit} kcal</strong>
-                        </div>
+                    <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:0.5rem;">
+                        ${t('A BAJAR', kgToLose.toFixed(1) + ' kg')}
+                        ${t('VAS PERDIENDO', gramsDay + ' g/día')}
+                        ${t('POR SEMANA', kgWeek + ' kg')}
                     </div>
-                    <p style="text-align:center; font-size:0.8rem; color:var(--accent-main); margin-top:0.8rem;">
-                        Fecha estimada: <strong>${goalDate.toLocaleDateString('es-MX', { day:'numeric', month:'long', year:'numeric' })}</strong>
-                    </p>
+                    <p style="font-size:0.68rem; color:var(--text-dim); margin-top:0.7rem; text-align:center;">Calculado con ${method}.</p>
+                    ${days500 < days ? `<p style="font-size:0.75rem; color:#fff; margin-top:0.5rem; text-align:center;">⚡ Si sostienes un déficit de 500 kcal/día, podrías adelantarlo al <strong style="color:var(--accent-main)">${fmt(date500)}</strong>.</p>` : ''}
                 </div>
             `;
         };

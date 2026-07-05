@@ -866,8 +866,80 @@ const FOOD_DATABASE = [
   { name: "omelette con verduras 2 huevos", cal: 230, p: 14, c: 8, f: 16 },
   { name: "fruta picada 1 vaso mediano", cal: 110, p: 2, c: 28, f: 0 },
   { name: "yogur con fruta y granola 1 vaso", cal: 280, p: 12, c: 42, f: 7 },
-  { name: "smoothie bowl 1 plato", cal: 320, p: 8, c: 56, f: 7 }
+  { name: "smoothie bowl 1 plato", cal: 320, p: 8, c: 56, f: 7 },
+  // === COMPLEMENTOS v5.24 (huecos detectados) ===
+  { name: "taco de adobada 1 pieza", cal: 220, p: 11, c: 15, f: 12 },
+  { name: "taco campechano 1 pieza", cal: 250, p: 13, c: 15, f: 15 },
+  { name: "taco de asada con queso 1 pieza", cal: 300, p: 18, c: 16, f: 18 },
+  { name: "sushi roll empanizado 8 piezas", cal: 480, p: 14, c: 52, f: 22 },
+  { name: "sushi roll de aguacate 8 piezas", cal: 300, p: 6, c: 46, f: 10 },
+  { name: "sashimi de salmón 3 piezas", cal: 120, p: 13, c: 0, f: 7 },
+  { name: "arroz yakimeshi 1 plato", cal: 480, p: 18, c: 62, f: 16 },
+  { name: "gohan con pollo 1 plato", cal: 520, p: 34, c: 68, f: 12 },
+  { name: "coca-cola 1 lata 355ml", cal: 140, p: 0, c: 39, f: 0 },
+  { name: "coca-cola 1 botella 600ml", cal: 252, p: 0, c: 63, f: 0 },
+  { name: "coca-cola light o zero 1 lata", cal: 1, p: 0, c: 0, f: 0 },
+  { name: "proteína en polvo 1 scoop", cal: 120, p: 24, c: 3, f: 2 },
+  { name: "licuado de proteína con leche 1 vaso", cal: 280, p: 30, c: 18, f: 8 },
+  { name: "barra de proteína 1 pieza", cal: 200, p: 20, c: 22, f: 6 },
+  { name: "crema de cacahuate 1 cucharada", cal: 95, p: 4, c: 3, f: 8 },
+  { name: "claras de huevo 4 piezas", cal: 68, p: 14, c: 1, f: 0 },
+  { name: "pechuga asada 1 pieza 200g", cal: 330, p: 62, c: 0, f: 7 },
+  { name: "salmón a la plancha 1 filete 180g", cal: 370, p: 36, c: 0, f: 24 },
+  { name: "tilapia a la plancha 1 filete 150g", cal: 195, p: 40, c: 0, f: 3 },
+  { name: "caldo de camarón 1 plato", cal: 250, p: 22, c: 18, f: 9 },
+  { name: "lentejas guisadas 1 plato", cal: 280, p: 16, c: 40, f: 6 },
+  { name: "ensalada de atún 1 plato", cal: 280, p: 30, c: 12, f: 12 },
+  { name: "ensalada de pollo 1 plato", cal: 320, p: 32, c: 14, f: 14 },
+  { name: "bowl de pollo con arroz y verdura 1 plato", cal: 520, p: 42, c: 58, f: 12 },
+  { name: "camote cocido 1 pieza mediana", cal: 115, p: 2, c: 27, f: 0 },
+  { name: "avena con proteína 1 plato", cal: 320, p: 28, c: 40, f: 6 },
+  { name: "fresas 1 taza", cal: 50, p: 1, c: 12, f: 0 },
+  { name: "uvas 1 taza", cal: 62, p: 1, c: 16, f: 0 },
+  { name: "yogur griego natural 1 taza", cal: 130, p: 20, c: 8, f: 2 },
+  { name: "queso cottage 1 taza", cal: 180, p: 24, c: 8, f: 5 }
 ];
+
+// Unidad de medida de un alimento (derivada del propio nombre: pieza, plato, taza...)
+function foodUnit(food) {
+    const n = ((food && food.name) || '').toLowerCase();
+    const m = n.match(/\b(pieza|piezas|plato|platos|taza|tazas|vaso|vasos|rebanada|rebanadas|botella|lata|bolsa|copa|caballito|scoop|cucharada|cucharadas|orden|caja|barra|filete|huevos)\b/);
+    if (m) {
+        const map = { piezas: 'pieza', platos: 'plato', tazas: 'taza', vasos: 'vaso', rebanadas: 'rebanada', cucharadas: 'cucharada', huevos: 'huevo' };
+        return map[m[1]] || m[1];
+    }
+    if (/100\s*g/.test(n)) return '100g';
+    return 'porción';
+}
+
+// Sugerencias tipo autocompletado (Registrar + Asistente de comida)
+function findFoodSuggestions(query, max = 8) {
+    const norm = (s) => (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/_/g, ' ').replace(/\s+/g, ' ').trim();
+    const q = norm(query);
+    if (!q || q.length < 2) return [];
+    const custom = (typeof loadCustomFoods === 'function') ? loadCustomFoods() : [];
+    const all = [...FOOD_DATABASE, ...custom];
+    const qWords = q.split(' ').filter(Boolean);
+    const scored = [];
+    for (const f of all) {
+        const n = norm(f.name);
+        let s = 0;
+        if (n === q) s = 1000;
+        else if (n.startsWith(q)) s = 500;
+        else if (n.includes(q)) s = 250;
+        else {
+            const nWords = n.split(' ');
+            let hits = 0;
+            for (const w of qWords) {
+                if (nWords.some(x => x.startsWith(w) || (x.length >= 3 && w.startsWith(x)))) hits++;
+            }
+            if (hits > 0 && hits === qWords.length) s = 100 + hits;
+        }
+        if (s > 0) scored.push([s, f]);
+    }
+    scored.sort((a, b) => b[0] - a[0] || a[1].name.length - b[1].name.length);
+    return scored.slice(0, max).map(x => x[1]);
+}
 
 /**
  * ================================================================

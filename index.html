@@ -8,9 +8,9 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0a0e14">
     <link rel="apple-touch-icon" href="logo.png">
-    <link rel="stylesheet" href="index.css?v=20260705c">
+    <link rel="stylesheet" href="index.css?v=20260705d">
     <!-- Premium UI overrides (inerte si <body> NO tiene .premium-mode) -->
-    <link rel="stylesheet" href="premium.css?v=20260705c">
+    <link rel="stylesheet" href="premium.css?v=20260705d">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <!-- Fuentes: Inter para cuerpos de texto, Oswald (Heavy Gym) para titulares -->
@@ -64,6 +64,31 @@
       .pm-d-reg-qtyrow label{font-size:.8rem;color:var(--text-dim,#7f93a8);}
       .pm-d-reg-add{width:100%;margin-top:12px;padding:.95rem;border-radius:12px;border:none;background:var(--accent-main,#00c97a);color:#04120b;font-family:var(--font-accent,Oswald,sans-serif);font-size:.95rem;font-weight:700;letter-spacing:.8px;cursor:pointer;}
       .pm-d-reg-add:active{transform:scale(.99);}
+      /* ── Autocompletado de alimentos ── */
+      .ax-suggest{position:fixed;z-index:100003;background:var(--pm-s1,#0d1826);border:1px solid var(--accent-main,#00c97a);border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,.55);max-height:264px;overflow-y:auto;}
+      .ax-suggest-item{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 12px;cursor:pointer;font-size:.85rem;color:var(--text-primary,#e8edf5);border-bottom:1px solid rgba(255,255,255,.05);}
+      .ax-suggest-item:last-child{border-bottom:none;}
+      .ax-suggest-item:hover,.ax-suggest-item:active{background:rgba(0,201,122,.12);}
+      .ax-suggest-item small{color:var(--accent-main,#00c97a);white-space:nowrap;font-weight:700;}
+      /* ── Mi Plan: comida protagonista centrada ── */
+      .pm-d-meal-center{display:flex;align-items:center;justify-content:center;position:relative;padding:10px 34px;}
+      .pm-d-meal-name-c{font-family:var(--font-accent,Oswald,sans-serif);font-size:1rem;letter-spacing:1.5px;color:var(--accent-main,#00c97a);font-weight:700;text-align:center;}
+      .pm-d-meal-center .pm-d-meal-edit{position:absolute;right:6px;top:50%;transform:translateY(-50%);font-size:1.05rem;}
+      /* ── Ventana de vista de comida ── */
+      .ax-view-ov{position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:22px;z-index:100002;opacity:0;transition:opacity .18s ease;}
+      .ax-view-ov.show{opacity:1;}
+      .ax-view{width:100%;max-width:420px;max-height:80vh;display:flex;flex-direction:column;background:var(--pm-s1,#0d1826);border:1px solid var(--accent-main,#00c97a);border-radius:18px;padding:22px 20px;box-shadow:0 20px 60px rgba(0,0,0,.6);transform:translateY(8px) scale(.98);transition:transform .18s ease;}
+      .ax-view-ov.show .ax-view{transform:translateY(0) scale(1);}
+      .ax-view-title{text-align:center;font-family:var(--font-accent,Oswald,sans-serif);font-size:1.25rem;letter-spacing:2px;color:var(--accent-main,#00c97a);font-weight:700;margin-bottom:14px;}
+      .ax-view-body{flex:1;overflow-y:auto;color:var(--text-primary,#e8edf5);font-size:.92rem;line-height:1.6;white-space:pre-line;padding:4px 2px 14px;}
+      .ax-view-btns{display:flex;gap:10px;}
+      /* ── Cuadros HOY INGERISTE (Calculadora) ── */
+      .ax-tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px;}
+      .ax-tile{text-align:center;background:rgba(255,255,255,.05);border:1px solid var(--glass-border,rgba(255,255,255,.1));border-radius:12px;padding:.6rem .3rem;}
+      .ax-tile strong{display:block;font-size:1.05rem;line-height:1.15;}
+      .ax-tile span{font-size:.55rem;color:var(--text-dim,#7f93a8);letter-spacing:.5px;}
+      /* ── Reglas de ejemplo (sombreadas) ── */
+      .pm-d-rule.ax-example{opacity:.5;font-style:italic;}
     </style>
 </head>
 <body data-theme="neon" class="premium-mode">
@@ -439,9 +464,9 @@
                 </div>
                 <!-- Reloj y fecha (en móvil aparece debajo) -->
                 <div class="live-stats">
-                    <span id="live-time">00:00:00</span>
-                    <span class="separator">|</span>
                     <span id="live-date">---</span>
+                    <span class="separator">|</span>
+                    <span id="live-time">00:00:00</span>
                 </div>
                 <!-- Mini cronómetro visible cuando está corriendo -->
                 <div id="sw-mini-container" style="display:none; align-items:center; gap:8px; background:rgba(0,255,136,0.08); padding:4px 12px; border-radius:20px; border:1px solid rgba(0,255,136,0.2); cursor:pointer;" onclick="document.querySelector('[data-page=workout]').click();" title="Clic para ir al cronómetro">
@@ -779,10 +804,10 @@
             <div id="page-diet" class="page"></div>
             <div id="page-workout" class="page"></div>
             <div id="page-assistant" class="page">
-                <!-- Resumen del día (auto-actualizado por código) -->
-                <div class="glass-card" style="padding:1.5rem; margin-bottom:1.5rem; border-left:5px solid var(--accent-main);">
-                    <h2 style="color:var(--accent-main); font-family:var(--font-accent); font-size:1.1rem; margin-bottom:0.5rem;"><span class="h-sym">∑</span>CALCULADORA INTELIGENTE</h2>
-                    <p id="calc-status-line" style="font-size:0.85rem; color:var(--text-dim); line-height:1.5;">--</p>
+                <!-- Resumen del día en cuadros (auto-actualizado por código) -->
+                <div class="glass-card" style="padding:1.2rem 1.5rem; margin-bottom:1.5rem; border-left:5px solid var(--accent-main);">
+                    <h2 style="color:var(--accent-main); font-family:var(--font-accent); font-size:1.1rem;"><span class="h-sym">∑</span>HOY INGERISTE</h2>
+                    <div id="calc-today-tiles" class="ax-tiles"></div>
                 </div>
 
                 <!-- 1. ASISTENTE DE COMIDA — alimento + cantidad -> kcal + macros + ejercicio -->
@@ -791,10 +816,10 @@
                         <span class="pm-calc-icon"><svg viewBox="0 0 24 24"><path d="M12 3l1.8 4.4L18.2 9.2 13.8 11 12 15.4 10.2 11 5.8 9.2 10.2 7.4z"/><path d="M18.2 14.4l.7 1.9 1.9.7-1.9.7-.7 1.9-.7-1.9-1.9-.7 1.9-.7z"/></svg></span>
                         <h3 class="pm-calc-title pm-calc-title-green">ASISTENTE DE COMIDA</h3>
                     </div>
-                    <p class="pm-calc-desc">Escribe un alimento y la cantidad. Te digo las calorías, los macros (proteína, carbos y grasa) y qué ejercicio hacer para quemarlo.</p>
-                    <input type="text" id="calc-extra-cal" class="pm-calc-input" style="width:100%; box-sizing:border-box;" placeholder="Ej. taco de adobada, pizza con salami, lentejas...">
+                    <p class="pm-calc-desc">Escribe un alimento (te sugiero mientras escribes) y la cantidad. Te digo las calorías, los macros (proteína, carbos y grasa) y qué ejercicio hacer para quemarlo.</p>
+                    <input type="text" id="calc-extra-cal" class="pm-calc-input" style="width:100%; box-sizing:border-box;" placeholder="Ej. taco de adobada, sushi, caldo de pollo...">
                     <div class="ax-qty-line">
-                        <label>Cantidad</label>
+                        <label id="calc-unit-lbl">Cantidad</label>
                         <div class="ax-qty">
                             <button type="button" class="ax-qty-btn" data-qty="calc-food-qty" data-dir="-1">−</button>
                             <input type="number" id="calc-food-qty" class="ax-qty-input" value="1" min="1" step="1">
@@ -959,12 +984,12 @@
 
     <!-- Gráficas (Al final para no bloquear inicio rápido) -->
     <script src="https://cdn.jsdelivr.net/npm/apexcharts" defer></script>
-    <script src="profile-persist.js?v=20260705c"></script>
-    <script src="knowledge.js?v=20260705c"></script>
-    <script src="app.js?v=20260705c"></script>
+    <script src="profile-persist.js?v=20260705d"></script>
+    <script src="knowledge.js?v=20260705d"></script>
+    <script src="app.js?v=20260705d"></script>
     <!-- Premium UI: catálogo de insignias + FAB + onboarding -->
-    <script src="premium-badges.js?v=20260705c"></script>
-    <script src="premium-extras.js?v=20260705c"></script>
+    <script src="premium-badges.js?v=20260705d"></script>
+    <script src="premium-extras.js?v=20260705d"></script>
 
     <!-- REGISTRO GLOBAL — funciona aunque app.js falle -->
     <script>
@@ -1042,7 +1067,7 @@
         // Registro del Service Worker de PWA unificado con detección de actualizaciones y auto-refresco
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=20260705c').then(reg => {
+                navigator.serviceWorker.register('sw.js?v=20260705d').then(reg => {
                     console.log('[AX-CORE] Service Worker registrado con éxito:', reg.scope);
                     
                     // Detectar si hay una actualización de Service Worker esperando

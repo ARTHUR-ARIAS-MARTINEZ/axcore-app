@@ -1,12 +1,12 @@
-const CACHE_NAME = 'axcore-v5.23-calc-comida-macros-20260705';
+const CACHE_NAME = 'axcore-v5.24-autocompletado-plan-central-20260705';
 const urlsToCache = [
   './',
-  './index.html?v=20260705c',
-  './index.css?v=20260705c',
-  './premium.css?v=20260705c',
-  './profile-persist.js?v=20260705c',
-  './app.js?v=20260705c',
-  './knowledge.js?v=20260705c',
+  './index.html?v=20260705d',
+  './index.css?v=20260705d',
+  './premium.css?v=20260705d',
+  './profile-persist.js?v=20260705d',
+  './app.js?v=20260705d',
+  './knowledge.js?v=20260705d',
   './logo.png',
   './logo_coach.png',
   './manifest_vip.json',
