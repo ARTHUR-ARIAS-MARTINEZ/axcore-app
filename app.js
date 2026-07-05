@@ -452,6 +452,13 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (savedPage === 'workout' && typeof renderWorkoutPage === 'function') renderWorkoutPage();
                         if (savedPage === 'evolution' && typeof renderEvolutionPage === 'function') renderEvolutionPage('all');
                         if (savedPage === 'studio' && typeof renderStudioPage === 'function') renderStudioPage();
+                        if (savedPage === 'assistant' && typeof window._activateCalculator === 'function') window._activateCalculator();
+                        // Ajustes: rellenar días/kg/insignias del héroe (si no, quedan en 0
+                        // hasta que el usuario navega a otra sección y regresa).
+                        if (savedPage === 'settings' && typeof window.updatePmProfileHero === 'function') {
+                            window.updatePmProfileHero();
+                            setTimeout(() => window.updatePmProfileHero(), 450); // 2a pasada: tras cargar datos remotos/insignias
+                        }
                     }
                 }
                 // Reset de scroll tras restaurar la página (timeout para asegurar render)
@@ -1536,6 +1543,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const toastFn = typeof pmShowToast === 'function' ? pmShowToast : null;
             if (toastFn) {
                 const nombres = {
+                    blanco: 'BLANCO',
                     cyberpunk: 'VERDE',
                     black: 'NEGRO',
                     pink: 'ROSA',
@@ -4037,14 +4045,30 @@ document.addEventListener('DOMContentLoaded', () => {
         const m = log.reduce((t, f) => { t.p += (+f.p || 0); t.c += (+f.c || 0); t.f += (+f.f || 0); return t; }, { p: 0, c: 0, f: 0 });
         const box = document.getElementById('calc-today-tiles');
         if (box) {
-            const tile = (lbl, val, col) => `<div class="ax-tile"><strong style="color:${col};">${val}</strong><span>${lbl}</span></div>`;
+            const tile = (lbl, val, col, extra) => `<div class="ax-tile"${extra || ''}><strong style="color:${col};">${val}</strong><span>${lbl}</span></div>`;
             box.innerHTML =
-                tile('CALORÍAS', consumed.toLocaleString(), '#fff') +
+                tile('CALORÍAS', consumed.toLocaleString(), 'var(--text-primary,#fff)') +
                 tile('PROTEÍNA', m.p + 'g', '#00c97a') +
                 tile('CARBOS', m.c + 'g', '#2979ff') +
                 tile('GRASA', m.f + 'g', '#ff9f43') +
                 tile('QUEMADAS', burned.toLocaleString(), '#ff5c6c') +
-                tile('TE QUEDAN', limit > 0 ? remaining.toLocaleString() : '—', remaining < 0 ? '#ff5c6c' : 'var(--accent-main)');
+                tile('TE QUEDAN', limit > 0 ? remaining.toLocaleString() : 'FÍJALO ✎',
+                     limit > 0 ? (remaining < 0 ? '#ff5c6c' : 'var(--accent-main)') : 'var(--accent-main)',
+                     ' id="ax-tile-limit" style="cursor:pointer;" title="Toca para fijar o cambiar tu límite diario"');
+            // El cuadro TE QUEDAN se toca para fijar/cambiar el límite diario
+            // (también se fija solo al pegar la dieta completa con kcal).
+            const lt = document.getElementById('ax-tile-limit');
+            if (lt) lt.onclick = async () => {
+                const input = await axPrompt('¿Cuál es tu límite diario de calorías?\n(También se fija solo al pegar tu dieta completa)', userData.dailyCalLimit || '');
+                if (input === null) return;
+                const v = parseInt(String(input).replace(/[^0-9]/g, ''));
+                if (isNaN(v) || v < 800 || v > 6000) { axToast('Escribe un número entre 800 y 6000.'); return; }
+                userData.dailyCalLimit = v;
+                saveData();
+                renderCalculatorPage();
+                if (typeof updateDashboard === 'function') updateDashboard();
+                axToast(`✅ Límite diario fijado: ${v.toLocaleString()} kcal`);
+            };
         }
     }
 
@@ -4174,32 +4198,53 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             const kgToLose = w - tw;
 
-            // Método 1 (el más real): ritmo de TU báscula (primer vs. último registro con peso).
+            // ── PROYECCIÓN CON BASE CIENTÍFICA ──
+            // · 1 kg de grasa ≈ 7,700 kcal (Wishnofsky).
+            // · Se descuenta ~15% por adaptación metabólica (el gasto cae al bajar de peso).
+            // · Pérdida sostenible: 0.5–1% del peso corporal por semana (estándar en
+            //   nutrición deportiva). Todo ritmo medido se TOPA al 1%/semana: las caídas
+            //   rápidas iniciales son agua/glucógeno, no grasa, y proyectarlas engaña.
+            const ADAPT = 0.85, KCAL_KG = 7700;
+            const maxPerDay = (w * 0.01) / 7; // techo saludable: 1% del peso por semana
             const hist = (userData.history || []).filter(h => +h.weight > 0);
-            let ratePerDay = 0, method = '';
-            if (hist.length >= 2) {
-                const d1 = parseAppDate(hist[0].date), d2 = parseAppDate(hist[hist.length - 1].date);
-                const days = Math.max(1, Math.round((d2 - d1) / 86400000));
-                const lost = (+hist[0].weight) - (+hist[hist.length - 1].weight);
-                if (lost > 0 && days >= 3) { ratePerDay = lost / days; method = 'tu ritmo real de báscula'; }
+            let ratePerDay = 0, method = '', capped = false;
+
+            // Método 1: ritmo REAL de báscula, ventana reciente (hasta 8 pesajes) y
+            // promediando extremos para suavizar el peso de agua. Exige ≥3 pesajes en ≥7 días.
+            if (hist.length >= 3) {
+                const recent = hist.slice(-8);
+                const d1 = parseAppDate(recent[0].date), d2 = parseAppDate(recent[recent.length - 1].date);
+                const spanDays = Math.max(1, Math.round((d2 - d1) / 86400000));
+                if (spanDays >= 7) {
+                    const k = Math.max(1, Math.min(3, Math.floor(recent.length / 2)));
+                    const avg = arr => arr.reduce((s, h) => s + (+h.weight), 0) / arr.length;
+                    const lost = avg(recent.slice(0, k)) - avg(recent.slice(-k));
+                    if (lost > 0.1) { ratePerDay = lost / spanDays; method = 'tu ritmo real de báscula (pesajes recientes)'; }
+                }
             }
-            // Método 2 (respaldo): tu déficit calórico registrado (7,700 kcal ≈ 1 kg de grasa).
+            // Método 2 (respaldo): déficit calórico registrado, con adaptación descontada.
             if (!ratePerDay && userData.totalNetDeficit > 0 && hist.length >= 1) {
                 const d1 = parseAppDate(hist[0].date);
                 const daysElapsed = Math.max(1, Math.round((new Date() - d1) / 86400000));
-                const avgDef = userData.totalNetDeficit / daysElapsed;
-                if (avgDef > 0) { ratePerDay = avgDef / 7700; method = 'tu déficit calórico registrado'; }
+                if (daysElapsed >= 7) {
+                    const avgDef = userData.totalNetDeficit / daysElapsed;
+                    if (avgDef > 100) { ratePerDay = (avgDef * ADAPT) / KCAL_KG; method = 'tu déficit calórico registrado'; }
+                }
             }
-            // Escenario alternativo fijo: déficit disciplinado de 500 kcal/día.
-            const days500 = Math.ceil(kgToLose / (500 / 7700));
+            // Aplicar el techo saludable
+            if (ratePerDay > maxPerDay) { ratePerDay = maxPerDay; capped = true; method = 'el máximo saludable (1% de tu peso por semana)'; }
+
+            // Escenario de referencia: déficit disciplinado de 500 kcal/día (~0.4 kg/sem reales).
+            const days500 = Math.ceil(kgToLose / Math.min(maxPerDay, (500 * ADAPT) / KCAL_KG));
             const date500 = new Date(); date500.setDate(date500.getDate() + days500);
             const fmt = (d) => d.toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric' });
 
             if (!ratePerDay) {
                 out.innerHTML = `
                     <div style="padding:1rem; background:rgba(0,0,0,0.2); border-radius:12px; border:1px solid var(--glass-border);">
-                        <p style="font-size:0.82rem; color:var(--text-dim); line-height:1.5;">Aún no tengo datos suficientes de TU ritmo (pésate al menos 2 veces, con unos días de diferencia, en Evolución).</p>
-                        <p style="font-size:0.85rem; color:#fff; margin-top:0.6rem;">📌 Pero con un déficit de <strong>500 kcal/día</strong> (comer bien + ejercicio), tus <strong>${kgToLose.toFixed(1)} kg</strong> caerían en <strong style="color:var(--accent-main)">${days500} días</strong> — alrededor del <strong style="color:var(--accent-main)">${fmt(date500)}</strong>.</p>
+                        <p style="font-size:0.82rem; color:var(--text-dim); line-height:1.5;">Para proyectar con TU ritmo real necesito al menos <strong style="color:var(--text-primary,#fff)">3 pesajes repartidos en 7 días o más</strong> (regístralos en Evolución). Así evito darte fechas infladas por el peso de agua de los primeros días.</p>
+                        <p style="font-size:0.85rem; color:var(--text-primary,#fff); margin-top:0.6rem;">📌 Mientras tanto, la referencia científica: con un déficit sostenido de <strong>500 kcal/día</strong>, tus <strong>${kgToLose.toFixed(1)} kg</strong> tomarían ~<strong style="color:var(--accent-main)">${days500} días</strong> — alrededor del <strong style="color:var(--accent-main)">${fmt(date500)}</strong>.</p>
+                        <p style="font-size:0.65rem; color:var(--text-dim); margin-top:0.5rem;">Base: 1 kg de grasa ≈ 7,700 kcal · −15% por adaptación metabólica · máx. saludable 1% de tu peso/semana.</p>
                     </div>`;
                 return;
             }
@@ -4220,8 +4265,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         ${t('VAS PERDIENDO', gramsDay + ' g/día')}
                         ${t('POR SEMANA', kgWeek + ' kg')}
                     </div>
-                    <p style="font-size:0.68rem; color:var(--text-dim); margin-top:0.7rem; text-align:center;">Calculado con ${method}.</p>
-                    ${days500 < days ? `<p style="font-size:0.75rem; color:#fff; margin-top:0.5rem; text-align:center;">⚡ Si sostienes un déficit de 500 kcal/día, podrías adelantarlo al <strong style="color:var(--accent-main)">${fmt(date500)}</strong>.</p>` : ''}
+                    <p style="font-size:0.68rem; color:var(--text-dim); margin-top:0.7rem; text-align:center;">Calculado con ${method}.${capped ? ' Tu ritmo medido era mayor, pero las bajadas rápidas del inicio son agua/glucógeno — proyecto solo grasa real.' : ''}</p>
+                    ${days > 365 ? `<p style="font-size:0.68rem; color:var(--text-dim); margin-top:0.4rem; text-align:center;">⏳ A más de un año la proyección es orientativa: re-cálculala cada mes con tus nuevos pesajes.</p>` : ''}
+                    ${days500 < days ? `<p style="font-size:0.75rem; color:var(--text-primary,#fff); margin-top:0.5rem; text-align:center;">⚡ Sosteniendo un déficit de 500 kcal/día podrías adelantarlo al <strong style="color:var(--accent-main)">${fmt(date500)}</strong>.</p>` : ''}
+                    <p style="font-size:0.6rem; color:var(--text-dim); margin-top:0.5rem; text-align:center;">Base: 1 kg grasa ≈ 7,700 kcal · −15% adaptación metabólica · máx. saludable 1% de tu peso/semana.</p>
                 </div>
             `;
         };

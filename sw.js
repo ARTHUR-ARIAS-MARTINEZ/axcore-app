@@ -1,12 +1,12 @@
-const CACHE_NAME = 'axcore-v5.24-autocompletado-plan-central-20260705';
+const CACHE_NAME = 'axcore-v5.25-blanco-proyeccion-limpieza-20260705';
 const urlsToCache = [
   './',
-  './index.html?v=20260705d',
-  './index.css?v=20260705d',
-  './premium.css?v=20260705d',
-  './profile-persist.js?v=20260705d',
-  './app.js?v=20260705d',
-  './knowledge.js?v=20260705d',
+  './index.html?v=20260705e',
+  './index.css?v=20260705e',
+  './premium.css?v=20260705e',
+  './profile-persist.js?v=20260705e',
+  './app.js?v=20260705e',
+  './knowledge.js?v=20260705e',
   './logo.png',
   './logo_coach.png',
   './manifest_vip.json',

@@ -30,6 +30,20 @@
     --accent-secondary-rgb: 119, 119, 119;
 }
 
+[data-theme="blanco"] {
+    --bg-dark: #f2f3f5;
+    --text-primary: #14181d;
+    --text-dim: #5a6572;
+    --accent-main: #14181d;
+    --accent-secondary: #4a5560;
+    --accent-alert: #d61f3d;
+    --glass: rgba(0, 0, 0, 0.045);
+    --glass-border: rgba(0, 0, 0, 0.16);
+    --neon-glow: 0 0 10px rgba(0, 0, 0, 0.10), 0 0 5px rgba(0, 0, 0, 0.06);
+    --accent-rgb: 20, 24, 29;
+    --accent-secondary-rgb: 74, 85, 96;
+}
+
 [data-theme="cyberpunk"] {
     --bg-dark: #050a1f;
     --accent-main: #00d4aa; /* Verde menta neón */

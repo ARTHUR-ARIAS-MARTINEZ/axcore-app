@@ -97,6 +97,28 @@ body.premium-mode[data-theme="black"] {
   --pm-border: rgba(255,255,255,0.07);
   background: #000000 !important;
 }
+/* ── BLANCO: modo claro, inverso exacto del NEGRO ── */
+body.premium-mode[data-theme="blanco"] {
+  --pm-green-rgb: 20,24,29;
+  --pm-cyan-rgb:  90,101,114;
+  --pm-title-2: #3d4650;
+  --pm-s1: #ffffff; --pm-s2: #f2f3f5; --pm-s3: #e8eaee; --pm-dim: #c6ccd4;
+  --pm-dim2: #5a6572;
+  --pm-white: #14181d;
+  --pm-border: rgba(0,0,0,0.10);
+  --pm-border2: rgba(0,0,0,0.14);
+  --text-primary: #14181d;
+  --text-dim: #5a6572;
+  background: #f2f3f5 !important;
+}
+/* En tema blanco, el texto blanco fijo (inline #fff) pasa a oscuro,
+   y los fondos negros translúcidos inline se aclaran. */
+body.premium-mode[data-theme="blanco"] [style*="color:#fff"],
+body.premium-mode[data-theme="blanco"] [style*="color: #fff"],
+body.premium-mode[data-theme="blanco"] [style*="color:#ffffff"] { color: #14181d !important; }
+body.premium-mode[data-theme="blanco"] [style*="background:rgba(0,0,0,0.3)"],
+body.premium-mode[data-theme="blanco"] [style*="background:rgba(0,0,0,0.2)"] { background: rgba(0,0,0,0.05) !important; }
+
 /* ── MASCULINO 2: CYBERPUNK ── */
 body.premium-mode[data-theme="cyberpunk"] {
   --pm-green-rgb: 0,212,170;
