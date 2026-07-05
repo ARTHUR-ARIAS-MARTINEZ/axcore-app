@@ -96,6 +96,47 @@ document.addEventListener('DOMContentLoaded', () => {
         { key: 'snacks',       name: 'SNACK OPCIONAL', icon: '🥕' }
     ];
 
+    // ── Motor compartido de alimentos (Calculadora + Registrar) ──
+    // Analiza un alimento (o número de kcal) × cantidad.
+    function analyzeFoodEntry(rawInput, qty) {
+        const raw = (rawInput || '').trim();
+        qty = Math.max(1, parseInt(qty) || 1);
+        if (!raw) return { error: 'Escribe un alimento o un número de kcal.' };
+        if (/^\d+$/.test(raw)) {
+            const n = parseInt(raw);
+            if (n > 0) return { name: raw + ' kcal', qty, cal: n * qty, p: 0, c: 0, f: 0, isNumber: true };
+        }
+        const found = (typeof findFood === 'function') ? findFood(raw) : null;
+        if (!found) return { error: `No encontré "${raw}" en mi base. Prueba con otro nombre o escribe las kcal (ej. 300).` };
+        return {
+            name: found.name, qty,
+            cal: Math.round((found.cal || 0) * qty),
+            p: Math.round((found.p || 0) * qty),
+            c: Math.round((found.c || 0) * qty),
+            f: Math.round((found.f || 0) * qty),
+            isNumber: false
+        };
+    }
+    function macrosRowHtml(a) {
+        if (a.isNumber) return '';
+        const cell = (lbl, val, col) => `<div style="flex:1; min-width:78px; text-align:center; background:rgba(255,255,255,0.05); border-radius:10px; padding:0.5rem 0.3rem;"><div style="font-size:1.1rem; font-weight:bold; color:${col};">${val}<small style="font-size:0.6rem;">g</small></div><div style="font-size:0.58rem; color:var(--text-dim); letter-spacing:0.5px;">${lbl}</div></div>`;
+        return `<div style="display:flex; gap:8px; margin-top:0.6rem; flex-wrap:wrap;">${cell('PROTEÍNA', a.p, '#00c97a')}${cell('CARBOS', a.c, '#2979ff')}${cell('GRASA', a.f, '#ff9f43')}</div>`;
+    }
+    function burnExercisesHtml(cal) {
+        const opts = (typeof findCompensationOptions === 'function') ? findCompensationOptions(cal, 4) : [];
+        if (!opts.length) return '';
+        return `<p style="font-size:0.78rem; color:var(--text-dim); margin:0.8rem 0 0.5rem;">🔥 Para quemar esas <strong style="color:var(--accent-main)">${cal.toLocaleString()} kcal</strong>, haz cualquiera:</p><div style="display:grid; gap:0.45rem;">${opts.map(o => `<div style="padding:0.6rem 0.9rem; background:rgba(0,201,122,0.08); border-radius:8px; border-left:3px solid var(--accent-main);"><div style="font-weight:bold; color:#fff; font-size:0.85rem;">${o.name}</div><div style="font-size:0.72rem; color:var(--accent-main);">${o.amount} ${o.unit.toLowerCase()}</div></div>`).join('')}</div>`;
+    }
+    // Botones +/- del selector de cantidad (delegado, global).
+    document.addEventListener('click', (e) => {
+        const b = e.target.closest && e.target.closest('.ax-qty-btn');
+        if (!b) return;
+        const inp = document.getElementById(b.dataset.qty);
+        if (!inp) return;
+        const cur = Math.max(1, parseInt(inp.value) || 1);
+        inp.value = Math.max(1, cur + (parseInt(b.dataset.dir) || 0));
+    });
+
     const themeBtns = document.querySelectorAll('.theme-buttons .theme-btn');
     const saveSettingsBtn = document.getElementById('save-settings');
     const saveMeasurementsBtn = document.getElementById('save-measurements');
@@ -2072,6 +2113,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const calAvail = Math.max(0, calLim - calIn);
         const calPct = calLim > 0 ? Math.min(100, Math.round((calIn / calLim) * 100)) : 0;
         const foodLog = Array.isArray(userData.foodLogToday) ? userData.foodLogToday : [];
+        const macroTot = foodLog.reduce((t, f) => { t.cal += (+f.cal || 0); t.p += (+f.p || 0); t.c += (+f.c || 0); t.f += (+f.f || 0); return t; }, { cal: 0, p: 0, c: 0, f: 0 });
 
         const formatMealText = (text) => {
             const t = (text || '').trim();
@@ -2133,15 +2175,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 <!-- ─── TAB REGISTRAR ALIMENTO ─── -->
                 <div class="pm-d-panel" id="pmDt-log">
-                    <div class="pm-d-log-hint">Registra lo que comes HOY · suma al contador de calorías</div>
-                    <div class="pm-d-food-row">
-                        <input type="text" id="food-desc" class="pm-d-food-input" placeholder="Ej. 100g pollo y arroz...">
-                        <button class="pm-d-food-add" id="btn-add-food">+ AGREGAR</button>
+                    <div class="pm-d-reg-title">🍽️ REGISTRA LO QUE COMES HOY</div>
+                    <div class="pm-d-reg-sub">Escribe el alimento y la cantidad. Suma calorías y macros (proteína, carbos, grasa) a tu día.</div>
+
+                    <div class="pm-d-reg-totals">
+                        <div><strong>${macroTot.cal.toLocaleString()}</strong><span>KCAL HOY</span></div>
+                        <div><strong style="color:#00c97a">${macroTot.p}g</strong><span>PROTEÍNA</span></div>
+                        <div><strong style="color:#2979ff">${macroTot.c}g</strong><span>CARBOS</span></div>
+                        <div><strong style="color:#ff9f43">${macroTot.f}g</strong><span>GRASA</span></div>
                     </div>
-                    <div class="pm-d-food-log" id="pmFoodLogList">
+
+                    <input type="text" id="food-desc" class="pm-d-reg-input" placeholder="Ej. taco de adobada, lentejas, pizza con salami...">
+                    <div class="pm-d-reg-qtyrow">
+                        <label>Cantidad</label>
+                        <div class="ax-qty">
+                            <button type="button" class="ax-qty-btn" data-qty="food-qty" data-dir="-1">−</button>
+                            <input type="number" id="food-qty" class="ax-qty-input" value="1" min="1" step="1">
+                            <button type="button" class="ax-qty-btn" data-qty="food-qty" data-dir="1">+</button>
+                        </div>
+                    </div>
+                    <button class="pm-d-reg-add" id="btn-add-food">+ AGREGAR A MI DÍA</button>
+
+                    <div class="pm-d-food-log" id="pmFoodLogList" style="margin-top:1.2rem;">
                         ${foodLog.length === 0
                             ? '<div class="pm-d-food-empty">Sin registros hoy. Agrega tu primera comida arriba ↑</div>'
-                            : foodLog.map((f, i) => `<div class="pm-d-food-item"><span class="pm-d-food-name">${(f.desc || '').toString().replace(/</g,'&lt;')}</span><span class="pm-d-food-cal">${f.cal || 0}<small>kcal</small></span><button class="pm-d-food-del" onclick="window.deleteFoodLog(${i})" title="Quitar este registro" aria-label="Quitar" style="background:transparent;border:none;color:#ff5c6c;font-size:1rem;line-height:1;cursor:pointer;padding:2px 8px;margin-left:6px;flex-shrink:0;">✕</button></div>`).join('')
+                            : foodLog.map((f, i) => `<div class="pm-d-food-item"><div style="flex:1; min-width:0;"><span class="pm-d-food-name">${(f.desc || '').toString().replace(/</g,'&lt;')}</span>${(f.p || f.c || f.f) ? `<div style="font-size:0.62rem; color:var(--text-dim); margin-top:2px;">P ${f.p || 0}g · C ${f.c || 0}g · G ${f.f || 0}g</div>` : ''}</div><span class="pm-d-food-cal">${f.cal || 0}<small>kcal</small></span><button class="pm-d-food-del" onclick="window.deleteFoodLog(${i})" title="Quitar este registro" aria-label="Quitar" style="background:transparent;border:none;color:#ff5c6c;font-size:1rem;line-height:1;cursor:pointer;padding:2px 8px;margin-left:6px;flex-shrink:0;">✕</button></div>`).join('')
                         }
                     </div>
                 </div>
@@ -2247,62 +2305,22 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('btn-add-food').onclick = async () => {
             const desc = document.getElementById('food-desc').value.trim();
             if (!desc) return;
+            const qtyEl = document.getElementById('food-qty');
+            const qty = qtyEl ? qtyEl.value : 1;
 
-            const btn = document.getElementById('btn-add-food');
-            const calUsed = userData.caloriesConsumedToday;
-            const calLimit = userData.dailyCalLimit;
-
-            const ldesc = desc.toLowerCase().trim();
-            let estimatedCal = null;
-            let dbMatch = null;
-            let longestMatchLen = 0;
-
-            // Buscar en FOOD_DATABASE base
-            if (typeof FOOD_DATABASE !== 'undefined') {
-                for (const food of FOOD_DATABASE) {
-                    if (ldesc.includes(food.name) || food.name.includes(ldesc)) {
-                        if (food.name.length > longestMatchLen) {
-                            longestMatchLen = food.name.length;
-                            dbMatch = food;
-                        }
-                    }
-                }
-            }
-
-            // Buscar también en alimentos personalizados del usuario
-            if (!dbMatch && Array.isArray(userData.customFoods)) {
-                for (const food of userData.customFoods) {
-                    if (ldesc.includes(food.name) || food.name.includes(ldesc)) {
-                        if (food.name.length > longestMatchLen) {
-                            longestMatchLen = food.name.length;
-                            dbMatch = food;
-                        }
-                    }
-                }
-            }
-
-            if (dbMatch) {
-                estimatedCal = dbMatch.cal;
-                registerFood(desc, estimatedCal, calLimit, calUsed);
-            } else {
-                // Sin match: pedir kcal al usuario y persistirlo en su DB personal
-                const input = await axPrompt(`No tengo "${desc}" en mi base de alimentos.\n\n¿Cuántas kcal aproximadas tiene? (solo el número)`);
-                if (input === null) {
-                    btn.textContent = "REGISTRAR";
-                    btn.disabled = false;
-                    return;
-                }
-                const manualCal = parseInt(String(input).replace(/[^0-9]/g, ""));
-                if (isNaN(manualCal) || manualCal <= 0 || manualCal > 5000) {
-                    axToast("Valor inválido. Escribe un número entre 1 y 5000.");
-                    return;
-                }
-                estimatedCal = manualCal;
-                // Guardar en customFoods del usuario para futuros hits
+            let a = analyzeFoodEntry(desc, qty);
+            if (a.error) {
+                // No está en la base: pedir kcal por porción y guardarlo para la próxima
+                const input = await axPrompt(`No tengo "${desc}" en mi base.\n¿Cuántas kcal tiene UNA porción? (solo el número)`);
+                if (input === null) return;
+                const per = parseInt(String(input).replace(/[^0-9]/g, ''));
+                if (isNaN(per) || per <= 0 || per > 5000) { axToast('Valor inválido. Escribe un número entre 1 y 5000.'); return; }
                 if (!Array.isArray(userData.customFoods)) userData.customFoods = [];
-                userData.customFoods.push({ name: ldesc, cal: estimatedCal, p: 0, c: 0, f: 0 });
-                registerFood(desc, estimatedCal, calLimit, calUsed);
+                userData.customFoods.push({ name: desc.toLowerCase(), cal: per, p: 0, c: 0, f: 0 });
+                const q = Math.max(1, parseInt(qty) || 1);
+                a = { name: desc, qty: q, cal: per * q, p: 0, c: 0, f: 0, isNumber: false };
             }
+            registerFood(a);
         };
 
         // Quitar una comida ya registrada hoy y DESHACER su efecto en el contador
@@ -2322,32 +2340,22 @@ document.addEventListener('DOMContentLoaded', () => {
             renderDietPage();
         };
 
-        function registerFood(desc, estimatedCal, calLimit, calUsed) {
-            const newTotal = calUsed + estimatedCal;
-            const remaining = calLimit - newTotal;
-
-            userData.caloriesConsumedToday += estimatedCal;
-            userData.totalNetDeficit -= Math.round(estimatedCal * 0.15);
+        function registerFood(a) {
+            userData.caloriesConsumedToday = (+userData.caloriesConsumedToday || 0) + a.cal;
+            userData.totalNetDeficit = (+userData.totalNetDeficit || 0) - Math.round(a.cal * 0.15);
             userData.totalFoodLogs = (userData.totalFoodLogs || 0) + 1;
+            if (!Array.isArray(userData.foodLogToday)) userData.foodLogToday = [];
             userData.foodLogToday.push({
-                time: new Date().toLocaleTimeString('es-MX', {hour: '2-digit', minute:'2-digit'}),
-                desc, cal: estimatedCal
+                time: new Date().toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' }),
+                desc: a.name + (a.qty > 1 ? ` × ${a.qty}` : ''),
+                cal: a.cal, p: a.p, c: a.c, f: a.f
             });
             saveData();
             updateDashboard();
             if (typeof checkAchievements === 'function') checkAchievements();
-
-            let msg = `✅ Registrado: "${desc}"\n📊 Calorías: +${estimatedCal} kcal\n`;
-            if (remaining > 0) {
-                msg += `💚 Te quedan ${remaining} kcal disponibles hoy.`;
-            } else {
-                msg += `⚠️ SUPERASTE tu límite diario por ${Math.abs(remaining)} kcal. Compensa con ejercicio.`;
-            }
-            axToast(msg);
-            const descEl = document.getElementById('food-desc');
-            const btn = document.getElementById('btn-add-food');
-            if (descEl) descEl.value = "";
-            if (btn) { btn.textContent = "REGISTRAR"; btn.disabled = false; }
+            renderDietPage();
+            const macroMsg = (a.p || a.c || a.f) ? ` · P ${a.p} · C ${a.c} · G ${a.f}` : '';
+            axToast(`✅ +${a.cal.toLocaleString()} kcal registradas${macroMsg}.`);
         }
     }
 
@@ -3929,54 +3937,22 @@ document.addEventListener('DOMContentLoaded', () => {
         const btn = document.getElementById('btn-calc-compensate');
         if (!btn) return;
         btn.onclick = () => {
-            const raw = document.getElementById('calc-extra-cal').value.trim();
+            const raw = document.getElementById('calc-extra-cal').value;
+            const qtyEl = document.getElementById('calc-food-qty');
+            const qty = qtyEl ? qtyEl.value : 1;
             const out = document.getElementById('calc-compensate-result');
-            if (!raw) {
-                out.innerHTML = `<p style="color:var(--accent-alert); font-size:0.85rem;">Escribe un alimento o número de kcal.</p>`;
+            const a = analyzeFoodEntry(raw, qty);
+            if (a.error) {
+                out.innerHTML = `<p style="color:var(--accent-alert); font-size:0.85rem;">${a.error}</p>`;
                 return;
             }
-            
-            let extra = 0;
-            let foodName = '';
-
-            // Detectar si es un número directo
-            const asNum = parseInt(raw);
-            if (!isNaN(asNum) && asNum > 0 && /^\d+$/.test(raw)) {
-                extra = asNum;
-            } else {
-                // Es un texto, buscar el alimento en la base de datos
-                const found = (typeof findFood === 'function') ? findFood(raw) : null;
-                if (!found) {
-                    out.innerHTML = `<p style="color:var(--accent-alert); font-size:0.85rem;">No encontré "${raw}" en mi base. Intenta con "pizza", "taco al pastor", etc., o escribe un número de kcal.</p>`;
-                    return;
-                }
-                extra = found.cal;
-                foodName = found.name;
-            }
-
-            const opts = (typeof findCompensationOptions === 'function') ? findCompensationOptions(extra, 6) : [];
-            if (opts.length === 0) {
-                out.innerHTML = `<p style="color:var(--text-dim); font-size:0.85rem;">No encontré ejercicios óptimos. Prueba con un valor menor.</p>`;
-                return;
-            }
-
-            let foodInfoHtml = '';
-            if (foodName) {
-                foodInfoHtml = `<p style="font-size:0.85rem; color:#fff; margin-bottom:0.4rem;">🍔 Encontré <strong>${foodName}</strong> con <strong style="color:var(--accent-main)">${extra} kcal</strong>.</p>`;
-            }
-
             out.innerHTML = `
-                ${foodInfoHtml}
-                <p style="font-size:0.8rem; color:var(--text-dim); margin-bottom:0.6rem;">Para quemar <strong style="color:var(--accent-main)">${extra} kcal</strong>, haz cualquiera:</p>
-                <div style="display:grid; gap:0.5rem;">
-                    ${opts.map(o => `
-                        <div style="padding:0.7rem 1rem; background:rgba(0,255,136,0.08); border-radius:8px; border-left:3px solid var(--accent-main);">
-                            <div style="font-weight:bold; color:#fff; font-size:0.9rem;">${o.name}</div>
-                            <div style="font-size:0.75rem; color:var(--accent-main);">${o.amount} ${o.unit.toLowerCase()}</div>
-                            <div style="font-size:0.7rem; color:var(--text-dim); margin-top:0.2rem;">${o.desc}</div>
-                        </div>
-                    `).join('')}
+                <div style="padding:0.9rem 1rem; background:rgba(0,201,122,0.08); border:1px solid rgba(0,201,122,0.25); border-radius:12px;">
+                    <div style="font-size:0.9rem; color:#fff;">🍽️ <strong>${a.name}</strong>${a.qty > 1 ? ` × ${a.qty}` : ''}</div>
+                    <div style="font-size:1.6rem; font-weight:bold; color:var(--accent-main); margin-top:0.15rem;">${a.cal.toLocaleString()} <small style="font-size:0.8rem; color:var(--text-dim);">kcal</small></div>
+                    ${macrosRowHtml(a)}
                 </div>
+                ${burnExercisesHtml(a.cal)}
             `;
         };
     }

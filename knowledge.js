@@ -877,20 +877,42 @@ const FOOD_DATABASE = [
 
 // Buscar alimento por matching del nombre más largo (igual que en app.js)
 function findFood(query) {
-    const ldesc = (query || '').toLowerCase().trim();
-    if (!ldesc) return null;
-    let best = null, bestLen = 0;
+    // Normaliza: minúsculas, sin acentos, sin guiones bajos.
+    const norm = (s) => (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/_/g, ' ').replace(/\s+/g, ' ').trim();
+    const q = norm(query);
+    if (!q) return null;
     const customFoods = (typeof loadCustomFoods === 'function') ? loadCustomFoods() : [];
     const allFoods = [...FOOD_DATABASE, ...customFoods];
+
+    // 1) Coincidencia directa por subcadena (la más específica gana).
+    let best = null, bestLen = 0;
     for (const food of allFoods) {
-        if (ldesc.includes(food.name) || food.name.includes(ldesc)) {
-            if (food.name.length > bestLen) {
-                bestLen = food.name.length;
-                best = food;
-            }
+        const n = norm(food.name);
+        if (q.includes(n) || n.includes(q)) {
+            if (n.length > bestLen) { bestLen = n.length; best = food; }
         }
     }
-    return best;
+    if (best) return best;
+
+    // 2) Fallback por palabras clave: tolera "taco de adobada" -> "tacos",
+    //    "milanesa empanizada" -> "milanesa ...", ignora "de/con/en/al" etc.
+    const stop = new Set(['de', 'con', 'la', 'el', 'un', 'una', 'al', 'a', 'y', 'en', 'sin', 'los', 'las', 'del', 'por', 'para']);
+    const qWords = q.split(' ').filter(w => w.length >= 3 && !stop.has(w));
+    if (qWords.length === 0) return null;
+    let bestScore = 0;
+    for (const food of allFoods) {
+        const nWords = norm(food.name).split(' ');
+        let score = 0;
+        for (const qw of qWords) {
+            for (const nw of nWords) {
+                if (nw === qw || nw === qw + 's' || qw === nw + 's' || (qw.length >= 4 && nw.startsWith(qw)) || (nw.length >= 4 && qw.startsWith(nw))) {
+                    score += Math.min(qw.length, nw.length);
+                }
+            }
+        }
+        if (score > bestScore) { bestScore = score; best = food; }
+    }
+    return bestScore > 0 ? best : null;
 }
 
 // Cargar alimentos personalizados que el usuario fue agregando
