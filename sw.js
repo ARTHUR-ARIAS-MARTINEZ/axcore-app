@@ -1,12 +1,12 @@
-const CACHE_NAME = 'axcore-v5.19-scroll-estudio-temas-20260704';
+const CACHE_NAME = 'axcore-v5.20-cafe-simbolos-degradados-20260704';
 const urlsToCache = [
   './',
-  './index.html?v=20260704f',
-  './index.css?v=20260704f',
-  './premium.css?v=20260704f',
-  './profile-persist.js?v=20260704f',
-  './app.js?v=20260704f',
-  './knowledge.js?v=20260704f',
+  './index.html?v=20260704g',
+  './index.css?v=20260704g',
+  './premium.css?v=20260704g',
+  './profile-persist.js?v=20260704g',
+  './app.js?v=20260704g',
+  './knowledge.js?v=20260704g',
   './logo.png',
   './logo_coach.png',
   './manifest_vip.json',

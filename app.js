@@ -1348,7 +1348,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     pastel: 'LILA',
                     azul: 'AZUL',
                     violeta: 'VIOLETA',
-                    naranja: 'NARANJA',
+                    cafe: 'CAFÉ',
                     rojo: 'ROJO',
                     dorado: 'DORADO',
                     neon: 'NEON'

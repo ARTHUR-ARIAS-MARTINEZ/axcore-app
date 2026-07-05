@@ -174,17 +174,19 @@
 }
 
 /* ── NARANJA ── */
-[data-theme="naranja"] {
-    --bg-dark: #170a02;
-    --accent-main: #ff6d00;
-    --accent-secondary: #ff3d00;
-    --accent-alert: #ff2222;
-    --glass: rgba(255, 109, 0, 0.08);
-    --glass-border: rgba(255, 109, 0, 0.32);
-    --neon-glow: 0 0 10px rgba(255, 109, 0, 0.5), 0 0 20px rgba(255, 61, 0, 0.25);
-    --text-dim: #bf8a6a;
-    --accent-rgb: 255, 109, 0;
-    --accent-secondary-rgb: 255, 61, 0;
+/* ── CAFÉ ── (reemplaza TURQUESA: café/mocha cálido → crema; más apagado y
+   terroso que el DORADO brillante y que el ROJO, para que no se confunda) */
+[data-theme="cafe"] {
+    --bg-dark: #140d08;
+    --accent-main: #a86b43;
+    --accent-secondary: #d9b48f;
+    --accent-alert: #ff5470;
+    --glass: rgba(168, 107, 67, 0.08);
+    --glass-border: rgba(168, 107, 67, 0.30);
+    --neon-glow: 0 0 10px rgba(168, 107, 67, 0.5), 0 0 20px rgba(217, 180, 143, 0.25);
+    --text-dim: #a98d74;
+    --accent-rgb: 168, 107, 67;
+    --accent-secondary-rgb: 217, 180, 143;
 }
 
 /* ── ROJO ── (menos monótono: crimson → ember, gradiente "fuego") */
@@ -1683,6 +1685,30 @@ body {
 [data-theme="natural"] .ach-card--locked .ach-title,
 [data-theme="natural"] .ach-card--locked .ach-desc {
     color: #6b7a6d !important;
+}
+
+/* ===== Iconos de línea en encabezados (calculadora, etc.) =====
+   Reemplazan a los emojis de colores. Heredan el color del encabezado
+   (currentColor) para armonizar con cada tema, en vez de un glifo fijo. */
+.h-ico {
+    width: 1.05em; height: 1.05em;
+    vertical-align: -0.16em;
+    margin-right: 0.45em;
+    stroke: currentColor; fill: none;
+    stroke-width: 1.8;
+    stroke-linecap: round; stroke-linejoin: round;
+    opacity: 0.95;
+}
+/* Símbolo tipográfico en encabezados (alternativa al icono SVG).
+   Hereda el color del encabezado (tema). */
+.h-sym {
+    display: inline-block;
+    margin-right: 0.4em;
+    font-size: 1.18em;
+    font-weight: 700;
+    line-height: 1;
+    vertical-align: -0.05em;
+    opacity: 0.95;
 }
 
 /* ===== Natural Zen — Inputs en calculadora (con estilos inline en HTML) ===== */

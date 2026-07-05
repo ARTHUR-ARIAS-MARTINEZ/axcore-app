@@ -8,9 +8,9 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0a0e14">
     <link rel="apple-touch-icon" href="logo.png">
-    <link rel="stylesheet" href="index.css?v=20260704f">
+    <link rel="stylesheet" href="index.css?v=20260704g">
     <!-- Premium UI overrides (inerte si <body> NO tiene .premium-mode) -->
-    <link rel="stylesheet" href="premium.css?v=20260704f">
+    <link rel="stylesheet" href="premium.css?v=20260704g">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <!-- Fuentes: Inter para cuerpos de texto, Oswald (Heavy Gym) para titulares -->
@@ -736,14 +736,14 @@
             <div id="page-assistant" class="page">
                 <!-- Resumen del día (auto-actualizado por código) -->
                 <div class="glass-card" style="padding:1.5rem; margin-bottom:1.5rem; border-left:5px solid var(--accent-main);">
-                    <h2 style="color:var(--accent-main); font-family:var(--font-accent); font-size:1.1rem; margin-bottom:0.5rem;">🧮 CALCULADORA INTELIGENTE</h2>
+                    <h2 style="color:var(--accent-main); font-family:var(--font-accent); font-size:1.1rem; margin-bottom:0.5rem;"><span class="h-sym">∑</span>CALCULADORA INTELIGENTE</h2>
                     <p id="calc-status-line" style="font-size:0.85rem; color:var(--text-dim); line-height:1.5;">--</p>
                 </div>
 
                 <!-- 1. ASISTENTE DE COMIDA (look del prototipo) -->
                 <div class="glass-card pm-calc-tool pm-calc-assistant" style="padding:1.5rem; margin-bottom:1.5rem;">
                     <div class="pm-calc-hdr">
-                        <span class="pm-calc-icon">🧠</span>
+                        <span class="pm-calc-icon"><svg viewBox="0 0 24 24"><path d="M12 3l1.8 4.4L18.2 9.2 13.8 11 12 15.4 10.2 11 5.8 9.2 10.2 7.4z"/><path d="M18.2 14.4l.7 1.9 1.9.7-1.9.7-.7 1.9-.7-1.9-1.9-.7 1.9-.7z"/></svg></span>
                         <h3 class="pm-calc-title pm-calc-title-green">ASISTENTE DE COMIDA</h3>
                     </div>
                     <p class="pm-calc-desc">Escribe un alimento o pega cuántas kcal vas a meter. Te digo calorías, ejercicio para compensar y alternativas.</p>
@@ -757,7 +757,7 @@
 
                 <!-- 2. INTERCAMBIAR ALIMENTO -->
                 <div class="glass-card" style="padding:1.5rem; margin-bottom:1.5rem;">
-                    <h3 style="color:var(--accent-secondary); font-family:var(--font-accent); font-size:0.95rem; margin-bottom:0.3rem;">🔄 INTERCAMBIAR ALIMENTO</h3>
+                    <h3 style="color:var(--accent-secondary); font-family:var(--font-accent); font-size:0.95rem; margin-bottom:0.3rem;"><svg class="h-ico" viewBox="0 0 24 24"><polyline points="16.5 2.5 20.5 6.5 16.5 10.5"/><path d="M20.5 6.5H8.5a4 4 0 00-4 4"/><polyline points="7.5 21.5 3.5 17.5 7.5 13.5"/><path d="M3.5 17.5h12a4 4 0 004-4"/></svg>INTERCAMBIAR ALIMENTO</h3>
                     <p style="font-size:0.75rem; color:var(--text-dim); margin-bottom:1rem;">Te dice qué comer en lugar de algo. Busca alternativas con calorías similares.</p>
                     <div style="display:flex; gap:10px; flex-wrap:wrap;">
                         <input type="text" id="calc-swap-food" placeholder="Ej. pizza, taco al pastor, hamburguesa..." style="flex:1; min-width:140px; background:rgba(0,0,0,0.3); border:1px solid var(--accent-secondary); padding:0.9rem; color:#fff; border-radius:10px; font-size:1rem;">
@@ -768,7 +768,7 @@
 
                 <!-- 3. AJUSTAR LÍMITE DIARIO (BMR/TDEE) -->
                 <div class="glass-card" style="padding:1.5rem; margin-bottom:1.5rem;">
-                    <h3 style="color:var(--accent-main); font-family:var(--font-accent); font-size:0.95rem; margin-bottom:0.3rem;">⚖️ CALCULAR LÍMITE DIARIO IDEAL</h3>
+                    <h3 style="color:var(--accent-main); font-family:var(--font-accent); font-size:0.95rem; margin-bottom:0.3rem;"><span class="h-sym">≤</span>CALCULAR LÍMITE DIARIO IDEAL</h3>
                     <p style="font-size:0.75rem; color:var(--text-dim); margin-bottom:1rem;">Te calcula cuántas kcal comer al día según tu peso, altura, edad y actividad para llegar a tu meta.</p>
                     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:10px;">
                         <input type="number" id="calc-age" placeholder="Edad" style="background:rgba(0,0,0,0.3); border:1px solid var(--glass-border); padding:0.8rem; color:#fff; border-radius:10px;">
@@ -791,7 +791,7 @@
                 <!-- 4. PROYECCIÓN A META -->
                 <div class="glass-card pm-calc-tool" style="padding:1.5rem; margin-bottom:1.5rem;">
                     <div class="pm-calc-hdr">
-                        <span class="pm-calc-icon">🎯</span>
+                        <span class="pm-calc-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.8"/><circle cx="12" cy="12" r="1.4"/></svg></span>
                         <h3 class="pm-calc-title">PROYECCIÓN A TU META</h3>
                     </div>
                     <p class="pm-calc-desc">Con tu ritmo actual, cuándo llegas a tu peso meta y cuántos gramos por día.</p>
@@ -857,10 +857,10 @@
                             <div class="t-dot" style="background:linear-gradient(135deg,#7c3aed,#c93aff); border:2px solid rgba(201,58,255,.3); width:26px; height:26px; border-radius:50%; margin:0 auto 6px;"></div>
                             <div class="t-name">VIOLETA</div>
                         </div>
-                        <!-- NARANJA -->
-                        <div class="t-swatch" data-theme="naranja" onclick="pmSetTheme('naranja')">
-                            <div class="t-dot" style="background:linear-gradient(135deg,#ff6d00,#ff3d00); border:2px solid rgba(255,109,0,.3); width:26px; height:26px; border-radius:50%; margin:0 auto 6px;"></div>
-                            <div class="t-name">NARANJA</div>
+                        <!-- CAFÉ -->
+                        <div class="t-swatch" data-theme="cafe" onclick="pmSetTheme('cafe')">
+                            <div class="t-dot" style="background:linear-gradient(135deg,#a86b43,#d9b48f); border:2px solid rgba(168,107,67,.3); width:26px; height:26px; border-radius:50%; margin:0 auto 6px;"></div>
+                            <div class="t-name">CAFÉ</div>
                         </div>
                         <!-- ROJO -->
                         <div class="t-swatch" data-theme="rojo" onclick="pmSetTheme('rojo')">
@@ -941,12 +941,12 @@
 
     <!-- Gráficas (Al final para no bloquear inicio rápido) -->
     <script src="https://cdn.jsdelivr.net/npm/apexcharts" defer></script>
-    <script src="profile-persist.js?v=20260704f"></script>
-    <script src="knowledge.js?v=20260704f"></script>
-    <script src="app.js?v=20260704f"></script>
+    <script src="profile-persist.js?v=20260704g"></script>
+    <script src="knowledge.js?v=20260704g"></script>
+    <script src="app.js?v=20260704g"></script>
     <!-- Premium UI: catálogo de insignias + FAB + onboarding -->
-    <script src="premium-badges.js?v=20260704f"></script>
-    <script src="premium-extras.js?v=20260704f"></script>
+    <script src="premium-badges.js?v=20260704g"></script>
+    <script src="premium-extras.js?v=20260704g"></script>
 
     <!-- REGISTRO GLOBAL — funciona aunque app.js falle -->
     <script>
@@ -1024,7 +1024,7 @@
         // Registro del Service Worker de PWA unificado con detección de actualizaciones y auto-refresco
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=20260704f').then(reg => {
+                navigator.serviceWorker.register('sw.js?v=20260704g').then(reg => {
                     console.log('[AX-CORE] Service Worker registrado con éxito:', reg.scope);
                     
                     // Detectar si hay una actualización de Service Worker esperando

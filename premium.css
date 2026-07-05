@@ -22,6 +22,12 @@ body.premium-mode {
   --pm-green-rgb: 0,201,122;
   --pm-cyan-rgb:  0,229,255;
 
+  /* Fin del degradado de TÍTULOS: tono claro/casi-blanco TEÑIDO con el
+     color del tema. Da el mismo efecto elegante "acento → claro" que el
+     tema DORADO en todos los temas. Se sobrescribe por tema más abajo.
+     (Valor plano, sin color-mix, para no romperse en WebViews viejos.) */
+  --pm-title-2: #c4ffe9;
+
   /* Superficies y dim — se sobrescriben por tema más abajo (default = NEON) */
   --pm-s1:  #0d1826;
   --pm-s2:  #111f30;
@@ -86,6 +92,7 @@ body.premium-mode[data-theme="rainbow"] {  /* RAINBOW PRIDE */
 body.premium-mode[data-theme="black"] {
   --pm-green-rgb: 240,240,240;
   --pm-cyan-rgb:  160,160,160;
+  --pm-title-2: #8f97a1;
   --pm-s1: #060606; --pm-s2: #0e0e0e; --pm-s3: #161616; --pm-dim: #2a2a2a;
   --pm-border: rgba(255,255,255,0.07);
   background: #000000 !important;
@@ -94,6 +101,7 @@ body.premium-mode[data-theme="black"] {
 body.premium-mode[data-theme="cyberpunk"] {
   --pm-green-rgb: 0,212,170;
   --pm-cyan-rgb:  0,255,102;
+  --pm-title-2: #bffff0;
   --pm-s1: #06091a; --pm-s2: #0a1028; --pm-s3: #111834; --pm-dim: #1a2a4a;
   --pm-border: rgba(0,212,170,0.12);
   background: #050a1f !important;
@@ -110,6 +118,7 @@ body.premium-mode[data-theme="military"] {
 body.premium-mode[data-theme="pink"] {
   --pm-green-rgb: 247,37,133;
   --pm-cyan-rgb:  255,157,226;
+  --pm-title-2: #ffd4ee;
   --pm-s1: #200a1c; --pm-s2: #2a1028; --pm-s3: #361436; --pm-dim: #6a1850;
   background: #130816 !important;
 }
@@ -124,6 +133,7 @@ body.premium-mode[data-theme="salmon"] {
 body.premium-mode[data-theme="pastel"] {
   --pm-green-rgb: 255,158,226;
   --pm-cyan-rgb:  181,226,255;
+  --pm-title-2: #eef4ff;
   --pm-s1: #130f1d; --pm-s2: #191426; --pm-s3: #221c32; --pm-dim: #352a4e;
   background: #0f0b18 !important;
 }
@@ -155,6 +165,7 @@ body.premium-mode[data-theme="neon-bi"] {
 body.premium-mode[data-theme="azul"] {
   --pm-green-rgb: 31,107,255;
   --pm-cyan-rgb:  64,223,255;
+  --pm-title-2: #cfe6ff;
   --pm-s1: #071120; --pm-s2: #0c1a30; --pm-s3: #12243e; --pm-dim: #2a4a78;
   --pm-border: rgba(64,223,255,0.16);
   background: #04101f !important;
@@ -163,22 +174,26 @@ body.premium-mode[data-theme="azul"] {
 body.premium-mode[data-theme="violeta"] {
   --pm-green-rgb: 124,58,237;
   --pm-cyan-rgb:  201,58,255;
+  --pm-title-2: #e9d9ff;
   --pm-s1: #120a20; --pm-s2: #19102c; --pm-s3: #221638; --pm-dim: #3c2660;
   --pm-border: rgba(201,58,255,0.16);
   background: #0d0618 !important;
 }
 /* ── NARANJA ── */
-body.premium-mode[data-theme="naranja"] {
-  --pm-green-rgb: 255,109,0;
-  --pm-cyan-rgb:  255,61,0;
-  --pm-s1: #170e08; --pm-s2: #201410; --pm-s3: #2a1c16; --pm-dim: #4a2c18;
-  --pm-border: rgba(255,109,0,0.14);
-  background: #170a02 !important;
+/* ── CAFÉ ── (reemplaza TURQUESA: café/mocha → crema) */
+body.premium-mode[data-theme="cafe"] {
+  --pm-green-rgb: 168,107,67;
+  --pm-cyan-rgb:  217,180,143;
+  --pm-title-2: #f0dcc4;
+  --pm-s1: #17100a; --pm-s2: #211710; --pm-s3: #2c2016; --pm-dim: #4e3826;
+  --pm-border: rgba(168,107,67,0.16);
+  background: #140d08 !important;
 }
 /* ── ROJO ── (menos monótono: crimson → ember, gradiente "fuego") */
 body.premium-mode[data-theme="rojo"] {
   --pm-green-rgb: 255,45,74;
   --pm-cyan-rgb:  255,122,60;
+  --pm-title-2: #ffd7cb;
   --pm-s1: #180a0b; --pm-s2: #221010; --pm-s3: #2c1815; --pm-dim: #4a2420;
   --pm-border: rgba(255,122,60,0.16);
   background: #150407 !important;
@@ -187,6 +202,7 @@ body.premium-mode[data-theme="rojo"] {
 body.premium-mode[data-theme="dorado"] {
   --pm-green-rgb: 232,192,76;
   --pm-cyan-rgb:  255,244,214;
+  --pm-title-2: #fff4d6;
   --pm-s1: #14120a; --pm-s2: #1c1810; --pm-s3: #262016; --pm-dim: #4a4020;
   --pm-border: rgba(232,192,76,0.16);
   background: #14120a !important;
@@ -2990,8 +3006,16 @@ body.premium-mode .pm-calc-hdr {
   margin-bottom: 4px;
 }
 body.premium-mode .pm-calc-icon {
-  font-size: 18px;
+  display: inline-flex;
+  align-items: center;
   line-height: 1;
+  color: var(--accent-main);
+}
+body.premium-mode .pm-calc-icon svg {
+  width: 20px; height: 20px;
+  stroke: currentColor; fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round; stroke-linejoin: round;
 }
 body.premium-mode .pm-calc-title {
   font-family: 'Oswald', sans-serif !important;
@@ -3556,10 +3580,14 @@ body.premium-mode #page-studio .sx-fab-primary {
    EVOLUCIÓN — más vida (2ª pasada): títulos en degradado, filtros con
    acento, tabla con filas alternadas. Antes seguía viéndose plana.
    ══════════════════════════════════════════════════════════════════ */
-/* Títulos de panel con degradado del tema (en vez de un color sólido) */
+/* Títulos de panel con degradado del tema (en vez de un color sólido).
+   El degradado va del ACENTO a un tono claro teñido (--pm-title-2), para
+   que en TODOS los temas se perciba el mismo efecto elegante "color →
+   claro" que ya tenía DORADO (antes terminaba en --pm-cyan, que en varios
+   temas era casi el mismo tono y el degradado se veía plano). */
 body.premium-mode #page-evolution .settings-panel > h2,
 body.premium-mode #page-evolution .evolution-panel > h2 {
-  background: linear-gradient(90deg, var(--pm-green), var(--pm-cyan)) !important;
+  background: linear-gradient(90deg, var(--pm-green), var(--pm-title-2)) !important;
   -webkit-background-clip: text !important; background-clip: text !important;
   -webkit-text-fill-color: transparent !important; color: transparent !important;
   display: inline-block;
