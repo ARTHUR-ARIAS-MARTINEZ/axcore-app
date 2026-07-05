@@ -1895,12 +1895,13 @@ document.addEventListener('DOMContentLoaded', () => {
             // Comprobación ultra-rápida por clases de contenedores con scroll horizontal en nuestra app
             // Esto evita llamar a getComputedStyle (provoca layout thrashing extremo en touchstart)
             if (el.classList) {
-                if (el.classList.contains('studio-templates') || 
+                if (el.classList.contains('studio-templates') ||
                     el.classList.contains('studio-metrics') ||
                     el.classList.contains('studio-pro-pills') ||
                     el.classList.contains('studio-pro-swatches') ||
                     el.classList.contains('studio-pro-tabs') ||
                     el.classList.contains('sx-tabbar') ||
+                    el.classList.contains('pm-workout-filters') ||
                     el.classList.contains('theme-grid')) {
                     return true;
                 }
@@ -2550,7 +2551,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     <button class="pm-wf-chip" data-filter="pierna">PIERNA</button>
                     <button class="pm-wf-chip" data-filter="gluteo">GLÚTEO</button>
                     <button class="pm-wf-chip" data-filter="pecho">PECHO</button>
+                    <button class="pm-wf-chip" data-filter="espalda">ESPALDA</button>
                     <button class="pm-wf-chip" data-filter="hombro">HOMBRO</button>
+                    <button class="pm-wf-chip" data-filter="brazo">BRAZO</button>
+                    <button class="pm-wf-chip" data-filter="core">CORE</button>
                 </div>
                 <div class="exercise-catalog" id="pm-ex-catalog">
                     ${ARTHUR_KNOWLEDGE.exercises_catalog.map((ex, i) => {
@@ -2563,8 +2567,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         const filterKey = typeSlug.startsWith('hombro') ? 'hombro'
                             : typeSlug.startsWith('pierna') || typeSlug === 'pantorrilla' ? 'pierna'
                             : typeSlug.startsWith('gluteo') ? 'gluteo'
-                            : typeSlug.startsWith('pecho') || typeSlug === 'espalda' ? 'pecho'
-                            : typeSlug.startsWith('cardio') ? 'cardio'
+                            : typeSlug.startsWith('pecho') ? 'pecho'
+                            : typeSlug === 'espalda' ? 'espalda'
+                            : typeSlug === 'biceps' || typeSlug === 'triceps' || typeSlug === 'antebrazo' ? 'brazo'
+                            : typeSlug === 'core' || typeSlug === 'abdomen' || typeSlug === 'calistenia' ? 'core'
+                            : typeSlug.startsWith('cardio') || typeSlug === 'carrera' ? 'cardio'
                             : typeSlug.startsWith('hiit') ? 'hiit'
                             : typeSlug;
                         const badgeClass = typeSlug === 'hiit' ? 'hiit' : typeSlug === 'cardio' ? 'cardio' : 'fuerza';
@@ -2627,12 +2634,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     c.className = 'pm-wf-chip';
                 });
                 chip.classList.add(`active-${filter}`);
-                // Mostrar/ocultar tarjetas
+                // Mostrar/ocultar tarjetas. OJO: premium.css pinta .exercise-card con
+                // display:flex !important, así que el inline normal pierde — hay que
+                // ocultar con !important inline (setProperty) para que el filtro gane.
                 document.querySelectorAll('#pm-ex-catalog .exercise-card').forEach(card => {
                     if (filter === 'todos' || card.dataset.filterKey === filter) {
-                        card.style.display = '';
+                        card.style.removeProperty('display');
                     } else {
-                        card.style.display = 'none';
+                        card.style.setProperty('display', 'none', 'important');
                     }
                 });
             };

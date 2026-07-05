@@ -1,12 +1,12 @@
-const CACHE_NAME = 'axcore-v5.25-blanco-proyeccion-limpieza-20260705';
+const CACHE_NAME = 'axcore-v5.26-workouts-filtros-catalogo-20260705';
 const urlsToCache = [
   './',
-  './index.html?v=20260705e',
-  './index.css?v=20260705e',
-  './premium.css?v=20260705e',
-  './profile-persist.js?v=20260705e',
-  './app.js?v=20260705e',
-  './knowledge.js?v=20260705e',
+  './index.html?v=20260705f',
+  './index.css?v=20260705f',
+  './premium.css?v=20260705f',
+  './profile-persist.js?v=20260705f',
+  './app.js?v=20260705f',
+  './knowledge.js?v=20260705f',
   './logo.png',
   './logo_coach.png',
   './manifest_vip.json',

@@ -73,12 +73,74 @@ const ARTHUR_KNOWLEDGE = {
         { name: "Abdominales Crunch", desc: "~0.3 cal/rep. Ombligo hacia adentro.", cal: 20, type: "Core", unit: "Series de 25", baseVal: 4 },
         { name: "Tijeras (Leg Raises)", desc: "~0.5 cal/rep. Lumbares en suelo.", cal: 30, type: "Core", unit: "Series de 20", baseVal: 4 },
         { name: "Russian Twists", desc: "~0.4 cal/rep. Rotación con o sin peso.", cal: 25, type: "Core", unit: "Series de 20", baseVal: 4 },
-        // === CALISTENIA ===
-        { name: "Dips en Paralelas", desc: "~1 cal/rep. Pecho + Tríceps.", cal: 55, type: "Calistenia", unit: "Series de 10", baseVal: 4 },
-        { name: "Pike Push-ups", desc: "~0.6 cal/rep. Hombro calistenia.", cal: 35, type: "Calistenia", unit: "Series de 10", baseVal: 4 },
+        // === CALISTENIA (reclasificados a su músculo) ===
+        { name: "Dips en Paralelas", desc: "~1 cal/rep. Pecho + Tríceps.", cal: 55, type: "Tríceps", unit: "Series de 10", baseVal: 4 },
+        { name: "Pike Push-ups", desc: "~0.6 cal/rep. Hombro calistenia.", cal: 35, type: "Hombros", unit: "Series de 10", baseVal: 4 },
         // === PREPARACIÓN CARRERA ===
         { name: "Intervalos HIIT (Sprints)", desc: "20 seg sprint / 40 seg descanso. Quema ~18 cal/min activo.", cal: 180, type: "Carrera", unit: "Minutos totales", baseVal: 15 },
-        { name: "Fartlek (Correr libre)", desc: "Alternancia libre de velocidad. ~12 cal/min.", cal: 240, type: "Carrera", unit: "Minutos", baseVal: 20 }
+        { name: "Fartlek (Correr libre)", desc: "Alternancia libre de velocidad. ~12 cal/min.", cal: 240, type: "Carrera", unit: "Minutos", baseVal: 20 },
+        // === ESPALDA (ampliación v5.26) ===
+        { name: "Remo con Barra", desc: "~0.7 cal/rep. Torso a 45°, espalda recta.", cal: 50, type: "Espalda", unit: "Series de 12", baseVal: 4 },
+        { name: "Jalón al Pecho (Polea)", desc: "~0.6 cal/rep. Agarre abierto, pecho arriba.", cal: 45, type: "Espalda", unit: "Series de 12", baseVal: 4 },
+        { name: "Remo en Polea Baja", desc: "~0.6 cal/rep. Codos pegados al cuerpo.", cal: 45, type: "Espalda", unit: "Series de 12", baseVal: 4 },
+        { name: "Peso Muerto Convencional", desc: "~1 cal/rep. Cadera y espalda completa.", cal: 70, type: "Espalda", unit: "Series de 8", baseVal: 4 },
+        { name: "Pullover con Mancuerna", desc: "~0.5 cal/rep. Dorsal y serrato.", cal: 35, type: "Espalda", unit: "Series de 12", baseVal: 4 },
+        { name: "Hiperextensiones Lumbares", desc: "~0.4 cal/rep. Banco romano o suelo.", cal: 30, type: "Espalda", unit: "Series de 15", baseVal: 4 },
+        { name: "Remo Invertido en Barra", desc: "~0.7 cal/rep. Cuerpo recto bajo la barra.", cal: 45, type: "Espalda", unit: "Series de 10", baseVal: 4 },
+        { name: "Encogimientos de Trapecio", desc: "~0.3 cal/rep. Hombros a las orejas, pausa arriba.", cal: 25, type: "Espalda", unit: "Series de 15", baseVal: 4 },
+        // === PECHO (ampliación) ===
+        { name: "Press de Banca con Barra", desc: "~0.7 cal/rep. Escápulas retraídas.", cal: 50, type: "Pecho", unit: "Series de 10", baseVal: 4 },
+        { name: "Press Inclinado", desc: "~0.7 cal/rep. Pecho superior.", cal: 50, type: "Pecho", unit: "Series de 10", baseVal: 4 },
+        { name: "Aperturas con Mancuernas", desc: "~0.4 cal/rep. Codos semiflexionados.", cal: 30, type: "Pecho", unit: "Series de 12", baseVal: 4 },
+        { name: "Fondos para Pecho", desc: "~1 cal/rep. Torso inclinado al frente.", cal: 55, type: "Pecho", unit: "Series de 10", baseVal: 4 },
+        { name: "Press en Máquina (Pecho)", desc: "~0.6 cal/rep. Control total del recorrido.", cal: 40, type: "Pecho", unit: "Series de 12", baseVal: 4 },
+        { name: "Flexiones Diamante", desc: "~0.6 cal/rep. Manos juntas, pecho interno y tríceps.", cal: 35, type: "Pecho", unit: "Series de 12", baseVal: 4 },
+        // === HOMBRO (ampliación) ===
+        { name: "Elevaciones Frontales", desc: "~0.3 cal/rep. Hombro anterior, sin impulso.", cal: 20, type: "Hombros", unit: "Series de 15", baseVal: 4 },
+        { name: "Pájaros (Hombro Posterior)", desc: "~0.3 cal/rep. Inclinado, brazos abiertos.", cal: 20, type: "Hombros", unit: "Series de 15", baseVal: 4 },
+        { name: "Press Arnold", desc: "~0.5 cal/rep. Giro completo de muñeca.", cal: 35, type: "Hombros", unit: "Series de 10", baseVal: 4 },
+        { name: "Remo al Mentón", desc: "~0.4 cal/rep. Codos por encima de las manos.", cal: 30, type: "Hombros", unit: "Series de 12", baseVal: 4 },
+        { name: "Toques de Hombro en Plancha", desc: "~0.4 cal/rep. Core firme, sin balanceo.", cal: 25, type: "Hombros", unit: "Series de 20", baseVal: 4 },
+        // === BÍCEPS (ampliación) ===
+        { name: "Curl con Barra", desc: "~0.5 cal/rep. Codos fijos al costado.", cal: 30, type: "Bíceps", unit: "Series de 12", baseVal: 4 },
+        { name: "Curl Concentrado", desc: "~0.3 cal/rep. Codo apoyado en el muslo.", cal: 20, type: "Bíceps", unit: "Series de 12", baseVal: 4 },
+        { name: "Curl Predicador", desc: "~0.4 cal/rep. Banco Scott, estiramiento completo.", cal: 25, type: "Bíceps", unit: "Series de 12", baseVal: 4 },
+        { name: "Curl Inverso (Antebrazo)", desc: "~0.3 cal/rep. Agarre prono.", cal: 20, type: "Bíceps", unit: "Series de 15", baseVal: 4 },
+        // === TRÍCEPS (ampliación) ===
+        { name: "Press Francés", desc: "~0.4 cal/rep. Barra Z a la frente.", cal: 30, type: "Tríceps", unit: "Series de 12", baseVal: 4 },
+        { name: "Extensión de Tríceps en Polea", desc: "~0.4 cal/rep. Codos pegados.", cal: 25, type: "Tríceps", unit: "Series de 15", baseVal: 4 },
+        { name: "Press Cerrado en Banca", desc: "~0.6 cal/rep. Manos al ancho de hombros.", cal: 40, type: "Tríceps", unit: "Series de 10", baseVal: 4 },
+        // === PIERNA (ampliación) ===
+        { name: "Prensa de Pierna", desc: "~0.8 cal/rep. Sin bloquear rodillas arriba.", cal: 55, type: "Pierna", unit: "Series de 12", baseVal: 4 },
+        { name: "Extensiones de Cuádriceps", desc: "~0.4 cal/rep. Pausa de 1 seg arriba.", cal: 30, type: "Pierna", unit: "Series de 15", baseVal: 4 },
+        { name: "Curl Femoral", desc: "~0.4 cal/rep. Acostado o sentado en máquina.", cal: 30, type: "Pierna", unit: "Series de 12", baseVal: 4 },
+        { name: "Sentadilla Búlgara", desc: "~0.7 cal/rep por pierna. Pie trasero en banco.", cal: 50, type: "Pierna", unit: "Series de 10", baseVal: 4 },
+        { name: "Hack Squat", desc: "~0.8 cal/rep. Espalda pegada al respaldo.", cal: 55, type: "Pierna", unit: "Series de 12", baseVal: 4 },
+        { name: "Zancadas Caminando", desc: "~0.7 cal/rep. Paso largo, rodilla al suelo.", cal: 50, type: "Pierna", unit: "Series de 20", baseVal: 4 },
+        { name: "Aductores en Máquina", desc: "~0.3 cal/rep. Cierre controlado.", cal: 25, type: "Pierna", unit: "Series de 15", baseVal: 4 },
+        { name: "Elevación de Talones Sentado", desc: "~0.3 cal/rep. Sóleo, pausa arriba.", cal: 25, type: "Pantorrilla", unit: "Series de 20", baseVal: 4 },
+        // === GLÚTEO (ampliación) ===
+        { name: "Peso Muerto Rumano a 1 Pierna", desc: "~0.6 cal/rep. Equilibrio y glúteo medio.", cal: 40, type: "Glúteo", unit: "Series de 10", baseVal: 4 },
+        { name: "Abducción en Máquina", desc: "~0.3 cal/rep. Apertura con pausa.", cal: 25, type: "Glúteo", unit: "Series de 15", baseVal: 4 },
+        { name: "Frog Pumps", desc: "~0.4 cal/rep. Plantas de pies juntas.", cal: 25, type: "Glúteo", unit: "Series de 20", baseVal: 4 },
+        { name: "Subidas al Banco (Step-ups)", desc: "~0.6 cal/rep por pierna. Empuja con el talón.", cal: 45, type: "Glúteo", unit: "Series de 12", baseVal: 4 },
+        // === CORE (ampliación) ===
+        { name: "Plancha Lateral", desc: "~4 cal/min por lado. Cadera arriba.", cal: 16, type: "Core", unit: "Minutos", baseVal: 4 },
+        { name: "Rueda Abdominal (Ab Wheel)", desc: "~0.8 cal/rep. Extensión sin arquear lumbar.", cal: 40, type: "Core", unit: "Series de 10", baseVal: 4 },
+        { name: "Elevaciones de Piernas Colgado", desc: "~0.7 cal/rep. Sin balanceo.", cal: 40, type: "Core", unit: "Series de 10", baseVal: 4 },
+        { name: "Crunch en Polea Alta", desc: "~0.4 cal/rep. Enrolla la columna.", cal: 30, type: "Core", unit: "Series de 15", baseVal: 4 },
+        { name: "Dead Bug", desc: "~0.3 cal/rep. Lumbar pegada al suelo.", cal: 20, type: "Core", unit: "Series de 20", baseVal: 4 },
+        // === CARDIO (ampliación) ===
+        { name: "Elíptica", desc: "Ritmo moderado. Quema ~9 cal/min (90kg).", cal: 270, type: "Cardio", unit: "Minutos", baseVal: 30 },
+        { name: "Remo en Máquina (Ergómetro)", desc: "Cuerpo completo. ~11 cal/min.", cal: 220, type: "Cardio", unit: "Minutos", baseVal: 20 },
+        { name: "Escalera (StairMaster)", desc: "Sube sin apoyarte de más. ~10 cal/min.", cal: 200, type: "Cardio", unit: "Minutos", baseVal: 20 },
+        { name: "Spinning / Bici Indoor", desc: "Clase o libre. ~11 cal/min.", cal: 330, type: "Cardio", unit: "Minutos", baseVal: 30 },
+        { name: "Caminadora con Inclinación 12%", desc: "6 km/h con inclinación. ~9 cal/min.", cal: 270, type: "Cardio", unit: "Minutos", baseVal: 30 },
+        // === HIIT (ampliación) ===
+        { name: "Box Jumps", desc: "~1 cal/salto. Aterriza suave.", cal: 60, type: "HIIT", unit: "Series de 12", baseVal: 4 },
+        { name: "Wall Balls", desc: "~0.8 cal/rep. Sentadilla + lanzamiento.", cal: 50, type: "HIIT", unit: "Series de 15", baseVal: 4 },
+        { name: "Thrusters", desc: "~1 cal/rep. Sentadilla frontal + press.", cal: 60, type: "HIIT", unit: "Series de 12", baseVal: 4 },
+        { name: "Ball Slams", desc: "~0.8 cal/rep. Azota el balón con todo.", cal: 45, type: "HIIT", unit: "Series de 15", baseVal: 4 }
     ],
     emergency_food: {
         "tacos al pastor": { cal_per_unit: 150, recommendation: "Max 3-4 si saltas una comida. Compensa con 20 min extra de burpees. Ponle mucha salsa y limón." },
