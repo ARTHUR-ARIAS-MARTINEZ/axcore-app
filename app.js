@@ -14,7 +14,88 @@ document.addEventListener('DOMContentLoaded', () => {
     const liveDateEl = document.getElementById('live-date');
     const navLinks = document.querySelectorAll('.nav-links li');
     const pages = document.querySelectorAll('.page');
-    
+
+    // ═══════════════════════════════════════════════════════════
+    // AVISOS PROPIOS (toast/confirm/prompt) — reemplazan a los
+    // nativos alert/confirm/prompt para NO mostrar el dominio
+    // "usuario.github.io dice:" en el recuadro.
+    // ═══════════════════════════════════════════════════════════
+    function axToast(msg, ms) {
+        const t = document.createElement('div');
+        t.className = 'ax-toast';
+        t.textContent = String(msg == null ? '' : msg);
+        document.body.appendChild(t);
+        requestAnimationFrame(() => t.classList.add('show'));
+        const txt = String(msg || '');
+        const dur = ms || (txt.length > 60 ? 4200 : 2600);
+        setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, dur);
+    }
+    function axConfirm(msg, opts) {
+        opts = opts || {};
+        return new Promise((resolve) => {
+            const ov = document.createElement('div');
+            ov.className = 'ax-modal-ov';
+            ov.innerHTML =
+                '<div class="ax-modal">' +
+                    '<div class="ax-modal-msg"></div>' +
+                    '<div class="ax-modal-btns">' +
+                        '<button class="ax-modal-btn ax-cancel"></button>' +
+                        '<button class="ax-modal-btn ax-ok"></button>' +
+                    '</div>' +
+                '</div>';
+            ov.querySelector('.ax-modal-msg').textContent = String(msg || '');
+            ov.querySelector('.ax-cancel').textContent = opts.cancel || 'CANCELAR';
+            const okBtn = ov.querySelector('.ax-ok');
+            okBtn.textContent = opts.ok || 'ACEPTAR';
+            if (opts.danger) okBtn.classList.add('danger');
+            document.body.appendChild(ov);
+            requestAnimationFrame(() => ov.classList.add('show'));
+            const done = (v) => { ov.classList.remove('show'); setTimeout(() => ov.remove(), 200); resolve(v); };
+            okBtn.onclick = () => done(true);
+            ov.querySelector('.ax-cancel').onclick = () => done(false);
+            ov.onclick = (e) => { if (e.target === ov) done(false); };
+        });
+    }
+    function axPrompt(msg, def) {
+        return new Promise((resolve) => {
+            const ov = document.createElement('div');
+            ov.className = 'ax-modal-ov';
+            ov.innerHTML =
+                '<div class="ax-modal">' +
+                    '<div class="ax-modal-msg"></div>' +
+                    '<textarea class="ax-modal-input"></textarea>' +
+                    '<div class="ax-modal-btns">' +
+                        '<button class="ax-modal-btn ax-cancel">CANCELAR</button>' +
+                        '<button class="ax-modal-btn ax-ok">GUARDAR</button>' +
+                    '</div>' +
+                '</div>';
+            ov.querySelector('.ax-modal-msg').textContent = String(msg || '');
+            const inp = ov.querySelector('.ax-modal-input');
+            inp.value = def == null ? '' : String(def);
+            inp.rows = Math.min(12, Math.max(2, String(def || '').split('\n').length));
+            document.body.appendChild(ov);
+            requestAnimationFrame(() => { ov.classList.add('show'); inp.focus(); });
+            const done = (v) => { ov.classList.remove('show'); setTimeout(() => ov.remove(), 200); resolve(v); };
+            ov.querySelector('.ax-ok').onclick = () => done(inp.value);
+            ov.querySelector('.ax-cancel').onclick = () => done(null);
+            ov.onclick = (e) => { if (e.target === ov) done(null); };
+        });
+    }
+    window.axToast = axToast; window.axConfirm = axConfirm; window.axPrompt = axPrompt;
+
+    // Comidas del plan (fuente única). Se conservan las claves antiguas
+    // (breakfast/lunch/dinner/snacks) para no perder dietas ya guardadas.
+    const MEAL_SLOTS = [
+        { key: 'breakfast',    name: 'DESAYUNO',       icon: '🌅' },
+        { key: 'midmorning',   name: 'MEDIA MAÑANA',   icon: '🥤' },
+        { key: 'lunch',        name: 'COMIDA',         icon: '☀️' },
+        { key: 'midafternoon', name: 'MEDIA TARDE',    icon: '🍎' },
+        { key: 'preworkout',   name: 'PRE-ENTRENO',    icon: '⚡' },
+        { key: 'postworkout',  name: 'POST-ENTRENO',   icon: '💪' },
+        { key: 'dinner',       name: 'CENA',           icon: '🌙' },
+        { key: 'snacks',       name: 'SNACK OPCIONAL', icon: '🥕' }
+    ];
+
     const themeBtns = document.querySelectorAll('.theme-buttons .theme-btn');
     const saveSettingsBtn = document.getElementById('save-settings');
     const saveMeasurementsBtn = document.getElementById('save-measurements');
@@ -30,13 +111,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const overlayEl = document.getElementById('meal-modal-overlay');
         
         if (titleEl) {
-            const names = {
-                breakfast: 'DESAYUNO',
-                lunch: 'COMIDA',
-                dinner: 'CENA',
-                snacks: 'SNACKS'
-            };
-            titleEl.textContent = names[mealType] || 'COMIDA';
+            const slot = MEAL_SLOTS.find(s => s.key === mealType);
+            titleEl.textContent = slot ? slot.name : 'COMIDA';
         }
         if (textareaEl) {
             textareaEl.value = diet[mealType] || '';
@@ -277,6 +353,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!userData.foodLogToday) userData.foodLogToday = [];
             if (!userData.workoutLogToday) userData.workoutLogToday = [];
             if (!userData.forearm) userData.forearm = 0;
+            if (!userData.back) userData.back = 0;
             if (!userData.achievements) userData.achievements = [];
             // Normalizar: si userName está vacío O es un placeholder genérico,
             // usar username de login, persistencia separada, o currentUser como fallback
@@ -463,7 +540,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             // Otro dispositivo inició sesión — forzar cierre aquí
                             clearApiToken();
                             localStorage.removeItem('arthur_current_user');
-                            alert('⚠️ Tu cuenta fue abierta en otro dispositivo.\nEsta sesión se ha cerrado para proteger tu cuenta.');
+                            axToast('⚠️ Tu cuenta fue abierta en otro dispositivo.\nEsta sesión se ha cerrado para proteger tu cuenta.');
                             location.reload();
                             return;
                         }
@@ -560,7 +637,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const showErr = (msg) => {
             if (errDiv) { errDiv.textContent = msg; errDiv.style.display = 'block'; }
-            else alert(msg);
+            else axToast(msg);
         };
 
         if (errDiv) errDiv.style.display = 'none';
@@ -579,7 +656,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         if (localStorage.getItem(`arthur_data_${u}`)) {
-            if (!confirm("Ya existe un usuario con ese nombre en este dispositivo.\n¿Deseas reemplazarlo con una cuenta nueva?")) {
+            if (!(await axConfirm("Ya existe un usuario con ese nombre en este dispositivo. ¿Deseas reemplazarlo con una cuenta nueva?", { ok: 'REEMPLAZAR', danger: true }))) {
                 return;
             }
         }
@@ -667,7 +744,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const u = loginUser.value.trim();
         const p = loginPass.value.trim();
         if (u.length < 3 || p.length < 4) {
-            alert("Usuario y contraseña requeridos.");
+            axToast("Usuario y contraseña requeridos.");
             return;
         }
 
@@ -706,7 +783,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     return;
                 } else {
                     // Mensaje del backend (ej. franquicia sin pago)
-                    alert(data.message || "Credenciales incorrectas.");
+                    axToast(data.message || "Credenciales incorrectas.");
                     btn.textContent = originalText;
                     btn.disabled = false;
                     return;
@@ -719,13 +796,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 3. Login local (DEMO o fallback offline)
         if (!savedLocal) {
-            alert("Usuario no encontrado en este dispositivo.\nUsa NUEVO ATLETA para crear cuenta.");
+            axToast("Usuario no encontrado en este dispositivo.\nUsa NUEVO ATLETA para crear cuenta.");
             btn.textContent = originalText; btn.disabled = false;
             return;
         }
         const storedCred = (savedLocal.passHash != null) ? savedLocal.passHash : savedLocal.password;
         if (!(await window.axPassVerify(storedCred, p))) {
-            alert("Contraseña incorrecta.");
+            axToast("Contraseña incorrecta.");
             btn.textContent = originalText; btn.disabled = false;
             return;
         }
@@ -1255,7 +1332,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ── Helpers modal contraseña ──────────────────────────────────────────────
     window.pmChangePassword = function() {
         const modal = document.getElementById('pm-pass-modal');
-        if (!modal) { alert('Función de cambio de contraseña no disponible.'); return; }
+        if (!modal) { axToast('Función de cambio de contraseña no disponible.'); return; }
         // Limpiar campos
         ['pm-pass-current','pm-pass-new','pm-pass-new2'].forEach(id => {
             const el = document.getElementById(id);
@@ -1562,7 +1639,7 @@ document.addEventListener('DOMContentLoaded', () => {
     navLinks.forEach(link => {
         link.onclick = async (e) => {
             if (link.id === 'nav-logout') {
-                if (confirm("¿Cerrar sesión táctica en AX-CORE?")) {
+                if (await axConfirm("¿Cerrar sesión táctica en AX-CORE?", { ok: 'CERRAR SESIÓN', danger: true })) {
                     // Invalidar sesión en el servidor para liberar el dispositivo
                     if (apiToken()) {
                         try {
@@ -1853,6 +1930,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <td style="padding:1rem;">${h.glute || 0} cm</td>
                     <td style="padding:1rem;">${h.neck || 0} cm</td>
                     <td style="padding:1rem;">${h.forearm || 0} cm</td>
+                    <td style="padding:1rem;">${h.back || 0} cm</td>
                     <td style="padding:1rem; color:${diffColor}; font-weight:bold;">${diff > 0 ? '+'+diff : diff} kg</td>
                     <td style="padding:1rem;">
                         <button class="btn-cancel" style="padding:2px 6px; font-size:0.6rem; background:transparent; border:1px solid var(--accent-alert); color:var(--accent-alert); border-radius:4px;" onclick="deleteHistoryRow(${filtered.length - 1 - i})">X</button>
@@ -1872,10 +1950,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const gl = parseFloat(document.getElementById('log-glute').value) || 0;
             const nk = parseFloat(document.getElementById('log-neck').value) || 0;
             const fr = parseFloat(document.getElementById('log-forearm').value) || 0;
+            const bk = parseFloat(document.getElementById('log-back').value) || 0;
 
-            if (!w && !ws) { alert("Al menos ingresa Peso o Cintura."); return; }
+            if (!w && !ws) { axToast("Al menos ingresa Peso o Cintura."); return; }
 
-            const rec = { date: new Date().toLocaleDateString('es-MX'), weight: w, waist: ws, bicep: bc, leg: lg, chest: ch, hip: hp, calf: cf, glute: gl, neck: nk, forearm: fr };
+            const rec = { date: new Date().toLocaleDateString('es-MX'), weight: w, waist: ws, bicep: bc, leg: lg, chest: ch, hip: hp, calf: cf, glute: gl, neck: nk, forearm: fr, back: bk };
             userData.history.push(rec);
             if (w) userData.weight = w;
             if (ws) userData.waist = ws;
@@ -1887,20 +1966,21 @@ document.addEventListener('DOMContentLoaded', () => {
             if (gl) userData.glute = gl;
             if (nk) userData.neck = nk;
             if (fr) userData.forearm = fr;
+            if (bk) userData.back = bk;
             saveData();
             updateDashboard();
             renderEvolutionPage(filter);
             if (typeof checkAchievements === 'function') checkAchievements();
             // Limpiar inputs
-            ['log-weight','log-waist','log-bicep','log-leg','log-chest','log-hip','log-calf','log-glute','log-neck','log-forearm'].forEach(id => {
+            ['log-weight','log-waist','log-bicep','log-leg','log-chest','log-hip','log-calf','log-glute','log-neck','log-forearm','log-back'].forEach(id => {
                 const el = document.getElementById(id);
                 if(el) el.value = '';
             });
-            alert("Medidas guardadas con éxito.");
+            axToast("Medidas guardadas con éxito.");
         };
 
-        window.deleteHistoryRow = (realIndex) => {
-            if (confirm("¿Eliminar este registro de evolución?")) {
+        window.deleteHistoryRow = async (realIndex) => {
+            if (await axConfirm("¿Eliminar este registro de evolución?", { ok: 'ELIMINAR', danger: true })) {
                 userData.history.splice(realIndex, 1);
                 saveData();
                 renderEvolutionPage(filter);
@@ -1916,25 +1996,66 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- DIET PAGE ---
     function parseDietText(text) {
-        const result = { breakfast: '', lunch: '', dinner: '', snacks: '', recommendations: '' };
+        // Detectores de encabezado en ORDEN DE PRIORIDAD. Los específicos van
+        // primero para que "media mañana" no caiga en "mañana", "snack opcional
+        // (noche)" no caiga en "cena", "post entreno" no caiga en "entreno", etc.
+        const MATCHERS = [
+            { key: 'midmorning',      re: /media\s*ma(?:ñ|n)ana|colaci(?:o|ó)n\s*matutina/ },
+            { key: 'midafternoon',    re: /media\s*tarde|colaci(?:o|ó)n\s*vespertina/ },
+            { key: 'preworkout',      re: /pre[\s-]*entren|pre[\s-]*workout|antes\s*de\s*entrenar/ },
+            { key: 'postworkout',     re: /post[\s-]*entren|post[\s-]*workout|despu(?:e|é)s\s*de\s*entrenar|post[\s-]*ejercicio/ },
+            { key: 'snacks',          re: /snack\s*opcional|snack|colaci(?:o|ó)n|merienda|tentempi(?:e|é)|refrigerio|botana|extras/ },
+            { key: 'breakfast',       re: /desayuno|breakfast|en\s*ayunas|ma(?:ñ|n)ana/ },
+            { key: 'lunch',           re: /comida\s*fuerte|comida|almuerzo|lunch|mediod(?:i|í)a/ },
+            { key: 'dinner',          re: /cena|dinner|noche/ },
+            { key: 'recommendations', re: /recomend|regla|consejo|tips|indicacion|protocolo|importante/ }
+        ];
+        const result = {};
+        MATCHERS.forEach(m => { result[m.key] = ''; });
         const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
         let current = null;
         for (const line of lines) {
             const low = line.toLowerCase();
-            if (/desayuno|breakfast|mañana/i.test(low)) { current = 'breakfast'; result.breakfast += line.replace(/.*?[:：]\s*/,'') + '\n'; continue; }
-            if (/comida|almuerzo|lunch|mediod[ií]a/i.test(low)) { current = 'lunch'; result.lunch += line.replace(/.*?[:：]\s*/,'') + '\n'; continue; }
-            if (/cena|dinner|noche/i.test(low)) { current = 'dinner'; result.dinner += line.replace(/.*?[:：]\s*/,'') + '\n'; continue; }
-            if (/snack|merienda|colaci[oó]n|tentempié|refrigerio|botana|extras/i.test(low)) { current = 'snacks'; result.snacks += line.replace(/.*?[:：]\s*/,'') + '\n'; continue; }
-            if (/recomend|reglas?|consejo|tips|indicaciones|protocolo|importante/i.test(low)) { current = 'recommendations'; result.recommendations += line.replace(/.*?[:：]\s*/,'') + '\n'; continue; }
+            const head = low.slice(0, 30);
+            // Una línea es ENCABEZADO si la palabra clave aparece al inicio Y además
+            // la línea es corta (título suelto) o trae separador ":"/"-" (Título: contenido).
+            const sep = line.match(/^(.{0,30}?)\s*[:：\-–—]\s*(.*)$/);
+            const isShort = line.length <= 26;
+            let matched = false;
+            for (const m of MATCHERS) {
+                if (m.re.test(head) && (sep || isShort)) {
+                    current = m.key;
+                    const rest = sep ? sep[2].trim() : '';
+                    if (rest) result[m.key] += rest + '\n';
+                    matched = true;
+                    break;
+                }
+            }
+            if (matched) continue;
             if (current) result[current] += line + '\n';
         }
-        return {
-            breakfast: result.breakfast.trim(),
-            lunch: result.lunch.trim(),
-            dinner: result.dinner.trim(),
-            snacks: result.snacks.trim(),
-            recommendations: result.recommendations.trim()
-        };
+        const out = {};
+        MATCHERS.forEach(m => { out[m.key] = (result[m.key] || '').trim(); });
+        return out;
+    }
+
+    // Detecta las calorías reales escritas en el texto de la dieta.
+    // Si hay una línea con "total", usa ese número; si no, suma las menciones "kcal".
+    function extractDietCalories(text) {
+        const num = (s) => parseInt(String(s).replace(/[.,\s]/g, ''), 10);
+        const totalLine = text.split('\n').find(l => /total/i.test(l) && /\d/.test(l));
+        if (totalLine) {
+            const mt = totalLine.match(/(\d[\d.,\s]{1,6})\s*k?cal/i) || totalLine.match(/(\d[\d.,]{2,6})/);
+            if (mt) { const v = num(mt[1]); if (v >= 500 && v <= 8000) return v; }
+        }
+        let sum = 0, count = 0, mm;
+        const re = /(\d[\d.,\s]{1,6})\s*k?cal/gi;
+        while ((mm = re.exec(text)) !== null) {
+            const v = num(mm[1]);
+            if (v > 0 && v < 3000) { sum += v; count++; }
+        }
+        if (count >= 2 && sum >= 800 && sum <= 8000) return sum;
+        return 0;
     }
 
     function renderDietPage() {
@@ -1977,35 +2098,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 <!-- PESTAÑAS -->
                 <div class="pm-d-tabs">
-                    <div class="pm-d-tab on" data-d-tab="plan">MI PLAN</div>
                     <div class="pm-d-tab" data-d-tab="log">REGISTRAR</div>
+                    <div class="pm-d-tab on" data-d-tab="plan">MI PLAN</div>
                     <div class="pm-d-tab" data-d-tab="rules">REGLAS</div>
                 </div>
 
                 <!-- ─── TAB MI PLAN ─── -->
                 <div class="pm-d-panel on" id="pmDt-plan">
-                    <div class="pm-d-meal ${diet.breakfast ? 'has-content' : ''}" data-meal="breakfast">
-                        <div class="pm-d-meal-hdr"><span class="pm-d-meal-name">🌅 DESAYUNO</span><span class="pm-d-meal-icon">⛶</span></div>
-                        <div class="pm-d-meal-body">${formatMealText(diet.breakfast)}</div>
-                    </div>
-                    <div class="pm-d-meal ${diet.lunch ? 'has-content' : ''}" data-meal="lunch">
-                        <div class="pm-d-meal-hdr"><span class="pm-d-meal-name">☀️ COMIDA</span><span class="pm-d-meal-icon">⛶</span></div>
-                        <div class="pm-d-meal-body">${formatMealText(diet.lunch)}</div>
-                    </div>
-                    <div class="pm-d-meal ${diet.dinner ? 'has-content' : ''}" data-meal="dinner">
-                        <div class="pm-d-meal-hdr"><span class="pm-d-meal-name">🌙 CENA</span><span class="pm-d-meal-icon">⛶</span></div>
-                        <div class="pm-d-meal-body">${formatMealText(diet.dinner)}</div>
-                    </div>
-                    <div class="pm-d-meal ${diet.snacks ? 'has-content' : ''}" data-meal="snacks">
-                        <div class="pm-d-meal-hdr"><span class="pm-d-meal-name">🥕 SNACKS</span><span class="pm-d-meal-icon">⛶</span></div>
-                        <div class="pm-d-meal-body">${formatMealText(diet.snacks)}</div>
-                    </div>
+                    <div class="pm-d-plan-hint">Toca una comida para ver su contenido · el lápiz ✎ para editarla</div>
+                    ${MEAL_SLOTS.map(m => {
+                        const has = (diet[m.key] || '').trim();
+                        return `
+                    <div class="pm-d-meal ${has ? 'has-content' : ''}" data-meal="${m.key}">
+                        <div class="pm-d-meal-hdr">
+                            <span class="pm-d-meal-name">${m.icon} ${m.name}</span>
+                            <span class="pm-d-meal-actions">
+                                <button class="pm-d-meal-edit" data-edit="${m.key}" title="Editar" aria-label="Editar">✎</button>
+                                <span class="pm-d-meal-chev">▸</span>
+                            </span>
+                        </div>
+                        <div class="pm-d-meal-body" hidden>${formatMealText(diet[m.key])}</div>
+                    </div>`;
+                    }).join('')}
 
                     <!-- INGRESO AUTOMÁTICO DE DIETA -->
                     <div class="pm-diet-import-card">
                         <div class="pm-diet-import-title">📥 INGRESO DE DIETA COMPLETA</div>
-                        <div class="pm-diet-import-sub">Pega tu plan completo. El sistema lo distribuye en Desayuno · Comida · Cena · Snacks · Recomendaciones automáticamente.</div>
-                        <textarea class="pm-diet-import-area" id="diet-full-import" placeholder="Ejemplo:&#10;Desayuno: 3 huevos revueltos + tortilla&#10;Comida: pechuga 200g + arroz integral + ensalada&#10;Cena: 2 tortillas con verduras&#10;Snacks: 1 manzana, 30g nueces&#10;Recomendaciones: 3L agua, ayuno 6PM-7AM"></textarea>
+                        <div class="pm-diet-import-sub">Pega tu plan completo. Lo distribuyo en Desayuno · Media mañana · Comida · Media tarde · Pre-entreno · Post-entreno · Cena · Snack · Recomendaciones, y detecto las calorías automáticamente.</div>
+                        <textarea class="pm-diet-import-area" id="diet-full-import" placeholder="Ejemplo:&#10;Desayuno: 2 huevos + 4 claras + 2 tortillas (~470 kcal)&#10;Media mañana: 200g yogur griego + 1 fruta (~250 kcal)&#10;Comida: pechuga 200g + arroz + ensalada (~620 kcal)&#10;Media tarde: 30g nueces&#10;Post-entreno: 1 scoop proteína (~150 kcal)&#10;Cena: 200g pollo + camote + verduras (~450 kcal)&#10;Snack: 150g cottage&#10;Recomendaciones: 3L agua, 8000 pasos"></textarea>
                         <button class="pm-diet-import-btn" id="btn-distribute-diet">⚡ DISTRIBUIR AUTOMÁTICAMENTE</button>
                     </div>
                     <button class="btn-premium pm-d-reset" id="btn-reset-diet" style="width:100%; margin-top:14px; background:transparent; border:1px solid rgba(255,51,102,.4); color:#ff3366;">🗑️ REINICIAR DIETA</button>
@@ -2049,21 +2169,28 @@ document.addEventListener('DOMContentLoaded', () => {
             };
         });
 
-        // ─── Click en meal card: abre modal de comida a pantalla completa ───
-        dietEl.querySelectorAll('.pm-d-meal').forEach(card => {
-            card.onclick = () => {
-                openMealModal(card.dataset.meal);
+        // ─── Acordeón: el encabezado despliega/oculta el contenido; el lápiz edita ───
+        dietEl.querySelectorAll('.pm-d-meal-hdr').forEach(hdr => {
+            hdr.onclick = (e) => {
+                if (e.target.closest('.pm-d-meal-edit')) return; // el lápiz no despliega
+                const card = hdr.closest('.pm-d-meal');
+                const body = card.querySelector('.pm-d-meal-body');
+                if (body.hasAttribute('hidden')) { body.removeAttribute('hidden'); card.classList.add('open'); }
+                else { body.setAttribute('hidden', ''); card.classList.remove('open'); }
             };
+        });
+        dietEl.querySelectorAll('.pm-d-meal-edit').forEach(btn => {
+            btn.onclick = (e) => { e.stopPropagation(); openMealModal(btn.dataset.edit); };
         });
 
         // Editar reglas de protocolo
         const btnEditRules = document.getElementById('btn-edit-rules');
         if (btnEditRules) {
-            btnEditRules.onclick = () => {
+            btnEditRules.onclick = async () => {
                 const current = (userData.customDietRules && userData.customDietRules.length > 0)
                     ? userData.customDietRules
                     : rules;
-                const text = prompt("Edita tus reglas de protocolo (una por línea):", current.join('\n'));
+                const text = await axPrompt("Edita tus reglas de protocolo (una por línea):", current.join('\n'));
                 if (text === null) return;
                 const newRules = text.split('\n').map(s => s.trim()).filter(Boolean);
                 userData.customDietRules = newRules;
@@ -2075,36 +2202,40 @@ document.addEventListener('DOMContentLoaded', () => {
         // Distribuir dieta completa automáticamente y guardar de inmediato
         document.getElementById('btn-distribute-diet').onclick = () => {
             const raw = document.getElementById('diet-full-import').value.trim();
-            if (!raw) { alert('Escribe o pega tu dieta primero.'); return; }
+            if (!raw) { axToast('Escribe o pega tu dieta primero.'); return; }
             const parsed = parseDietText(raw);
-            const hasData = parsed.breakfast || parsed.lunch || parsed.dinner || parsed.snacks || parsed.recommendations;
+            const mealKeys = MEAL_SLOTS.map(s => s.key);
+            const hasData = mealKeys.some(k => parsed[k]) || parsed.recommendations;
             if (!hasData) {
-                alert('No se encontraron secciones reconocibles.\nUsa palabras como "Desayuno:", "Comida:", "Cena:", "Snacks:", "Recomendaciones:" para que la app las detecte.');
+                axToast('No reconocí secciones. Usa encabezados como "Desayuno:", "Media mañana:", "Comida:", "Media tarde:", "Pre-entreno:", "Post-entreno:", "Cena:", "Snack:", "Recomendaciones:".');
                 return;
             }
-            if (parsed.breakfast) userData.recommendedDiet.breakfast = parsed.breakfast;
-            if (parsed.lunch)     userData.recommendedDiet.lunch = parsed.lunch;
-            if (parsed.dinner)    userData.recommendedDiet.dinner = parsed.dinner;
-            if (parsed.snacks)    userData.recommendedDiet.snacks = parsed.snacks;
-            
+            if (!userData.recommendedDiet) userData.recommendedDiet = {};
+            mealKeys.forEach(k => { if (parsed[k]) userData.recommendedDiet[k] = parsed[k]; });
+
             // Recomendaciones detectadas → se convierten en reglas custom
             if (parsed.recommendations) {
                 const newRules = parsed.recommendations.split('\n').map(l => l.trim()).filter(l => l.length > 3);
-                if (newRules.length > 0) {
-                    userData.customDietRules = newRules;
-                }
+                if (newRules.length > 0) userData.customDietRules = newRules;
             }
+
+            // Calorías reales detectadas en el texto → límite diario
+            const kcal = extractDietCalories(raw);
+            let calMsg = '';
+            if (kcal > 0) { userData.dailyCalLimit = kcal; calMsg = ' · Detecté ~' + kcal.toLocaleString() + ' kcal y las puse como tu límite diario'; }
+
             saveData();
             document.getElementById('diet-full-import').value = '';
             renderDietPage();
-            const recsMsg = parsed.recommendations ? '\n💡 También detecté reglas/recomendaciones y se guardaron como reglas custom.' : '';
-            alert('✅ Dieta distribuida y guardada de inmediato.' + recsMsg);
+            if (typeof checkAchievements === 'function') checkAchievements();
+            const recsMsg = parsed.recommendations ? ' · Guardé también reglas/recomendaciones' : '';
+            axToast('✅ Dieta distribuida y guardada' + calMsg + recsMsg + '.');
         };
 
         const btnResetDiet = document.getElementById('btn-reset-diet');
         if (btnResetDiet) {
-            btnResetDiet.onclick = () => {
-                if (confirm("¿Estás seguro de borrar toda la dieta actual y sus reglas para empezar desde cero?")) {
+            btnResetDiet.onclick = async () => {
+                if (await axConfirm("¿Estás seguro de borrar toda la dieta actual y sus reglas para empezar desde cero?", { ok: 'BORRAR TODO', danger: true })) {
                     userData.recommendedDiet = { breakfast: '', lunch: '', dinner: '', snacks: '' };
                     userData.customDietRules = [];
                     saveData();
@@ -2113,7 +2244,7 @@ document.addEventListener('DOMContentLoaded', () => {
             };
         }
 
-        document.getElementById('btn-add-food').onclick = () => {
+        document.getElementById('btn-add-food').onclick = async () => {
             const desc = document.getElementById('food-desc').value.trim();
             if (!desc) return;
 
@@ -2155,7 +2286,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 registerFood(desc, estimatedCal, calLimit, calUsed);
             } else {
                 // Sin match: pedir kcal al usuario y persistirlo en su DB personal
-                const input = prompt(`No tengo "${desc}" en mi base de alimentos.\n\n¿Cuántas kcal aproximadas tiene?\n(Lo guardaré para que la próxima vez lo encuentre solo)`);
+                const input = await axPrompt(`No tengo "${desc}" en mi base de alimentos.\n\n¿Cuántas kcal aproximadas tiene? (solo el número)`);
                 if (input === null) {
                     btn.textContent = "REGISTRAR";
                     btn.disabled = false;
@@ -2163,7 +2294,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 const manualCal = parseInt(String(input).replace(/[^0-9]/g, ""));
                 if (isNaN(manualCal) || manualCal <= 0 || manualCal > 5000) {
-                    alert("Valor inválido. Escribe un número entre 1 y 5000.");
+                    axToast("Valor inválido. Escribe un número entre 1 y 5000.");
                     return;
                 }
                 estimatedCal = manualCal;
@@ -2176,11 +2307,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Quitar una comida ya registrada hoy y DESHACER su efecto en el contador
         // de calorías y en el déficit (revierte exactamente lo que hizo registerFood).
-        window.deleteFoodLog = function(i) {
+        window.deleteFoodLog = async function(i) {
             const list = Array.isArray(userData.foodLogToday) ? userData.foodLogToday : [];
             const item = list[i];
             if (!item) return;
-            if (!confirm(`¿Quitar "${item.desc}" (${item.cal || 0} kcal) del registro de hoy?`)) return;
+            if (!(await axConfirm(`¿Quitar "${item.desc}" (${item.cal || 0} kcal) del registro de hoy?`, { ok: 'QUITAR', danger: true }))) return;
             const cal = +item.cal || 0;
             userData.caloriesConsumedToday = Math.max(0, (+userData.caloriesConsumedToday || 0) - cal);
             userData.totalNetDeficit = (+userData.totalNetDeficit || 0) + Math.round(cal * 0.15); // revierte el ajuste de registerFood
@@ -2212,7 +2343,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 msg += `⚠️ SUPERASTE tu límite diario por ${Math.abs(remaining)} kcal. Compensa con ejercicio.`;
             }
-            alert(msg);
+            axToast(msg);
             const descEl = document.getElementById('food-desc');
             const btn = document.getElementById('btn-add-food');
             if (descEl) descEl.value = "";
@@ -2389,11 +2520,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Quitar un ejercicio registrado hoy y DESHACER las calorías quemadas.
-        window.deleteWorkoutLog = function(i) {
+        window.deleteWorkoutLog = async function(i) {
             const list = Array.isArray(userData.workoutLogToday) ? userData.workoutLogToday : [];
             const item = list[i];
             if (!item) return;
-            if (!confirm(`¿Quitar "${item.name}" (-${item.cal || 0} kcal) del registro de hoy?`)) return;
+            if (!(await axConfirm(`¿Quitar "${item.name}" (-${item.cal || 0} kcal) del registro de hoy?`, { ok: 'QUITAR', danger: true }))) return;
             const cal = +item.cal || 0;
             userData.caloriesBurnedToday = Math.max(0, (+userData.caloriesBurnedToday || 0) - cal);
             userData.totalNetDeficit = (+userData.totalNetDeficit || 0) - cal; // revierte el += de registerExercise
@@ -2490,7 +2621,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('btn-just-record').onclick = () => {
         document.getElementById('sensation-feedback').classList.add('hidden');
-        alert("Sensación registrada en el historial de Arthur.");
+        axToast("Sensación registrada en el historial de Arthur.");
     };
 
     document.getElementById('btn-ask-ai-sensation').onclick = () => {
@@ -2624,7 +2755,8 @@ document.addEventListener('DOMContentLoaded', () => {
         { key:'bicep',   label:'Bíceps',        val:() => (userData.bicep||0)+'cm', default:false },
         { key:'chest',   label:'Pecho',         val:() => (userData.chest||0)+'cm', default:false },
         { key:'leg',     label:'Pierna',        val:() => (userData.leg||0)+'cm', default:false },
-        { key:'hip',     label:'Cadera',        val:() => (userData.hip||0)+'cm', default:false }
+        { key:'hip',     label:'Cadera',        val:() => (userData.hip||0)+'cm', default:false },
+        { key:'back',    label:'Espalda',       val:() => (userData.back||0)+'cm', default:false }
     ];
 
     let studioState = {
@@ -3671,7 +3803,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             hdCanvas.toBlob(async (blob) => {
                 if (!blob) {
-                    alert('Error al generar la imagen.');
+                    axToast('Error al generar la imagen.');
                     return;
                 }
                 const file = new File([blob], 'AX-CORE_Logros.png', { type: 'image/png' });
@@ -3725,7 +3857,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const w = parseFloat(document.getElementById('input-weight').value);
         const ws = parseFloat(document.getElementById('input-waist').value);
         const tw = parseFloat(document.getElementById('input-target-weight').value);
-        if (isNaN(h) || isNaN(w) || isNaN(ws) || isNaN(tw)) return alert("Todos los campos del perfil deben ser numéricos.");
+        if (isNaN(h) || isNaN(w) || isNaN(ws) || isNaN(tw)) return axToast("Todos los campos del perfil deben ser numéricos.");
         userData.height = h;
         userData.weight = w;
         userData.waist = ws;
@@ -3733,11 +3865,11 @@ document.addEventListener('DOMContentLoaded', () => {
         saveData();
         updateDashboard();
         applySettings();
-        alert("Perfil antropométrico actualizado.");
+        axToast("Perfil antropométrico actualizado.");
     };
 
-    document.getElementById('btn-reset-measurements').onclick = () => {
-        if (confirm("¿Seguro que quieres REINICIAR TODO? Se borrarán medidas, historial, dieta y progreso físico. Tu cuenta y API Key permanecerán activas.")) {
+    document.getElementById('btn-reset-measurements').onclick = async () => {
+        if (await axConfirm("¿Seguro que quieres REINICIAR TODO? Se borrarán medidas, historial, dieta y progreso físico. Tu cuenta y API Key permanecerán activas.", { ok: 'REINICIAR', danger: true })) {
             // Reset físico total
             userData.weight = 0;
             userData.waist = 0;
@@ -3751,6 +3883,7 @@ document.addEventListener('DOMContentLoaded', () => {
             userData.glute = 0;
             userData.neck = 0;
             userData.forearm = 0;
+            userData.back = 0;
             userData.history = [];
             userData.recommendedDiet = { breakfast: '', lunch: '', dinner: '', snacks: '' };
             userData.totalNetDeficit = 0;
@@ -3762,7 +3895,7 @@ document.addEventListener('DOMContentLoaded', () => {
             saveData();
             applySettings();
             updateDashboard();
-            alert("SISTEMA REINICIADO: Todos los datos físicos y nutricionales han sido borrados.");
+            axToast("SISTEMA REINICIADO: Todos los datos físicos y nutricionales han sido borrados.");
         }
     };
 
@@ -3770,8 +3903,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // con 5 toques rápidos en el título "SISTEMA ÉLITE" (toque secreto Arthur).
 
 
-    document.getElementById('btn-reset-all').onclick = () => {
-        if (confirm("ESTO ELIMINARÁ TODA TU CUENTA Y DATOS. ¿ESTÁS SEGURO?")) {
+    document.getElementById('btn-reset-all').onclick = async () => {
+        if (await axConfirm("ESTO ELIMINARÁ TODA TU CUENTA Y DATOS. ¿ESTÁS SEGURO?", { ok: 'ELIMINAR CUENTA', danger: true })) {
             localStorage.clear();
             location.reload();
         }
@@ -3928,7 +4061,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 saveData();
                 if (typeof updateDashboard === 'function') updateDashboard();
                 renderCalculatorPage();
-                alert(`✅ Límite diario actualizado: ${limit} kcal/día`);
+                axToast(`✅ Límite diario actualizado: ${limit} kcal/día`);
             };
         };
     }
@@ -4050,10 +4183,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const DEF = () => userData.totalNetDeficit || 0;
     const BURN = () => userData.totalCaloriesBurned || 0;
     const WK = () => userData.totalWorkouts || 0;
+    // Una comida "cuenta" solo si tiene contenido con sentido (evita que letras
+    // sueltas sin sentido desbloqueen el logro). Debe tener espacio/coma/dígito.
+    const mealLooksReal = (t) => {
+        const s = (t || '').trim();
+        if (s.length < 5) return false;
+        return /[\s,]/.test(s) || /\d/.test(s);
+    };
     const dietConfigured = () => {
         const rd = userData.recommendedDiet || {};
-        return !!(rd.breakfast || rd.lunch || rd.dinner || rd.snacks) ||
-               (Array.isArray(userData.customDietRules) && userData.customDietRules.length > 0);
+        // Exige la dieta COMPLETA: las 3 comidas principales con contenido real.
+        const core = ['breakfast', 'lunch', 'dinner'];
+        return core.every(k => mealLooksReal(rd[k]));
     };
     const ACHIEVEMENTS_DEF = [
         // ─── INICIO (10) ───
@@ -4113,7 +4254,7 @@ document.addEventListener('DOMContentLoaded', () => {
         { id:'meas_10',   icon:'📐', title:'10 MEDICIONES', desc:'10 mediciones.',          t:2, cat:'medidas', check:()=>H().length>=10 },
         { id:'meas_25',   icon:'📐', title:'25 MEDICIONES', desc:'25 mediciones.',          t:3, cat:'medidas', check:()=>H().length>=25 },
         { id:'meas_50',   icon:'📐', title:'50 MEDICIONES', desc:'50 mediciones.',          t:4, cat:'medidas', check:()=>H().length>=50 },
-        { id:'meas_full', icon:'🧍', title:'CUERPO COMPLETO', desc:'Registraste todas tus medidas en un día.', t:3, cat:'medidas', check:()=>H().some(h=>+h.bicep>0&&+h.leg>0&&+h.chest>0&&+h.hip>0&&+h.calf>0&&+h.glute>0&&+h.neck>0&&+h.forearm>0) },
+        { id:'meas_full', icon:'🧍', title:'CUERPO COMPLETO', desc:'Registraste todas tus medidas en un día.', t:3, cat:'medidas', check:()=>H().some(h=>+h.bicep>0&&+h.leg>0&&+h.chest>0&&+h.hip>0&&+h.calf>0&&+h.glute>0&&+h.neck>0&&+h.forearm>0&&+h.back>0) },
         // ─── EJERCICIO (16) — calorías quemadas acumuladas y # de ejercicios ───
         { id:'burn_100',    icon:'🔥', title:'100 KCAL',    desc:'Quemaste 100 kcal.',       t:1, cat:'ejercicio', check:()=>BURN()>=100 },
         { id:'burn_500',    icon:'🔥', title:'500 KCAL',    desc:'Quemaste 500 kcal.',       t:1, cat:'ejercicio', check:()=>BURN()>=500 },

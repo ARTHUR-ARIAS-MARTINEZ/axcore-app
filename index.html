@@ -8,9 +8,9 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0a0e14">
     <link rel="apple-touch-icon" href="logo.png">
-    <link rel="stylesheet" href="index.css?v=20260705a">
+    <link rel="stylesheet" href="index.css?v=20260705b">
     <!-- Premium UI overrides (inerte si <body> NO tiene .premium-mode) -->
-    <link rel="stylesheet" href="premium.css?v=20260705a">
+    <link rel="stylesheet" href="premium.css?v=20260705b">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <!-- Fuentes: Inter para cuerpos de texto, Oswald (Heavy Gym) para titulares -->
@@ -23,6 +23,27 @@
       .meas-help-pop strong{display:block;color:var(--accent-main,#00c97a);font-size:.72rem;letter-spacing:.6px;margin-bottom:5px;font-family:var(--font-accent,Oswald,sans-serif);}
       .meas-help-pop span{display:block;font-size:.78rem;line-height:1.45;}
       @keyframes measHelpIn{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+      /* ── Avisos propios (toast) — sin mostrar el dominio ── */
+      .ax-toast{position:fixed;bottom:88px;left:50%;transform:translateX(-50%) translateY(10px);max-width:88vw;background:var(--pm-s1,#0d1826);color:var(--text-primary,#e8edf5);border:1px solid var(--accent-main,#00c97a);border-left:4px solid var(--accent-main,#00c97a);border-radius:12px;padding:12px 18px;font-family:var(--font-main,sans-serif);font-size:.85rem;line-height:1.4;white-space:pre-line;box-shadow:0 12px 40px rgba(0,0,0,.5);z-index:100001;opacity:0;transition:opacity .25s ease,transform .25s ease;pointer-events:none;text-align:center;}
+      .ax-toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+      /* ── Confirm/Prompt propios ── */
+      .ax-modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;padding:24px;z-index:100002;opacity:0;transition:opacity .18s ease;}
+      .ax-modal-ov.show{opacity:1;}
+      .ax-modal{width:100%;max-width:360px;background:var(--pm-s1,#0d1826);border:1px solid var(--glass-border,rgba(255,255,255,.12));border-radius:16px;padding:22px 20px;box-shadow:0 20px 60px rgba(0,0,0,.6);transform:translateY(8px) scale(.98);transition:transform .18s ease;}
+      .ax-modal-ov.show .ax-modal{transform:translateY(0) scale(1);}
+      .ax-modal-msg{color:var(--text-primary,#e8edf5);font-family:var(--font-main,sans-serif);font-size:.92rem;line-height:1.5;white-space:pre-line;margin-bottom:16px;}
+      .ax-modal-input{width:100%;background:var(--pm-s2,#111f30);border:1px solid var(--pm-dim,#3d5570);border-radius:10px;color:var(--text-primary,#e8edf5);font-family:var(--font-main,sans-serif);font-size:.9rem;padding:10px 12px;margin-bottom:16px;resize:vertical;box-sizing:border-box;}
+      .ax-modal-btns{display:flex;gap:10px;}
+      .ax-modal-btn{flex:1;padding:11px 14px;border-radius:10px;font-family:var(--font-accent,Oswald,sans-serif);font-size:.82rem;letter-spacing:.5px;font-weight:700;cursor:pointer;border:1px solid var(--pm-dim,#3d5570);background:transparent;color:var(--text-primary,#e8edf5);}
+      .ax-modal-btn.ax-ok{background:var(--accent-main,#00c97a);border-color:var(--accent-main,#00c97a);color:#04120b;}
+      .ax-modal-btn.ax-ok.danger{background:#ff3b5c;border-color:#ff3b5c;color:#fff;}
+      /* ── Acordeón de comidas (Mi Plan): por defecto solo el nombre ── */
+      .pm-d-plan-hint{font-size:.72rem;color:var(--text-dim,#7f93a8);text-align:center;margin-bottom:10px;font-style:italic;}
+      .pm-d-meal-body[hidden]{display:none !important;}
+      .pm-d-meal-actions{display:inline-flex;align-items:center;gap:10px;}
+      .pm-d-meal-edit{background:transparent;border:none;color:var(--accent-main,#00c97a);font-size:1rem;cursor:pointer;padding:2px 4px;line-height:1;}
+      .pm-d-meal-chev{display:inline-block;transition:transform .2s ease;color:var(--text-dim,#7f93a8);font-size:.9rem;}
+      .pm-d-meal.open .pm-d-meal-chev{transform:rotate(90deg);color:var(--accent-main,#00c97a);}
     </style>
 </head>
 <body data-theme="neon" class="premium-mode">
@@ -693,6 +714,10 @@
                             <label>ANTEBRAZO (CM) <span class="meas-help" data-title="ANTEBRAZO" data-help="Contorno del antebrazo en su parte más gruesa (unos dedos por debajo del codo), con el brazo extendido y relajado. Es distinto del bíceps porque mide POR DEBAJO del codo.">?</span></label>
                             <input type="number" id="log-forearm">
                         </div>
+                        <div class="input-group" style="margin:0;">
+                            <label>ESPALDA (CM) <span class="meas-help" data-title="ESPALDA (DORSALES)" data-help="Contorno de la espalda alta: pasa la cinta por debajo de las axilas rodeando la parte más ancha de los dorsales, con los brazos relajados a los lados. Se toma MÁS ARRIBA que el pecho, así que refleja el ancho de tu espalda, no lo mismo que el pecho.">?</span></label>
+                            <input type="number" id="log-back">
+                        </div>
                         <button class="btn-premium" id="btn-save-daily" style="align-self:end; height:50px;">LOG MEDIDA</button>
                     </div>
 
@@ -717,6 +742,7 @@
                                     <th style="padding:1rem;">GLÚTEO</th>
                                     <th style="padding:1rem;">CUELLO</th>
                                     <th style="padding:1rem;">ANTEB.</th>
+                                    <th style="padding:1rem;">ESPALDA</th>
                                     <th style="padding:1rem;">CAMBIO</th>
                                     <th style="padding:1rem;">DEL</th>
                                 </tr>
@@ -940,12 +966,12 @@
 
     <!-- Gráficas (Al final para no bloquear inicio rápido) -->
     <script src="https://cdn.jsdelivr.net/npm/apexcharts" defer></script>
-    <script src="profile-persist.js?v=20260705a"></script>
-    <script src="knowledge.js?v=20260705a"></script>
-    <script src="app.js?v=20260705a"></script>
+    <script src="profile-persist.js?v=20260705b"></script>
+    <script src="knowledge.js?v=20260705b"></script>
+    <script src="app.js?v=20260705b"></script>
     <!-- Premium UI: catálogo de insignias + FAB + onboarding -->
-    <script src="premium-badges.js?v=20260705a"></script>
-    <script src="premium-extras.js?v=20260705a"></script>
+    <script src="premium-badges.js?v=20260705b"></script>
+    <script src="premium-extras.js?v=20260705b"></script>
 
     <!-- REGISTRO GLOBAL — funciona aunque app.js falle -->
     <script>
@@ -1023,7 +1049,7 @@
         // Registro del Service Worker de PWA unificado con detección de actualizaciones y auto-refresco
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=20260705a').then(reg => {
+                navigator.serviceWorker.register('sw.js?v=20260705b').then(reg => {
                     console.log('[AX-CORE] Service Worker registrado con éxito:', reg.scope);
                     
                     // Detectar si hay una actualización de Service Worker esperando

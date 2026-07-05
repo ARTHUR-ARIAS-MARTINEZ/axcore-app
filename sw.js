@@ -1,12 +1,12 @@
-const CACHE_NAME = 'axcore-v5.21-medidas-tooltips-20260705';
+const CACHE_NAME = 'axcore-v5.22-dieta-avisos-espalda-20260705';
 const urlsToCache = [
   './',
-  './index.html?v=20260705a',
-  './index.css?v=20260705a',
-  './premium.css?v=20260705a',
-  './profile-persist.js?v=20260705a',
-  './app.js?v=20260705a',
-  './knowledge.js?v=20260705a',
+  './index.html?v=20260705b',
+  './index.css?v=20260705b',
+  './premium.css?v=20260705b',
+  './profile-persist.js?v=20260705b',
+  './app.js?v=20260705b',
+  './knowledge.js?v=20260705b',
   './logo.png',
   './logo_coach.png',
   './manifest_vip.json',
