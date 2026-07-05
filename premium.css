@@ -151,21 +151,21 @@ body.premium-mode[data-theme="neon-bi"] {
 }
 
 /* ══ NUEVOS TEMAS DE COLOR — mismo estilo, degradado propio por tema ══ */
-/* ── AZUL ── */
+/* ── AZUL ── (más contraste: azul eléctrico → aqua brillante) */
 body.premium-mode[data-theme="azul"] {
-  --pm-green-rgb: 41,121,255;
-  --pm-cyan-rgb:  0,200,255;
-  --pm-s1: #060c1a; --pm-s2: #0a1428; --pm-s3: #101c34; --pm-dim: #24406a;
-  --pm-border: rgba(41,121,255,0.14);
-  background: #030a18 !important;
+  --pm-green-rgb: 31,107,255;
+  --pm-cyan-rgb:  64,223,255;
+  --pm-s1: #071120; --pm-s2: #0c1a30; --pm-s3: #12243e; --pm-dim: #2a4a78;
+  --pm-border: rgba(64,223,255,0.16);
+  background: #04101f !important;
 }
-/* ── AMARILLO ── */
-body.premium-mode[data-theme="amarillo"] {
-  --pm-green-rgb: 255,214,0;
-  --pm-cyan-rgb:  255,160,0;
-  --pm-s1: #14100a; --pm-s2: #1c1610; --pm-s3: #262016; --pm-dim: #4a3c1a;
-  --pm-border: rgba(255,214,0,0.14);
-  background: #141005 !important;
+/* ── VIOLETA ── (reemplaza AMARILLO: violeta eléctrico → magenta) */
+body.premium-mode[data-theme="violeta"] {
+  --pm-green-rgb: 124,58,237;
+  --pm-cyan-rgb:  201,58,255;
+  --pm-s1: #120a20; --pm-s2: #19102c; --pm-s3: #221638; --pm-dim: #3c2660;
+  --pm-border: rgba(201,58,255,0.16);
+  background: #0d0618 !important;
 }
 /* ── NARANJA ── */
 body.premium-mode[data-theme="naranja"] {
@@ -175,13 +175,13 @@ body.premium-mode[data-theme="naranja"] {
   --pm-border: rgba(255,109,0,0.14);
   background: #170a02 !important;
 }
-/* ── ROJO ── */
+/* ── ROJO ── (menos monótono: crimson → ember, gradiente "fuego") */
 body.premium-mode[data-theme="rojo"] {
-  --pm-green-rgb: 255,23,68;
-  --pm-cyan-rgb:  183,28,28;
-  --pm-s1: #180a0c; --pm-s2: #220e10; --pm-s3: #2c1416; --pm-dim: #4a1c22;
-  --pm-border: rgba(255,23,68,0.14);
-  background: #180307 !important;
+  --pm-green-rgb: 255,45,74;
+  --pm-cyan-rgb:  255,122,60;
+  --pm-s1: #180a0b; --pm-s2: #221010; --pm-s3: #2c1815; --pm-dim: #4a2420;
+  --pm-border: rgba(255,122,60,0.16);
+  background: #150407 !important;
 }
 /* ── DORADO ── */
 body.premium-mode[data-theme="dorado"] {
@@ -3495,7 +3495,27 @@ body.premium-mode #page-studio .sx-canvas-glow {
 }
 
 /* ---- SHEET: un poco más alto y con notch más vivo ---- */
-body.premium-mode #page-studio .sx-sheet { max-height: 46vh !important; }
+/* SCROLL: el editor deja de ser un cuadro con scroll interno diminuto.
+   Ahora la PÁGINA entera hace scroll (todo se mueve en conjunto) y ningún
+   control queda cortado ni tapado (antes: el slider de tamaño y los
+   botones de FX quedaban pegados/ocultos por el borde del sheet). */
+body.premium-mode #page-studio .sx-sheet {
+  max-height: none !important;
+  min-height: 0 !important;
+}
+body.premium-mode #page-studio .sx-tabscroll {
+  overflow: visible !important;
+  flex: none !important;
+}
+body.premium-mode #page-studio .studio-pro-tab-content {
+  padding-bottom: 40px !important;
+}
+/* Barra de pestañas opaca (para que el contenido no se transparente
+   detrás de ella). Todo el conjunto —tabs + contenido— se mueve junto
+   al hacer scroll de la página. */
+body.premium-mode #page-studio .sx-tabbar {
+  background: var(--pm-s1) !important;
+}
 body.premium-mode #page-studio .sx-notch {
   width: 46px !important; height: 5px !important;
   background: linear-gradient(90deg, var(--pm-green), var(--pm-cyan)) !important; opacity: 0.5;
@@ -3530,4 +3550,42 @@ body.premium-mode #page-studio .studio-tpl-card.selected {
 /* ---- Botón compartir flotante: que resalte más como acción principal ---- */
 body.premium-mode #page-studio .sx-fab-primary {
   box-shadow: 0 6px 20px rgba(var(--pm-green-rgb),0.5) !important;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   EVOLUCIÓN — más vida (2ª pasada): títulos en degradado, filtros con
+   acento, tabla con filas alternadas. Antes seguía viéndose plana.
+   ══════════════════════════════════════════════════════════════════ */
+/* Títulos de panel con degradado del tema (en vez de un color sólido) */
+body.premium-mode #page-evolution .settings-panel > h2,
+body.premium-mode #page-evolution .evolution-panel > h2 {
+  background: linear-gradient(90deg, var(--pm-green), var(--pm-cyan)) !important;
+  -webkit-background-clip: text !important; background-clip: text !important;
+  -webkit-text-fill-color: transparent !important; color: transparent !important;
+  display: inline-block;
+  letter-spacing: 1.5px !important;
+}
+/* Filtros TODO / SEMANA / MES: el activo con degradado del tema */
+body.premium-mode #page-evolution .history-controls .theme-btn {
+  border: 1px solid var(--pm-border) !important;
+  background: var(--pm-s2) !important;
+  color: var(--pm-dim2) !important;
+  font-family: 'Oswald', sans-serif !important; letter-spacing: 1px !important;
+}
+body.premium-mode #page-evolution .history-controls .theme-btn.active {
+  background: linear-gradient(135deg, var(--pm-green), var(--pm-cyan)) !important;
+  color: #000 !important; border-color: transparent !important;
+  box-shadow: 0 3px 12px rgba(var(--pm-green-rgb),0.3) !important;
+}
+/* Tabla de historial: filas alternadas (zebra) + primera columna (fecha)
+   con acento, para que no se vea un bloque plano de números. */
+body.premium-mode #page-evolution .history-table-container tbody tr:nth-child(even) {
+  background: rgba(var(--pm-green-rgb), 0.04);
+}
+body.premium-mode #page-evolution .history-table-container tbody td:first-child {
+  color: var(--accent-secondary) !important; font-weight: 600;
+}
+/* Formulario de medidas: una franja de acento arriba (detalle de vida) */
+body.premium-mode #page-evolution .evolution-panel .measurement-form {
+  position: relative;
 }

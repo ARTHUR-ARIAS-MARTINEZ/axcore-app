@@ -1,12 +1,12 @@
-const CACHE_NAME = 'axcore-v5.18-rediseno-estudio-ajustes-20260704';
+const CACHE_NAME = 'axcore-v5.19-scroll-estudio-temas-20260704';
 const urlsToCache = [
   './',
-  './index.html?v=20260704e',
-  './index.css?v=20260704e',
-  './premium.css?v=20260704e',
-  './profile-persist.js?v=20260704e',
-  './app.js?v=20260704e',
-  './knowledge.js?v=20260704e',
+  './index.html?v=20260704f',
+  './index.css?v=20260704f',
+  './premium.css?v=20260704f',
+  './profile-persist.js?v=20260704f',
+  './app.js?v=20260704f',
+  './knowledge.js?v=20260704f',
   './logo.png',
   './logo_coach.png',
   './manifest_vip.json',

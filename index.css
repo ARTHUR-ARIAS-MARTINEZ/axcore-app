@@ -145,32 +145,32 @@
    de 2 acentos por tema). IDs nuevos, sin datos previos que migrar.
    ══════════════════════════════════════════════════════════════ */
 
-/* ── AZUL ── */
+/* ── AZUL ── (más contraste: azul eléctrico profundo → aqua brillante) */
 [data-theme="azul"] {
-    --bg-dark: #030a18;
-    --accent-main: #2979ff;
-    --accent-secondary: #00c8ff;
-    --accent-alert: #ff3b5c;
-    --glass: rgba(41, 121, 255, 0.08);
-    --glass-border: rgba(41, 121, 255, 0.32);
-    --neon-glow: 0 0 10px rgba(41, 121, 255, 0.5), 0 0 20px rgba(0, 200, 255, 0.25);
-    --text-dim: #6f8fbf;
-    --accent-rgb: 41, 121, 255;
-    --accent-secondary-rgb: 0, 200, 255;
+    --bg-dark: #04101f;
+    --accent-main: #1f6bff;
+    --accent-secondary: #40dfff;
+    --accent-alert: #ff466e;
+    --glass: rgba(31, 107, 255, 0.09);
+    --glass-border: rgba(64, 223, 255, 0.34);
+    --neon-glow: 0 0 10px rgba(31, 107, 255, 0.5), 0 0 22px rgba(64, 223, 255, 0.3);
+    --text-dim: #82a6d8;
+    --accent-rgb: 31, 107, 255;
+    --accent-secondary-rgb: 64, 223, 255;
 }
 
-/* ── AMARILLO ── */
-[data-theme="amarillo"] {
-    --bg-dark: #141005;
-    --accent-main: #ffd600;
-    --accent-secondary: #ffa000;
-    --accent-alert: #ff3b3b;
-    --glass: rgba(255, 214, 0, 0.08);
-    --glass-border: rgba(255, 214, 0, 0.32);
-    --neon-glow: 0 0 10px rgba(255, 214, 0, 0.5), 0 0 20px rgba(255, 160, 0, 0.25);
-    --text-dim: #a89a6a;
-    --accent-rgb: 255, 214, 0;
-    --accent-secondary-rgb: 255, 160, 0;
+/* ── VIOLETA ── (reemplaza AMARILLO: violeta eléctrico → magenta) */
+[data-theme="violeta"] {
+    --bg-dark: #0d0618;
+    --accent-main: #7c3aed;
+    --accent-secondary: #c93aff;
+    --accent-alert: #ff3b6b;
+    --glass: rgba(124, 58, 237, 0.09);
+    --glass-border: rgba(201, 58, 255, 0.34);
+    --neon-glow: 0 0 12px rgba(124, 58, 237, 0.5), 0 0 24px rgba(201, 58, 255, 0.3);
+    --text-dim: #a58cc9;
+    --accent-rgb: 124, 58, 237;
+    --accent-secondary-rgb: 201, 58, 255;
 }
 
 /* ── NARANJA ── */
@@ -187,18 +187,18 @@
     --accent-secondary-rgb: 255, 61, 0;
 }
 
-/* ── ROJO ── */
+/* ── ROJO ── (menos monótono: crimson → ember, gradiente "fuego") */
 [data-theme="rojo"] {
-    --bg-dark: #180307;
-    --accent-main: #ff1744;
-    --accent-secondary: #b71c1c;
-    --accent-alert: #ffcc00;
-    --glass: rgba(255, 23, 68, 0.08);
-    --glass-border: rgba(255, 23, 68, 0.32);
-    --neon-glow: 0 0 10px rgba(255, 23, 68, 0.5), 0 0 20px rgba(183, 28, 28, 0.3);
-    --text-dim: #bf6a75;
-    --accent-rgb: 255, 23, 68;
-    --accent-secondary-rgb: 183, 28, 28;
+    --bg-dark: #150407;
+    --accent-main: #ff2d4a;
+    --accent-secondary: #ff7a3c;
+    --accent-alert: #ffd60a;
+    --glass: rgba(255, 45, 74, 0.09);
+    --glass-border: rgba(255, 122, 60, 0.34);
+    --neon-glow: 0 0 12px rgba(255, 45, 74, 0.5), 0 0 22px rgba(255, 122, 60, 0.3);
+    --text-dim: #cf8a8f;
+    --accent-rgb: 255, 45, 74;
+    --accent-secondary-rgb: 255, 122, 60;
 }
 
 /* ── DORADO ── */

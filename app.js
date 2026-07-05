@@ -364,6 +364,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function applySettings() {
+        // Migración: el tema "amarillo" se eliminó (se parecía a dorado) → usar dorado.
+        if (userData.theme === 'amarillo') { userData.theme = 'dorado'; try { saveData(); } catch(e){} }
         const activeTheme = userData.theme || 'neon';
         document.body.setAttribute('data-theme', activeTheme);
         // Marcar theme-btn (legacy) y t-swatch (premium) con estado activo
@@ -1345,7 +1347,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     pink: 'ROSA',
                     pastel: 'LILA',
                     azul: 'AZUL',
-                    amarillo: 'AMARILLO',
+                    violeta: 'VIOLETA',
                     naranja: 'NARANJA',
                     rojo: 'ROJO',
                     dorado: 'DORADO',
