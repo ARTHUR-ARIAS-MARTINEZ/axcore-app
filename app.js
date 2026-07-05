@@ -120,7 +120,6 @@ document.addEventListener('DOMContentLoaded', () => {
         weight: 0,
         waist: 0,
         bicep: 0,
-        tricep: 0,
         leg: 0,
         chest: 0,
         hip: 0,
@@ -278,7 +277,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!userData.foodLogToday) userData.foodLogToday = [];
             if (!userData.workoutLogToday) userData.workoutLogToday = [];
             if (!userData.forearm) userData.forearm = 0;
-            if (!userData.back) userData.back = 0;
             if (!userData.achievements) userData.achievements = [];
             // Normalizar: si userName está vacío O es un placeholder genérico,
             // usar username de login, persistencia separada, o currentUser como fallback
@@ -1713,11 +1711,14 @@ document.addEventListener('DOMContentLoaded', () => {
             let el = target;
             for (let i = 0; i < 8 && el; i++) {
                 if (el.classList && (
-                    el.classList.contains('sx-sheet') || 
-                    el.classList.contains('sx-ach-bar') || 
-                    el.classList.contains('sx-ach-body') || 
-                    el.classList.contains('studio-modal-overlay') || 
-                    el.classList.contains('studio-modal-container')
+                    el.classList.contains('sx-sheet') ||
+                    el.classList.contains('sx-ach-bar') ||
+                    el.classList.contains('sx-ach-body') ||
+                    el.classList.contains('studio-modal-overlay') ||
+                    el.classList.contains('studio-modal-container') ||
+                    el.classList.contains('history-table-container') ||   // tabla de medidas (scroll horizontal)
+                    el.classList.contains('history-controls') ||          // filtro TODO/SEMANA/MES
+                    el.classList.contains('measurement-form')             // formulario de medidas
                 )) {
                     return true;
                 }
@@ -1784,6 +1785,45 @@ document.addEventListener('DOMContentLoaded', () => {
         }, { passive: true });
     })();
 
+    // ═══════════════════════════════════════════════════════════
+    // TOOLTIPS DE AYUDA (?) — Cómo medir cada parte del cuerpo
+    // ═══════════════════════════════════════════════════════════
+    (function setupMeasHelp() {
+        let pop = null;
+        function close() { if (pop) { pop.remove(); pop = null; } }
+        document.addEventListener('click', (e) => {
+            const btn = e.target.closest && e.target.closest('.meas-help');
+            if (!btn) { close(); return; }
+            e.preventDefault();
+            e.stopPropagation();
+            const wasOpen = pop && pop._owner === btn;
+            close();
+            if (wasOpen) return; // segundo clic sobre el mismo (?) lo cierra
+            pop = document.createElement('div');
+            pop.className = 'meas-help-pop';
+            pop._owner = btn;
+            const title = document.createElement('strong');
+            title.textContent = btn.dataset.title || 'CÓMO MEDIR';
+            const body = document.createElement('span');
+            body.textContent = btn.dataset.help || '';
+            pop.appendChild(title);
+            pop.appendChild(body);
+            document.body.appendChild(pop);
+            // Posicionar bajo el (?) y ajustar si se sale de pantalla
+            const r = btn.getBoundingClientRect();
+            const pw = pop.offsetWidth;
+            const ph = pop.offsetHeight;
+            let left = r.left + r.width / 2 - pw / 2;
+            left = Math.max(12, Math.min(left, window.innerWidth - pw - 12));
+            let top = r.bottom + 8;
+            if (top + ph > window.innerHeight - 12) top = Math.max(12, r.top - ph - 8);
+            pop.style.left = left + 'px';
+            pop.style.top = top + 'px';
+        }, true);
+        window.addEventListener('scroll', close, true);
+        window.addEventListener('resize', close);
+    })();
+
     // --- EVOLUTION LOGIC ---
     function renderEvolutionPage(filter = 'all') {
         const body = document.getElementById('history-body');
@@ -1806,7 +1846,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     <td style="padding:1rem; font-weight:bold;">${h.weight} kg</td>
                     <td style="padding:1rem;">${h.waist} cm</td>
                     <td style="padding:1rem;">${h.bicep || 0} cm</td>
-                    <td style="padding:1rem;">${h.tricep || 0} cm</td>
                     <td style="padding:1rem;">${h.leg || 0} cm</td>
                     <td style="padding:1rem;">${h.chest || 0} cm</td>
                     <td style="padding:1rem;">${h.hip || 0} cm</td>
@@ -1814,7 +1853,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     <td style="padding:1rem;">${h.glute || 0} cm</td>
                     <td style="padding:1rem;">${h.neck || 0} cm</td>
                     <td style="padding:1rem;">${h.forearm || 0} cm</td>
-                    <td style="padding:1rem;">${h.back || 0} cm</td>
                     <td style="padding:1rem; color:${diffColor}; font-weight:bold;">${diff > 0 ? '+'+diff : diff} kg</td>
                     <td style="padding:1rem;">
                         <button class="btn-cancel" style="padding:2px 6px; font-size:0.6rem; background:transparent; border:1px solid var(--accent-alert); color:var(--accent-alert); border-radius:4px;" onclick="deleteHistoryRow(${filtered.length - 1 - i})">X</button>
@@ -1827,7 +1865,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const w = parseFloat(document.getElementById('log-weight').value) || 0;
             const ws = parseFloat(document.getElementById('log-waist').value) || 0;
             const bc = parseFloat(document.getElementById('log-bicep').value) || 0;
-            const tr = parseFloat(document.getElementById('log-tricep').value) || 0;
             const lg = parseFloat(document.getElementById('log-leg').value) || 0;
             const ch = parseFloat(document.getElementById('log-chest').value) || 0;
             const hp = parseFloat(document.getElementById('log-hip').value) || 0;
@@ -1835,16 +1872,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const gl = parseFloat(document.getElementById('log-glute').value) || 0;
             const nk = parseFloat(document.getElementById('log-neck').value) || 0;
             const fr = parseFloat(document.getElementById('log-forearm').value) || 0;
-            const bk = parseFloat(document.getElementById('log-back').value) || 0;
 
             if (!w && !ws) { alert("Al menos ingresa Peso o Cintura."); return; }
-            
-            const rec = { date: new Date().toLocaleDateString('es-MX'), weight: w, waist: ws, bicep: bc, tricep: tr, leg: lg, chest: ch, hip: hp, calf: cf, glute: gl, neck: nk, forearm: fr, back: bk };
+
+            const rec = { date: new Date().toLocaleDateString('es-MX'), weight: w, waist: ws, bicep: bc, leg: lg, chest: ch, hip: hp, calf: cf, glute: gl, neck: nk, forearm: fr };
             userData.history.push(rec);
             if (w) userData.weight = w;
             if (ws) userData.waist = ws;
             if (bc) userData.bicep = bc;
-            if (tr) userData.tricep = tr;
             if (lg) userData.leg = lg;
             if (ch) userData.chest = ch;
             if (hp) userData.hip = hp;
@@ -1852,13 +1887,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (gl) userData.glute = gl;
             if (nk) userData.neck = nk;
             if (fr) userData.forearm = fr;
-            if (bk) userData.back = bk;
             saveData();
             updateDashboard();
             renderEvolutionPage(filter);
             if (typeof checkAchievements === 'function') checkAchievements();
             // Limpiar inputs
-            ['log-weight','log-waist','log-bicep','log-tricep','log-leg','log-chest','log-hip','log-calf','log-glute','log-neck','log-forearm','log-back'].forEach(id => {
+            ['log-weight','log-waist','log-bicep','log-leg','log-chest','log-hip','log-calf','log-glute','log-neck','log-forearm'].forEach(id => {
                 const el = document.getElementById(id);
                 if(el) el.value = '';
             });
@@ -2590,8 +2624,7 @@ document.addEventListener('DOMContentLoaded', () => {
         { key:'bicep',   label:'Bíceps',        val:() => (userData.bicep||0)+'cm', default:false },
         { key:'chest',   label:'Pecho',         val:() => (userData.chest||0)+'cm', default:false },
         { key:'leg',     label:'Pierna',        val:() => (userData.leg||0)+'cm', default:false },
-        { key:'hip',     label:'Cadera',        val:() => (userData.hip||0)+'cm', default:false },
-        { key:'back',    label:'Espalda',       val:() => (userData.back||0)+'cm', default:false }
+        { key:'hip',     label:'Cadera',        val:() => (userData.hip||0)+'cm', default:false }
     ];
 
     let studioState = {
@@ -3711,7 +3744,6 @@ document.addEventListener('DOMContentLoaded', () => {
             userData.height = 0;
             userData.target_weight = 0;
             userData.bicep = 0;
-            userData.tricep = 0;
             userData.leg = 0;
             userData.chest = 0;
             userData.hip = 0;
@@ -3719,7 +3751,6 @@ document.addEventListener('DOMContentLoaded', () => {
             userData.glute = 0;
             userData.neck = 0;
             userData.forearm = 0;
-            userData.back = 0;
             userData.history = [];
             userData.recommendedDiet = { breakfast: '', lunch: '', dinner: '', snacks: '' };
             userData.totalNetDeficit = 0;
@@ -4082,7 +4113,7 @@ document.addEventListener('DOMContentLoaded', () => {
         { id:'meas_10',   icon:'📐', title:'10 MEDICIONES', desc:'10 mediciones.',          t:2, cat:'medidas', check:()=>H().length>=10 },
         { id:'meas_25',   icon:'📐', title:'25 MEDICIONES', desc:'25 mediciones.',          t:3, cat:'medidas', check:()=>H().length>=25 },
         { id:'meas_50',   icon:'📐', title:'50 MEDICIONES', desc:'50 mediciones.',          t:4, cat:'medidas', check:()=>H().length>=50 },
-        { id:'meas_full', icon:'🧍', title:'CUERPO COMPLETO', desc:'Registraste todas tus medidas en un día.', t:3, cat:'medidas', check:()=>H().some(h=>+h.bicep>0&&+h.tricep>0&&+h.leg>0&&+h.chest>0&&+h.hip>0&&+h.calf>0&&+h.glute>0&&+h.neck>0&&+h.forearm>0&&+h.back>0) },
+        { id:'meas_full', icon:'🧍', title:'CUERPO COMPLETO', desc:'Registraste todas tus medidas en un día.', t:3, cat:'medidas', check:()=>H().some(h=>+h.bicep>0&&+h.leg>0&&+h.chest>0&&+h.hip>0&&+h.calf>0&&+h.glute>0&&+h.neck>0&&+h.forearm>0) },
         // ─── EJERCICIO (16) — calorías quemadas acumuladas y # de ejercicios ───
         { id:'burn_100',    icon:'🔥', title:'100 KCAL',    desc:'Quemaste 100 kcal.',       t:1, cat:'ejercicio', check:()=>BURN()>=100 },
         { id:'burn_500',    icon:'🔥', title:'500 KCAL',    desc:'Quemaste 500 kcal.',       t:1, cat:'ejercicio', check:()=>BURN()>=500 },

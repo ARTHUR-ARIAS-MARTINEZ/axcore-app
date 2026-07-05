@@ -1,12 +1,12 @@
-const CACHE_NAME = 'axcore-v5.20-cafe-simbolos-degradados-20260704';
+const CACHE_NAME = 'axcore-v5.21-medidas-tooltips-20260705';
 const urlsToCache = [
   './',
-  './index.html?v=20260704g',
-  './index.css?v=20260704g',
-  './premium.css?v=20260704g',
-  './profile-persist.js?v=20260704g',
-  './app.js?v=20260704g',
-  './knowledge.js?v=20260704g',
+  './index.html?v=20260705a',
+  './index.css?v=20260705a',
+  './premium.css?v=20260705a',
+  './profile-persist.js?v=20260705a',
+  './app.js?v=20260705a',
+  './knowledge.js?v=20260705a',
   './logo.png',
   './logo_coach.png',
   './manifest_vip.json',
