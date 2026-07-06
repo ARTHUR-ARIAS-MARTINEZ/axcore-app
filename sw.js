@@ -1,12 +1,12 @@
-const CACHE_NAME = 'axcore-v5.29-estudio-tema-blanco-swipe-20260706';
+const CACHE_NAME = 'axcore-v5.30-blanco-cajas-oscuras-20260706';
 const urlsToCache = [
   './',
-  './index.html?v=20260706a',
-  './index.css?v=20260706a',
-  './premium.css?v=20260706a',
-  './profile-persist.js?v=20260706a',
-  './app.js?v=20260706a',
-  './knowledge.js?v=20260706a',
+  './index.html?v=20260706b',
+  './index.css?v=20260706b',
+  './premium.css?v=20260706b',
+  './profile-persist.js?v=20260706b',
+  './app.js?v=20260706b',
+  './knowledge.js?v=20260706b',
   './logo.png',
   './logo_coach.png',
   './manifest_vip.json',

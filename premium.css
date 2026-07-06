@@ -154,8 +154,11 @@ body.premium-mode[data-theme="blanco"] .btn-ex-check.ex-ok {
 }
 /* Chips de músculo inactivos: borde visible sobre blanco. */
 body.premium-mode[data-theme="blanco"] .pm-wf-chip { border-color: rgba(0,0,0,0.14) !important; }
-/* Pestaña de dieta activa: texto grafito legible. */
-body.premium-mode[data-theme="blanco"] .pm-d-tab.on { color: #14181d !important; }
+/* Pestaña de dieta activa (REGISTRAR/MI PLAN/REGLAS): su fondo es el gradiente
+   del acento, que en blanco vale GRAFITO oscuro. El texto debe ir BLANCO
+   (antes iba grafito → grafito-sobre-grafito = invisible, el "gris oscuro sin
+   texto" reportado). */
+body.premium-mode[data-theme="blanco"] .pm-d-tab.on { color: #ffffff !important; }
 
 /* 3) TEXTO BLANCO FIJO (inline) → grafito. Los botones de arriba fuerzan su
    propio blanco con MÁS especificidad, así que su texto no se ve afectado. */
@@ -274,6 +277,63 @@ body.premium-mode[data-theme="blanco"] .achievements-grid > div[style*="opacity"
 body.premium-mode[data-theme="blanco"] .pm-bcard.locked {
   background: repeating-linear-gradient(45deg, rgba(0,0,0,.05), rgba(0,0,0,.05) 8px, rgba(0,0,0,.02) 8px, rgba(0,0,0,.02) 16px), #eef0f3 !important;
   border: 1px dashed rgba(0,0,0,0.18) !important;
+}
+
+/* 11) BOTONES RELLENOS DE ACENTO CON TEXTO NEGRO FIJO. En blanco el acento
+   (--pm-green/--pm-cyan = --accent-main/secondary) vale GRAFITO oscuro: el
+   gradiente ya se ve como un botón grafito elegante, pero el texto negro fijo
+   (color:#000) quedaba negro-sobre-grafito = INVISIBLE. Aquí solo se voltea el
+   texto a BLANCO — el fondo grafito se conserva. Estos botones traían su color
+   por selector de ID (gana por especificidad al override genérico de botón),
+   por eso hay que listarlos uno a uno. Los chips de músculo (cardio/pierna/…)
+   NO entran: usan hex de color vivo con texto negro correcto. */
+body.premium-mode[data-theme="blanco"] #btn-sw-start,
+body.premium-mode[data-theme="blanco"] #btn-calc-swap,
+body.premium-mode[data-theme="blanco"] #btn-calc-tdee,
+body.premium-mode[data-theme="blanco"] #btn-calc-projection,
+body.premium-mode[data-theme="blanco"] #btn-apply-limit,
+body.premium-mode[data-theme="blanco"] #btn-save-daily,
+body.premium-mode[data-theme="blanco"] #btn-studio-share,
+body.premium-mode[data-theme="blanco"] #save-settings,
+body.premium-mode[data-theme="blanco"] .pm-calc-btn-violet,
+body.premium-mode[data-theme="blanco"] #page-evolution .history-controls .theme-btn.active {
+  color: #ffffff !important;
+}
+
+/* 12) PANELES/TARJETAS CON NAVY FIJO (rgba(13,24,38,.7)) que la hoja pinta por
+   sección SIN usar --pm-s*, y por eso seguían siendo cajas OSCURAS sobre el
+   fondo claro. En blanco pasan a la superficie clara del tema. Arregla:
+   · Calculadora (#page-assistant): cada tarjeta era navy → era la peor.
+   · Workout (.workout-plan): el contenedor era navy → sobre él los chips
+     inactivos (texto grafito) no se leían.
+   · Estudio y los legados diet-plan/food-entry-group, por consistencia. */
+body.premium-mode[data-theme="blanco"] #page-assistant .glass-card,
+body.premium-mode[data-theme="blanco"] .workout-plan,
+body.premium-mode[data-theme="blanco"] #page-studio .glass-card,
+body.premium-mode[data-theme="blanco"] .diet-plan,
+body.premium-mode[data-theme="blanco"] .food-entry-group {
+  background: var(--pm-s2) !important;
+}
+
+/* 13) INPUTS DE CALCULADORA por ID: #calc-* ganan por especificidad (id) a la
+   regla .pm-calc-input, así que seguían con fondo negro translúcido (recuadros
+   grises con texto invisible). Se igualan a blanco + borde visible + texto grafito. */
+body.premium-mode[data-theme="blanco"] #calc-extra-cal,
+body.premium-mode[data-theme="blanco"] #calc-swap-food,
+body.premium-mode[data-theme="blanco"] #calc-age,
+body.premium-mode[data-theme="blanco"] #calc-sex,
+body.premium-mode[data-theme="blanco"] #calc-activity {
+  background: #ffffff !important;
+  border: 1px solid rgba(0,0,0,0.20) !important;
+  color: #14181d !important;
+}
+
+/* 14) Verde neón fijo (#00ff88) usado inline en la columna CAMBIO de Evolución
+   ("bajó de peso") y en resultados: casi ilegible sobre blanco. A verde oscuro
+   legible SOLO en este tema. */
+body.premium-mode[data-theme="blanco"] [style*="color:#00ff88"],
+body.premium-mode[data-theme="blanco"] [style*="color: #00ff88"] {
+  color: #0a8f4d !important;
 }
 
 /* ── MASCULINO 2: CYBERPUNK ── */
