@@ -894,11 +894,15 @@ body {
     margin-bottom: 4px;
     text-transform: uppercase;
 }
-.ex-badge.cardio { background: rgba(var(--accent-secondary-rgb), 0.12); color: var(--accent-secondary); }
-.ex-badge.hiit { background: rgba(255, 51, 102, 0.12); color: #ff3366; }
-.ex-badge.pierna, .ex-badge.gluteo, .ex-badge.pecho, .ex-badge.hombro, .ex-badge.biceps, .ex-badge.triceps, .ex-badge.core, .ex-badge.calistenia, .ex-badge.carrera { 
-    background: rgba(155, 127, 255, 0.12); color: #9b7fff; 
-}
+.ex-badge.cardio   { background: rgba(34, 211, 238, 0.12); color: #22d3ee; }
+.ex-badge.hiit     { background: rgba(244, 63, 94, 0.12); color: #f43f5e; }
+.ex-badge.pierna   { background: rgba(167, 139, 250, 0.12); color: #a78bfa; }
+.ex-badge.gluteo   { background: rgba(236, 72, 153, 0.12); color: #ec4899; }
+.ex-badge.pecho    { background: rgba(249, 115, 22, 0.12); color: #f97316; }
+.ex-badge.espalda  { background: rgba(59, 130, 246, 0.12); color: #3b82f6; }
+.ex-badge.hombro   { background: rgba(250, 204, 21, 0.12); color: #facc15; }
+.ex-badge.brazo, .ex-badge.biceps, .ex-badge.triceps, .ex-badge.antebrazo { background: rgba(132, 204, 22, 0.12); color: #84cc16; }
+.ex-badge.core, .ex-badge.calistenia, .ex-badge.carrera { background: rgba(148, 163, 184, 0.14); color: #94a3b8; }
 .ex-title {
     font-family: var(--font-accent);
     font-size: 11px; /* Reducido ~30% */

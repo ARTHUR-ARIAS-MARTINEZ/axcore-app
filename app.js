@@ -2574,7 +2574,9 @@ document.addEventListener('DOMContentLoaded', () => {
                             : typeSlug.startsWith('cardio') || typeSlug === 'carrera' ? 'cardio'
                             : typeSlug.startsWith('hiit') ? 'hiit'
                             : typeSlug;
-                        const badgeClass = typeSlug === 'hiit' ? 'hiit' : typeSlug === 'cardio' ? 'cardio' : 'fuerza';
+                        // El badge usa el MISMO color que su chip de filtro (filterKey),
+                        // así "CARDIO" en la tarjeta se ve igual que el chip CARDIO activo.
+                        const badgeClass = filterKey;
                         return `
                         <div class="exercise-card" data-ex-type="${typeSlug}" data-filter-key="${filterKey}" data-ex-name="${ex.name}">
                             <div>

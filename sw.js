@@ -1,12 +1,12 @@
-const CACHE_NAME = 'axcore-v5.26-workouts-filtros-catalogo-20260705';
+const CACHE_NAME = 'axcore-v5.27-colores-calorias-degradados-20260705';
 const urlsToCache = [
   './',
-  './index.html?v=20260705f',
-  './index.css?v=20260705f',
-  './premium.css?v=20260705f',
-  './profile-persist.js?v=20260705f',
-  './app.js?v=20260705f',
-  './knowledge.js?v=20260705f',
+  './index.html?v=20260705g',
+  './index.css?v=20260705g',
+  './premium.css?v=20260705g',
+  './profile-persist.js?v=20260705g',
+  './app.js?v=20260705g',
+  './knowledge.js?v=20260705g',
   './logo.png',
   './logo_coach.png',
   './manifest_vip.json',

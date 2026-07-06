@@ -766,16 +766,21 @@ body.premium-mode .pm-wf-chip {
   transition: all .18s;
   white-space: nowrap;
 }
+/* Paleta de 9 filtros de músculo: colores repartidos a 40° en el círculo
+   cromático (máxima distinción posible entre 9 tonos) — ver [[axcore-arquitectura]].
+   NO reusar var(--accent-main)/var(--pm-cyan) aquí: si el tema activo es verde
+   (cyberpunk/default), esos valores coinciden casi exacto con algún chip fijo
+   y "parecen repetirse". Por eso cada chip (excepto TODOS) usa hex fijo. */
 body.premium-mode .pm-wf-chip.active-todos   { background: var(--accent-main); color: #000; border-color: var(--accent-main); }
-body.premium-mode .pm-wf-chip.active-cardio  { background: var(--pm-cyan); color: #000; border-color: var(--pm-cyan); }
-body.premium-mode .pm-wf-chip.active-hiit    { background: #ff3366; color: #fff; border-color: #ff3366; }
-body.premium-mode .pm-wf-chip.active-pierna  { background: #9b7fff; color: #000; border-color: #9b7fff; }
-body.premium-mode .pm-wf-chip.active-gluteo  { background: #ff6b9d; color: #000; border-color: #ff6b9d; }
-body.premium-mode .pm-wf-chip.active-pecho   { background: #ff9900; color: #000; border-color: #ff9900; }
-body.premium-mode .pm-wf-chip.active-espalda { background: #4da6ff; color: #000; border-color: #4da6ff; }
-body.premium-mode .pm-wf-chip.active-hombro  { background: #f4a261; color: #000; border-color: #f4a261; }
-body.premium-mode .pm-wf-chip.active-brazo   { background: #ffd166; color: #000; border-color: #ffd166; }
-body.premium-mode .pm-wf-chip.active-core    { background: #00d4aa; color: #000; border-color: #00d4aa; }
+body.premium-mode .pm-wf-chip.active-cardio  { background: #22d3ee; color: #000; border-color: #22d3ee; }
+body.premium-mode .pm-wf-chip.active-hiit    { background: #f43f5e; color: #fff; border-color: #f43f5e; }
+body.premium-mode .pm-wf-chip.active-pierna  { background: #a78bfa; color: #000; border-color: #a78bfa; }
+body.premium-mode .pm-wf-chip.active-gluteo  { background: #ec4899; color: #fff; border-color: #ec4899; }
+body.premium-mode .pm-wf-chip.active-pecho   { background: #f97316; color: #000; border-color: #f97316; }
+body.premium-mode .pm-wf-chip.active-espalda { background: #3b82f6; color: #fff; border-color: #3b82f6; }
+body.premium-mode .pm-wf-chip.active-hombro  { background: #facc15; color: #000; border-color: #facc15; }
+body.premium-mode .pm-wf-chip.active-brazo   { background: #84cc16; color: #000; border-color: #84cc16; }
+body.premium-mode .pm-wf-chip.active-core    { background: #94a3b8; color: #000; border-color: #94a3b8; }
 
 /* Catálogo de ejercicios — cards premium */
 body.premium-mode .exercise-catalog {
@@ -801,12 +806,17 @@ body.premium-mode .ex-badge {
   font-size: 7.5px !important;
   margin-bottom: 4px !important;
 }
-body.premium-mode .ex-badge.cardio  { background: rgba(var(--pm-cyan-rgb, 0, 229, 255), 0.12) !important; color: var(--pm-cyan) !important; }
-body.premium-mode .ex-badge.hiit    { background: rgba(255, 51, 102, 0.12) !important; color: #ff3366 !important; }
-body.premium-mode .ex-badge.pierna,
-body.premium-mode .ex-badge.gluteo,
-body.premium-mode .ex-badge.pecho,
-body.premium-mode .ex-badge.hombro  { background: rgba(155, 127, 255, 0.12) !important; color: #9b7fff !important; }
+/* Cada badge usa el MISMO hex que su chip de filtro (ver .pm-wf-chip.active-*
+   arriba) — así el filtro y la etiqueta de cada tarjeta se ven del mismo color. */
+body.premium-mode .ex-badge.cardio   { background: rgba(34, 211, 238, 0.14) !important; color: #22d3ee !important; }
+body.premium-mode .ex-badge.hiit     { background: rgba(244, 63, 94, 0.14) !important; color: #f43f5e !important; }
+body.premium-mode .ex-badge.pierna   { background: rgba(167, 139, 250, 0.14) !important; color: #a78bfa !important; }
+body.premium-mode .ex-badge.gluteo   { background: rgba(236, 72, 153, 0.14) !important; color: #ec4899 !important; }
+body.premium-mode .ex-badge.pecho    { background: rgba(249, 115, 22, 0.14) !important; color: #f97316 !important; }
+body.premium-mode .ex-badge.espalda  { background: rgba(59, 130, 246, 0.14) !important; color: #3b82f6 !important; }
+body.premium-mode .ex-badge.hombro   { background: rgba(250, 204, 21, 0.14) !important; color: #facc15 !important; }
+body.premium-mode .ex-badge.brazo    { background: rgba(132, 204, 22, 0.14) !important; color: #84cc16 !important; }
+body.premium-mode .ex-badge.core     { background: rgba(148, 163, 184, 0.16) !important; color: #94a3b8 !important; }
 
 body.premium-mode .ex-title {
   font-family: 'Oswald', sans-serif !important;
