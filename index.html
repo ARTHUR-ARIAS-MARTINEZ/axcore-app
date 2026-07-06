@@ -3,14 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>AX-CORE By ARTHUR | Powering your Biology</title>
+    <title>AX-CORE By ARTHUR</title>
+    <!-- Vista previa al compartir el enlace (WhatsApp/Telegram/etc. leen estos Open Graph) -->
+    <meta name="description" content="Registra tu peso, tu dieta y tus entrenamientos. Mira tu evolución día a día.">
+    <meta property="og:title" content="AX-CORE By ARTHUR">
+    <meta property="og:description" content="Registra tu peso, tu dieta y tus entrenamientos. Mira tu evolución día a día.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://arthur-arias-martinez.github.io/axcore-app/">
+    <meta property="og:image" content="https://arthur-arias-martinez.github.io/axcore-app/logo.png">
     <!-- Configuración App Móvil (PWA) -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0a0e14">
     <link rel="apple-touch-icon" href="logo.png">
-    <link rel="stylesheet" href="index.css?v=20260706j">
+    <link rel="stylesheet" href="index.css?v=20260706k">
     <!-- Premium UI overrides (inerte si <body> NO tiene .premium-mode) -->
-    <link rel="stylesheet" href="premium.css?v=20260706j">
+    <link rel="stylesheet" href="premium.css?v=20260706k">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <!-- Fuentes: Inter para cuerpos de texto, Oswald (Heavy Gym) para titulares -->
@@ -989,12 +996,12 @@
 
     <!-- Gráficas (Al final para no bloquear inicio rápido) -->
     <script src="https://cdn.jsdelivr.net/npm/apexcharts" defer></script>
-    <script src="profile-persist.js?v=20260706j"></script>
-    <script src="knowledge.js?v=20260706j"></script>
-    <script src="app.js?v=20260706j"></script>
+    <script src="profile-persist.js?v=20260706k"></script>
+    <script src="knowledge.js?v=20260706k"></script>
+    <script src="app.js?v=20260706k"></script>
     <!-- Premium UI: catálogo de insignias + FAB + onboarding -->
-    <script src="premium-badges.js?v=20260706j"></script>
-    <script src="premium-extras.js?v=20260706j"></script>
+    <script src="premium-badges.js?v=20260706k"></script>
+    <script src="premium-extras.js?v=20260706k"></script>
 
     <!-- REGISTRO GLOBAL — funciona aunque app.js falle -->
     <script>
@@ -1072,7 +1079,7 @@
         // Registro del Service Worker de PWA unificado con detección de actualizaciones y auto-refresco
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=20260706j').then(reg => {
+                navigator.serviceWorker.register('sw.js?v=20260706k').then(reg => {
                     console.log('[AX-CORE] Service Worker registrado con éxito:', reg.scope);
                     
                     // Detectar si hay una actualización de Service Worker esperando

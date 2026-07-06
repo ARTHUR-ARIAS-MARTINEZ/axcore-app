@@ -1,12 +1,12 @@
-const CACHE_NAME = 'axcore-v5.38-autocomplete-scroll';
+const CACHE_NAME = 'axcore-v5.39-tarjeta-compartir';
 const urlsToCache = [
   './',
-  './index.html?v=20260706j',
-  './index.css?v=20260706j',
-  './premium.css?v=20260706j',
-  './profile-persist.js?v=20260706j',
-  './app.js?v=20260706j',
-  './knowledge.js?v=20260706j',
+  './index.html?v=20260706k',
+  './index.css?v=20260706k',
+  './premium.css?v=20260706k',
+  './profile-persist.js?v=20260706k',
+  './app.js?v=20260706k',
+  './knowledge.js?v=20260706k',
   './logo.png',
   './logo_coach.png',
   './manifest_vip.json',

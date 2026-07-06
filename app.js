@@ -3056,8 +3056,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const APP_URL = 'https://arthur-arias-martinez.github.io/axcore-app/';
         if (navigator.share) {
             navigator.share({
-                title: 'AX-CORE By Arthur',
-                text: 'Únete a la vanguardia de la optimización biológica con AX-CORE.',
+                title: 'AX-CORE By ARTHUR',
+                text: 'Te invito a AX-CORE 💪 Registra tu peso, tu dieta y tus entrenamientos, y mira tu evolución día a día. Entra aquí:',
                 url: APP_URL
             }).catch(err => console.warn('[pmShareApp]', err));
         } else {
