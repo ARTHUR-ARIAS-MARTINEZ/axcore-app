@@ -508,6 +508,15 @@ document.addEventListener('DOMContentLoaded', () => {
             // Reset diario de calorías
             const today = new Date().toDateString();
             if (userData.lastUpdateDate !== today) {
+                // Antes de limpiar los contadores del día que termina, marcarlo como
+                // día activo si tuvo actividad (así cuenta para la racha aunque no se
+                // haya registrado una medida ese día).
+                const _endedHadActivity = (userData.foodLogToday || []).length > 0 || (userData.workoutLogToday || []).length > 0 ||
+                    (+userData.caloriesConsumedToday || 0) > 0 || (+userData.caloriesBurnedToday || 0) > 0;
+                if (_endedHadActivity && userData.lastUpdateDate) {
+                    const _prev = new Date(userData.lastUpdateDate);
+                    if (!isNaN(_prev.getTime())) markActiveDay(_prev);
+                }
                 const dayDeficit = userData.dailyCalLimit - (userData.caloriesConsumedToday - userData.caloriesBurnedToday);
                 userData.totalNetDeficit += Math.max(0, dayDeficit);
                 userData.caloriesConsumedToday = 0;
@@ -516,6 +525,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 userData.workoutLogToday = [];
                 userData.lastUpdateDate = today;
                 saveData();
+            }
+            // Backfill: si HOY ya hubo actividad (contadores/logs del día) pero aún no
+            // está en activeDays —p.ej. actividad registrada ANTES de esta versión, o
+            // que solo vive en los contadores— marcar hoy para que la racha lo cuente.
+            if (userData.lastUpdateDate === today &&
+                ((userData.foodLogToday || []).length > 0 || (userData.workoutLogToday || []).length > 0 ||
+                 (+userData.caloriesConsumedToday || 0) > 0 || (+userData.caloriesBurnedToday || 0) > 0)) {
+                const _before = (userData.activeDays || []).length;
+                markActiveToday();
+                if ((userData.activeDays || []).length !== _before) saveData();
             }
         }
         applySettings();
@@ -1622,16 +1641,140 @@ document.addEventListener('DOMContentLoaded', () => {
     // Handler compartido para el cambio de foto — DELEGA al sistema robusto AXProfile
     // (compresión agresiva a 256x256 JPEG q=0.55 → ~20KB → cabe en localStorage)
     window.pmHandlePhotoChange = function(inputEl) {
+        const file = inputEl?.files?.[0];
+        if (!file) return;
+        // Abrir el recortador para que el usuario acerque/aleje y acomode la imagen
+        // dentro del círculo antes de guardarla. Se limpia el input para poder
+        // volver a elegir el MISMO archivo después.
+        if (typeof window.pmOpenPhotoCropper === 'function') {
+            window.pmOpenPhotoCropper(file);
+            try { inputEl.value = ''; } catch(_) {}
+            return;
+        }
+        // Fallback: sin recorte, delega al sistema robusto AXProfile
         if (window.AXProfile && typeof window.AXProfile.handleFileInput === 'function') {
             window.AXProfile.handleFileInput(inputEl);
             return;
         }
-        // Fallback: si AXProfile no cargó, lógica antigua mínima
-        const file = inputEl?.files?.[0];
-        if (!file) return;
         const reader = new FileReader();
         reader.onload = (ev) => pmSaveAvatar(ev.target.result);
         reader.readAsDataURL(file);
+    };
+
+    // ═══════════════ RECORTADOR DE FOTO DE PERFIL ═══════════════
+    // Autónomo (sin librerías). El usuario acerca/aleja con la barra y arrastra
+    // para reposicionar dentro del círculo; al APLICAR se dibuja el recorte a un
+    // canvas 256×256 y se guarda vía AXProfile.savePhoto (misma persistencia).
+    window.pmOpenPhotoCropper = function(file) {
+        if (!file) return;
+        const objectUrl = URL.createObjectURL(file);
+        const image = new Image();
+        image.onload = () => buildCropper();
+        image.onerror = () => {
+            try { URL.revokeObjectURL(objectUrl); } catch(_){}
+            if (typeof axToast === 'function') axToast('❌ No se pudo abrir la imagen.');
+        };
+        image.src = objectUrl;
+
+        function buildCropper() {
+            const V = 260;                                   // lado del área de recorte
+            const natW = image.naturalWidth  || image.width;
+            const natH = image.naturalHeight || image.height;
+            const coverScale = V / Math.min(natW, natH);     // en zoom=1 cubre el cuadro
+            const MINZ = 1, MAXZ = 4;
+            let zoom = 1, tx = 0, ty = 0;                    // tx,ty = esquina sup-izq de la imagen (≤0)
+
+            const ov = document.createElement('div');
+            ov.className = 'pm-crop-ov';
+            ov.innerHTML = `
+                <div class="pm-crop-panel">
+                    <div class="pm-crop-title">AJUSTA TU FOTO</div>
+                    <div class="pm-crop-hint">Arrastra para mover · usa la barra para acercar</div>
+                    <div class="pm-crop-stage" id="pmCropStage" style="width:${V}px;height:${V}px;">
+                        <img class="pm-crop-img" id="pmCropImg" alt="" draggable="false">
+                        <div class="pm-crop-ring"></div>
+                    </div>
+                    <input type="range" class="pm-crop-zoom" id="pmCropZoom" min="1" max="4" step="0.01" value="1">
+                    <div class="pm-crop-btns">
+                        <button class="pm-crop-cancel" id="pmCropCancel">CANCELAR</button>
+                        <button class="btn-premium pm-crop-apply" id="pmCropApply">APLICAR</button>
+                    </div>
+                </div>`;
+            document.body.appendChild(ov);
+
+            const stage = ov.querySelector('#pmCropStage');
+            const imgEl = ov.querySelector('#pmCropImg');
+            const zoomEl = ov.querySelector('#pmCropZoom');
+            imgEl.src = objectUrl;
+
+            const dispW = () => natW * coverScale * zoom;
+            const dispH = () => natH * coverScale * zoom;
+            function clamp() {
+                const minX = V - dispW(), minY = V - dispH();
+                tx = Math.min(0, Math.max(minX, tx));
+                ty = Math.min(0, Math.max(minY, ty));
+            }
+            function render() {
+                imgEl.style.width  = dispW() + 'px';
+                imgEl.style.height = dispH() + 'px';
+                imgEl.style.left = tx + 'px';
+                imgEl.style.top  = ty + 'px';
+            }
+            tx = (V - dispW()) / 2; ty = (V - dispH()) / 2; clamp(); render();
+
+            zoomEl.oninput = () => {
+                const cx = V/2, cy = V/2;
+                const preScale = coverScale * zoom;
+                const srcCx = (cx - tx) / preScale, srcCy = (cy - ty) / preScale;
+                zoom = Math.max(MINZ, Math.min(MAXZ, parseFloat(zoomEl.value) || 1));
+                const postScale = coverScale * zoom;
+                tx = cx - srcCx * postScale; ty = cy - srcCy * postScale;
+                clamp(); render();
+            };
+
+            let dragging = false, lastX = 0, lastY = 0;
+            stage.addEventListener('pointerdown', (e) => {
+                dragging = true; lastX = e.clientX; lastY = e.clientY;
+                try { stage.setPointerCapture(e.pointerId); } catch(_){}
+            });
+            stage.addEventListener('pointermove', (e) => {
+                if (!dragging) return;
+                tx += e.clientX - lastX; ty += e.clientY - lastY;
+                lastX = e.clientX; lastY = e.clientY;
+                clamp(); render();
+            });
+            const endDrag = (e) => { dragging = false; try { stage.releasePointerCapture(e.pointerId); } catch(_){} };
+            stage.addEventListener('pointerup', endDrag);
+            stage.addEventListener('pointercancel', endDrag);
+
+            const close = () => { try { URL.revokeObjectURL(objectUrl); } catch(_){} ov.remove(); };
+            ov.querySelector('#pmCropCancel').onclick = close;
+            ov.addEventListener('click', (e) => { if (e.target === ov) close(); });
+
+            ov.querySelector('#pmCropApply').onclick = () => {
+                const OUT = 256;
+                const canvas = document.createElement('canvas');
+                canvas.width = OUT; canvas.height = OUT;
+                const ctx = canvas.getContext('2d');
+                ctx.fillStyle = '#000'; ctx.fillRect(0, 0, OUT, OUT);
+                const scale = coverScale * zoom;
+                const srcX = (-tx) / scale, srcY = (-ty) / scale, srcSize = V / scale;
+                try {
+                    ctx.drawImage(image, srcX, srcY, srcSize, srcSize, 0, 0, OUT, OUT);
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
+                    if (window.AXProfile && typeof window.AXProfile.savePhoto === 'function') window.AXProfile.savePhoto(dataUrl);
+                    else if (typeof pmSaveAvatar === 'function') pmSaveAvatar(dataUrl);
+                    if (typeof window.updatePmProfileHero === 'function') window.updatePmProfileHero();
+                    if (typeof window.syncProfileEverywhere === 'function') window.syncProfileEverywhere();
+                    if (typeof checkAchievements === 'function') checkAchievements();
+                    if (typeof axToast === 'function') axToast('✓ Foto de perfil actualizada.');
+                } catch (err) {
+                    console.warn('[pmCrop]', err.message);
+                    if (typeof axToast === 'function') axToast('❌ No se pudo recortar la foto.');
+                }
+                close();
+            };
+        }
     };
 
     // Guarda la foto delegando al sistema robusto AXProfile.
@@ -4578,15 +4721,19 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         return [...keys].map(k => parseAppDate(k)).sort((a, b) => b - a);
     }
-    // Marca HOY como día activo. Se llama tras registrar comida/ejercicio/medida.
-    window.markActiveToday = function markActiveToday() {
+    // Marca un día (por defecto HOY) como activo. Declaración de función (hoisted)
+    // para poder llamarla desde la carga de datos aunque el código esté más abajo.
+    function markActiveDay(d) {
         if (!Array.isArray(userData.activeDays)) userData.activeDays = [];
-        const k = _dayKey();
+        const k = _dayKey(d || new Date());
         if (!userData.activeDays.includes(k)) {
             userData.activeDays.push(k);
             userData.activeDays.sort();
         }
-    };
+    }
+    function markActiveToday() { markActiveDay(new Date()); }
+    window.markActiveDay = markActiveDay;
+    window.markActiveToday = markActiveToday;
 
     function streakDays() {
         const unique = activeDaySet();   // Date[] desc, un elemento por día activo

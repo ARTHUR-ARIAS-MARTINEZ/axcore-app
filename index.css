@@ -3132,3 +3132,100 @@ body.premium-mode #btn-studio-share.sx-share-btn {
     font-family: var(--font-accent, 'Oswald', sans-serif);
     text-transform: uppercase;
 }
+
+/* ════════════════════════════════════════════════════════════════
+   RECORTADOR DE FOTO DE PERFIL (acercar/alejar + reposicionar)
+   ════════════════════════════════════════════════════════════════ */
+.pm-crop-ov {
+    position: fixed;
+    inset: 0;
+    z-index: 100000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(0,0,0,0.72);
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+    animation: pmCropIn .18s ease;
+}
+@keyframes pmCropIn { from { opacity: 0; } to { opacity: 1; } }
+.pm-crop-panel {
+    width: 100%;
+    max-width: 330px;
+    background: var(--pm-s1, #12151c);
+    color: var(--pm-white, #e8edf5);
+    border: 1px solid var(--pm-border, rgba(255,255,255,0.12));
+    border-radius: 20px;
+    padding: 20px 18px;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+.pm-crop-title {
+    font-family: var(--font-accent, 'Oswald', sans-serif);
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--accent-main, #00c97a);
+    margin-bottom: 4px;
+}
+.pm-crop-hint {
+    font-size: 0.66rem;
+    color: var(--pm-dim2, rgba(255,255,255,0.5));
+    margin-bottom: 16px;
+    line-height: 1.4;
+}
+.pm-crop-stage {
+    position: relative;
+    margin: 0 auto 18px;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #000;
+    touch-action: none;               /* el arrastre no hace scroll de la página */
+    cursor: grab;
+    user-select: none;
+}
+.pm-crop-stage:active { cursor: grabbing; }
+.pm-crop-img {
+    position: absolute;
+    left: 0; top: 0;
+    max-width: none;                  /* anulamos el reset que limita a 100% */
+    -webkit-user-drag: none;
+    user-select: none;
+    pointer-events: none;             /* los gestos los captura el stage */
+}
+.pm-crop-ring {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    box-shadow: 0 0 0 9999px rgba(0,0,0,0.55);   /* oscurece las esquinas fuera del círculo */
+    border: 2px solid rgba(255,255,255,0.9);
+    pointer-events: none;
+}
+.pm-crop-zoom {
+    width: 100%;
+    margin: 0 0 18px;
+    accent-color: var(--accent-main, #00c97a);
+    cursor: pointer;
+}
+.pm-crop-btns {
+    display: flex;
+    gap: 10px;
+}
+.pm-crop-cancel,
+.pm-crop-apply {
+    flex: 1;
+    padding: 12px 10px;
+    border-radius: 12px;
+    font-family: var(--font-accent, 'Oswald', sans-serif);
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    font-size: 0.8rem;
+    cursor: pointer;
+}
+.pm-crop-cancel {
+    background: transparent;
+    color: var(--pm-dim2, rgba(255,255,255,0.6));
+    border: 1px solid var(--pm-border2, rgba(255,255,255,0.18));
+}
+.pm-crop-apply { border: none; }      /* el resto lo da .btn-premium (respeta el tema) */

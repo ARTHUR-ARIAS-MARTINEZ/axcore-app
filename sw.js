@@ -1,12 +1,12 @@
-const CACHE_NAME = 'axcore-v5.33-racha-cuenta-actividad';
+const CACHE_NAME = 'axcore-v5.34-recorte-foto-backfill-racha';
 const urlsToCache = [
   './',
-  './index.html?v=20260706e',
-  './index.css?v=20260706e',
-  './premium.css?v=20260706e',
-  './profile-persist.js?v=20260706e',
-  './app.js?v=20260706e',
-  './knowledge.js?v=20260706e',
+  './index.html?v=20260706f',
+  './index.css?v=20260706f',
+  './premium.css?v=20260706f',
+  './profile-persist.js?v=20260706f',
+  './app.js?v=20260706f',
+  './knowledge.js?v=20260706f',
   './logo.png',
   './logo_coach.png',
   './manifest_vip.json',
