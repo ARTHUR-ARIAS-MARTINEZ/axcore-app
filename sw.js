@@ -1,12 +1,12 @@
-const CACHE_NAME = 'axcore-v5.30-blanco-cajas-oscuras-20260706';
+const CACHE_NAME = 'axcore-v5.31-blanco-evol-dieta-scroll-estudio';
 const urlsToCache = [
   './',
-  './index.html?v=20260706b',
-  './index.css?v=20260706b',
-  './premium.css?v=20260706b',
-  './profile-persist.js?v=20260706b',
-  './app.js?v=20260706b',
-  './knowledge.js?v=20260706b',
+  './index.html?v=20260706c',
+  './index.css?v=20260706c',
+  './premium.css?v=20260706c',
+  './profile-persist.js?v=20260706c',
+  './app.js?v=20260706c',
+  './knowledge.js?v=20260706c',
   './logo.png',
   './logo_coach.png',
   './manifest_vip.json',

@@ -287,6 +287,8 @@ body.premium-mode[data-theme="blanco"] .pm-bcard.locked {
    por selector de ID (gana por especificidad al override genérico de botón),
    por eso hay que listarlos uno a uno. Los chips de músculo (cardio/pierna/…)
    NO entran: usan hex de color vivo con texto negro correcto. */
+body.premium-mode[data-theme="blanco"] #btn-add-food,
+body.premium-mode[data-theme="blanco"] #btn-distribute-diet,
 body.premium-mode[data-theme="blanco"] #btn-sw-start,
 body.premium-mode[data-theme="blanco"] #btn-calc-swap,
 body.premium-mode[data-theme="blanco"] #btn-calc-tdee,
@@ -334,6 +336,24 @@ body.premium-mode[data-theme="blanco"] #calc-activity {
 body.premium-mode[data-theme="blanco"] [style*="color:#00ff88"],
 body.premium-mode[data-theme="blanco"] [style*="color: #00ff88"] {
   color: #0a8f4d !important;
+}
+
+/* 15) EVOLUCIÓN: las reglas de contraste v5.17 llevan ID (#page-evolution) y
+   GANAN a los overrides genéricos del blanco. Etiquetas rgba(255,255,255,.72),
+   inputs con fondo/borde blanco-translúcido y encabezado de tabla blanco =
+   TODO invisible sobre blanco. Mismo ID aquí para ganarles. */
+body.premium-mode[data-theme="blanco"] #page-evolution .input-group label {
+  color: #5a6572 !important;
+}
+body.premium-mode[data-theme="blanco"] #page-evolution .input-group input:not([type="checkbox"]) {
+  background: #ffffff !important;
+  border: 1px solid rgba(0,0,0,0.20) !important;
+}
+body.premium-mode[data-theme="blanco"] #page-evolution .input-group input:not([type="checkbox"]):hover {
+  border-color: rgba(0,0,0,0.35) !important;
+}
+body.premium-mode[data-theme="blanco"] #page-evolution .history-table-container thead tr {
+  color: #5a6572 !important;
 }
 
 /* ── MASCULINO 2: CYBERPUNK ── */

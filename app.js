@@ -3738,10 +3738,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const sizePicker = document.getElementById('studio-size-picker');
         const sizeVal = document.getElementById('studio-size-val');
+        // Throttle con rAF: oninput dispara decenas de veces por segundo al
+        // arrastrar y cada llamada re-dibuja TODO el canvas → el slider se
+        // trababa. Con rAF se dibuja como mucho 1 vez por frame.
+        let sizeRafPending = false;
         sizePicker.oninput = (e) => {
             studioState.textSize = parseFloat(e.target.value);
             if (sizeVal) sizeVal.textContent = Math.round(studioState.textSize * 100) + '%';
-            renderStudioCard(previewCanvas, studioState.tpl, studioState.fmt, studioState.metrics, true);
+            if (sizeRafPending) return;
+            sizeRafPending = true;
+            requestAnimationFrame(() => {
+                sizeRafPending = false;
+                renderStudioCard(previewCanvas, studioState.tpl, studioState.fmt, studioState.metrics, true);
+            });
         };
 
         // --- Lógica de TABS del estudio (DISEÑO / MÉTRICAS / EFECTOS) ---
