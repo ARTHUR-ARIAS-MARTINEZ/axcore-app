@@ -1,12 +1,12 @@
-const CACHE_NAME = 'axcore-v5.39-tarjeta-compartir';
+const CACHE_NAME = 'axcore-v5.40-enlace-corto-neutro';
 const urlsToCache = [
   './',
-  './index.html?v=20260706k',
-  './index.css?v=20260706k',
-  './premium.css?v=20260706k',
-  './profile-persist.js?v=20260706k',
-  './app.js?v=20260706k',
-  './knowledge.js?v=20260706k',
+  './index.html?v=20260706l',
+  './index.css?v=20260706l',
+  './premium.css?v=20260706l',
+  './profile-persist.js?v=20260706l',
+  './app.js?v=20260706l',
+  './knowledge.js?v=20260706l',
   './logo.png',
   './logo_coach.png',
   './manifest_vip.json',

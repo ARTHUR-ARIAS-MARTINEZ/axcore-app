@@ -3053,7 +3053,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ── Funciones globales de compartir e instalar (llamadas desde ajustes) ──
     window.pmShareApp = function() {
-        const APP_URL = 'https://arthur-arias-martinez.github.io/axcore-app/';
+        // Enlace corto NEUTRO (creado en TinyURL, alias fijo 'axcoremx'): redirige
+        // 301 a la app en GitHub Pages sin mostrar el nombre del dueño ni github.io
+        // en el mensaje. Si algún día cambia el hosting, basta apuntar el alias.
+        const APP_URL = 'https://tinyurl.com/axcoremx';
         if (navigator.share) {
             navigator.share({
                 title: 'AX-CORE By ARTHUR',
