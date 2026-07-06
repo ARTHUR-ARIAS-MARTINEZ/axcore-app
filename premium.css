@@ -36,6 +36,10 @@ body.premium-mode {
 
   --pm-border2: rgba(var(--pm-green-rgb), 0.25);
   --pm-glow:    0 0 24px rgba(var(--pm-green-rgb), 0.35);
+  /* Tinta que CONTRASTA con el acento (texto encima de fondo = --accent-main).
+     En temas oscuros el acento es brillante → tinta negra. En BLANCO el acento
+     es casi-negro → se sobrescribe a blanco (más abajo). */
+  --pm-accent-ink: #000;
   --pm-r:       22px;
   --pm-r2:      14px;
   --pm-r3:      10px;
@@ -105,8 +109,12 @@ body.premium-mode[data-theme="blanco"] {
   --pm-s1: #ffffff; --pm-s2: #f2f3f5; --pm-s3: #e8eaee; --pm-dim: #c6ccd4;
   --pm-dim2: #5a6572;
   --pm-white: #14181d;
-  --pm-border: rgba(0,0,0,0.10);
-  --pm-border2: rgba(0,0,0,0.14);
+  /* Bordes más marcados que en oscuro: sobre blanco un alfa 0.10 casi no se ve.
+     Estos hacen visibles TODOS los contornos que usan var(--pm-border/2). */
+  --pm-border: rgba(0,0,0,0.16);
+  --pm-border2: rgba(0,0,0,0.24);
+  /* El acento vale casi-negro → la tinta que contrasta encima es BLANCA. */
+  --pm-accent-ink: #ffffff;
   --text-primary: #14181d;
   --text-dim: #5a6572;
   background: #f2f3f5 !important;
@@ -187,6 +195,85 @@ body.premium-mode[data-theme="blanco"] .pm-bottom-nav-inner {
   background: rgba(255,255,255,0.95) !important;
   border: 1px solid rgba(0,0,0,0.10) !important;
   box-shadow: 0 8px 28px rgba(0,0,0,0.14), 0 0 0 1px rgba(0,0,0,0.02) !important;
+}
+
+/* 7) INPUTS Y PANELES HUNDIDOS: la hoja los pinta con fondo negro translúcido
+   (rgba(0,0,0,0.2–0.4)) directamente en reglas — los selectores de estilo
+   INLINE de arriba (#4) NO los alcanzan. En blanco quedaban como recuadros
+   GRISES con borde invisible. Aquí: fondo blanco + borde visible + texto grafito.
+   (Los inputs del Estudio se tratan en su propio bloque #page-studio.) */
+body.premium-mode[data-theme="blanco"] select,
+body.premium-mode[data-theme="blanco"] #diet-edit-snacks,
+body.premium-mode[data-theme="blanco"] #food-desc,
+body.premium-mode[data-theme="blanco"] .ex-input-wrapper,
+body.premium-mode[data-theme="blanco"] #calc-activity,
+body.premium-mode[data-theme="blanco"] .measurement-form input,
+body.premium-mode[data-theme="blanco"] #input-username,
+body.premium-mode[data-theme="blanco"] .pm-d-edit,
+body.premium-mode[data-theme="blanco"] .pm-diet-import-area,
+body.premium-mode[data-theme="blanco"] .pm-calc-input {
+  background: #ffffff !important;
+  border: 1px solid rgba(0,0,0,0.20) !important;
+  color: #14181d !important;
+}
+body.premium-mode[data-theme="blanco"] .pm-calc-input:focus,
+body.premium-mode[data-theme="blanco"] .measurement-form input:focus,
+body.premium-mode[data-theme="blanco"] #food-desc:focus {
+  border-color: rgba(0,0,0,0.42) !important;
+}
+/* Placeholder legible (gris medio, no casi-invisible) */
+body.premium-mode[data-theme="blanco"] input::placeholder,
+body.premium-mode[data-theme="blanco"] textarea::placeholder {
+  color: rgba(20,24,29,0.42) !important;
+}
+/* Tarjetas de estadística del perfil y tag de tier de insignia: gris → claro. */
+body.premium-mode[data-theme="blanco"] #page-settings .pm-prof-stat {
+  background: #ffffff !important;
+  border: 1px solid rgba(0,0,0,0.12) !important;
+}
+body.premium-mode[data-theme="blanco"] .pm-btier {
+  background: rgba(0,0,0,0.07) !important;
+  color: #14181d !important;
+}
+
+/* 8) TEXTOS BLANCOS de HOJA (color:#fff en reglas, no inline) que se perdían
+   sobre el blanco. Se recolorean a grafito SOLO en este tema. */
+body.premium-mode[data-theme="blanco"] .pd-weight,
+body.premium-mode[data-theme="blanco"] .pd-ring-num,
+body.premium-mode[data-theme="blanco"] .pd-sum-val,
+body.premium-mode[data-theme="blanco"] .pd-evol-w,
+body.premium-mode[data-theme="blanco"] .pd-next-ach-name,
+body.premium-mode[data-theme="blanco"] #page-settings .pm-prof-stat strong,
+body.premium-mode[data-theme="blanco"] .pm-bname,
+body.premium-mode[data-theme="blanco"] .pm-badges-close,
+body.premium-mode[data-theme="blanco"] .user-rank,
+body.premium-mode[data-theme="blanco"] #display-username,
+body.premium-mode[data-theme="blanco"] #live-time {
+  color: #14181d !important;
+}
+
+/* 9) TOP BAR: era una barra azul-marino translúcida fija. En blanco se aclara
+   para armonizar; su reloj y nombre de usuario ya pasan a grafito (arriba). */
+body.premium-mode[data-theme="blanco"] .top-bar {
+  background: rgba(255,255,255,0.92) !important;
+  border: 1px solid rgba(0,0,0,0.08) !important;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.06) !important;
+}
+
+/* 10) MEDALLAS BLOQUEADAS (Estudio y modal): la trama era negra fija (#0a0a0a),
+   un bloque oscuro sobre el blanco. Aquí: trama clara con candado grafito. */
+body.premium-mode[data-theme="blanco"] #achievements-panel .ach-card--locked,
+body.premium-mode[data-theme="blanco"] .achievements-grid > div[style*="opacity"] {
+  background: repeating-linear-gradient(45deg, rgba(0,0,0,.05), rgba(0,0,0,.05) 8px, rgba(0,0,0,.02) 8px, rgba(0,0,0,.02) 16px), #eef0f3 !important;
+  border: 1px dashed rgba(0,0,0,0.18) !important;
+}
+body.premium-mode[data-theme="blanco"] #achievements-panel .ach-card--locked::after,
+body.premium-mode[data-theme="blanco"] .achievements-grid > div[style*="opacity"]::after {
+  color: rgba(20,24,29,0.4) !important;
+}
+body.premium-mode[data-theme="blanco"] .pm-bcard.locked {
+  background: repeating-linear-gradient(45deg, rgba(0,0,0,.05), rgba(0,0,0,.05) 8px, rgba(0,0,0,.02) 8px, rgba(0,0,0,.02) 16px), #eef0f3 !important;
+  border: 1px dashed rgba(0,0,0,0.18) !important;
 }
 
 /* ── MASCULINO 2: CYBERPUNK ── */
@@ -3660,12 +3747,14 @@ body.premium-mode #page-studio .sx-sec-lbl::before {
   background: linear-gradient(var(--pm-green), var(--pm-cyan)); flex-shrink: 0;
 }
 
-/* ---- GRUPOS DE CONTROLES como tarjetas (reduce densidad visual) ---- */
+/* ---- GRUPOS DE CONTROLES como tarjetas (reduce densidad visual) ----
+   Fondo teñido con el ACENTO del tema (no negro fijo): así el contenedor
+   sigue el tema en TODOS los casos y en BLANCO no queda un bloque gris. */
 body.premium-mode #page-studio .studio-pro-pills,
 body.premium-mode #page-studio .studio-metrics,
 body.premium-mode #page-studio .studio-format-btns,
 body.premium-mode #page-studio .studio-pro-swatches {
-  background: rgba(0,0,0,0.20); border: 1px solid var(--pm-border);
+  background: rgba(var(--pm-green-rgb),0.05) !important; border: 1px solid var(--pm-border) !important;
   border-radius: 16px; padding: 12px !important;
 }
 /* Miniaturas de plantilla: estado seleccionado con acento claro.
@@ -3679,6 +3768,80 @@ body.premium-mode #page-studio .studio-tpl-card.selected {
 /* ---- Botón compartir flotante: que resalte más como acción principal ---- */
 body.premium-mode #page-studio .sx-fab-primary {
   box-shadow: 0 6px 20px rgba(var(--pm-green-rgb),0.5) !important;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   ESTUDIO — SUPERFICIES Y TEXTO QUE SIGUEN EL TEMA
+   La hoja base (index.css) pintaba casi todo el Estudio con azul-marino
+   fijo (rgba(6,10,20,..), rgba(20,28,42,..), rgba(10,14,24,..)) y texto
+   blanco fijo, así que NINGÚN tema lo modificaba (y en BLANCO el texto se
+   perdía). Aquí todo pasa a las superficies del tema (--pm-s1/2/3),
+   bordes (--pm-border) y texto (--pm-white / --pm-dim2), que ya se adaptan
+   a cada tema — incluido el claro.
+   ══════════════════════════════════════════════════════════════════ */
+
+/* Sheet (el panel grande de edición = "fondo de casi todo el Estudio") */
+body.premium-mode #page-studio .sx-sheet {
+  background: var(--pm-s1) !important;
+  border-top: 1px solid var(--pm-border) !important;
+}
+/* Botones flotantes (guardar / vista previa) */
+body.premium-mode #page-studio .sx-fab {
+  background: var(--pm-s2) !important;
+  border: 1px solid var(--pm-border) !important;
+  color: var(--pm-dim2) !important;
+}
+body.premium-mode #page-studio .sx-fab:hover {
+  background: rgba(var(--pm-green-rgb),0.14) !important;
+  border-color: rgba(var(--pm-green-rgb),0.4) !important;
+  color: var(--pm-green) !important;
+}
+body.premium-mode #page-studio .sx-notch {
+  background: var(--pm-dim) !important;
+}
+/* Cabecera del Estudio */
+body.premium-mode #page-studio .sx-hdr-title { color: var(--pm-white) !important; }
+body.premium-mode #page-studio .sx-hdr-sub  { color: var(--pm-dim2) !important; }
+body.premium-mode #page-studio .sx-ach-lbl  { color: var(--pm-white) !important; }
+/* Pestañas del sheet: inactivas legibles en cualquier tema */
+body.premium-mode #page-studio .sx-tabbar .studio-pro-tab {
+  color: var(--pm-dim2) !important;
+}
+body.premium-mode #page-studio .sx-tabbar .studio-pro-tab svg { stroke: var(--pm-dim2) !important; }
+body.premium-mode #page-studio .sx-tabbar .studio-pro-tab.active { color: var(--accent-main) !important; }
+body.premium-mode #page-studio .sx-tabbar .studio-pro-tab.active svg { stroke: var(--accent-main) !important; }
+
+/* Miniaturas de plantilla — "el fondo que aparece atrás de las imágenes" */
+body.premium-mode #page-studio .studio-tpl-card {
+  background: var(--pm-s2) !important;
+  border: 2px solid var(--pm-border) !important;
+}
+
+/* Control segmentado de FORMATO */
+body.premium-mode #page-studio .sx-fmt-seg {
+  background: var(--pm-s3) !important;
+  border: 1px solid var(--pm-border) !important;
+}
+body.premium-mode #page-studio .sx-fmt-seg button { color: var(--pm-dim2) !important; }
+body.premium-mode #page-studio .sx-fmt-seg button.active {
+  background: rgba(var(--pm-green-rgb),0.16) !important;
+  color: var(--accent-main) !important;
+}
+
+/* Toggles de MÉTRICA (DATOS): inactivos y activos legibles en todo tema */
+body.premium-mode #page-studio .studio-metric-toggle {
+  background: var(--pm-s2) !important;
+  border: 1px solid var(--pm-border) !important;
+  color: var(--pm-dim2) !important;
+}
+body.premium-mode #page-studio .studio-metric-toggle:hover {
+  background: rgba(var(--pm-green-rgb),0.08) !important;
+  color: var(--pm-white) !important;
+}
+body.premium-mode #page-studio .studio-metric-toggle.on {
+  border-color: var(--accent-main) !important;
+  background: rgba(var(--pm-green-rgb),0.12) !important;
+  color: var(--accent-main) !important;
 }
 
 /* ══════════════════════════════════════════════════════════════════

@@ -1,12 +1,12 @@
-const CACHE_NAME = 'axcore-v5.28-tema-blanco-armonico-20260705';
+const CACHE_NAME = 'axcore-v5.29-estudio-tema-blanco-swipe-20260706';
 const urlsToCache = [
   './',
-  './index.html?v=20260705h',
-  './index.css?v=20260705h',
-  './premium.css?v=20260705h',
-  './profile-persist.js?v=20260705h',
-  './app.js?v=20260705h',
-  './knowledge.js?v=20260705h',
+  './index.html?v=20260706a',
+  './index.css?v=20260706a',
+  './premium.css?v=20260706a',
+  './profile-persist.js?v=20260706a',
+  './app.js?v=20260706a',
+  './knowledge.js?v=20260706a',
   './logo.png',
   './logo_coach.png',
   './manifest_vip.json',

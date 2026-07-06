@@ -1902,6 +1902,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     el.classList.contains('studio-pro-tabs') ||
                     el.classList.contains('sx-tabbar') ||
                     el.classList.contains('pm-workout-filters') ||
+                    el.classList.contains('pd-badges-scroll') ||   // carrusel de insignias del tablero (scroll horizontal propio)
                     el.classList.contains('theme-grid')) {
                     return true;
                 }
@@ -3774,11 +3775,14 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!cont) return;
             const accent_css = 'var(--accent-main)';
             const redraw = () => renderStudioCard(previewCanvas, studioState.tpl, studioState.fmt, studioState.metrics, true);
+            // Colores adaptativos al tema (funcionan en oscuros Y en BLANCO):
+            //  activo   → fondo acento + tinta que contrasta (--pm-accent-ink)
+            //  inactivo → superficie del tema + texto tenue + borde del tema
             const refreshBtns = () => cont.querySelectorAll('.sx-btn').forEach(b => {
                 const active = b.dataset.val === studioState[stateKey];
-                b.style.background = active ? accent_css : 'rgba(255,255,255,0.06)';
-                b.style.color      = active ? '#000' : 'rgba(255,255,255,0.8)';
-                b.style.borderColor = active ? accent_css : 'rgba(255,255,255,0.15)';
+                b.style.background = active ? accent_css : 'var(--pm-s2)';
+                b.style.color      = active ? 'var(--pm-accent-ink)' : 'var(--pm-dim2)';
+                b.style.borderColor = active ? accent_css : 'var(--pm-border)';
             });
             options.forEach(opt => {
                 const btn = document.createElement('button');
@@ -3787,9 +3791,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 btn.textContent = opt.l;
                 const isActive = studioState[stateKey] === opt.v;
                 btn.style.cssText = `padding:4px 9px; font-size:0.60rem; border-radius:8px; cursor:pointer;
-                    border:1px solid ${isActive ? accent_css : 'rgba(255,255,255,0.15)'};
-                    background:${isActive ? accent_css : 'rgba(255,255,255,0.06)'};
-                    color:${isActive ? '#000' : 'rgba(255,255,255,0.8)'};
+                    border:1px solid ${isActive ? accent_css : 'var(--pm-border)'};
+                    background:${isActive ? accent_css : 'var(--pm-s2)'};
+                    color:${isActive ? 'var(--pm-accent-ink)' : 'var(--pm-dim2)'};
                     font-weight:800; letter-spacing:0.5px; transition:all .15s;`;
                 if (opt.dot) {
                     const dot = document.createElement('span');
@@ -3816,8 +3820,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const accent_main = 'var(--accent-main)';
             const refreshHero = () => heroContainer.querySelectorAll('.sx-btn').forEach(b => {
                 const active = b.dataset.val === studioState.heroMetric;
-                b.style.background = active ? accent_main : 'rgba(255,255,255,0.06)';
-                b.style.color      = active ? '#000' : 'rgba(255,255,255,0.8)';
+                b.style.background = active ? accent_main : 'var(--pm-s2)';
+                b.style.color      = active ? 'var(--pm-accent-ink)' : 'var(--pm-dim2)';
+                b.style.borderColor = active ? accent_main : 'var(--pm-border)';
             });
             STUDIO_METRICS.filter(m => studioState.metrics.includes(m.key)).forEach(m => {
                 const btn = document.createElement('button');
@@ -3825,9 +3830,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 btn.textContent = m.label;
                 const isActive = studioState.heroMetric === m.key;
                 btn.style.cssText = `padding:4px 10px; font-size:0.60rem; border-radius:8px; cursor:pointer;
-                    border:1px solid rgba(255,255,255,0.15);
-                    background:${isActive ? accent_main : 'rgba(255,255,255,0.06)'};
-                    color:${isActive ? '#000' : 'rgba(255,255,255,0.8)'};
+                    border:1px solid ${isActive ? accent_main : 'var(--pm-border)'};
+                    background:${isActive ? accent_main : 'var(--pm-s2)'};
+                    color:${isActive ? 'var(--pm-accent-ink)' : 'var(--pm-dim2)'};
                     font-weight:800; letter-spacing:0.5px; transition:all .15s;`;
                 btn.onclick = () => {
                     studioState.heroMetric = m.key;

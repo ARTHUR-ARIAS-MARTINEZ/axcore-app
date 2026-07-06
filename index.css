@@ -2826,12 +2826,14 @@ body {
 /* ────────────────────────────────────────────────────────────
    PREMIUM MODE overrides específicos del Studio
    ──────────────────────────────────────────────────────────── */
-body.premium-mode #page-studio { background: #06090f; }
+/* Fondo de TODA la sección Estudio: sigue el tema (antes fijo #06090f, no
+   cambiaba con ningún tema y en BLANCO quedaba casi-negro). */
+body.premium-mode #page-studio { background: var(--pm-bg); }
 body.premium-mode .sx-hdr {
-    background: rgba(5,8,18,0.96);
+    background: var(--pm-s1);
 }
 body.premium-mode .sx-sheet {
-    background: rgba(5,8,18,0.98);
+    background: var(--pm-s1);
 }
 body.premium-mode #page-studio .studio-pro-tab-content {
     background: transparent;
