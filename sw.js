@@ -1,12 +1,12 @@
-const CACHE_NAME = 'axcore-v5.31-blanco-evol-dieta-scroll-estudio';
+const CACHE_NAME = 'axcore-v5.32-sync-no-borra-racha';
 const urlsToCache = [
   './',
-  './index.html?v=20260706c',
-  './index.css?v=20260706c',
-  './premium.css?v=20260706c',
-  './profile-persist.js?v=20260706c',
-  './app.js?v=20260706c',
-  './knowledge.js?v=20260706c',
+  './index.html?v=20260706d',
+  './index.css?v=20260706d',
+  './premium.css?v=20260706d',
+  './profile-persist.js?v=20260706d',
+  './app.js?v=20260706d',
+  './knowledge.js?v=20260706d',
   './logo.png',
   './logo_coach.png',
   './manifest_vip.json',

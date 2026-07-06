@@ -533,7 +533,27 @@ document.addEventListener('DOMContentLoaded', () => {
                     const _localName   = userData.userName;
                     const _localUser   = userData.username;
                     const _localAvatar = userData.avatarPhoto || userData.avatar;
+                    const _localHist   = Array.isArray(userData.history) ? userData.history : [];
+                    const _localAch    = Array.isArray(userData.achievements) ? userData.achievements : [];
+                    // Contadores de HOY: si lo local ya es de hoy y lo remoto es de
+                    // un día viejo, conservar lo de hoy (comida/ejercicio del día).
+                    const _localToday  = userData.lastUpdateDate === new Date().toDateString() ? {
+                        lastUpdateDate: userData.lastUpdateDate,
+                        caloriesConsumedToday: userData.caloriesConsumedToday || 0,
+                        caloriesBurnedToday: userData.caloriesBurnedToday || 0,
+                        foodLogToday: userData.foodLogToday || [],
+                        workoutLogToday: userData.workoutLogToday || []
+                    } : null;
                     userData = { ...userData, ...remote.data };
+                    // MERGE de historial: UNIÓN sin duplicados, no reemplazo. Antes el
+                    // pull reemplazaba history completo y BORRABA los registros locales
+                    // que aún no habían subido (push debounced perdido o pull lento que
+                    // llegaba después de registrar) → racha/días "no cambiaban".
+                    const _seenRec = new Set();
+                    userData.history = [...(Array.isArray(userData.history) ? userData.history : []), ..._localHist]
+                        .filter(r => { const k = JSON.stringify(r); if (_seenRec.has(k)) return false; _seenRec.add(k); return true; })
+                        .sort((a, b) => parseAppDate(a.date) - parseAppDate(b.date));
+                    if (_localToday && userData.lastUpdateDate !== _localToday.lastUpdateDate) Object.assign(userData, _localToday);
                     // Restaurar identidad local si remote viene vacío o con placeholder
                     const _bad = new Set(['', 'atleta', 'admin', 'usuario']);
                     const _ok  = v => v && !_bad.has(String(v).trim().toLowerCase());
@@ -544,7 +564,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         userData.avatar      = _localAvatar;
                     }
                     userData.lastSync = remote.lastSync;
-                    if (Array.isArray(remote.achievements)) userData.achievements = remote.achievements;
+                    // Insignias: unión remoto+local (no reemplazo, misma razón que history)
+                    if (Array.isArray(remote.achievements)) userData.achievements = [...new Set([...remote.achievements, ..._localAch])];
                     window.userData = userData;
                     localStorage.setItem(getStorageKey(), JSON.stringify(userData));
                     applySettings();
@@ -659,7 +680,22 @@ document.addEventListener('DOMContentLoaded', () => {
                         achievements: userData.achievements || []
                     })
                 });
-                if (res.status === 401) {
+                if (res.ok) {
+                    // Registrar el momento del push. Sin esto, userData.lastSync solo
+                    // cambiaba al hacer PULL, así que el pull de cada arranque veía
+                    // "remoto más nuevo" SIEMPRE y machacaba lo local — la racha, los
+                    // días y las medidas recién registradas desaparecían si el pull
+                    // (lento por el arranque en frío de Render) llegaba después.
+                    try {
+                        const okBody = await res.json();
+                        if (okBody && okBody.lastSync) {
+                            userData.lastSync = okBody.lastSync;
+                            const _k = getStorageKey();
+                            const _stored = JSON.parse(localStorage.getItem(_k) || 'null');
+                            if (_stored) { _stored.lastSync = okBody.lastSync; localStorage.setItem(_k, JSON.stringify(_stored)); }
+                        }
+                    } catch(_) {}
+                } else if (res.status === 401) {
                     try {
                         const body = await res.json();
                         if (body.displaced) {
