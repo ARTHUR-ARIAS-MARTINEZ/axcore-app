@@ -132,14 +132,26 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!inp || inp._axSuggest) return;
         inp._axSuggest = true;
         inp.setAttribute('autocomplete', 'off');
+        // Limpiar cualquier caja huérfana de un render anterior (el input de dieta se
+        // recrea con innerHTML pero la caja vive en <body>).
+        document.querySelectorAll('.ax-suggest').forEach(b => b.remove());
         let box = null;
-        const close = () => { if (box) { box.remove(); box = null; } };
         const setUnitLbl = (f) => {
             const lbl = document.getElementById(unitLabelId);
             if (!lbl) return;
             const u = f && typeof foodUnit === 'function' ? foodUnit(f) : null;
             lbl.textContent = u ? `Cantidad (${unitPlural(u, 2)})` : 'Cantidad';
         };
+        // Cierre + limpieza de listeners globales (se enganchan solo mientras hay caja
+        // abierta, para no acumularlos en cada render).
+        const onOutside = (e) => { if (!box) return; if (e.target === inp || box.contains(e.target)) return; close(); };
+        const onScroll  = (e) => { if (box && e.target !== box && !box.contains(e.target)) close(); };
+        function close() {
+            if (box) { box.remove(); box = null; }
+            document.removeEventListener('pointerdown', onOutside, true);
+            window.removeEventListener('scroll', onScroll, true);
+        }
+        const select = (f) => { inp.value = f.name; setUnitLbl(f); close(); try { inp.focus(); } catch(_){} };
         const render = () => {
             close();
             const q = inp.value.trim();
@@ -154,7 +166,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 const nm = document.createElement('span'); nm.textContent = f.name;
                 const info = document.createElement('small'); info.textContent = `${f.cal} kcal`;
                 row.appendChild(nm); row.appendChild(info);
-                row.onmousedown = (e) => { e.preventDefault(); inp.value = f.name; setUnitLbl(f); close(); };
+                // Seleccionar SOLO con un toque real: si el dedo se arrastra (scroll de la
+                // lista) NO se selecciona. Antes usaba 'mousedown' → seleccionaba al primer
+                // contacto y cerraba la lista al intentar desplazarla.
+                let sx = 0, sy = 0, moved = false;
+                row.addEventListener('pointerdown', (e) => { sx = e.clientX; sy = e.clientY; moved = false; });
+                row.addEventListener('pointermove', (e) => { if (Math.abs(e.clientX - sx) > 8 || Math.abs(e.clientY - sy) > 8) moved = true; });
+                row.addEventListener('pointercancel', () => { moved = true; });   // el navegador toma el gesto para hacer scroll
+                row.addEventListener('pointerup', () => { if (!moved) select(f); });
                 box.appendChild(row);
             });
             const r = inp.getBoundingClientRect();
@@ -162,10 +181,12 @@ document.addEventListener('DOMContentLoaded', () => {
             box.style.top = (r.bottom + 4) + 'px';
             box.style.width = r.width + 'px';
             document.body.appendChild(box);
+            // Cierra al tocar fuera (input o caja) o al hacer scroll de la PÁGINA (no de la
+            // caja). Reemplaza el 'blur', que cerraba la lista al desplazarla con el dedo.
+            document.addEventListener('pointerdown', onOutside, true);
+            window.addEventListener('scroll', onScroll, true);
         };
         inp.addEventListener('input', render);
-        inp.addEventListener('blur', () => setTimeout(close, 150));
-        window.addEventListener('scroll', close, true);
     }
     // Activar autocompletado en el Asistente de comida (HTML estático)
     setupFoodAutocomplete('calc-extra-cal', 'calc-unit-lbl');

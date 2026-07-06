@@ -1,12 +1,12 @@
-const CACHE_NAME = 'axcore-v5.37-kcal-hoy-negro-blanco';
+const CACHE_NAME = 'axcore-v5.38-autocomplete-scroll';
 const urlsToCache = [
   './',
-  './index.html?v=20260706i',
-  './index.css?v=20260706i',
-  './premium.css?v=20260706i',
-  './profile-persist.js?v=20260706i',
-  './app.js?v=20260706i',
-  './knowledge.js?v=20260706i',
+  './index.html?v=20260706j',
+  './index.css?v=20260706j',
+  './premium.css?v=20260706j',
+  './profile-persist.js?v=20260706j',
+  './app.js?v=20260706j',
+  './knowledge.js?v=20260706j',
   './logo.png',
   './logo_coach.png',
   './manifest_vip.json',

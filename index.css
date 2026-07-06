@@ -3229,3 +3229,49 @@ body.premium-mode #btn-studio-share.sx-share-btn {
     border: 1px solid var(--pm-border2, rgba(255,255,255,0.18));
 }
 .pm-crop-apply { border: none; }      /* el resto lo da .btn-premium (respeta el tema) */
+
+/* ════════════════════════════════════════════════════════════════
+   AUTOCOMPLETADO DE ALIMENTOS (lista de sugerencias desplazable)
+   ════════════════════════════════════════════════════════════════ */
+.ax-suggest {
+    position: fixed;
+    z-index: 99999;
+    max-height: 240px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;   /* scroll suave en iOS */
+    overscroll-behavior: contain;        /* no arrastra la página al llegar al borde */
+    background: var(--pm-s2, #12151c);
+    border: 1px solid var(--pm-border2, rgba(255,255,255,0.16));
+    border-radius: 12px;
+    box-shadow: 0 14px 36px rgba(0,0,0,0.45);
+    padding: 4px;
+    scrollbar-width: thin;
+}
+.ax-suggest::-webkit-scrollbar { width: 6px; }
+.ax-suggest::-webkit-scrollbar-thumb { background: rgba(128,128,128,0.5); border-radius: 6px; }
+.ax-suggest-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 12px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    color: var(--pm-white, #e8edf5);
+    font-size: 0.85rem;
+    line-height: 1.2;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: pan-y;                 /* permite desplazar verticalmente la lista */
+}
+.ax-suggest-item + .ax-suggest-item { border-top: 1px solid var(--pm-border, rgba(255,255,255,0.06)); }
+.ax-suggest-item:hover,
+.ax-suggest-item:active {
+    background: rgba(var(--pm-green-rgb, 0,201,122), 0.14);
+}
+.ax-suggest-item small {
+    color: var(--pm-dim2, rgba(255,255,255,0.5));
+    font-size: 0.7rem;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
