@@ -695,11 +695,17 @@ document.addEventListener('DOMContentLoaded', () => {
             if (_syncing) return;
             _syncing = true;
             try {
+                // La foto NO viaja en el sync (la maneja AXProfile en su propia clave,
+                // se mantiene local). Se excluye del payload para no mandar ~250KB en
+                // cada push; en memoria sigue en userData.avatarPhoto para mostrarla.
+                const _dataForSync = Object.assign({}, userData);
+                delete _dataForSync.avatarPhoto;
+                delete _dataForSync.avatar;
                 const res = await fetch(`${API_URL}/api/user/sync`, {
                     method: 'POST',
                     headers: apiAuthHeaders(),
                     body: JSON.stringify({
-                        data: userData,
+                        data: _dataForSync,
                         achievements: userData.achievements || []
                     })
                 });
@@ -1756,7 +1762,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 const canvas = document.createElement('canvas');
                 canvas.width = OUT; canvas.height = OUT;
                 const ctx = canvas.getContext('2d');
-                ctx.fillStyle = '#000'; ctx.fillRect(0, 0, OUT, OUT);
                 // Recorte WYSIWYG: se MIDE la geometría real renderizada (rects en
                 // pantalla) en vez de recalcularla, para que lo guardado sea EXACTO a
                 // lo que se ve dentro del círculo, sin depender de reglas CSS externas.
@@ -1770,7 +1775,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 const srcH = sRect.height * sy;
                 try {
                     ctx.drawImage(image, srcX, srcY, srcW, srcH, 0, 0, OUT, OUT);
-                    const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
+                    // Máscara CIRCULAR: deja las esquinas TRANSPARENTES para que la foto se
+                    // vea perfectamente redonda en cualquier contenedor/dispositivo. (El
+                    // avatar es un círculo por border-radius, pero algunos WebView de Android
+                    // no recortan bien el fondo y asomaban las esquinas cuadradas negras →
+                    // "semicuadrada".) PNG para conservar el canal alfa.
+                    ctx.globalCompositeOperation = 'destination-in';
+                    ctx.beginPath();
+                    ctx.arc(OUT / 2, OUT / 2, OUT / 2, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.globalCompositeOperation = 'source-over';
+                    const dataUrl = canvas.toDataURL('image/png');
                     // Reflejar la foto en memoria para que TODAS las vistas del avatar la
                     // muestren (updatePmProfileHero/applySettings leen userData.avatarPhoto;
                     // antes lo veían vacío y borraban la foto recién puesta por AXProfile).
