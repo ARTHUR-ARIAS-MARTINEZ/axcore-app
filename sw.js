@@ -1,12 +1,12 @@
-const CACHE_NAME = 'axcore-v5.36-foto-circular-transparente';
+const CACHE_NAME = 'axcore-v5.37-kcal-hoy-negro-blanco';
 const urlsToCache = [
   './',
-  './index.html?v=20260706h',
-  './index.css?v=20260706h',
-  './premium.css?v=20260706h',
-  './profile-persist.js?v=20260706h',
-  './app.js?v=20260706h',
-  './knowledge.js?v=20260706h',
+  './index.html?v=20260706i',
+  './index.css?v=20260706i',
+  './premium.css?v=20260706i',
+  './profile-persist.js?v=20260706i',
+  './app.js?v=20260706i',
+  './knowledge.js?v=20260706i',
   './logo.png',
   './logo_coach.png',
   './manifest_vip.json',
