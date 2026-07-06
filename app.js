@@ -478,6 +478,7 @@ document.addEventListener('DOMContentLoaded', () => {
             window.userData = userData;
             if (!userData.foodLogToday) userData.foodLogToday = [];
             if (!userData.workoutLogToday) userData.workoutLogToday = [];
+            if (!Array.isArray(userData.activeDays)) userData.activeDays = [];
             if (!userData.forearm) userData.forearm = 0;
             if (!userData.back) userData.back = 0;
             if (!userData.achievements) userData.achievements = [];
@@ -535,6 +536,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const _localAvatar = userData.avatarPhoto || userData.avatar;
                     const _localHist   = Array.isArray(userData.history) ? userData.history : [];
                     const _localAch    = Array.isArray(userData.achievements) ? userData.achievements : [];
+                    const _localActive = Array.isArray(userData.activeDays) ? userData.activeDays : [];
                     // Contadores de HOY: si lo local ya es de hoy y lo remoto es de
                     // un día viejo, conservar lo de hoy (comida/ejercicio del día).
                     const _localToday  = userData.lastUpdateDate === new Date().toDateString() ? {
@@ -566,6 +568,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     userData.lastSync = remote.lastSync;
                     // Insignias: unión remoto+local (no reemplazo, misma razón que history)
                     if (Array.isArray(remote.achievements)) userData.achievements = [...new Set([...remote.achievements, ..._localAch])];
+                    // Días activos: unión remoto+local (racha/DÍAS no se pierden en el sync)
+                    userData.activeDays = [...new Set([...(Array.isArray(userData.activeDays) ? userData.activeDays : []), ..._localActive])].sort();
                     window.userData = userData;
                     localStorage.setItem(getStorageKey(), JSON.stringify(userData));
                     applySettings();
@@ -1775,10 +1779,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Stats: días, kg perdidos, insignias
             const history = Array.isArray(ud.history) ? ud.history : [];
-            // "días" = días CALENDARIO distintos con registro (no cuenta doble si registras 2 veces el mismo día)
-            const days = (typeof parseAppDate === 'function')
-                ? new Set(history.map(h => parseAppDate(h.date).toDateString())).size
-                : history.length;
+            // "DÍAS" = días CALENDARIO distintos con CUALQUIER actividad (comida,
+            // ejercicio o medida) — misma base que la racha del Tablero.
+            const days = (typeof activeDaySet === 'function')
+                ? activeDaySet().length
+                : new Set(history.map(h => parseAppDate(h.date).toDateString())).size;
             setText('pmProfDays', days);
 
             let lost = 0;
@@ -2132,6 +2137,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (nk) userData.neck = nk;
             if (fr) userData.forearm = fr;
             if (bk) userData.back = bk;
+            if (typeof window.markActiveToday === 'function') window.markActiveToday();
             saveData();
             updateDashboard();
             renderEvolutionPage(filter);
@@ -2505,6 +2511,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 desc: a.name + (a.qty > 1 ? ` × ${a.qty} ${unitPlural(a.u, a.qty)}` : ''),
                 cal: a.cal, p: a.p, c: a.c, f: a.f
             });
+            if (typeof window.markActiveToday === 'function') window.markActiveToday();
             saveData();
             updateDashboard();
             if (typeof checkAchievements === 'function') checkAchievements();
@@ -2730,6 +2737,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 detail: `${val} ${unitLbl}`.trim(),
                 cal: realCal
             });
+            if (typeof window.markActiveToday === 'function') window.markActiveToday();
             saveData();
             updateDashboard();
             renderWoLogList();
@@ -4546,19 +4554,50 @@ document.addEventListener('DOMContentLoaded', () => {
         return String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0');
     }
 
+    // ── DÍAS ACTIVOS ──────────────────────────────────────────────────────
+    // La racha y los "DÍAS" de Ajustes cuentan CUALQUIER día con actividad real:
+    // una comida registrada, un ejercicio registrado O una medida de Evolución.
+    // (Antes solo contaban las medidas; el usuario podía usar la app a diario y
+    // no ver ningún avance → desmotivante.) Se guardan como claves ISO
+    // 'aaaa-mm-dd' en userData.activeDays, que PERSISTE (no se borra en el reset
+    // diario, al revés que foodLogToday/workoutLogToday) y se fusiona en el sync.
+    function _dayKey(d) {
+        d = d || new Date();
+        return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    }
+    // Unión de activeDays + los días del historial de medidas (así los usuarios
+    // que ya tenían medidas siguen contando sin migración). Date[] a medianoche
+    // local, ordenado descendente y deduplicado por día calendario.
+    function activeDaySet() {
+        const keys = new Set();
+        (Array.isArray(userData.activeDays) ? userData.activeDays : []).forEach(k => {
+            const d = parseAppDate(k); if (!isNaN(d.getTime())) keys.add(_dayKey(d));
+        });
+        (userData.history || []).forEach(r => {
+            const d = parseAppDate(r.date); if (!isNaN(d.getTime())) keys.add(_dayKey(d));
+        });
+        return [...keys].map(k => parseAppDate(k)).sort((a, b) => b - a);
+    }
+    // Marca HOY como día activo. Se llama tras registrar comida/ejercicio/medida.
+    window.markActiveToday = function markActiveToday() {
+        if (!Array.isArray(userData.activeDays)) userData.activeDays = [];
+        const k = _dayKey();
+        if (!userData.activeDays.includes(k)) {
+            userData.activeDays.push(k);
+            userData.activeDays.sort();
+        }
+    };
+
     function streakDays() {
-        const h = userData.history || [];
-        if (h.length === 0) return 0;
-        // h debe estar ordenado por fecha; buscar último registro y contar consecutivos
-        const dates = h.map(r => parseAppDate(r.date).toDateString());
-        const unique = [...new Set(dates)].map(d => new Date(d)).sort((a,b) => b-a);
+        const unique = activeDaySet();   // Date[] desc, un elemento por día activo
+        if (unique.length === 0) return 0;
         let streak = 1;
         for (let i = 1; i < unique.length; i++) {
             const diff = (unique[i-1] - unique[i]) / (1000 * 60 * 60 * 24);
             if (Math.round(diff) === 1) streak++;
             else break;
         }
-        // Validar que el último sea hoy o ayer
+        // Válida solo si el último día activo es hoy o ayer.
         const lastDiff = (new Date() - unique[0]) / (1000 * 60 * 60 * 24);
         return lastDiff <= 1.5 ? streak : 0;
     }
@@ -4583,8 +4622,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Cantidad de días de calendario DISTINTOS en los que hubo registro.
     function distinctDaysLogged() {
-        const h = userData.history || [];
-        return new Set(h.map(r => parseAppDate(r.date).toDateString())).size;
+        // Días distintos con CUALQUIER actividad (comida/ejercicio/medida).
+        return activeDaySet().length;
     }
 
     function checkAchievements() {

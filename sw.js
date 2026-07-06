@@ -1,12 +1,12 @@
-const CACHE_NAME = 'axcore-v5.32-sync-no-borra-racha';
+const CACHE_NAME = 'axcore-v5.33-racha-cuenta-actividad';
 const urlsToCache = [
   './',
-  './index.html?v=20260706d',
-  './index.css?v=20260706d',
-  './premium.css?v=20260706d',
-  './profile-persist.js?v=20260706d',
-  './app.js?v=20260706d',
-  './knowledge.js?v=20260706d',
+  './index.html?v=20260706e',
+  './index.css?v=20260706e',
+  './premium.css?v=20260706e',
+  './profile-persist.js?v=20260706e',
+  './app.js?v=20260706e',
+  './knowledge.js?v=20260706e',
   './logo.png',
   './logo_coach.png',
   './manifest_vip.json',
