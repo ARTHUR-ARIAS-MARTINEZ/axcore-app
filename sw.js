@@ -1,12 +1,12 @@
-const CACHE_NAME = 'axcore-v5.34-recorte-foto-backfill-racha';
+const CACHE_NAME = 'axcore-v5.35-recorte-foto-wysiwyg';
 const urlsToCache = [
   './',
-  './index.html?v=20260706f',
-  './index.css?v=20260706f',
-  './premium.css?v=20260706f',
-  './profile-persist.js?v=20260706f',
-  './app.js?v=20260706f',
-  './knowledge.js?v=20260706f',
+  './index.html?v=20260706g',
+  './index.css?v=20260706g',
+  './premium.css?v=20260706g',
+  './profile-persist.js?v=20260706g',
+  './app.js?v=20260706g',
+  './knowledge.js?v=20260706g',
   './logo.png',
   './logo_coach.png',
   './manifest_vip.json',

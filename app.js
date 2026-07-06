@@ -1757,15 +1757,29 @@ document.addEventListener('DOMContentLoaded', () => {
                 canvas.width = OUT; canvas.height = OUT;
                 const ctx = canvas.getContext('2d');
                 ctx.fillStyle = '#000'; ctx.fillRect(0, 0, OUT, OUT);
-                const scale = coverScale * zoom;
-                const srcX = (-tx) / scale, srcY = (-ty) / scale, srcSize = V / scale;
+                // Recorte WYSIWYG: se MIDE la geometría real renderizada (rects en
+                // pantalla) en vez de recalcularla, para que lo guardado sea EXACTO a
+                // lo que se ve dentro del círculo, sin depender de reglas CSS externas.
+                const sRect = stage.getBoundingClientRect();
+                const iRect = imgEl.getBoundingClientRect();
+                const sx = natW / iRect.width;      // px naturales por px de pantalla
+                const sy = natH / iRect.height;
+                const srcX = Math.max(0, (sRect.left - iRect.left) * sx);
+                const srcY = Math.max(0, (sRect.top  - iRect.top ) * sy);
+                const srcW = sRect.width  * sx;
+                const srcH = sRect.height * sy;
                 try {
-                    ctx.drawImage(image, srcX, srcY, srcSize, srcSize, 0, 0, OUT, OUT);
+                    ctx.drawImage(image, srcX, srcY, srcW, srcH, 0, 0, OUT, OUT);
                     const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
+                    // Reflejar la foto en memoria para que TODAS las vistas del avatar la
+                    // muestren (updatePmProfileHero/applySettings leen userData.avatarPhoto;
+                    // antes lo veían vacío y borraban la foto recién puesta por AXProfile).
+                    // saveData la quita del JSON de localStorage → no rompe la cuota.
+                    try { userData.avatarPhoto = dataUrl; userData.avatar = dataUrl; } catch(_){}
                     if (window.AXProfile && typeof window.AXProfile.savePhoto === 'function') window.AXProfile.savePhoto(dataUrl);
                     else if (typeof pmSaveAvatar === 'function') pmSaveAvatar(dataUrl);
-                    if (typeof window.updatePmProfileHero === 'function') window.updatePmProfileHero();
                     if (typeof window.syncProfileEverywhere === 'function') window.syncProfileEverywhere();
+                    if (typeof window.updatePmProfileHero === 'function') window.updatePmProfileHero();
                     if (typeof checkAchievements === 'function') checkAchievements();
                     if (typeof axToast === 'function') axToast('✓ Foto de perfil actualizada.');
                 } catch (err) {
@@ -1902,10 +1916,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const _bset4 = new Set(['', 'atleta', 'admin', 'usuario']);
             const _san4  = (v) => { const s=(v||'').toString().trim(); return _bset4.has(s.toLowerCase()) ? '' : s; };
             let name = _san4(ud.userName) || _san4(ud.username) || _san4(currentUser) || 'ATLETA';
+            // Foto: la fuente canónica es AXProfile (donde guarda el recortador);
+            // userData.avatarPhoto es respaldo. Antes solo miraba userData y, como
+            // AXProfile no escribe ahí, borraba la foto recién recortada.
+            let _heroPhoto = ud.avatarPhoto || ud.avatar || '';
+            try { if (window.AXProfile && typeof window.AXProfile.getPhoto === 'function') _heroPhoto = window.AXProfile.getPhoto() || _heroPhoto; } catch(_){}
             const av = document.getElementById('pmProfAvatar');
             if (av) {
-                if (ud.avatarPhoto) {
-                    av.style.background = `url(${ud.avatarPhoto}) center/cover`;
+                if (_heroPhoto) {
+                    av.style.background = `url(${_heroPhoto}) center/cover`;
                     av.textContent = '';
                 } else {
                     av.style.background = '';
