@@ -111,13 +111,83 @@ body.premium-mode[data-theme="blanco"] {
   --text-dim: #5a6572;
   background: #f2f3f5 !important;
 }
-/* En tema blanco, el texto blanco fijo (inline #fff) pasa a oscuro,
-   y los fondos negros translúcidos inline se aclaran. */
+/* ═══════════════════════════════════════════════════════════
+   TEMA BLANCO — modo claro armónico (SOLO [data-theme="blanco"])
+   Página clara · tarjetas blancas · texto grafito · botones
+   grafito→negro con texto BLANCO · bordes gris tenue.
+   ═══════════════════════════════════════════════════════════ */
+
+/* 1) BOTONES PRIMARIOS. En blanco el acento vale casi-negro, así que el
+   gradiente acento→acento con texto negro perdía el texto. Aquí: grafito→
+   negro sólido con texto BLANCO. Se EXCLUYEN los botones de peligro (rojos)
+   por :not() y por los selectores de ID que ya los pintan de rojo. */
+body.premium-mode[data-theme="blanco"] .btn-premium:not(.pm-d-reset):not(.danger-btn),
+body.premium-mode[data-theme="blanco"] .pm-calc-btn-green,
+body.premium-mode[data-theme="blanco"] .pm-diet-import-btn,
+body.premium-mode[data-theme="blanco"] .pm-d-reg-add,
+body.premium-mode[data-theme="blanco"] .pm-d-food-add,
+body.premium-mode[data-theme="blanco"] .ax-modal-btn.ax-ok {
+  background: linear-gradient(135deg, #33383f, #14181d) !important;
+  color: #ffffff !important;
+  border: none !important;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.16) !important;
+}
+body.premium-mode[data-theme="blanco"] .btn-premium:not(.pm-d-reset):not(.danger-btn):hover,
+body.premium-mode[data-theme="blanco"] .pm-calc-btn-green:hover,
+body.premium-mode[data-theme="blanco"] .pm-diet-import-btn:hover,
+body.premium-mode[data-theme="blanco"] .pm-d-reg-add:hover {
+  box-shadow: 0 6px 22px rgba(0,0,0,0.26) !important;
+}
+
+/* 2) CHIP "TODOS" y botón ✓: fondo grafito + texto blanco (acento = casi-negro). */
+body.premium-mode[data-theme="blanco"] .pm-wf-chip.active-todos,
+body.premium-mode[data-theme="blanco"] .btn-ex-check.ex-ok {
+  background: #14181d !important; color: #ffffff !important; border-color: #14181d !important;
+}
+/* Chips de músculo inactivos: borde visible sobre blanco. */
+body.premium-mode[data-theme="blanco"] .pm-wf-chip { border-color: rgba(0,0,0,0.14) !important; }
+/* Pestaña de dieta activa: texto grafito legible. */
+body.premium-mode[data-theme="blanco"] .pm-d-tab.on { color: #14181d !important; }
+
+/* 3) TEXTO BLANCO FIJO (inline) → grafito. Los botones de arriba fuerzan su
+   propio blanco con MÁS especificidad, así que su texto no se ve afectado. */
 body.premium-mode[data-theme="blanco"] [style*="color:#fff"],
 body.premium-mode[data-theme="blanco"] [style*="color: #fff"],
-body.premium-mode[data-theme="blanco"] [style*="color:#ffffff"] { color: #14181d !important; }
+body.premium-mode[data-theme="blanco"] [style*="color:#ffffff"],
+body.premium-mode[data-theme="blanco"] [style*="color: #ffffff"],
+body.premium-mode[data-theme="blanco"] [style*="color:white"],
+body.premium-mode[data-theme="blanco"] [style*="color:#e8edf5"] {
+  color: #14181d !important;
+}
+
+/* 4) FONDOS NEGROS TRANSLÚCIDOS inline → gris muy claro (para leer el texto
+   grafito encima). Cubre los alfas usados en inputs y paneles. */
+body.premium-mode[data-theme="blanco"] [style*="background:rgba(0,0,0,0.5)"],
+body.premium-mode[data-theme="blanco"] [style*="background:rgba(0,0,0,0.4)"],
+body.premium-mode[data-theme="blanco"] [style*="background:rgba(0,0,0,0.35)"],
 body.premium-mode[data-theme="blanco"] [style*="background:rgba(0,0,0,0.3)"],
-body.premium-mode[data-theme="blanco"] [style*="background:rgba(0,0,0,0.2)"] { background: rgba(0,0,0,0.05) !important; }
+body.premium-mode[data-theme="blanco"] [style*="background:rgba(0,0,0,0.25)"],
+body.premium-mode[data-theme="blanco"] [style*="background:rgba(0,0,0,0.2)"],
+body.premium-mode[data-theme="blanco"] [style*="background: rgba(0,0,0,0.3)"],
+body.premium-mode[data-theme="blanco"] [style*="background:rgba(0, 0, 0, 0.3)"] {
+  background: rgba(0,0,0,0.045) !important;
+}
+
+/* 5) BORDES BLANCOS FIJOS inline (no vía --glass-border) → gris tenue oscuro,
+   para que los contornos de los recuadros se vean sobre el blanco. */
+body.premium-mode[data-theme="blanco"] [style*="1px solid rgba(255,255,255"],
+body.premium-mode[data-theme="blanco"] [style*="2px solid rgba(255,255,255"] {
+  border-color: rgba(0,0,0,0.14) !important;
+}
+
+/* 6) NAV INFERIOR: era una píldora azul-marino fija. En blanco se vuelve
+   píldora blanca; sus íconos activos ya usan el acento (grafito) y los
+   inactivos son gris medio → ambos visibles sobre el blanco. */
+body.premium-mode[data-theme="blanco"] .pm-bottom-nav-inner {
+  background: rgba(255,255,255,0.95) !important;
+  border: 1px solid rgba(0,0,0,0.10) !important;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.14), 0 0 0 1px rgba(0,0,0,0.02) !important;
+}
 
 /* ── MASCULINO 2: CYBERPUNK ── */
 body.premium-mode[data-theme="cyberpunk"] {
