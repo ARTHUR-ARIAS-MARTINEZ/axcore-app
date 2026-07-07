@@ -135,7 +135,7 @@
                 var hdr = document.getElementById('display-username');
                 if (hdr) {
                     hdr.textContent = clean.toUpperCase();
-                    hdr.style.setProperty('color', '#ffffff', 'important');
+                    hdr.style.setProperty('color', document.body.getAttribute('data-theme') === 'blanco' ? '#14181d' : '#ffffff', 'important');
                     hdr.style.setProperty('display', 'block', 'important');
                     hdr.style.setProperty('visibility', 'visible', 'important');
                     hdr.style.setProperty('opacity', '1', 'important');

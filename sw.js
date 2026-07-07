@@ -1,12 +1,12 @@
-const CACHE_NAME = 'axcore-v5.40-enlace-corto-neutro';
+const CACHE_NAME = 'axcore-v5.41-nombre-usuario-blanco';
 const urlsToCache = [
   './',
-  './index.html?v=20260706l',
-  './index.css?v=20260706l',
-  './premium.css?v=20260706l',
-  './profile-persist.js?v=20260706l',
-  './app.js?v=20260706l',
-  './knowledge.js?v=20260706l',
+  './index.html?v=20260706m',
+  './index.css?v=20260706m',
+  './premium.css?v=20260706m',
+  './profile-persist.js?v=20260706m',
+  './app.js?v=20260706m',
+  './knowledge.js?v=20260706m',
   './logo.png',
   './logo_coach.png',
   './manifest_vip.json',

@@ -399,7 +399,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     target.textContent = nameUpper;
                 }
                 // Reforzar estilos para garantizar visibilidad absoluta en cualquier tema
-                target.style.setProperty('color', '#ffffff', 'important');
+                target.style.setProperty('color', document.body.getAttribute('data-theme') === 'blanco' ? '#14181d' : '#ffffff', 'important');
                 target.style.setProperty('display', 'block', 'important');
                 target.style.setProperty('visibility', 'visible', 'important');
                 target.style.setProperty('opacity', '1', 'important');
@@ -1888,7 +1888,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const headerName = document.getElementById('display-username');
             if (headerName) {
                 headerName.textContent = nameUp;
-                headerName.style.setProperty('color', '#ffffff', 'important');
+                headerName.style.setProperty('color', document.body.getAttribute('data-theme') === 'blanco' ? '#14181d' : '#ffffff', 'important');
                 headerName.style.setProperty('display', 'block', 'important');
                 headerName.style.setProperty('visibility', 'visible', 'important');
                 headerName.style.setProperty('opacity', '1', 'important');
