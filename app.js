@@ -1006,6 +1006,42 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
+        // 2b. DISPOSITIVO NUEVO (o sin código local): login remoto por USERNAME para
+        //     JALAR los datos de la nube a este dispositivo. Con esto, al poner tu
+        //     usuario y contraseña en cualquier celular se restaura tu progreso.
+        try {
+            const res = await fetch(`${API_URL}/api/user/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: u, password: p })
+            });
+            const data = await res.json();
+            if (data.success) {
+                setApiToken(data.token);
+                const merged = { ...(savedLocal || {}), ...(data.data || {}) };
+                merged.username = u;
+                merged.passHash = await window.axPassHash(p);
+                delete merged.password;
+                if (data.gymCode) merged.gymCode = data.gymCode;
+                merged.achievements = data.achievements || merged.achievements || [];
+                localStorage.setItem(`arthur_data_${u}`, JSON.stringify(merged));
+                currentUser = u;
+                localStorage.setItem('arthur_current_user', u);
+                location.reload();
+                return;
+            }
+            // Backend respondió pero rechazó. Si NO hay respaldo local, mostrar su motivo
+            // (salvo "Faltan datos", que indica un backend viejo sin login por usuario).
+            if (!savedLocal && data.message && data.message !== 'Faltan datos.') {
+                axToast(data.message);
+                btn.textContent = originalText; btn.disabled = false;
+                return;
+            }
+        } catch (e) {
+            console.warn('[login] remoto por usuario no disponible:', e.message);
+            // Sin conexión → intentar login local de abajo.
+        }
+
         // 3. Login local (DEMO o fallback offline)
         if (!savedLocal) {
             axToast("Usuario no encontrado en este dispositivo.\nUsa NUEVO ATLETA para crear cuenta.");
@@ -1413,7 +1449,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     <path d="${wPath}" fill="none" stroke="${accentMain}" stroke-width="2" stroke-linecap="round"/>
                     ${cPath ? `<path d="${cPath}" fill="none" stroke="${accentSec}" stroke-width="1.5" stroke-dasharray="4 2" opacity=".7"/>` : ''}
                     <circle cx="${lastX}" cy="${lastY}" r="3" fill="${accentMain}"/>`;
-                get('pd-spark-svg').parentElement.style.display = '';
+                spark.parentElement.style.display = '';
+            } else if (spark) {
+                // Menos de 2 medidas: no hay línea que trazar → mostrar aviso claro en
+                // vez de una caja vacía (antes se veía "TENDENCIA 10 DÍAS" sin nada).
+                spark.innerHTML = `<text x="155" y="33" text-anchor="middle" fill="#8a94a6" font-size="9.5" font-family="Inter,sans-serif">Registra 2 o más medidas para ver tu tendencia</text>`;
+                spark.parentElement.style.display = '';
             }
         } else if (evolSection) {
             evolSection.style.display = 'none';
@@ -2133,21 +2174,27 @@ document.addEventListener('DOMContentLoaded', () => {
             const ctx = _axAudioCtx;
             if (ctx.state === 'suspended') ctx.resume();   // el swipe es gesto de usuario → permitido
             const now = ctx.currentTime;
+            // "Pop" cálido y suave (onda triangular, tono que BAJA) — más acorde/discreto
+            // que el beep agudo anterior. Un lowpass le quita el filo metálico.
             const osc = ctx.createOscillator();
             const gain = ctx.createGain();
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(430, now);
-            osc.frequency.exponentialRampToValueAtTime(760, now + 0.05);   // sube = "blup"
+            const lp = ctx.createBiquadFilter();
+            lp.type = 'lowpass'; lp.frequency.value = 1400;
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(540, now);
+            osc.frequency.exponentialRampToValueAtTime(300, now + 0.10);   // baja = "pop/boop"
             gain.gain.setValueAtTime(0.0001, now);
-            gain.gain.exponentialRampToValueAtTime(0.16, now + 0.012);
-            gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.14);
-            osc.connect(gain); gain.connect(ctx.destination);
+            gain.gain.exponentialRampToValueAtTime(0.22, now + 0.010);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.17);
+            osc.connect(lp); lp.connect(gain); gain.connect(ctx.destination);
             osc.start(now);
-            osc.stop(now + 0.16);
+            osc.stop(now + 0.19);
         } catch(_) {}
     }
     function axNavFeedback() {
-        try { if (navigator.vibrate) navigator.vibrate(18); } catch(_) {}
+        // Vibración más notoria: patrón de doble pulso (vibra-pausa-vibra) — se
+        // siente más que un solo toque corto. (Android; iOS ignora navigator.vibrate.)
+        try { if (navigator.vibrate) navigator.vibrate([35, 25, 60]); } catch(_) {}
         axPlayBlip();
     }
 

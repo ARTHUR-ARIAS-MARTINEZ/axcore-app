@@ -857,8 +857,10 @@ body.premium-mode #diet-edit-breakfast,
 body.premium-mode #diet-edit-lunch,
 body.premium-mode #diet-edit-dinner,
 body.premium-mode #diet-edit-snacks {
-  background: rgba(0,0,0,0.3) !important;
-  border: 1px solid var(--pm-border) !important;
+  /* Tinte sutil del acento del tema (antes rgba(0,0,0,.3) fijo = gris muddy que
+     no armonizaba: en temas de color se veía como un hueco oscuro). */
+  background: rgba(var(--pm-green-rgb), 0.08) !important;
+  border: 1px solid rgba(var(--pm-green-rgb), 0.18) !important;
   border-radius: var(--pm-r3) !important;
   color: var(--pm-white) !important;
   font-family: 'Inter', sans-serif !important;

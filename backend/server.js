@@ -458,29 +458,48 @@ app.post('/api/user/register', loginLimiter, async (req, res) => {
 // Login del atleta — devuelve JWT + data
 app.post('/api/user/login', loginLimiter, async (req, res) => {
     try {
-        const { code, password } = req.body || {};
+        const { code, username, password } = req.body || {};
         const codeUp = String(code || '').toUpperCase();
         const p = sanitizeStr(password, 100);
 
-        if (!isValidCode(codeUp) || !p) return res.json({ success: false, message: 'Faltan datos.' });
+        if (!p) return res.json({ success: false, message: 'Faltan datos.' });
 
-        const user = await User.findOne({ code: codeUp });
+        // Buscar por CÓDIGO (login normal) o por USERNAME (para entrar en un
+        // dispositivo NUEVO sin tener el código a la mano → así se jalan los datos
+        // de la nube). El username no es único, se valida la contraseña contra cada
+        // coincidencia y solo se acepta si hay exactamente una.
+        let user = null;
+        if (isValidCode(codeUp)) {
+            user = await User.findOne({ code: codeUp });
+        } else if (username) {
+            const uname = sanitizeStr(username, 40);
+            const candidates = await User.find({ username: uname }).limit(25);
+            const matches = [];
+            for (const c of candidates) {
+                if (await comparePassword(p, c.password)) matches.push(c);
+            }
+            if (matches.length > 1) return res.json({ success: false, message: 'Hay varias cuentas con ese usuario. Inicia sesión con tu código AXV.' });
+            if (matches.length === 1) user = matches[0];
+        } else {
+            return res.json({ success: false, message: 'Faltan datos.' });
+        }
         if (!user) return res.json({ success: false, message: 'Usuario no registrado. Usa NUEVO ATLETA.' });
 
         const ok = await comparePassword(p, user.password);
         if (!ok) return res.json({ success: false, message: 'Contraseña incorrecta.' });
 
+        const uCode = user.code;
         // Validar que el código siga activo y la franquicia pagada
-        const pass = await Code.findOne({ code: codeUp });
+        const pass = await Code.findOne({ code: uCode });
         if (!pass || !pass.active) return res.json({ success: false, message: 'Acceso suspendido por tu gimnasio.' });
         const gym = await Gym.findOne({ gymCode: user.gymCode });
         if (gym && !gym.active) return res.json({ success: false, message: 'Franquicia sin pago activo.' });
 
         // Generar nuevo sessionId — invalida automáticamente cualquier sesión previa
         const sid = crypto.randomBytes(16).toString('hex');
-        await User.updateOne({ code: codeUp }, { activeSessionId: sid });
+        await User.updateOne({ code: uCode }, { activeSessionId: sid });
 
-        const token = jwt.sign({ code: codeUp, gymCode: user.gymCode, username: user.username, sid }, JWT_SECRET, { expiresIn: '30d' });
+        const token = jwt.sign({ code: uCode, gymCode: user.gymCode, username: user.username, sid }, JWT_SECRET, { expiresIn: '30d' });
         res.json({
             success: true,
             token,
