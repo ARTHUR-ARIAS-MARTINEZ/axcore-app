@@ -1,12 +1,12 @@
-const CACHE_NAME = 'axcore-v5.43-sonido-vibra-textarea-sparkline-login';
+const CACHE_NAME = 'axcore-v5.44-sonido-tech-sin-vibra-swipe';
 const urlsToCache = [
   './',
-  './index.html?v=20260706o',
-  './index.css?v=20260706o',
-  './premium.css?v=20260706o',
-  './profile-persist.js?v=20260706o',
-  './app.js?v=20260706o',
-  './knowledge.js?v=20260706o',
+  './index.html?v=20260706p',
+  './index.css?v=20260706p',
+  './premium.css?v=20260706p',
+  './profile-persist.js?v=20260706p',
+  './app.js?v=20260706p',
+  './knowledge.js?v=20260706p',
   './logo.png',
   './logo_coach.png',
   './manifest_vip.json',

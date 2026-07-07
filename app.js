@@ -2161,10 +2161,11 @@ document.addEventListener('DOMContentLoaded', () => {
     })();
 
     // ═══════════════════════════════════════════════════════════
-    // FEEDBACK AL BRINCAR DE SECCIÓN — sonido "blup" + vibración
+    // FEEDBACK AL BRINCAR DE SECCIÓN — tick digital elegante (sin vibración)
     // ═══════════════════════════════════════════════════════════
-    // Sonido sintetizado con Web Audio (sin archivos → funciona offline). La
-    // vibración solo existe en Android; iOS ignora navigator.vibrate (no falla).
+    // Sintetizado con Web Audio (sin archivos → funciona offline). Timbre limpio
+    // tipo "glass tick" moderno: fundamental + su octava en seno, sin bend, con
+    // caída suave y volumen discreto. Sobrio y tecnológico.
     let _axAudioCtx = null;
     function axPlayBlip() {
         try {
@@ -2174,27 +2175,26 @@ document.addEventListener('DOMContentLoaded', () => {
             const ctx = _axAudioCtx;
             if (ctx.state === 'suspended') ctx.resume();   // el swipe es gesto de usuario → permitido
             const now = ctx.currentTime;
-            // "Pop" cálido y suave (onda triangular, tono que BAJA) — más acorde/discreto
-            // que el beep agudo anterior. Un lowpass le quita el filo metálico.
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-            const lp = ctx.createBiquadFilter();
-            lp.type = 'lowpass'; lp.frequency.value = 1400;
-            osc.type = 'triangle';
-            osc.frequency.setValueAtTime(540, now);
-            osc.frequency.exponentialRampToValueAtTime(300, now + 0.10);   // baja = "pop/boop"
-            gain.gain.setValueAtTime(0.0001, now);
-            gain.gain.exponentialRampToValueAtTime(0.22, now + 0.010);
-            gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.17);
-            osc.connect(lp); lp.connect(gain); gain.connect(ctx.destination);
-            osc.start(now);
-            osc.stop(now + 0.19);
+            const master = ctx.createGain();
+            master.gain.value = 0.85;
+            master.connect(ctx.destination);
+            // [frecuencia, volumen, duración] — la octava alta cae más rápido (crisp).
+            [[988, 0.11, 0.12], [1976, 0.045, 0.075]].forEach(([freq, vol, dec]) => {
+                const osc = ctx.createOscillator();
+                const g = ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.value = freq;
+                g.gain.setValueAtTime(0.0001, now);
+                g.gain.exponentialRampToValueAtTime(vol, now + 0.006);   // ataque rápido
+                g.gain.exponentialRampToValueAtTime(0.0001, now + dec);  // caída suave
+                osc.connect(g); g.connect(master);
+                osc.start(now);
+                osc.stop(now + dec + 0.02);
+            });
         } catch(_) {}
     }
     function axNavFeedback() {
-        // Vibración más notoria: patrón de doble pulso (vibra-pausa-vibra) — se
-        // siente más que un solo toque corto. (Android; iOS ignora navigator.vibrate.)
-        try { if (navigator.vibrate) navigator.vibrate([35, 25, 60]); } catch(_) {}
+        // Solo sonido (la vibración se eliminó por completo a petición del dueño).
         axPlayBlip();
     }
 
@@ -2288,24 +2288,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
         document.addEventListener('touchmove', (e) => {
             if (!tracking) return;
-            // Si la dirección inicial es mayormente vertical, cancelar tracking
+            // Cancelar SOLO si el gesto es CLARAMENTE vertical (scroll de la página).
+            // Antes se cancelaba al primer micro-movimiento (dy>dx && dy>12), lo que
+            // hacía que el swipe "se trabara" y a veces fallara en una dirección.
             const dx = Math.abs(e.touches[0].clientX - sX);
             const dy = Math.abs(e.touches[0].clientY - sY);
-            if (dy > dx && dy > 12) tracking = false;
+            if (dy > 34 && dy > dx * 1.6) tracking = false;
         }, { passive: true });
 
         document.addEventListener('touchend', (e) => {
             if (!tracking) return;
             tracking = false;
             const dt = Date.now() - sT;
-            if (dt > 500) return;
+            if (dt > 900) return;            // permite swipes lentos/deliberados (antes 500)
             const eX = e.changedTouches[0].clientX;
             const eY = e.changedTouches[0].clientY;
             const dx = eX - sX;
             const dy = Math.abs(eY - sY);
-            if (Math.abs(dx) < 30) return;   // mínimo 30px horizontal
-            if (dy > 80) return;             // máximo 80px vertical
-            if (Math.abs(dx) < dy * 1.2) return; // debe ser más horizontal que diagonal
+            if (Math.abs(dx) < 28) return;   // mínimo horizontal
+            if (dy > 110) return;            // demasiado vertical
+            if (Math.abs(dx) < dy) return;   // debe ser más horizontal que vertical (simétrico ambos lados)
             goToPage(dx);
         }, { passive: true });
     })();
