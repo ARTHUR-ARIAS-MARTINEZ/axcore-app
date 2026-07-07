@@ -557,6 +557,34 @@ app.get('/api/user/data', requireUserAuth, async (req, res) => {
 });
 
 // Cambiar contraseña del atleta
+// Restablecer contraseña OLVIDADA (sin sesión). Prueba de propiedad: el CÓDIGO AXV
+// (que da el coach) + el USERNAME registrado deben coincidir. Sin correo no hay
+// forma más fuerte; el código es la llave de recuperación del atleta.
+app.post('/api/user/reset-password', loginLimiter, async (req, res) => {
+    try {
+        const { code, username, newPassword } = req.body || {};
+        const codeUp = String(code || '').toUpperCase();
+        const uname = sanitizeStr(username, 40);
+        const np = sanitizeStr(newPassword, 100);
+
+        if (!isValidCode(codeUp)) return res.json({ success: false, message: 'Código inválido.' });
+        if (!np || np.length < 4) return res.json({ success: false, message: 'La nueva contraseña debe tener mín. 4 caracteres.' });
+
+        const user = await User.findOne({ code: codeUp });
+        if (!user) return res.json({ success: false, message: 'No hay ninguna cuenta con ese código.' });
+        if (uname.toLowerCase() !== String(user.username || '').toLowerCase()) {
+            return res.json({ success: false, message: 'El usuario no coincide con ese código.' });
+        }
+        const pass = await Code.findOne({ code: codeUp });
+        if (!pass || !pass.active) return res.json({ success: false, message: 'Acceso suspendido por tu gimnasio.' });
+
+        user.password = await hashPassword(np);
+        user.activeSessionId = '';   // invalida cualquier sesión previa
+        await user.save();
+        res.json({ success: true, username: user.username });
+    } catch (e) { res.status(500).json({ success: false, message: e.message }); }
+});
+
 app.post('/api/user/password', requireUserAuth, async (req, res) => {
     try {
         const { oldPassword, newPassword } = req.body || {};

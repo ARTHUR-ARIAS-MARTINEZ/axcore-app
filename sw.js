@@ -1,12 +1,12 @@
-const CACHE_NAME = 'axcore-v5.44-sonido-tech-sin-vibra-swipe';
+const CACHE_NAME = 'axcore-v5.45-swipe-estudio-ajustes-recuperar';
 const urlsToCache = [
   './',
-  './index.html?v=20260706p',
-  './index.css?v=20260706p',
-  './premium.css?v=20260706p',
-  './profile-persist.js?v=20260706p',
-  './app.js?v=20260706p',
-  './knowledge.js?v=20260706p',
+  './index.html?v=20260706q',
+  './index.css?v=20260706q',
+  './premium.css?v=20260706q',
+  './profile-persist.js?v=20260706q',
+  './app.js?v=20260706q',
+  './knowledge.js?v=20260706q',
   './logo.png',
   './logo_coach.png',
   './manifest_vip.json',

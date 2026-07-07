@@ -15,9 +15,9 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0a0e14">
     <link rel="apple-touch-icon" href="logo.png">
-    <link rel="stylesheet" href="index.css?v=20260706p">
+    <link rel="stylesheet" href="index.css?v=20260706q">
     <!-- Premium UI overrides (inerte si <body> NO tiene .premium-mode) -->
-    <link rel="stylesheet" href="premium.css?v=20260706p">
+    <link rel="stylesheet" href="premium.css?v=20260706q">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <!-- Fuentes: Inter para cuerpos de texto, Oswald (Heavy Gym) para titulares -->
@@ -388,7 +388,8 @@
                 </div>
             </div>
             <button id="btn-login-access" class="btn-premium" onclick="axcoreLogin()">INGRESAR AL SISTEMA</button>
-            <p style="margin-top:1rem; font-size:0.8rem; color:var(--accent-main); cursor:pointer;" id="toggle-to-register" onclick="document.getElementById('login-overlay').classList.add('hidden'); document.getElementById('register-overlay').classList.remove('hidden'); fetch('https://axcore-appax-core-backend.onrender.com/health').catch(()=>{});">¿No tienes cuenta? Regístrate aquí</p>
+            <p style="margin-top:0.8rem; font-size:0.78rem; color:var(--text-dim,#8a94a6); cursor:pointer; text-decoration:underline;" id="link-recovery" onclick="if(window.axShowRecovery)window.axShowRecovery();">¿Olvidaste tu usuario o contraseña?</p>
+            <p style="margin-top:0.6rem; font-size:0.8rem; color:var(--accent-main); cursor:pointer;" id="toggle-to-register" onclick="document.getElementById('login-overlay').classList.add('hidden'); document.getElementById('register-overlay').classList.remove('hidden'); fetch('https://axcore-appax-core-backend.onrender.com/health').catch(()=>{});">¿No tienes cuenta? Regístrate aquí</p>
         </div>
     </div>
 
@@ -996,12 +997,12 @@
 
     <!-- Gráficas (Al final para no bloquear inicio rápido) -->
     <script src="https://cdn.jsdelivr.net/npm/apexcharts" defer></script>
-    <script src="profile-persist.js?v=20260706p"></script>
-    <script src="knowledge.js?v=20260706p"></script>
-    <script src="app.js?v=20260706p"></script>
+    <script src="profile-persist.js?v=20260706q"></script>
+    <script src="knowledge.js?v=20260706q"></script>
+    <script src="app.js?v=20260706q"></script>
     <!-- Premium UI: catálogo de insignias + FAB + onboarding -->
-    <script src="premium-badges.js?v=20260706p"></script>
-    <script src="premium-extras.js?v=20260706p"></script>
+    <script src="premium-badges.js?v=20260706q"></script>
+    <script src="premium-extras.js?v=20260706q"></script>
 
     <!-- REGISTRO GLOBAL — funciona aunque app.js falle -->
     <script>
@@ -1079,7 +1080,7 @@
         // Registro del Service Worker de PWA unificado con detección de actualizaciones y auto-refresco
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=20260706p').then(reg => {
+                navigator.serviceWorker.register('sw.js?v=20260706q').then(reg => {
                     console.log('[AX-CORE] Service Worker registrado con éxito:', reg.scope);
                     
                     // Detectar si hay una actualización de Service Worker esperando

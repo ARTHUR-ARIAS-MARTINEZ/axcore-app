@@ -3230,6 +3230,19 @@ body.premium-mode #btn-studio-share.sx-share-btn {
 }
 .pm-crop-apply { border: none; }      /* el resto lo da .btn-premium (respeta el tema) */
 
+/* ── Recuperar usuario / contraseña (usa el overlay .pm-crop-ov) ── */
+.ax-rec-block { margin-top: 14px; padding-top: 13px; border-top: 1px solid var(--pm-border, rgba(255,255,255,0.1)); }
+.ax-rec-block:first-of-type { border-top: none; padding-top: 4px; margin-top: 10px; }
+.ax-rec-h { font-family: var(--font-accent,'Oswald',sans-serif); font-weight: 700; letter-spacing: 1px; font-size: 0.9rem; color: var(--accent-main,#00c97a); margin-bottom: 4px; }
+.ax-rec-sub { font-size: 0.72rem; color: var(--pm-dim2, rgba(255,255,255,0.55)); line-height: 1.45; margin-bottom: 9px; }
+.ax-rec-users { display: flex; flex-wrap: wrap; gap: 6px; }
+.ax-rec-user { padding: 7px 13px; border-radius: 8px; background: rgba(var(--pm-green-rgb,0,201,122),0.12); border: 1px solid rgba(var(--pm-green-rgb,0,201,122),0.32); color: var(--pm-white,#e8edf5); font-size: 0.8rem; cursor: pointer; font-family: inherit; }
+.ax-rec-none { font-size: 0.72rem; color: var(--pm-dim2, rgba(255,255,255,0.4)); font-style: italic; }
+.ax-rec-in { width: 100%; box-sizing: border-box; margin-bottom: 8px; padding: 11px 12px; border-radius: 10px; background: var(--pm-s1, #0d1826); border: 1px solid var(--pm-border2, rgba(255,255,255,0.18)); color: var(--pm-white, #e8edf5); font-size: 0.85rem; font-family: inherit; }
+.ax-rec-in::placeholder { color: var(--pm-dim2, rgba(255,255,255,0.4)); }
+.ax-rec-msg { font-size: 0.72rem; line-height: 1.4; margin-bottom: 8px; min-height: 1px; }
+.ax-rec-apply { width: 100%; }
+
 /* ════════════════════════════════════════════════════════════════
    AUTOCOMPLETADO DE ALIMENTOS (lista de sugerencias desplazable)
    ════════════════════════════════════════════════════════════════ */

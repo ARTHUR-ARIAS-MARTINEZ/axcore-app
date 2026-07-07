@@ -1063,6 +1063,85 @@ document.addEventListener('DOMContentLoaded', () => {
     if (loginPass) loginPass.onkeypress = (e) => { if (e.key === 'Enter') document.getElementById('btn-login-access').click(); };
     if (regPass) regPass.onkeypress = (e) => { if (e.key === 'Enter') document.getElementById('btn-register-confirm').click(); };
 
+    // ═══════════════ RECUPERAR USUARIO / CONTRASEÑA ═══════════════
+    window.axShowRecovery = function() {
+        // Cuentas guardadas en ESTE dispositivo → ayuda si olvidó su usuario.
+        const devUsers = [];
+        try {
+            for (let i = 0; i < localStorage.length; i++) {
+                const k = localStorage.key(i);
+                if (k && k.indexOf('arthur_data_') === 0) devUsers.push(k.replace('arthur_data_', ''));
+            }
+        } catch(_) {}
+        const esc = s => String(s).replace(/</g,'&lt;').replace(/"/g,'&quot;');
+        const ov = document.createElement('div');
+        ov.className = 'pm-crop-ov';
+        ov.innerHTML = `
+            <div class="pm-crop-panel" style="max-width:360px; text-align:left;">
+                <div class="pm-crop-title" style="text-align:center;">RECUPERAR ACCESO</div>
+                <div class="ax-rec-block">
+                    <div class="ax-rec-h">¿Olvidaste tu USUARIO?</div>
+                    <div class="ax-rec-sub">Cuentas guardadas en este dispositivo:</div>
+                    <div class="ax-rec-users">${devUsers.length ? devUsers.map(u => `<button class="ax-rec-user" data-u="${esc(u)}">${esc(u)}</button>`).join('') : '<span class="ax-rec-none">— Ninguna guardada en este dispositivo —</span>'}</div>
+                </div>
+                <div class="ax-rec-block">
+                    <div class="ax-rec-h">¿Olvidaste tu CONTRASEÑA?</div>
+                    <div class="ax-rec-sub">Restablécela con tu <b>código de atleta</b> (el que te dio tu coach) y tu usuario.</div>
+                    <input class="ax-rec-in" id="axRecCode" placeholder="Código de atleta (AXV-...)" autocomplete="off">
+                    <input class="ax-rec-in" id="axRecUser" placeholder="Tu usuario" autocomplete="off">
+                    <input class="ax-rec-in" id="axRecPass" type="password" placeholder="Nueva contraseña (mín. 4)">
+                    <div class="ax-rec-msg" id="axRecMsg"></div>
+                    <button class="btn-premium ax-rec-apply" id="axRecReset">RESTABLECER CONTRASEÑA</button>
+                </div>
+                <button class="pm-crop-cancel" id="axRecClose" style="width:100%; margin-top:8px;">CERRAR</button>
+            </div>`;
+        document.body.appendChild(ov);
+        const close = () => ov.remove();
+        ov.querySelector('#axRecClose').onclick = close;
+        ov.addEventListener('click', (e) => { if (e.target === ov) close(); });
+        // Elegir un usuario del dispositivo → lo pone en el campo de login.
+        ov.querySelectorAll('.ax-rec-user').forEach(b => {
+            b.onclick = () => {
+                const li = document.getElementById('login-user');
+                if (li) li.value = b.dataset.u;
+                if (typeof axToast === 'function') axToast('Usuario puesto en el login. Escribe tu contraseña.');
+                close();
+            };
+        });
+        // Restablecer contraseña con código + usuario.
+        ov.querySelector('#axRecReset').onclick = async () => {
+            const code = (document.getElementById('axRecCode').value || '').trim().toUpperCase();
+            const user = (document.getElementById('axRecUser').value || '').trim();
+            const pass = (document.getElementById('axRecPass').value || '').trim();
+            const msg = document.getElementById('axRecMsg');
+            const setMsg = (t, ok) => { if (msg) { msg.textContent = t; msg.style.color = ok ? '#00c97a' : '#ff6b6b'; } };
+            if (!code) return setMsg('Escribe tu código de atleta.', false);
+            if (user.length < 3) return setMsg('Escribe tu usuario.', false);
+            if (pass.length < 4) return setMsg('La nueva contraseña debe tener mín. 4 caracteres.', false);
+            const btn = document.getElementById('axRecReset');
+            const orig = btn.textContent; btn.textContent = 'CONECTANDO…'; btn.disabled = true;
+            try {
+                const res = await fetch(`${API_URL}/api/user/reset-password`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ code, username: user, newPassword: pass })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    setMsg('✅ Contraseña actualizada. Entra con tu usuario y la nueva contraseña.', true);
+                    const li = document.getElementById('login-user'); if (li) li.value = data.username || user;
+                    setTimeout(close, 2400);
+                } else {
+                    setMsg('❌ ' + (data.message || 'No se pudo restablecer.'), false);
+                }
+            } catch(e) {
+                setMsg('❌ Sin conexión al servidor. Intenta en 1 minuto (puede estar iniciando).', false);
+            }
+            btn.textContent = orig; btn.disabled = false;
+        };
+        // Despertar el backend (cold start de Render) mientras el usuario escribe.
+        try { fetch(`${API_URL}/health`).catch(()=>{}); } catch(_) {}
+    };
+
     // El logout se gestiona ahora dentro del click de navLinks para evitar sobreescritura
 
     function showApp() {
@@ -2213,6 +2292,10 @@ document.addEventListener('DOMContentLoaded', () => {
             // Comprobación ultra-rápida por clases de contenedores con scroll horizontal en nuestra app
             // Esto evita llamar a getComputedStyle (provoca layout thrashing extremo en touchstart)
             if (el.classList) {
+                // SOLO scrollers HORIZONTALES reales (una franja horizontal roba el
+                // swipe para su propio scroll). NO incluir grids que envuelven como
+                // .theme-grid (es grid de 3 columnas, no scrollea) ni contenedores de
+                // scroll vertical: esos deben permitir el swipe de sección.
                 if (el.classList.contains('studio-templates') ||
                     el.classList.contains('studio-metrics') ||
                     el.classList.contains('studio-pro-pills') ||
@@ -2220,8 +2303,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     el.classList.contains('studio-pro-tabs') ||
                     el.classList.contains('sx-tabbar') ||
                     el.classList.contains('pm-workout-filters') ||
-                    el.classList.contains('pd-badges-scroll') ||   // carrusel de insignias del tablero (scroll horizontal propio)
-                    el.classList.contains('theme-grid')) {
+                    el.classList.contains('pd-badges-scroll')) {   // carrusel de insignias del tablero
                     return true;
                 }
             }
@@ -2235,14 +2317,13 @@ document.addEventListener('DOMContentLoaded', () => {
             let el = target;
             for (let i = 0; i < 8 && el; i++) {
                 if (el.classList && (
-                    el.classList.contains('sx-sheet') ||
-                    el.classList.contains('sx-ach-bar') ||
-                    el.classList.contains('sx-ach-body') ||
+                    // Modales a pantalla completa (no navegar por detrás) y la tabla de
+                    // medidas (scrollea en horizontal). Se QUITARON sx-sheet (ya no existe),
+                    // sx-ach-bar/body (scroll VERTICAL), history-controls y measurement-form:
+                    // bloqueaban el swipe en Estudio y Ajustes sin ser scrollers horizontales.
                     el.classList.contains('studio-modal-overlay') ||
                     el.classList.contains('studio-modal-container') ||
-                    el.classList.contains('history-table-container') ||   // tabla de medidas (scroll horizontal)
-                    el.classList.contains('history-controls') ||          // filtro TODO/SEMANA/MES
-                    el.classList.contains('measurement-form')             // formulario de medidas
+                    el.classList.contains('history-table-container')
                 )) {
                     return true;
                 }
