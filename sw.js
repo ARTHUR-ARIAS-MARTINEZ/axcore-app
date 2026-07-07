@@ -1,12 +1,12 @@
-const CACHE_NAME = 'axcore-v5.41-nombre-usuario-blanco';
+const CACHE_NAME = 'axcore-v5.42-feedback-swipe-seccion';
 const urlsToCache = [
   './',
-  './index.html?v=20260706m',
-  './index.css?v=20260706m',
-  './premium.css?v=20260706m',
-  './profile-persist.js?v=20260706m',
-  './app.js?v=20260706m',
-  './knowledge.js?v=20260706m',
+  './index.html?v=20260706n',
+  './index.css?v=20260706n',
+  './premium.css?v=20260706n',
+  './profile-persist.js?v=20260706n',
+  './app.js?v=20260706n',
+  './knowledge.js?v=20260706n',
   './logo.png',
   './logo_coach.png',
   './manifest_vip.json',

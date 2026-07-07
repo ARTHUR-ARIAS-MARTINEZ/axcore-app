@@ -2120,6 +2120,38 @@ document.addEventListener('DOMContentLoaded', () => {
     })();
 
     // ═══════════════════════════════════════════════════════════
+    // FEEDBACK AL BRINCAR DE SECCIÓN — sonido "blup" + vibración
+    // ═══════════════════════════════════════════════════════════
+    // Sonido sintetizado con Web Audio (sin archivos → funciona offline). La
+    // vibración solo existe en Android; iOS ignora navigator.vibrate (no falla).
+    let _axAudioCtx = null;
+    function axPlayBlip() {
+        try {
+            const AC = window.AudioContext || window.webkitAudioContext;
+            if (!AC) return;
+            if (!_axAudioCtx) _axAudioCtx = new AC();
+            const ctx = _axAudioCtx;
+            if (ctx.state === 'suspended') ctx.resume();   // el swipe es gesto de usuario → permitido
+            const now = ctx.currentTime;
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(430, now);
+            osc.frequency.exponentialRampToValueAtTime(760, now + 0.05);   // sube = "blup"
+            gain.gain.setValueAtTime(0.0001, now);
+            gain.gain.exponentialRampToValueAtTime(0.16, now + 0.012);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.14);
+            osc.connect(gain); gain.connect(ctx.destination);
+            osc.start(now);
+            osc.stop(now + 0.16);
+        } catch(_) {}
+    }
+    function axNavFeedback() {
+        try { if (navigator.vibrate) navigator.vibrate(18); } catch(_) {}
+        axPlayBlip();
+    }
+
+    // ═══════════════════════════════════════════════════════════
     // SWIPE LATERAL — Cambiar de sección con el pulgar (←/→)
     // ═══════════════════════════════════════════════════════════
     (function setupSwipeNavigation() {
@@ -2188,6 +2220,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 : (idx - 1 + list.length) % list.length;
             const target = list[newIdx];
             if (!target) return;
+            axNavFeedback();   // "blup" + vibración al brincar de sección
             target.click();
             const pg = document.querySelector('.page.active');
             if (pg) {
