@@ -166,14 +166,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 const nm = document.createElement('span'); nm.textContent = f.name;
                 const info = document.createElement('small'); info.textContent = `${f.cal} kcal`;
                 row.appendChild(nm); row.appendChild(info);
-                // Seleccionar SOLO con un toque real: si el dedo se arrastra (scroll de la
-                // lista) NO se selecciona. Antes usaba 'mousedown' → seleccionaba al primer
-                // contacto y cerraba la lista al intentar desplazarla.
-                let sx = 0, sy = 0, moved = false;
-                row.addEventListener('pointerdown', (e) => { sx = e.clientX; sy = e.clientY; moved = false; });
-                row.addEventListener('pointermove', (e) => { if (Math.abs(e.clientX - sx) > 8 || Math.abs(e.clientY - sy) > 8) moved = true; });
-                row.addEventListener('pointercancel', () => { moved = true; });   // el navegador toma el gesto para hacer scroll
-                row.addEventListener('pointerup', () => { if (!moved) select(f); });
+                // Seleccionar en CLICK real (no en pointerup): el navegador solo dispara
+                // click en un TOQUE; si arrastras para desplazar la lista, no hay click.
+                // Además la fila CONSUME el click. Antes se seleccionaba en pointerup y la
+                // caja se eliminaba al instante → el click sintético del navegador caía en
+                // lo que quedaba DEBAJO (el botón "+ AGREGAR A MI DÍA") y el alimento se
+                // registraba solo, sin que el usuario diera Agregar.
+                row.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); select(f); });
                 box.appendChild(row);
             });
             const r = inp.getBoundingClientRect();
@@ -2281,7 +2280,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // SWIPE LATERAL — Cambiar de sección con el pulgar (←/→)
     // ═══════════════════════════════════════════════════════════
     (function setupSwipeNavigation() {
-        let sX = 0, sY = 0, sT = 0, tracking = false;
+        let sX = 0, sY = 0, sT = 0, tracking = false, fired = false;
 
         // Solo bloqueamos elementos que USAN scroll horizontal propio
         // o capturan touch de forma activa (inputs, sliders, scroll horizontal)
@@ -2360,6 +2359,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         document.addEventListener('touchstart', (e) => {
             tracking = false;
+            fired = false;
             if (shouldBlock(e.target)) return;
             sX = e.touches[0].clientX;
             sY = e.touches[0].clientY;
@@ -2368,27 +2368,35 @@ document.addEventListener('DOMContentLoaded', () => {
         }, { passive: true });
 
         document.addEventListener('touchmove', (e) => {
-            if (!tracking) return;
-            // Cancelar SOLO si el gesto es CLARAMENTE vertical (scroll de la página).
-            // Antes se cancelaba al primer micro-movimiento (dy>dx && dy>12), lo que
-            // hacía que el swipe "se trabara" y a veces fallara en una dirección.
-            const dx = Math.abs(e.touches[0].clientX - sX);
+            if (!tracking || fired) return;
+            const dx = e.touches[0].clientX - sX;
             const dy = Math.abs(e.touches[0].clientY - sY);
-            if (dy > 34 && dy > dx * 1.6) tracking = false;
+            // DISPARO EN PLENO GESTO: en cuanto el arrastre es claramente horizontal
+            // (50px y más horizontal que vertical) se navega YA, sin esperar a soltar
+            // el dedo, sin exigir velocidad ni límite de tiempo. Esto elimina la
+            // sensación de "necesita fuerza/presión" — un arrastre suave basta.
+            if (Math.abs(dx) >= 50 && Math.abs(dx) > dy) {
+                fired = true;
+                tracking = false;
+                goToPage(dx);
+                return;
+            }
+            // Cancelar solo si es MUY claramente un scroll vertical.
+            if (dy > 60 && dy > Math.abs(dx) * 2) tracking = false;
         }, { passive: true });
 
         document.addEventListener('touchend', (e) => {
-            if (!tracking) return;
+            if (!tracking || fired) return;
             tracking = false;
-            const dt = Date.now() - sT;
-            if (dt > 900) return;            // permite swipes lentos/deliberados (antes 500)
+            // Respaldo para FLICKS cortos (el dedo se levantó antes de los 50px del
+            // disparo en movimiento). Sin límite de tiempo: también cuenta un arrastre
+            // corto y deliberado.
             const eX = e.changedTouches[0].clientX;
             const eY = e.changedTouches[0].clientY;
             const dx = eX - sX;
             const dy = Math.abs(eY - sY);
-            if (Math.abs(dx) < 28) return;   // mínimo horizontal
-            if (dy > 110) return;            // demasiado vertical
-            if (Math.abs(dx) < dy) return;   // debe ser más horizontal que vertical (simétrico ambos lados)
+            if (Math.abs(dx) < 24) return;        // mínimo horizontal
+            if (Math.abs(dx) < dy * 0.9) return;  // debe ser mayormente horizontal
             goToPage(dx);
         }, { passive: true });
     })();
@@ -2619,6 +2627,9 @@ document.addEventListener('DOMContentLoaded', () => {
         return 0;
     }
 
+    // Tab activo de la página de Dieta — PERSISTE entre re-renders (renderDietPage
+    // se llama al agregar/quitar alimentos y antes siempre regresaba a MI PLAN).
+    let pmDietTab = 'plan';
     function renderDietPage() {
         const diet = userData.recommendedDiet || { breakfast: '', lunch: '', dinner: '', snacks: '' };
         const hasCustomRules = userData.customDietRules && userData.customDietRules.length > 0;
@@ -2664,15 +2675,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="pm-diet-bar-bg"><div id="dCalBar" class="pm-diet-bar-fill" style="width:${calPct}%;"></div></div>
                 </div>
 
-                <!-- PESTAÑAS -->
+                <!-- PESTAÑAS (la activa se conserva entre re-renders: al agregar un
+                     alimento se re-dibuja la página y antes te regresaba a MI PLAN) -->
                 <div class="pm-d-tabs">
-                    <div class="pm-d-tab" data-d-tab="log">REGISTRAR</div>
-                    <div class="pm-d-tab on" data-d-tab="plan">MI PLAN</div>
-                    <div class="pm-d-tab" data-d-tab="rules">REGLAS</div>
+                    <div class="pm-d-tab ${pmDietTab === 'log' ? 'on' : ''}" data-d-tab="log">REGISTRAR</div>
+                    <div class="pm-d-tab ${pmDietTab === 'plan' ? 'on' : ''}" data-d-tab="plan">MI PLAN</div>
+                    <div class="pm-d-tab ${pmDietTab === 'rules' ? 'on' : ''}" data-d-tab="rules">REGLAS</div>
                 </div>
 
                 <!-- ─── TAB MI PLAN ─── -->
-                <div class="pm-d-panel on" id="pmDt-plan">
+                <div class="pm-d-panel ${pmDietTab === 'plan' ? 'on' : ''}" id="pmDt-plan">
                     <div class="pm-d-plan-hint">Toca una comida para abrirla · el lápiz ✎ para editarla</div>
                     ${MEAL_SLOTS.map(m => {
                         const has = (diet[m.key] || '').trim();
@@ -2696,7 +2708,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
 
                 <!-- ─── TAB REGISTRAR ALIMENTO ─── -->
-                <div class="pm-d-panel" id="pmDt-log">
+                <div class="pm-d-panel ${pmDietTab === 'log' ? 'on' : ''}" id="pmDt-log">
                     <div class="pm-d-reg-title">🍽️ REGISTRA LO QUE COMES HOY</div>
                     <div class="pm-d-reg-sub">Solo escribe el alimento (te sugiero mientras escribes) y cuántas piezas, platos o tazas. Las calorías y macros se calculan SOLAS.</div>
 
@@ -2727,7 +2739,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
 
                 <!-- ─── TAB REGLAS ─── -->
-                <div class="pm-d-panel" id="pmDt-rules">
+                <div class="pm-d-panel ${pmDietTab === 'rules' ? 'on' : ''}" id="pmDt-rules">
                     <div class="pm-d-log-hint">${hasCustomRules ? 'Las reglas de TU plan' : 'Aún no tienes reglas propias: se llenan SOLAS al pegar tu dieta completa (la parte de "Recomendaciones") o con ✏️ EDITAR REGLAS. Estos son solo ejemplos:'}</div>
                     <div class="pm-d-rules-list" id="rules-list-display">
                         ${hasCustomRules
@@ -2747,6 +2759,7 @@ document.addEventListener('DOMContentLoaded', () => {
         dietEl.querySelectorAll('.pm-d-tab').forEach(tab => {
             tab.onclick = () => {
                 const target = tab.dataset.dTab;
+                pmDietTab = target;   // recordar para sobrevivir re-renders
                 dietEl.querySelectorAll('.pm-d-tab').forEach(t => t.classList.toggle('on', t === tab));
                 dietEl.querySelectorAll('.pm-d-panel').forEach(p => p.classList.toggle('on', p.id === `pmDt-${target}`));
             };

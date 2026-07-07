@@ -1,12 +1,12 @@
-const CACHE_NAME = 'axcore-v5.45-swipe-estudio-ajustes-recuperar';
+const CACHE_NAME = 'axcore-v5.46-registro-alimento-swipe-gesto';
 const urlsToCache = [
   './',
-  './index.html?v=20260706q',
-  './index.css?v=20260706q',
-  './premium.css?v=20260706q',
-  './profile-persist.js?v=20260706q',
-  './app.js?v=20260706q',
-  './knowledge.js?v=20260706q',
+  './index.html?v=20260706r',
+  './index.css?v=20260706r',
+  './premium.css?v=20260706r',
+  './profile-persist.js?v=20260706r',
+  './app.js?v=20260706r',
+  './knowledge.js?v=20260706r',
   './logo.png',
   './logo_coach.png',
   './manifest_vip.json',
