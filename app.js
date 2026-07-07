@@ -840,11 +840,14 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btn-register-confirm').onclick = async () => {
         const u = regUser.value.trim();
         const p = regPass.value.trim();
+        const emEl = document.getElementById('reg-email');
+        const email = emEl ? emEl.value.trim().toLowerCase() : '';
         const gcc = document.getElementById('reg-gym-code');
         const gc = gcc ? gcc.value.trim().toUpperCase() : '';
         const privacyChk = document.getElementById('reg-privacy');
         const privacyAccepted = !!(privacyChk && privacyChk.checked);
         const errDiv = document.getElementById('reg-error');
+        const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
         const showErr = (msg) => {
             if (errDiv) { errDiv.textContent = msg; errDiv.style.display = 'block'; }
@@ -855,6 +858,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (u.length < 3 || p.length < 4) {
             showErr("⚠️ Usuario mínimo 3 caracteres y contraseña mínimo 4 caracteres.");
+            return;
+        }
+        if (!emailOk) {
+            showErr("⚠️ Escribe un correo electrónico válido. Es tu llave para recuperar tus datos si cambias de código o dispositivo.");
+            if (emEl) emEl.focus();
             return;
         }
         if (!gc) {
@@ -882,6 +890,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (gc === "AXV-DEMO") {
             currentUser = u;
             userData.username = u;
+            userData.email = email;
             userData.passHash = await window.axPassHash(p);
             delete userData.password;
             userData.gymCode = gc;
@@ -907,9 +916,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify({
                     code: gc,
                     username: u,
+                    email: email,
                     password: p,
                     privacyAccepted: true,
-                    data: { username: u, gymCode: gc, privacyAccepted: true, privacyDate: new Date().toISOString() }
+                    data: { username: u, email: email, gymCode: gc, privacyAccepted: true, privacyDate: new Date().toISOString() }
                 }),
                 signal: controller.signal
             });
@@ -919,19 +929,25 @@ document.addEventListener('DOMContentLoaded', () => {
             if (data.success) {
                 setApiToken(data.token);
                 currentUser = u;
+                // Si el servidor recuperó datos anteriores de este CORREO, adoptarlos.
+                if (data.restored && data.data && typeof data.data === 'object') {
+                    userData = { ...userData, ...data.data };
+                }
                 userData.username = u;
+                userData.email = email;
                 userData.passHash = await window.axPassHash(p);
                 delete userData.password;
                 userData.gymCode = gc;
                 userData.privacyAccepted = true;
                 userData.privacyDate = new Date().toISOString();
-                userData.achievements = [];
+                if (Array.isArray(data.achievements)) userData.achievements = data.achievements;
+                else if (!data.restored) userData.achievements = [];
                 saveData();
                 localStorage.setItem('arthur_current_user', u);
                 localStorage.setItem('axcore_first_run', '1');
-                showErr(`✅ Cuenta creada. Entrando a AX-CORE...`);
+                showErr(data.restored ? `✅ Cuenta creada. ¡Recuperamos tu progreso anterior! Entrando...` : `✅ Cuenta creada. Entrando a AX-CORE...`);
                 if (errDiv) errDiv.style.background = 'rgba(0,255,136,0.15)';
-                setTimeout(() => location.reload(), 1500);
+                setTimeout(() => location.reload(), 1800);
             } else {
                 showErr(`❌ ${data.message || "No se pudo registrar. Verifica el código."}`);
                 if (errDiv) errDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -1018,14 +1034,17 @@ document.addEventListener('DOMContentLoaded', () => {
             if (data.success) {
                 setApiToken(data.token);
                 const merged = { ...(savedLocal || {}), ...(data.data || {}) };
-                merged.username = u;
+                // Puede haber entrado con su CORREO; el username real lo dice el servidor.
+                const realUser = (data.username && data.username.trim()) ? data.username.trim() : u;
+                merged.username = realUser;
+                if (u.includes('@')) merged.email = u;
                 merged.passHash = await window.axPassHash(p);
                 delete merged.password;
                 if (data.gymCode) merged.gymCode = data.gymCode;
                 merged.achievements = data.achievements || merged.achievements || [];
-                localStorage.setItem(`arthur_data_${u}`, JSON.stringify(merged));
-                currentUser = u;
-                localStorage.setItem('arthur_current_user', u);
+                localStorage.setItem(`arthur_data_${realUser}`, JSON.stringify(merged));
+                currentUser = realUser;
+                localStorage.setItem('arthur_current_user', realUser);
                 location.reload();
                 return;
             }
@@ -1085,9 +1104,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
                 <div class="ax-rec-block">
                     <div class="ax-rec-h">¿Olvidaste tu CONTRASEÑA?</div>
-                    <div class="ax-rec-sub">Restablécela con tu <b>código de atleta</b> (el que te dio tu coach) y tu usuario.</div>
+                    <div class="ax-rec-sub">Restablécela con tu <b>código de atleta</b> (el que te dio tu coach) y tu usuario <b>o</b> tu correo.</div>
                     <input class="ax-rec-in" id="axRecCode" placeholder="Código de atleta (AXV-...)" autocomplete="off">
-                    <input class="ax-rec-in" id="axRecUser" placeholder="Tu usuario" autocomplete="off">
+                    <input class="ax-rec-in" id="axRecUser" placeholder="Tu usuario (o déjalo vacío)" autocomplete="off">
+                    <input class="ax-rec-in" id="axRecEmail" placeholder="Tu correo (o déjalo vacío)" autocomplete="off" style="text-transform:none;">
                     <input class="ax-rec-in" id="axRecPass" type="password" placeholder="Nueva contraseña (mín. 4)">
                     <div class="ax-rec-msg" id="axRecMsg"></div>
                     <button class="btn-premium ax-rec-apply" id="axRecReset">RESTABLECER CONTRASEÑA</button>
@@ -1111,18 +1131,19 @@ document.addEventListener('DOMContentLoaded', () => {
         ov.querySelector('#axRecReset').onclick = async () => {
             const code = (document.getElementById('axRecCode').value || '').trim().toUpperCase();
             const user = (document.getElementById('axRecUser').value || '').trim();
+            const email = (document.getElementById('axRecEmail').value || '').trim().toLowerCase();
             const pass = (document.getElementById('axRecPass').value || '').trim();
             const msg = document.getElementById('axRecMsg');
             const setMsg = (t, ok) => { if (msg) { msg.textContent = t; msg.style.color = ok ? '#00c97a' : '#ff6b6b'; } };
             if (!code) return setMsg('Escribe tu código de atleta.', false);
-            if (user.length < 3) return setMsg('Escribe tu usuario.', false);
+            if (user.length < 3 && !email) return setMsg('Escribe tu usuario o tu correo.', false);
             if (pass.length < 4) return setMsg('La nueva contraseña debe tener mín. 4 caracteres.', false);
             const btn = document.getElementById('axRecReset');
             const orig = btn.textContent; btn.textContent = 'CONECTANDO…'; btn.disabled = true;
             try {
                 const res = await fetch(`${API_URL}/api/user/reset-password`, {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ code, username: user, newPassword: pass })
+                    body: JSON.stringify({ code, username: user, email, newPassword: pass })
                 });
                 const data = await res.json();
                 if (data.success) {
@@ -2133,13 +2154,21 @@ document.addEventListener('DOMContentLoaded', () => {
                             });
                         } catch (_) {}
                     }
+                    // Datos de la cuenta que sale: si era cuenta de NUBE (tenía token),
+                    // borrar su copia local para NO dejar rastro en dispositivos
+                    // compartidos — la nube la conserva y se re-jala al volver a entrar.
+                    // Las cuentas DEMO (sin token, sin respaldo) se conservan.
+                    const _outUser = currentUser;
+                    const _hadCloud = !!apiToken();
                     localStorage.removeItem('arthur_current_user');
                     clearApiToken();
-                    // Limpiar el PERFIL (nombre/foto) para no filtrarlo al siguiente
-                    // usuario en dispositivos compartidos (ej. una tablet del gimnasio).
-                    // NO se borran los datos del atleta (arthur_data_*) para no perder
-                    // cuentas DEMO ni el historial guardado localmente.
                     try {
+                        if (_hadCloud && _outUser) {
+                            localStorage.removeItem('arthur_data_' + _outUser);
+                            localStorage.removeItem('axcore_uname_' + _outUser);
+                            localStorage.removeItem('axcore_avatar_' + _outUser);
+                        }
+                        // Perfil (nombre/foto) global: siempre se limpia para no filtrarlo.
                         ['axcore_profile_v1', 'axcore_avatar_global', 'axcore_uname_global'].forEach(k => localStorage.removeItem(k));
                         Object.keys(localStorage).forEach(k => {
                             if (k.indexOf('axcore_avatar_') === 0 || k.indexOf('axcore_uname_') === 0) localStorage.removeItem(k);

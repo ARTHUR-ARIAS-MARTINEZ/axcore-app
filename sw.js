@@ -1,12 +1,12 @@
-const CACHE_NAME = 'axcore-v5.46-registro-alimento-swipe-gesto';
+const CACHE_NAME = 'axcore-v5.47-correo-llave-permanente-logout-limpio';
 const urlsToCache = [
   './',
-  './index.html?v=20260706r',
-  './index.css?v=20260706r',
-  './premium.css?v=20260706r',
-  './profile-persist.js?v=20260706r',
-  './app.js?v=20260706r',
-  './knowledge.js?v=20260706r',
+  './index.html?v=20260706s',
+  './index.css?v=20260706s',
+  './premium.css?v=20260706s',
+  './profile-persist.js?v=20260706s',
+  './app.js?v=20260706s',
+  './knowledge.js?v=20260706s',
   './logo.png',
   './logo_coach.png',
   './manifest_vip.json',

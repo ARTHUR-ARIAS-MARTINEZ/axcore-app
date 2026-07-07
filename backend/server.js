@@ -109,6 +109,7 @@ const userSchema = new mongoose.Schema({
     code:        { type: String, required: true, unique: true, index: true }, // código AXV vinculado
     gymCode:     { type: String, required: true, index: true },
     username:    { type: String, required: true },
+    email:       { type: String, default: '', index: true }, // correo = llave PERMANENTE del atleta
     password:    { type: String, required: true }, // bcrypt hash
     privacyAccepted: { type: Boolean, default: false },
     privacyDate: { type: Date, default: null },
@@ -119,9 +120,23 @@ const userSchema = new mongoose.Schema({
     lastSync:    { type: Date, default: Date.now }
 });
 
-const Gym  = mongoose.model('Gym', gymSchema);
-const Code = mongoose.model('Code', codeSchema);
-const User = mongoose.model('User', userSchema);
+// BÓVEDA POR CORREO — copia del progreso indexada por email. Sobrevive al borrado
+// del código/usuario (cuando el coach da de baja a alguien). Si el atleta regresa
+// con un código NUEVO y usuario NUEVO pero el MISMO correo, se restaura desde aquí.
+// Nadie la borra salvo que el propio atleta pida reiniciar.
+const vaultSchema = new mongoose.Schema({
+    email:        { type: String, required: true, unique: true, index: true },
+    data:         { type: mongoose.Schema.Types.Mixed, default: {} },
+    achievements: { type: [String], default: [] },
+    lastUser:     { type: String, default: '' },
+    lastCode:     { type: String, default: '' },
+    updatedAt:    { type: Date, default: Date.now }
+});
+
+const Gym   = mongoose.model('Gym', gymSchema);
+const Code  = mongoose.model('Code', codeSchema);
+const User  = mongoose.model('User', userSchema);
+const Vault = mongoose.model('Vault', vaultSchema);
 
 // ============================================================
 // HELPERS DE SEGURIDAD
@@ -209,6 +224,10 @@ function sanitizeStr(v, max = 100) {
 
 function isValidCode(code) {
     return typeof code === 'string' && /^[A-Z0-9\-]{3,30}$/.test(code);
+}
+
+function isValidEmail(e) {
+    return typeof e === 'string' && e.length <= 120 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
 }
 
 // ============================================================
@@ -413,9 +432,11 @@ app.post('/api/user/register', loginLimiter, async (req, res) => {
         const codeUp = String(code || '').toUpperCase();
         const u = sanitizeStr(username, 40);
         const p = sanitizeStr(password, 100);
+        const email = sanitizeStr(req.body.email, 120).toLowerCase();
 
         if (!isValidCode(codeUp)) return res.json({ success: false, message: 'Código inválido.' });
         if (u.length < 3 || p.length < 4) return res.json({ success: false, message: 'Usuario mín 3 caracteres, clave mín 4.' });
+        if (!isValidEmail(email)) return res.json({ success: false, message: 'Escribe un correo electrónico válido (será tu llave para recuperar tus datos).' });
         if (!privacyAccepted) return res.json({ success: false, message: 'Debe aceptar el aviso de privacidad y T&C.' });
 
         // DEMO: no permitimos registrar/sync (es código compartido)
@@ -432,23 +453,42 @@ app.post('/api/user/register', loginLimiter, async (req, res) => {
         const existing = await User.findOne({ code: codeUp });
         if (existing) return res.json({ success: false, message: 'Este código ya tiene un usuario registrado. Usa el botón INICIAR SESIÓN.' });
 
+        // ¿Hay data guardada de este CORREO de un código/cuenta anterior? Restaurarla.
+        // (Así el atleta que regresa con código nuevo + usuario nuevo NO pierde nada.)
+        const vault = await Vault.findOne({ email });
+        const hasVault = !!(vault && vault.data && Object.keys(vault.data).length > 0);
+        const startData = hasVault ? vault.data : (data || {});
+        const startAch  = (vault && Array.isArray(vault.achievements)) ? vault.achievements : [];
+
         const hashed = await hashPassword(p);
         const sid = crypto.randomBytes(16).toString('hex');
         const user = await User.create({
             code: codeUp,
             gymCode: pass.gymCode,
             username: u,
+            email,
             password: hashed,
             privacyAccepted: true,
             privacyDate: new Date(),
-            data: data || {},
-            achievements: [],
+            data: startData,
+            achievements: startAch,
             activeSessionId: sid
         });
         await Code.updateOne({ code: codeUp }, { registered: true, user: u });
+        // Crear/actualizar la bóveda del correo con lo que arranca esta cuenta.
+        await Vault.updateOne(
+            { email },
+            { email, data: startData, achievements: startAch, lastUser: u, lastCode: codeUp, updatedAt: new Date() },
+            { upsert: true }
+        );
 
-        const token = jwt.sign({ code: codeUp, gymCode: pass.gymCode, username: u, sid }, JWT_SECRET, { expiresIn: '30d' });
-        res.json({ success: true, message: 'Usuario registrado.', token, gymCode: pass.gymCode, gymName: gym?.name || '' });
+        const token = jwt.sign({ code: codeUp, gymCode: pass.gymCode, username: u, email, sid }, JWT_SECRET, { expiresIn: '30d' });
+        res.json({
+            success: true,
+            message: hasVault ? 'Cuenta creada. Recuperamos tus datos anteriores.' : 'Usuario registrado.',
+            token, gymCode: pass.gymCode, gymName: gym?.name || '',
+            data: startData, achievements: startAch, restored: hasVault
+        });
     } catch (e) {
         if (e.code === 11000) return res.json({ success: false, message: 'Ya existe un usuario con ese código.' });
         res.status(500).json({ success: false, message: e.message });
@@ -472,13 +512,15 @@ app.post('/api/user/login', loginLimiter, async (req, res) => {
         if (isValidCode(codeUp)) {
             user = await User.findOne({ code: codeUp });
         } else if (username) {
-            const uname = sanitizeStr(username, 40);
-            const candidates = await User.find({ username: uname }).limit(25);
+            const raw = sanitizeStr(username, 120);
+            // El campo puede ser NOMBRE DE USUARIO o CORREO (la llave permanente).
+            const query = raw.includes('@') ? { email: raw.toLowerCase() } : { username: raw.slice(0, 40) };
+            const candidates = await User.find(query).limit(25);
             const matches = [];
             for (const c of candidates) {
                 if (await comparePassword(p, c.password)) matches.push(c);
             }
-            if (matches.length > 1) return res.json({ success: false, message: 'Hay varias cuentas con ese usuario. Inicia sesión con tu código AXV.' });
+            if (matches.length > 1) return res.json({ success: false, message: 'Hay varias cuentas con esos datos. Inicia sesión con tu código AXV.' });
             if (matches.length === 1) user = matches[0];
         } else {
             return res.json({ success: false, message: 'Faltan datos.' });
@@ -499,7 +541,7 @@ app.post('/api/user/login', loginLimiter, async (req, res) => {
         const sid = crypto.randomBytes(16).toString('hex');
         await User.updateOne({ code: uCode }, { activeSessionId: sid });
 
-        const token = jwt.sign({ code: uCode, gymCode: user.gymCode, username: user.username, sid }, JWT_SECRET, { expiresIn: '30d' });
+        const token = jwt.sign({ code: uCode, gymCode: user.gymCode, username: user.username, email: user.email || '', sid }, JWT_SECRET, { expiresIn: '30d' });
         res.json({
             success: true,
             token,
@@ -527,6 +569,17 @@ app.post('/api/user/sync', requireUserAuth, async (req, res) => {
         if (Array.isArray(achievements)) update.achievements = achievements.slice(0, 200);
 
         await User.updateOne({ code: req.user.code }, update);
+        // Reflejar en la bóveda por correo (fuente permanente que sobrevive al borrado
+        // del código). Si el token no trae email (cuenta vieja), lo buscamos.
+        let email = req.user.email;
+        if (!email) { const u = await User.findOne({ code: req.user.code }); email = u && u.email; }
+        if (email) {
+            await Vault.updateOne(
+                { email },
+                { email, data, achievements: update.achievements || [], lastUser: req.user.username || '', lastCode: req.user.code, updatedAt: new Date() },
+                { upsert: true }
+            );
+        }
         res.json({ success: true, lastSync: update.lastSync });
     } catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
@@ -556,15 +609,14 @@ app.get('/api/user/data', requireUserAuth, async (req, res) => {
     } catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
-// Cambiar contraseña del atleta
 // Restablecer contraseña OLVIDADA (sin sesión). Prueba de propiedad: el CÓDIGO AXV
-// (que da el coach) + el USERNAME registrado deben coincidir. Sin correo no hay
-// forma más fuerte; el código es la llave de recuperación del atleta.
+// (que da el coach) + el USERNAME o el CORREO registrado deben coincidir.
 app.post('/api/user/reset-password', loginLimiter, async (req, res) => {
     try {
-        const { code, username, newPassword } = req.body || {};
+        const { code, username, email, newPassword } = req.body || {};
         const codeUp = String(code || '').toUpperCase();
         const uname = sanitizeStr(username, 40);
+        const em = sanitizeStr(email, 120).toLowerCase();
         const np = sanitizeStr(newPassword, 100);
 
         if (!isValidCode(codeUp)) return res.json({ success: false, message: 'Código inválido.' });
@@ -572,8 +624,10 @@ app.post('/api/user/reset-password', loginLimiter, async (req, res) => {
 
         const user = await User.findOne({ code: codeUp });
         if (!user) return res.json({ success: false, message: 'No hay ninguna cuenta con ese código.' });
-        if (uname.toLowerCase() !== String(user.username || '').toLowerCase()) {
-            return res.json({ success: false, message: 'El usuario no coincide con ese código.' });
+        const matchUser  = uname && uname.toLowerCase() === String(user.username || '').toLowerCase();
+        const matchEmail = em && em === String(user.email || '').toLowerCase();
+        if (!matchUser && !matchEmail) {
+            return res.json({ success: false, message: 'El usuario o correo no coincide con ese código.' });
         }
         const pass = await Code.findOne({ code: codeUp });
         if (!pass || !pass.active) return res.json({ success: false, message: 'Acceso suspendido por tu gimnasio.' });
