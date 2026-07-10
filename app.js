@@ -3885,10 +3885,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             </div>
 
-            <!-- ═══ STUDIO CORE ═══ -->
-            <div class="sx-core">
+            <!-- ═══ STUDIO CORE — SCROLL VERTICAL (rediseño v5.48) ═══ -->
+            <div class="sx-core sx-scrollmode">
 
-                <!-- HEADER COMPACTO -->
+                <!-- TÍTULO DE SECCIÓN -->
                 <div class="sx-hdr">
                     <div class="sx-hdr-left">
                         <span class="sx-hdr-ico">🏆</span>
@@ -3903,108 +3903,105 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 </div>
 
-                <!-- PREVIEW HERO -->
-                <div class="sx-hero">
-
-                    <!-- BOTONES FLOTANTES SUPERIORES (glassmorphism, icon-only) -->
-                    <div class="sx-float-bar">
-                        <button class="sx-fab" id="sx-fab-preview" title="Vista previa en pantalla completa" onclick="window.openStudioFullscreenPreview()">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                        </button>
-                        <button class="sx-fab" id="sx-fab-save" title="Guardar en descargas" onclick="window.downloadStudioCardHD()">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                        </button>
-                        <button class="sx-fab sx-fab-primary" id="sx-fab-share" title="Compartir logros" onclick="window.shareStudioCard()">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-                        </button>
-                    </div>
-
+                <!-- TARJETA (canvas) + ACCIONES LATERALES (VISTA / DESCARGAR / COMPARTIR) -->
+                <div class="sx-stage">
                     <div class="sx-canvas-frame">
                         <div class="sx-canvas-glow"></div>
                         <canvas id="studio-preview-canvas"></canvas>
                     </div>
-                </div>
-
-                <!-- BOTTOM SHEET -->
-                <div class="sx-sheet">
-                    <div class="sx-notch"></div>
-
-                    <!-- TAB BAR (clases originales preservadas para JS) -->
-                    <div class="studio-pro-tabs sx-tabbar">
-                        <button class="studio-pro-tab active" data-stab="diseno">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-                            <span>DISEÑO</span>
+                    <div class="sx-actions">
+                        <button class="sx-act" title="Vista previa en pantalla completa" onclick="window.openStudioFullscreenPreview()">
+                            <span class="sx-act-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></span>
+                            <span class="sx-act-lbl">VISTA</span>
                         </button>
-                        <button class="studio-pro-tab" data-stab="metricas">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-                            <span>DATOS</span>
+                        <button class="sx-act" title="Guardar en descargas" onclick="window.downloadStudioCardHD()">
+                            <span class="sx-act-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></span>
+                            <span class="sx-act-lbl">DESCARGAR</span>
                         </button>
-                        <button class="studio-pro-tab" data-stab="estilo">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/></svg>
-                            <span>ESTILO</span>
-                        </button>
-                        <button class="studio-pro-tab" data-stab="fondo">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18"/></svg>
-                            <span>FONDO</span>
-                        </button>
-                        <button class="studio-pro-tab" data-stab="fx">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                            <span>FX</span>
+                        <button class="sx-act sx-act-primary" title="Compartir logros" onclick="window.shareStudioCard()">
+                            <span class="sx-act-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></span>
+                            <span class="sx-act-lbl">COMPARTIR</span>
                         </button>
                     </div>
+                </div>
 
-                    <!-- CONTENIDO DE TABS -->
-                    <div class="sx-tabscroll">
+                <!-- PESTAÑAS OCULTAS — se conservan .studio-pro-tab y [data-stab] para NO tocar el wiring/restorer -->
+                <div class="studio-pro-tabs sx-tabbar" style="display:none" aria-hidden="true">
+                    <button class="studio-pro-tab active" data-stab="diseno"></button>
+                    <button class="studio-pro-tab" data-stab="metricas"></button>
+                    <button class="studio-pro-tab" data-stab="estilo"></button>
+                    <button class="studio-pro-tab" data-stab="fondo"></button>
+                    <button class="studio-pro-tab" data-stab="fx"></button>
+                </div>
 
-                        <!-- DISEÑO: plantillas + estilo de tarjeta -->
-                        <div class="studio-pro-tab-content active" id="stab-diseno">
-                            <div class="sx-sec-lbl">PLANTILLAS</div>
-                            <div class="studio-templates" id="studio-tpl-list"></div>
-                            <div class="sx-sec-lbl" style="margin-top:20px">ESTILO DE TARJETA</div>
-                            <div id="studio-card-style-btns" class="studio-pro-pills sx-card-pills"></div>
-                        </div>
+                <!-- SECCIONES EN SCROLL VERTICAL -->
+                <div class="sx-scroll">
 
-                        <!-- DATOS: métricas + hero metric -->
-                        <div class="studio-pro-tab-content" id="stab-metricas">
+                    <!-- 1. PLANTILLAS -->
+                    <section class="sx-section">
+                        <div class="sx-sn-h"><span class="sx-sn-n">1</span>PLANTILLAS</div>
+                        <div class="studio-templates" id="studio-tpl-list"></div>
+                    </section>
+
+                    <!-- 2. COLOR PRINCIPAL (acento — ya existe: studioState.accentColor) -->
+                    <section class="sx-section">
+                        <div class="sx-sn-h"><span class="sx-sn-n">2</span>COLOR PRINCIPAL</div>
+                        <div id="studio-accent-btns" class="studio-pro-pills sx-accent-pills sx-color-row"></div>
+                    </section>
+
+                    <!-- FILA: 3. TIPOGRAFÍA | 4. DISEÑO Y EFECTOS -->
+                    <div class="sx-row">
+                        <section class="sx-section">
+                            <div class="sx-sn-h"><span class="sx-sn-n">3</span>TIPOGRAFÍA</div>
+                            <div id="studio-font-btns" class="studio-pro-pills sx-font-pills"></div>
+                        </section>
+                        <section class="sx-section">
+                            <div class="sx-sn-h"><span class="sx-sn-n">4</span>DISEÑO Y EFECTOS</div>
+                            <div class="sx-sub-lbl">Overlay</div>
+                            <div id="studio-filter-btns" class="studio-pro-pills"></div>
+                            <div class="sx-sub-lbl">HUD</div>
+                            <div id="studio-hud-btns" class="studio-pro-pills"></div>
+                        </section>
+                    </div>
+
+                    <!-- FILA: FORMATOS | COMPARTIR -->
+                    <div class="sx-row">
+                        <section class="sx-section">
+                            <div class="sx-sn-h">FORMATOS</div>
+                            <div class="studio-format-btns sx-fmt-seg" id="studio-fmt-btns"></div>
+                        </section>
+                        <section class="sx-section">
+                            <div class="sx-sn-h">COMPARTIR</div>
+                            <div class="sx-share-grid">
+                                <button class="sx-share-ico" title="Descargar" onclick="window.downloadStudioCardHD()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+                                <button class="sx-share-ico" title="Instagram (menú de compartir)" onclick="window.shareStudioCard()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.6" cy="6.4" r="1.1" fill="currentColor" stroke="none"/></svg></button>
+                                <button class="sx-share-ico" title="WhatsApp (menú de compartir)" onclick="window.shareStudioCard()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></button>
+                                <button class="sx-share-ico" title="Compartir" onclick="window.shareStudioCard()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></button>
+                            </div>
+                        </section>
+                    </div>
+
+                    <!-- DATOS Y TEXTO (colapsable — controles conservados que el mockup no muestra) -->
+                    <section class="sx-section sx-advanced">
+                        <button class="sx-adv-toggle" onclick="this.closest('.sx-advanced').classList.toggle('sx-adv-open')">
+                            <span class="sx-adv-lbl">⚙ DATOS Y TEXTO <span class="sx-adv-hint">avanzado</span></span>
+                            <span class="sx-adv-chevron">›</span>
+                        </button>
+                        <div class="sx-adv-body">
                             <div class="sx-sec-lbl">MÉTRICAS A MOSTRAR</div>
                             <div class="studio-metrics" id="studio-met-list"></div>
-                            <div class="sx-sec-lbl" style="margin-top:20px">⭐ MÉTRICA PRINCIPAL</div>
+                            <div class="sx-sec-lbl" style="margin-top:18px">⭐ MÉTRICA PRINCIPAL</div>
                             <div id="studio-hero-metric-btns" class="studio-pro-pills"></div>
-                        </div>
-
-                        <!-- ESTILO: acento · tipografía · colores · tamaño -->
-                        <div class="studio-pro-tab-content" id="stab-estilo">
-                            <div class="sx-sec-lbl">ACENTO DE COLOR</div>
-                            <div id="studio-accent-btns" class="studio-pro-pills sx-accent-pills"></div>
-                            <div class="sx-sec-lbl" style="margin-top:20px">TIPOGRAFÍA</div>
-                            <div id="studio-font-btns" class="studio-pro-pills sx-font-pills"></div>
-                            <div class="sx-sec-lbl" style="margin-top:20px">COLOR DE TEXTO</div>
+                            <div class="sx-sec-lbl" style="margin-top:18px">ESTILO DE TARJETA</div>
+                            <div id="studio-card-style-btns" class="studio-pro-pills sx-card-pills"></div>
+                            <div class="sx-sec-lbl" style="margin-top:18px">COLOR DE TEXTO</div>
                             <div id="studio-color-swatches" class="studio-pro-swatches sx-swatches"></div>
-                            <div class="sx-sec-lbl" style="margin-top:20px">TAMAÑO DE TEXTO <span class="sx-val-badge" id="studio-size-val">${Math.round(studioState.textSize*100)}%</span></div>
+                            <div class="sx-sec-lbl" style="margin-top:18px">TAMAÑO DE TEXTO <span class="sx-val-badge" id="studio-size-val">${Math.round(studioState.textSize*100)}%</span></div>
                             <input type="range" id="studio-size-picker" class="studio-pro-slider sx-slider" min="0.5" max="2.5" step="0.1" value="${studioState.textSize}">
                         </div>
+                    </section>
 
-                        <!-- FONDO: formato de tarjeta -->
-                        <div class="studio-pro-tab-content" id="stab-fondo">
-                            <div class="sx-sec-lbl">FORMATO DE TARJETA</div>
-                            <div class="studio-format-btns sx-fmt-seg" id="studio-fmt-btns"></div>
-                            <div class="sx-fmt-hint">
-                                <span class="sx-fmt-hint-item">STORY · 4:5</span>
-                                <span class="sx-fmt-hint-item">CUADRADO · 1:1</span>
-                                <span class="sx-fmt-hint-item">PAISAJE · 16:9</span>
-                            </div>
-                        </div>
-
-                        <!-- FX: overlay + HUD -->
-                        <div class="studio-pro-tab-content" id="stab-fx">
-                            <div class="sx-sec-lbl">FILTRO OVERLAY</div>
-                            <div id="studio-filter-btns" class="studio-pro-pills"></div>
-                            <div class="sx-sec-lbl" style="margin-top:20px">ESTILO HUD</div>
-                            <div id="studio-hud-btns" class="studio-pro-pills"></div>
-                        </div>
-
-                    </div><!-- /.sx-tabscroll -->
-                </div><!-- /.sx-sheet -->
+                </div><!-- /.sx-scroll -->
 
             </div><!-- /.sx-core -->
         `;
@@ -4307,7 +4304,8 @@ document.addEventListener('DOMContentLoaded', () => {
             { l:'CYAN',    v:'cyan',    dot:'#00ffcc' },
             { l:'GOLD',    v:'gold',    dot:'#ffd700' },
             { l:'BLOOD',   v:'blood',   dot:'#ff2222' },
-            { l:'FUCHSIA', v:'fuchsia', dot:'#ff00e5' }
+            { l:'FUCHSIA', v:'fuchsia', dot:'#ff00e5' },
+            { l:'AUTO',    v:'theme',   dot:'conic-gradient(from 90deg, #00e5ff, #00ffcc, #ffd700, #ff2222, #ff00e5, #00e5ff)' }
         ], 'accentColor');
 
         _makeStyleBtns('studio-hud-btns', [
