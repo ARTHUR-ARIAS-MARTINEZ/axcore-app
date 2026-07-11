@@ -3914,7 +3914,7 @@ body.premium-mode #page-studio .sx-fmt-seg {
 }
 body.premium-mode #page-studio .sx-fmt-seg button { color: var(--pm-dim2) !important; }
 body.premium-mode #page-studio .sx-fmt-seg button.active {
-  background: rgba(var(--pm-green-rgb),0.16) !important;
+  background: rgba(var(--accent-rgb),0.16) !important;
   color: var(--accent-main) !important;
 }
 
