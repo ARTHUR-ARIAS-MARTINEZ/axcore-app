@@ -3475,9 +3475,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // ── ACENTO: AUTO ('theme') = color insignia de la plantilla; si no, paleta fija ──
         const APAL = { neon:'#00e5ff', cyan:'#00ffcc', gold:'#ffd700', blood:'#ff2222', fuchsia:'#ff00e5' };
-        const accent = studioState.accentColor === 'theme'
-            ? ((tpl.colors && tpl.colors[0]) || '#39ff14')
-            : (APAL[studioState.accentColor] || '#00e5ff');
+        let accent;
+        if (studioState.accentColor === 'theme') {
+            accent = (tpl.colors && tpl.colors[0]) || '#39ff14';
+        } else if (typeof studioState.accentColor === 'string' && studioState.accentColor.charAt(0) === '#') {
+            accent = studioState.accentColor;                       // color custom (picker o preset hex)
+        } else {
+            accent = APAL[studioState.accentColor] || '#00e5ff';    // compat valores nombrados viejos
+        }
         const hex = (h) => { h = (h || '#000').replace('#',''); if (h.length === 3) h = h.split('').map(c => c + c).join('');
             return [parseInt(h.slice(0,2),16)||0, parseInt(h.slice(2,4),16)||0, parseInt(h.slice(4,6),16)||0]; };
         const AR = hex(accent);
@@ -4086,12 +4091,20 @@ document.addEventListener('DOMContentLoaded', () => {
             // Colores adaptativos al tema (funcionan en oscuros Y en BLANCO):
             //  activo   → fondo acento + tinta que contrasta (--pm-accent-ink)
             //  inactivo → superficie del tema + texto tenue + borde del tema
-            const refreshBtns = () => cont.querySelectorAll('.sx-btn').forEach(b => {
-                const active = b.dataset.val === studioState[stateKey];
-                b.style.background = active ? accent_css : 'var(--pm-s2)';
-                b.style.color      = active ? 'var(--pm-accent-ink)' : 'var(--pm-dim2)';
-                b.style.borderColor = active ? accent_css : 'var(--pm-border)';
-            });
+            const refreshBtns = () => {
+                const val = studioState[stateKey];
+                const btns = cont.querySelectorAll('.sx-btn');
+                const anyPreset = Array.from(btns).some(x => x.dataset.val === val);
+                btns.forEach(b => {
+                    let active = b.dataset.val === val;
+                    // La rueda/picker se marca activa con un color custom (hex fuera de los presets)
+                    if (b.dataset.val === '__picker' && !anyPreset && typeof val === 'string' && val.charAt(0) === '#') active = true;
+                    b.style.background = active ? accent_css : 'var(--pm-s2)';
+                    b.style.color      = active ? 'var(--pm-accent-ink)' : 'var(--pm-dim2)';
+                    b.style.borderColor = active ? accent_css : 'var(--pm-border)';
+                    b.classList.toggle('sx-on', active);
+                });
+            };
             options.forEach(opt => {
                 const btn = document.createElement('button');
                 btn.className = 'sx-btn';
@@ -4108,9 +4121,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     dot.style.cssText = `display:inline-block; width:8px; height:8px; border-radius:50%; background:${opt.dot}; margin-right:4px; vertical-align:middle;`;
                     btn.prepend(dot);
                 }
-                btn.onclick = () => { studioState[stateKey] = opt.v; refreshBtns(); redraw(); };
+                btn.classList.toggle('sx-on', isActive);
+                btn.onclick = opt.onClick
+                    ? () => opt.onClick(btn, refreshBtns, redraw)
+                    : () => { studioState[stateKey] = opt.v; refreshBtns(); redraw(); };
                 cont.appendChild(btn);
             });
+            refreshBtns();
         };
 
         _makeStyleBtns('studio-card-style-btns', [
@@ -4152,12 +4169,32 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         _makeStyleBtns('studio-accent-btns', [
-            { l:'NEON',    v:'neon',    dot:'#00e5ff' },
-            { l:'CYAN',    v:'cyan',    dot:'#00ffcc' },
-            { l:'GOLD',    v:'gold',    dot:'#ffd700' },
-            { l:'BLOOD',   v:'blood',   dot:'#ff2222' },
-            { l:'FUCHSIA', v:'fuchsia', dot:'#ff00e5' },
-            { l:'AUTO',    v:'theme',   dot:'conic-gradient(from 90deg, #00e5ff, #00ffcc, #ffd700, #ff2222, #ff00e5, #00e5ff)' }
+            { l:'VERDE',    v:'#22c55e', dot:'#22c55e' },
+            { l:'MORADO',   v:'#8b3dff', dot:'#8b3dff' },
+            { l:'NARANJA',  v:'#ff6a1a', dot:'#ff6a1a' },
+            { l:'DORADO',   v:'#ffc21a', dot:'#ffc21a' },
+            { l:'AZUL',     v:'#2f7bff', dot:'#2f7bff' },
+            { l:'ROJO',     v:'#ff3b3b', dot:'#ff3b3b' },
+            { l:'ROSA',     v:'#ff2ea6', dot:'#ff2ea6' },
+            { l:'TURQUESA', v:'#00e0c6', dot:'#00e0c6' },
+            { l:'CUSTOM',   v:'__picker',
+              dot:'conic-gradient(from 90deg, #00e5ff, #00ffcc, #ffd700, #ff2222, #ff00e5, #00e5ff)',
+              onClick: (btn, refresh, redraw) => {
+                  // Rueda arcoíris = COLOR PICKER real (input type=color nativo).
+                  let inp = document.getElementById('studio-accent-color-input');
+                  if (!inp) {
+                      inp = document.createElement('input');
+                      inp.type = 'color';
+                      inp.id = 'studio-accent-color-input';
+                      inp.style.cssText = 'position:fixed; left:-9999px; top:0; opacity:0; pointer-events:none;';
+                      document.body.appendChild(inp);
+                  }
+                  inp.value = (typeof studioState.accentColor === 'string' && studioState.accentColor.charAt(0) === '#')
+                      ? studioState.accentColor : '#00e5ff';
+                  // El hex elegido se guarda en studioState (persiste en la sesión) y redibuja.
+                  inp.oninput = () => { studioState.accentColor = inp.value; refresh(); redraw(); };
+                  inp.click();
+              } }
         ], 'accentColor');
 
         _makeStyleBtns('studio-hud-btns', [

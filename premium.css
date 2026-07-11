@@ -3947,10 +3947,8 @@ body.premium-mode #page-studio .studio-tpl-card.selected::after {
   box-shadow: 0 2px 8px rgba(0,0,0,0.45);
   z-index: 5;
 }
-/* "TU FOTO" se agrega primero en el DOM → mándala al final de la fila */
-body.premium-mode #page-studio #studio-tpl-list .studio-tpl-card:first-child {
-  order: 2 !important;
-}
+/* "TU FOTO" se agrega primero en el DOM → queda como PRIMERA tarjeta (izquierda),
+   antes de todas las plantillas. (Sin regla de order: respeta el orden del DOM.) */
 
 /* Control segmentado de FORMATO */
 body.premium-mode #page-studio .sx-fmt-seg {

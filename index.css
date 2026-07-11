@@ -3440,6 +3440,29 @@ body.premium-mode #page-studio .sx-scroll .studio-pro-swatches {
     flex-shrink: 0;
 }
 
+/* ── PASO 5b — quitar el chip numerado de TODAS las secciones (deja solo el título) ── */
+#page-studio .sx-sn-n { display: none !important; }
+
+/* ── PASO 5b — COLOR PRINCIPAL: paleta completa en una sola fila (scroll si no cabe) ── */
+#page-studio #studio-accent-btns.sx-color-row {
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    scrollbar-width: none !important;
+    justify-content: flex-start !important;
+    padding-bottom: 2px;
+}
+#page-studio #studio-accent-btns.sx-color-row::-webkit-scrollbar { display: none; }
+/* Círculo ACTIVO: palomita (check) centrada sobre el color */
+#page-studio .sx-accent-pills.sx-color-row .sx-btn.sx-on::after {
+    content: '\2713';
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--pm-white, #fff);
+    font-size: 17px; font-weight: 900;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.55);
+    pointer-events: none;
+}
+
 /* ---- COMPARTIR: grid de iconos (mismos handlers existentes) ---- */
 #page-studio .sx-share-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 9px; }
 #page-studio .sx-share-ico {
