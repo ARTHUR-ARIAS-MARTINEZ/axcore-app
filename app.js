@@ -3489,10 +3489,24 @@ document.addEventListener('DOMContentLoaded', () => {
         const ac = (a) => `rgba(${AR[0]},${AR[1]},${AR[2]},${a})`;
 
         // ── Tipografía / color / escala (siguen vivos desde el chrome) ──
+        // Los 3 valores originales se conservan intactos (compat con estado guardado).
+        // PASO 5c v2: + 12 familias nuevas para las tarjetas de TIPOGRAFÍA (solo "Aa").
         const FM = {
             'bold-impact':  { fam:"Impact,'Arial Narrow',sans-serif", wt:'900' },
             'tech-mono':    { fam:"'Courier New',Courier,monospace",  wt:'800' },
-            'elegant-sans': { fam:"'Trebuchet MS',Arial,sans-serif",  wt:'800' }
+            'elegant-sans': { fam:"'Trebuchet MS',Arial,sans-serif",  wt:'800' },
+            'orbitron':      { fam:"'Orbitron',sans-serif",      wt:'800' },
+            'oswald':        { fam:"'Oswald',sans-serif",        wt:'700' },
+            'bebas-neue':    { fam:"'Bebas Neue',sans-serif",    wt:'400' },
+            'montserrat':    { fam:"'Montserrat',sans-serif",    wt:'800' },
+            'raleway':       { fam:"'Raleway',sans-serif",       wt:'800' },
+            'anton':         { fam:"'Anton',sans-serif",         wt:'400' },
+            'archivo-black': { fam:"'Archivo Black',sans-serif", wt:'400' },
+            'teko':          { fam:"'Teko',sans-serif",          wt:'700' },
+            'rajdhani':      { fam:"'Rajdhani',sans-serif",      wt:'700' },
+            'russo-one':     { fam:"'Russo One',sans-serif",     wt:'400' },
+            'saira':         { fam:"'Saira',sans-serif",         wt:'800' },
+            'play':          { fam:"'Play',sans-serif",          wt:'700' }
         };
         const fd = FM[studioState.fontStyle] || FM['bold-impact'];
         const tS = Math.max(0.5, Math.min(2.5, studioState.textSize || 1));
@@ -3796,24 +3810,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     <!-- 1. PLANTILLAS -->
                     <section class="sx-section">
-                        <div class="sx-sn-h"><span class="sx-sn-n">1</span>PLANTILLAS</div>
+                        <div class="sx-sn-h">PLANTILLAS</div>
                         <div class="studio-templates" id="studio-tpl-list"></div>
                     </section>
 
                     <!-- 2. COLOR PRINCIPAL (acento — ya existe: studioState.accentColor) -->
                     <section class="sx-section">
-                        <div class="sx-sn-h"><span class="sx-sn-n">2</span>COLOR PRINCIPAL</div>
+                        <div class="sx-sn-h">COLOR PRINCIPAL</div>
                         <div id="studio-accent-btns" class="studio-pro-pills sx-accent-pills sx-color-row"></div>
                     </section>
 
                     <!-- FILA: 3. TIPOGRAFÍA | 4. DISEÑO Y EFECTOS -->
                     <div class="sx-row">
                         <section class="sx-section">
-                            <div class="sx-sn-h"><span class="sx-sn-n">3</span>TIPOGRAFÍA</div>
+                            <div class="sx-sn-h">TIPOGRAFÍA</div>
                             <div id="studio-font-btns" class="studio-pro-pills sx-font-pills"></div>
                         </section>
                         <section class="sx-section">
-                            <div class="sx-sn-h"><span class="sx-sn-n">4</span>DISEÑO Y EFECTOS</div>
+                            <div class="sx-sn-h">DISEÑO Y EFECTOS</div>
                             <div class="sx-sub-lbl">Overlay</div>
                             <div id="studio-filter-btns" class="studio-pro-pills"></div>
                             <div class="sx-sub-lbl">HUD</div>
@@ -4204,18 +4218,26 @@ document.addEventListener('DOMContentLoaded', () => {
             { l:'NONE',    v:'none'          }
         ], 'hudStyle');
 
-        // TIPOGRAFÍA — tarjetas con preview "Aa" REAL en cada fuente + nombre debajo (mockup PASO 5c).
-        // Los valores/keys NO cambian (bold-impact | tech-mono | elegant-sans); solo su presentación.
-        // Se recorre la lista completa: si en el futuro hay 5 fuentes, se pintan las 5 (fila scrollable).
+        // TIPOGRAFÍA — 12 tarjetas cuadradas con preview "Aa" REAL en cada fuente, SIN nombre (mockup PASO 5c v2).
+        // Las familias coinciden 1:1 con las keys nuevas del objeto FM en renderStudioCard,
+        // así el preview del recuadro es exactamente la fuente que va a usar la tarjeta.
         (() => {
             const cont = document.getElementById('studio-font-btns');
             if (!cont) return;
             const redraw = () => renderStudioCard(previewCanvas, studioState.tpl, studioState.fmt, studioState.metrics, true);
-            // Familias = mismas que usa renderStudioCard (FM), para que el preview coincida con la tarjeta.
             const FONTS = [
-                { l:'IMPACT',  v:'bold-impact',  fam:"Impact,'Arial Narrow',sans-serif", wt:900, ls:'1px' },
-                { l:'MONO',    v:'tech-mono',    fam:"'Courier New',Courier,monospace",  wt:700, ls:'0'   },
-                { l:'ELEGANT', v:'elegant-sans', fam:"'Trebuchet MS',Arial,sans-serif",  wt:600, it:true  }
+                { v:'orbitron',      fam:"'Orbitron',sans-serif",      wt:800 },
+                { v:'oswald',        fam:"'Oswald',sans-serif",        wt:700 },
+                { v:'bebas-neue',    fam:"'Bebas Neue',sans-serif",    wt:400 },
+                { v:'montserrat',    fam:"'Montserrat',sans-serif",    wt:800 },
+                { v:'raleway',       fam:"'Raleway',sans-serif",       wt:800 },
+                { v:'anton',         fam:"'Anton',sans-serif",         wt:400 },
+                { v:'archivo-black', fam:"'Archivo Black',sans-serif", wt:400 },
+                { v:'teko',          fam:"'Teko',sans-serif",          wt:700 },
+                { v:'rajdhani',      fam:"'Rajdhani',sans-serif",      wt:700 },
+                { v:'russo-one',     fam:"'Russo One',sans-serif",     wt:400 },
+                { v:'saira',         fam:"'Saira',sans-serif",         wt:800 },
+                { v:'play',          fam:"'Play',sans-serif",          wt:700 }
             ];
             const refresh = () => cont.querySelectorAll('.sx-font-card').forEach(c =>
                 c.classList.toggle('sx-on', c.dataset.val === studioState.fontStyle));
@@ -4224,7 +4246,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 card.type = 'button';
                 card.className = 'sx-font-card';
                 card.dataset.val = f.v;
-                card.innerHTML = `<span class="sx-font-aa" style="font-family:${f.fam}; font-weight:${f.wt}; letter-spacing:${f.ls || '0'};${f.it ? ' font-style:italic;' : ''}">Aa</span><span class="sx-font-name">${f.l}</span>`;
+                card.innerHTML = `<span class="sx-font-aa" style="font-family:${f.fam}; font-weight:${f.wt};">Aa</span>`;
                 card.onclick = () => { studioState.fontStyle = f.v; refresh(); redraw(); };
                 cont.appendChild(card);
             });
