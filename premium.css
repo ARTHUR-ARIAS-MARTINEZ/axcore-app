@@ -3907,6 +3907,51 @@ body.premium-mode #page-studio .studio-tpl-card {
   border: 2px solid var(--pm-border) !important;
 }
 
+/* ══════════════════════════════════════════════════════════════════
+   PASO 5a — PLANTILLAS como el mockup: fila scrollable con miniaturas
+   más presentes, activa con borde de acento + check, y "TU FOTO" como
+   una tarjeta más al final de la fila. Solo estilo — el wiring (onclick
+   de cada tarjeta y del cargar/tomar foto) queda intacto.
+   ══════════════════════════════════════════════════════════════════ */
+body.premium-mode #page-studio .studio-templates {
+  gap: 12px !important;
+  padding: 6px 2px 14px !important;
+}
+/* Miniaturas más grandes / presentes */
+body.premium-mode #page-studio .studio-tpl-card {
+  width: 104px !important;
+  height: 138px !important;
+  border-radius: 16px !important;
+  background: var(--pm-s2) !important;
+  border: 2px solid var(--pm-border) !important;
+}
+/* Activa: borde de acento limpio (sin doble outline) + halo */
+body.premium-mode #page-studio .studio-tpl-card.selected {
+  border-color: var(--accent-main) !important;
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(var(--accent-rgb),0.5),
+              0 0 18px rgba(var(--accent-rgb),0.35) !important;
+}
+/* Check (círculo con palomita) en la esquina inferior derecha de la activa */
+body.premium-mode #page-studio .studio-tpl-card.selected::after {
+  content: '\2713';
+  position: absolute;
+  right: 6px; bottom: 6px;
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background: var(--accent-main);
+  color: var(--pm-accent-ink);
+  font-size: 14px; font-weight: 900;
+  line-height: 24px; text-align: center;
+  border: 2px solid var(--pm-s1);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.45);
+  z-index: 5;
+}
+/* "TU FOTO" se agrega primero en el DOM → mándala al final de la fila */
+body.premium-mode #page-studio #studio-tpl-list .studio-tpl-card:first-child {
+  order: 2 !important;
+}
+
 /* Control segmentado de FORMATO */
 body.premium-mode #page-studio .sx-fmt-seg {
   background: var(--pm-s3) !important;
