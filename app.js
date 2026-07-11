@@ -4204,11 +4204,32 @@ document.addEventListener('DOMContentLoaded', () => {
             { l:'NONE',    v:'none'          }
         ], 'hudStyle');
 
-        _makeStyleBtns('studio-font-btns', [
-            { l:'IMPACT',  v:'bold-impact'  },
-            { l:'MONO',    v:'tech-mono'    },
-            { l:'ELEGANT', v:'elegant-sans' }
-        ], 'fontStyle');
+        // TIPOGRAFÍA — tarjetas con preview "Aa" REAL en cada fuente + nombre debajo (mockup PASO 5c).
+        // Los valores/keys NO cambian (bold-impact | tech-mono | elegant-sans); solo su presentación.
+        // Se recorre la lista completa: si en el futuro hay 5 fuentes, se pintan las 5 (fila scrollable).
+        (() => {
+            const cont = document.getElementById('studio-font-btns');
+            if (!cont) return;
+            const redraw = () => renderStudioCard(previewCanvas, studioState.tpl, studioState.fmt, studioState.metrics, true);
+            // Familias = mismas que usa renderStudioCard (FM), para que el preview coincida con la tarjeta.
+            const FONTS = [
+                { l:'IMPACT',  v:'bold-impact',  fam:"Impact,'Arial Narrow',sans-serif", wt:900, ls:'1px' },
+                { l:'MONO',    v:'tech-mono',    fam:"'Courier New',Courier,monospace",  wt:700, ls:'0'   },
+                { l:'ELEGANT', v:'elegant-sans', fam:"'Trebuchet MS',Arial,sans-serif",  wt:600, it:true  }
+            ];
+            const refresh = () => cont.querySelectorAll('.sx-font-card').forEach(c =>
+                c.classList.toggle('sx-on', c.dataset.val === studioState.fontStyle));
+            FONTS.forEach(f => {
+                const card = document.createElement('button');
+                card.type = 'button';
+                card.className = 'sx-font-card';
+                card.dataset.val = f.v;
+                card.innerHTML = `<span class="sx-font-aa" style="font-family:${f.fam}; font-weight:${f.wt}; letter-spacing:${f.ls || '0'};${f.it ? ' font-style:italic;' : ''}">Aa</span><span class="sx-font-name">${f.l}</span>`;
+                card.onclick = () => { studioState.fontStyle = f.v; refresh(); redraw(); };
+                cont.appendChild(card);
+            });
+            refresh();
+        })();
 
         _makeStyleBtns('studio-filter-btns', [
             { l:'LIMPIO', v:'clear'    },

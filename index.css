@@ -2709,32 +2709,56 @@ body {
     box-shadow: 0 0 10px currentColor, inset 0 0 4px rgba(255,255,255,0.2);
 }
 
-/* Font pills — preview tipográfico (la fuente se aplica al texto) */
-#page-studio .sx-font-pills .sx-btn {
-    padding: 12px 18px !important;
-    font-size: 0.78rem !important;
-    border-radius: 14px !important;
-    letter-spacing: 0.5px !important;
-    text-transform: none !important;
+/* ── PASO 5c — TIPOGRAFÍA: tarjetas con "Aa" dibujado en la fuente + nombre debajo ──
+   Fila scrollable horizontal (nowrap) para que quepan todas las fuentes disponibles. */
+#page-studio #studio-font-btns.sx-font-pills {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    gap: 9px !important;
+    overflow-x: auto !important;
+    scrollbar-width: none !important;
+    padding-bottom: 2px;
+    -webkit-overflow-scrolling: touch;
 }
-/* IMPACT */
-#page-studio .sx-font-pills .sx-btn[data-val="bold-impact"] {
-    font-family: Impact, 'Arial Narrow', sans-serif !important;
-    font-weight: 900 !important;
-    letter-spacing: 2px !important;
-    text-transform: uppercase !important;
+#page-studio #studio-font-btns.sx-font-pills::-webkit-scrollbar { display: none; }
+#page-studio .sx-font-card {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    min-width: 60px;
+    padding: 10px 8px 7px;
+    border-radius: 12px;
+    background: var(--pm-s2, rgba(255,255,255,0.04));
+    border: 1.5px solid var(--pm-border, rgba(255,255,255,0.1));
+    color: var(--pm-dim2, #5a7a99);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: border-color 0.18s ease, background 0.18s ease, transform 0.15s ease;
 }
-/* MONO */
-#page-studio .sx-font-pills .sx-btn[data-val="tech-mono"] {
-    font-family: 'Courier New', Courier, monospace !important;
-    font-weight: 700 !important;
+#page-studio .sx-font-card:hover { transform: translateY(-1px); }
+#page-studio .sx-font-card:active { transform: scale(0.97); }
+#page-studio .sx-font-card .sx-font-aa {
+    font-size: 1.55rem;
+    line-height: 1;
+    color: var(--pm-text, #eaf2ff);
 }
-/* ELEGANT */
-#page-studio .sx-font-pills .sx-btn[data-val="elegant-sans"] {
-    font-family: 'Trebuchet MS', Arial, sans-serif !important;
-    font-style: italic !important;
-    font-weight: 600 !important;
+#page-studio .sx-font-card .sx-font-name {
+    font-size: 0.5rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-family: var(--font-accent, 'Oswald');
 }
+/* Activa: borde + tinte de acento */
+#page-studio .sx-font-card.sx-on {
+    border-color: var(--accent-main) !important;
+    background: color-mix(in srgb, var(--accent-main) 14%, transparent);
+}
+#page-studio .sx-font-card.sx-on .sx-font-aa { color: var(--accent-main); }
+#page-studio .sx-font-card.sx-on .sx-font-name { color: var(--accent-main); }
 
 /* ────────────────────────────────────────────────────────────
    COLOR SWATCHES
