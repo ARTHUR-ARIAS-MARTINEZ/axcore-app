@@ -3853,26 +3853,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         </section>
                     </div>
 
-                    <!-- DATOS Y TEXTO (colapsable — controles conservados que el mockup no muestra) -->
-                    <section class="sx-section sx-advanced">
-                        <button class="sx-adv-toggle" onclick="this.closest('.sx-advanced').classList.toggle('sx-adv-open')">
-                            <span class="sx-adv-lbl">⚙ DATOS Y TEXTO <span class="sx-adv-hint">avanzado</span></span>
-                            <span class="sx-adv-chevron">›</span>
-                        </button>
-                        <div class="sx-adv-body">
-                            <div class="sx-sec-lbl">MÉTRICAS A MOSTRAR</div>
-                            <div class="studio-metrics" id="studio-met-list"></div>
-                            <div class="sx-sec-lbl" style="margin-top:18px">⭐ MÉTRICA PRINCIPAL</div>
-                            <div id="studio-hero-metric-btns" class="studio-pro-pills"></div>
-                            <div class="sx-sec-lbl" style="margin-top:18px">ESTILO DE TARJETA</div>
-                            <div id="studio-card-style-btns" class="studio-pro-pills sx-card-pills"></div>
-                            <div class="sx-sec-lbl" style="margin-top:18px">COLOR DE TEXTO</div>
-                            <div id="studio-color-swatches" class="studio-pro-swatches sx-swatches"></div>
-                            <div class="sx-sec-lbl" style="margin-top:18px">TAMAÑO DE TEXTO <span class="sx-val-badge" id="studio-size-val">${Math.round(studioState.textSize*100)}%</span></div>
-                            <input type="range" id="studio-size-picker" class="studio-pro-slider sx-slider" min="0.5" max="2.5" step="0.1" value="${studioState.textSize}">
-                        </div>
-                    </section>
-
                 </div><!-- /.sx-scroll -->
 
             </div><!-- /.sx-core -->
@@ -3963,114 +3943,13 @@ document.addEventListener('DOMContentLoaded', () => {
             fmtBtns.appendChild(btn);
         });
 
-        // --- Metric toggles ---
-        const metList = document.getElementById('studio-met-list');
-        STUDIO_METRICS.forEach(m => {
-            const tog = document.createElement('div');
-            // Leer estado en tiempo real (no closure) para que sea correcto tras renders
-            const getOn = () => studioState.metrics.includes(m.key);
-            tog.className = 'studio-metric-toggle' + (getOn() ? ' on' : '');
-            tog.innerHTML = `<div class="dot"></div> ${m.label}: <strong>${m.val()}</strong>`;
-            tog.onclick = () => {
-                if (getOn()) {
-                    studioState.metrics = studioState.metrics.filter(k => k !== m.key);
-                } else {
-                    studioState.metrics.push(m.key);
-                }
-                // Actualizar clase en-lugar SIN reconstruir toda la página
-                tog.classList.toggle('on', getOn());
-                // Solo redibujar el canvas de preview
-                renderStudioCard(previewCanvas, studioState.tpl, studioState.fmt, studioState.metrics, true);
-            };
-            metList.appendChild(tog);
-        });
-
         // --- Preview ---
         const previewCanvas = document.getElementById('studio-preview-canvas');
         renderStudioCard(previewCanvas, studioState.tpl, studioState.fmt, studioState.metrics, true);
 
-        // --- Eventos controles texto (Paleta extendida) ---
-        const swatchesContainer = document.getElementById('studio-color-swatches');
-        const palette = [
-            { c:'theme',   l:'AUTO', bg:'linear-gradient(45deg,#00ff88,#00d2ff)', glow:true },
-            // Blancos y grises
-            { c:'#ffffff', bg:'#ffffff' },
-            { c:'#d3d3d3', bg:'#d3d3d3' },
-            { c:'#808080', bg:'#808080' },
-            { c:'#36454F', bg:'#36454F' },
-            { c:'#1a1a1a', bg:'#1a1a1a' },
-            // NEONES
-            { c:'#00e5ff', bg:'#00e5ff',  glow:true },  // Cyan neón
-            { c:'#00ffcc', bg:'#00ffcc',  glow:true },  // Aqua neón
-            { c:'#39ff14', bg:'#39ff14',  glow:true },  // Verde eléctrico
-            { c:'#ccff00', bg:'#ccff00',  glow:true },  // Lima neón
-            { c:'#ff073a', bg:'#ff073a',  glow:true },  // Rojo neón sangre
-            { c:'#ff00ff', bg:'#ff00ff',  glow:true },  // Magenta neón
-            { c:'#ff6ec7', bg:'#ff6ec7',  glow:true },  // Rosa hot neón
-            { c:'#ff9500', bg:'#ff9500',  glow:true },  // Ámbar neón
-            { c:'#ffd700', bg:'#ffd700',  glow:true },  // Oro neón
-            { c:'#04d9ff', bg:'#04d9ff',  glow:true },  // Azul eléctrico
-            { c:'#bf5fff', bg:'#bf5fff',  glow:true },  // Violeta neón
-            // Vibrantes
-            { c:'#ff4400', bg:'#ff4400' },
-            { c:'#ff0000', bg:'#ff0000' },
-            { c:'#800080', bg:'#800080' },
-            { c:'#ffb6c1', bg:'#ffb6c1' },
-        ];
-        
-        const allSwatchBtns = [];
-        const refreshSwatches = () => {
-            allSwatchBtns.forEach(({ btn, p }) => {
-                if (studioState.textColor === p.c) {
-                    btn.style.outline = '3px solid var(--accent-main)';
-                    btn.style.transform = 'scale(1.18)';
-                    btn.style.border = '';
-                } else {
-                    btn.style.outline = '';
-                    btn.style.transform = '';
-                    btn.style.border = '1px solid rgba(255,255,255,0.18)';
-                }
-            });
-        };
-        palette.forEach(p => {
-            const btn = document.createElement('button');
-            btn.style.width = '28px'; btn.style.height = '28px';
-            btn.style.borderRadius = '7px'; btn.style.cursor = 'pointer';
-            btn.style.background = p.bg; btn.style.transition = 'transform .15s, box-shadow .15s';
-            if (p.glow) btn.style.boxShadow = `0 0 8px 1px ${p.c === 'theme' ? '#00ff88' : p.c}88`;
-            if (p.l) { btn.textContent = p.l; btn.style.fontSize='9px'; btn.style.fontWeight='900'; btn.style.color='#000'; btn.style.width='44px'; }
-            if (studioState.textColor === p.c) {
-                btn.style.outline = '3px solid var(--accent-main)';
-                btn.style.transform = 'scale(1.18)';
-            } else {
-                btn.style.border = '1px solid rgba(255,255,255,0.18)';
-            }
-            btn.onclick = () => {
-                studioState.textColor = p.c;
-                // Actualizar selección visual en-lugar SIN reconstruir toda la página
-                refreshSwatches();
-                renderStudioCard(previewCanvas, studioState.tpl, studioState.fmt, studioState.metrics, true);
-            };
-            allSwatchBtns.push({ btn, p });
-            swatchesContainer.appendChild(btn);
-        });
-
-        const sizePicker = document.getElementById('studio-size-picker');
-        const sizeVal = document.getElementById('studio-size-val');
-        // Throttle con rAF: oninput dispara decenas de veces por segundo al
-        // arrastrar y cada llamada re-dibuja TODO el canvas → el slider se
-        // trababa. Con rAF se dibuja como mucho 1 vez por frame.
-        let sizeRafPending = false;
-        sizePicker.oninput = (e) => {
-            studioState.textSize = parseFloat(e.target.value);
-            if (sizeVal) sizeVal.textContent = Math.round(studioState.textSize * 100) + '%';
-            if (sizeRafPending) return;
-            sizeRafPending = true;
-            requestAnimationFrame(() => {
-                sizeRafPending = false;
-                renderStudioCard(previewCanvas, studioState.tpl, studioState.fmt, studioState.metrics, true);
-            });
-        };
+        // (Panel "DATOS Y TEXTO — avanzado" eliminado en PASO 5e: métricas, métrica hero,
+        // estilo de tarjeta, color de texto y tamaño de texto quedan fijos en los defaults
+        // de studioState — la tarjeta sigue dibujando igual, solo ya no son editables.)
 
         // --- Lógica de TABS del estudio (DISEÑO / MÉTRICAS / EFECTOS) ---
         document.querySelectorAll('.studio-pro-tab').forEach(tab => {
@@ -4150,44 +4029,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             refreshBtns();
         };
-
-        _makeStyleBtns('studio-card-style-btns', [
-            { l:'HUD TACTICAL', v:'hud-tactical'  },
-            { l:'CARBON ELITE', v:'carbon-elite'  },
-            { l:'DATA PANEL',   v:'data-panel'    },
-            { l:'EDITORIAL',    v:'editorial'      },
-            { l:'SPLIT HERO',   v:'split-hero'    },
-            { l:'NORDIC DARK',  v:'nordic-dark'   }
-        ], 'cardStyle');
-
-        // Métrica hero: botones dinámicos según métricas activas
-        const heroContainer = document.getElementById('studio-hero-metric-btns');
-        if (heroContainer) {
-            const accent_main = 'var(--accent-main)';
-            const refreshHero = () => heroContainer.querySelectorAll('.sx-btn').forEach(b => {
-                const active = b.dataset.val === studioState.heroMetric;
-                b.style.background = active ? accent_main : 'var(--pm-s2)';
-                b.style.color      = active ? 'var(--pm-accent-ink)' : 'var(--pm-dim2)';
-                b.style.borderColor = active ? accent_main : 'var(--pm-border)';
-            });
-            STUDIO_METRICS.filter(m => studioState.metrics.includes(m.key)).forEach(m => {
-                const btn = document.createElement('button');
-                btn.className = 'sx-btn'; btn.dataset.val = m.key;
-                btn.textContent = m.label;
-                const isActive = studioState.heroMetric === m.key;
-                btn.style.cssText = `padding:4px 10px; font-size:0.60rem; border-radius:8px; cursor:pointer;
-                    border:1px solid ${isActive ? accent_main : 'var(--pm-border)'};
-                    background:${isActive ? accent_main : 'var(--pm-s2)'};
-                    color:${isActive ? 'var(--pm-accent-ink)' : 'var(--pm-dim2)'};
-                    font-weight:800; letter-spacing:0.5px; transition:all .15s;`;
-                btn.onclick = () => {
-                    studioState.heroMetric = m.key;
-                    refreshHero();
-                    renderStudioCard(previewCanvas, studioState.tpl, studioState.fmt, studioState.metrics, true);
-                };
-                heroContainer.appendChild(btn);
-            });
-        }
 
         _makeStyleBtns('studio-accent-btns', [
             { l:'VERDE',    v:'#22c55e', dot:'#22c55e' },
