@@ -3602,9 +3602,9 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.save(); ctx.shadowColor = ac(0.6); ctx.shadowBlur = Math.round(CW*0.01);
         ctx.fillText(fechaV, padX, y); ctx.restore();
 
-        // ── Grid 2×2 ── (CUADRADO: crece para dar aire entre filas/celdas; PASO 5i lo
-        //    sube un poco más — menos gap arriba — para liberar espacio en la zona baja)
-        const gy = y + Math.round(H * (isSquare ? 0.016 : 0.022));
+        // ── Grid 2×2 ── (CUADRADO: crece para dar aire entre filas/celdas; PASO 5j lo
+        //    sube un poco más para liberar más espacio en la zona baja)
+        const gy = y + Math.round(H * (isSquare ? 0.004 : 0.022));
         const gW = contW, gH = Math.round(H * (isSquare ? 0.1407 : 0.13)), gx = padX;
         const cwd = gW/2, chd = gH/2;
         ctx.save(); rr(gx, gy, gW, gH, Math.round(CW*0.022));
@@ -3678,11 +3678,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // ── QR abajo-derecha (se dibuja antes para calcular el área libre de la barra) ──
-        // CUADRADO: se achica y se ancla debajo del grid, con margen real hasta el borde
-        // (PASO 5i: el ajuste anterior lo dejaba casi tocando el marco — se achica más).
-        const qrS = Math.round(CW * (isSquare ? 0.098 : 0.135));
+        // CUADRADO: se achica y se ancla debajo del grid, con margen real hasta el borde.
+        const qrS = Math.round(CW * (isSquare ? 0.088 : 0.135));
         const qrX = padX + contW - qrS;
-        const qrY = isSquare ? (gy + gH + Math.round(H * 0.017)) : (Math.round(H * 0.96) - qrS);
+        const qrY = isSquare ? (gy + gH + Math.round(H * 0.011)) : (Math.round(H * 0.96) - qrS);
         ctx.save();
         const qp = Math.round(CW*0.008);
         rr(qrX - qp, qrY - qp, qrS + qp*2, qrS + qp*2, Math.round(CW*0.01)); ctx.fillStyle = '#ffffff'; ctx.fill();
@@ -3703,9 +3702,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const pLabelY = gy + gH + Math.round(H * (isSquare ? 0.0222 : 0.037));
         ctx.textAlign = 'left'; ctx.fillStyle = 'rgba(255,255,255,0.7)'; ctx.font = sans(Math.round(CW*0.026), '800');
         ctx.fillText(progLabel, padX, pLabelY);
-        const pPctY = pLabelY + Math.round(H * (isSquare ? 0.0509 : 0.063));
-        // PASO 5i: número aún más chico en CUADRADO para dejar más aire hacia el pie.
-        ctx.fillStyle = accent; ctx.font = sans(Math.round(CW*(isSquare ? 0.050 : 0.078)), '900');
+        const pPctY = pLabelY + Math.round(H * (isSquare ? 0.0455 : 0.063));
+        // PASO 5j: número aún más chico en CUADRADO para dejar más aire hacia el pie.
+        ctx.fillStyle = accent; ctx.font = sans(Math.round(CW*(isSquare ? 0.046 : 0.078)), '900');
         ctx.save(); ctx.shadowColor = ac(0.55); ctx.shadowBlur = Math.round(CW*0.012);
         ctx.fillText(progBig, padX, pPctY); ctx.restore();
         const pctW = ctx.measureText(progBig).width;
@@ -3722,13 +3721,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // ── Pie: tagline + #AXCORE (izquierda) ──
         // CUADRADO: no se ancla al borde inferior (chocaba con el número de progreso) —
-        // se ancla debajo del progreso. PASO 5i: más separación (renglón propio) + texto
-        // un poco más chico + margen real hasta el marco para que nada lo toque/salga.
-        const fY = isSquare ? (pPctY + Math.round(CW * 0.026)) : (H - Math.round(H * 0.075));
-        ctx.textAlign = 'left'; ctx.fillStyle = 'rgba(255,255,255,0.6)'; ctx.font = sans(Math.round(CW*(isSquare ? 0.020 : 0.023)), '700');
+        // se ancla debajo del progreso. PASO 5j: aún más separación entre renglones
+        // (DÍAS ACTIVOS/barra → tagline → #AXCORE) y más margen real hasta el marco.
+        const fY = isSquare ? (pPctY + Math.round(CW * 0.030)) : (H - Math.round(H * 0.075));
+        ctx.textAlign = 'left'; ctx.fillStyle = 'rgba(255,255,255,0.6)'; ctx.font = sans(Math.round(CW*(isSquare ? 0.018 : 0.023)), '700');
         ctx.fillText('DISCIPLINA. CONSTANCIA. EVOLUCIÓN.', padX, fY);
-        ctx.fillStyle = accent; ctx.font = sans(Math.round(CW*(isSquare ? 0.026 : 0.03)), '900');
-        ctx.fillText('#AXCORE', padX, fY + Math.round(CW*(isSquare ? 0.030 : 0.04)));
+        ctx.fillStyle = accent; ctx.font = sans(Math.round(CW*(isSquare ? 0.023 : 0.03)), '900');
+        ctx.fillText('#AXCORE', padX, fY + Math.round(CW*(isSquare ? 0.034 : 0.04)));
 
         // ── Filtro overlay (se conserva, siempre al final) ──
         const filter = studioState.overlayFilter || 'clear';
