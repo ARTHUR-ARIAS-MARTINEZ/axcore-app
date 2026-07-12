@@ -4011,6 +4011,154 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
+        // --- COLOR PERSONALIZADO — picker propio (reemplaza el <input type=color> nativo,
+        //     que abría el cuadro gris del sistema, desencajado del tema de la app) ---
+        function openAccentColorPicker(initialHex, onApply) {
+            const hex2rgb = (h) => { h = (h || '#00e5ff').replace('#','');
+                if (h.length === 3) h = h.split('').map(c => c+c).join('');
+                return [parseInt(h.slice(0,2),16)||0, parseInt(h.slice(2,4),16)||0, parseInt(h.slice(4,6),16)||0]; };
+            const rgb2hsv = (r,g,b) => {
+                r/=255; g/=255; b/=255;
+                const max = Math.max(r,g,b), min = Math.min(r,g,b), d = max-min;
+                let h = 0;
+                if (d !== 0) {
+                    if (max === r) h = 60 * (((g-b)/d) % 6);
+                    else if (max === g) h = 60 * ((b-r)/d + 2);
+                    else h = 60 * ((r-g)/d + 4);
+                }
+                if (h < 0) h += 360;
+                return [h, max === 0 ? 0 : d/max, max];
+            };
+            const hsv2rgb = (h,s,v) => {
+                const c = v*s, x = c*(1-Math.abs((h/60)%2-1)), m = v-c;
+                let r,g,b;
+                if (h<60) [r,g,b]=[c,x,0]; else if (h<120) [r,g,b]=[x,c,0];
+                else if (h<180) [r,g,b]=[0,c,x]; else if (h<240) [r,g,b]=[0,x,c];
+                else if (h<300) [r,g,b]=[x,0,c]; else [r,g,b]=[c,0,x];
+                return [Math.round((r+m)*255), Math.round((g+m)*255), Math.round((b+m)*255)];
+            };
+            const rgb2hex = (r,g,b) => '#' + [r,g,b].map(v => Math.max(0,Math.min(255,v)).toString(16).padStart(2,'0')).join('');
+
+            const [ir,ig,ib] = hex2rgb(initialHex);
+            let [hue, sat, val] = rgb2hsv(ir,ig,ib);
+
+            const ov = document.createElement('div');
+            ov.className = 'ax-modal-ov sx-cp-ov';
+            ov.innerHTML = `
+                <div class="ax-modal sx-cp-modal">
+                    <div class="ax-modal-msg">COLOR PERSONALIZADO</div>
+                    <canvas class="sx-cp-sv" width="260" height="150"></canvas>
+                    <div class="sx-cp-sv-wrap"><div class="sx-cp-sv-cursor"></div></div>
+                    <canvas class="sx-cp-hue" width="260" height="18"></canvas>
+                    <div class="sx-cp-hue-wrap"><div class="sx-cp-hue-cursor"></div></div>
+                    <div class="sx-cp-row">
+                        <div class="sx-cp-preview"></div>
+                        <input class="sx-cp-hex" type="text" maxlength="7" autocapitalize="off" autocomplete="off" spellcheck="false">
+                    </div>
+                    <div class="ax-modal-btns">
+                        <button class="ax-modal-btn ax-cancel">CANCELAR</button>
+                        <button class="ax-modal-btn ax-ok">ESTABLECER</button>
+                    </div>
+                </div>`;
+            document.body.appendChild(ov);
+            requestAnimationFrame(() => ov.classList.add('show'));
+
+            const svCanvas = ov.querySelector('.sx-cp-sv');
+            const svCtx = svCanvas.getContext('2d');
+            const svCursor = ov.querySelector('.sx-cp-sv-cursor');
+            const hueCanvas = ov.querySelector('.sx-cp-hue');
+            const hueCtx = hueCanvas.getContext('2d');
+            const hueCursor = ov.querySelector('.sx-cp-hue-cursor');
+            const preview = ov.querySelector('.sx-cp-preview');
+            const hexInput = ov.querySelector('.sx-cp-hex');
+
+            const drawHue = () => {
+                const g = hueCtx.createLinearGradient(0, 0, hueCanvas.width, 0);
+                for (let i = 0; i <= 6; i++) g.addColorStop(i/6, `hsl(${i*60},100%,50%)`);
+                hueCtx.fillStyle = g; hueCtx.fillRect(0, 0, hueCanvas.width, hueCanvas.height);
+            };
+            const drawSV = () => {
+                const [r,g,b] = hsv2rgb(hue, 1, 1);
+                svCtx.fillStyle = `rgb(${r},${g},${b})`; svCtx.fillRect(0, 0, svCanvas.width, svCanvas.height);
+                let gw = svCtx.createLinearGradient(0, 0, svCanvas.width, 0);
+                gw.addColorStop(0, 'rgba(255,255,255,1)'); gw.addColorStop(1, 'rgba(255,255,255,0)');
+                svCtx.fillStyle = gw; svCtx.fillRect(0, 0, svCanvas.width, svCanvas.height);
+                let gb = svCtx.createLinearGradient(0, 0, 0, svCanvas.height);
+                gb.addColorStop(0, 'rgba(0,0,0,0)'); gb.addColorStop(1, 'rgba(0,0,0,1)');
+                svCtx.fillStyle = gb; svCtx.fillRect(0, 0, svCanvas.width, svCanvas.height);
+            };
+            const currentHex = () => { const [r,g,b] = hsv2rgb(hue, sat, val); return rgb2hex(r,g,b); };
+            const syncUI = () => {
+                // % en vez de px del canvas: evita desfasar el cursor si la resolución
+                // interna del canvas no coincide 1:1 con su tamaño renderizado en CSS.
+                svCursor.style.left = (sat * 100) + '%';
+                svCursor.style.top  = ((1 - val) * 100) + '%';
+                hueCursor.style.left = (hue / 360 * 100) + '%';
+                const hx = currentHex();
+                preview.style.background = hx;
+                hexInput.value = hx;
+                svCursor.style.borderColor = val > 0.55 ? '#000' : '#fff';
+            };
+
+            drawHue(); drawSV(); syncUI();
+
+            const pt = (e) => (e.touches && e.touches[0]) ? e.touches[0] : e;
+            const dragOn = (canvas, onMove) => {
+                let dragging = false;
+                const move = (e) => {
+                    if (!dragging) return;
+                    const r = canvas.getBoundingClientRect();
+                    const p = pt(e);
+                    const x = Math.max(0, Math.min(canvas.width,  (p.clientX - r.left) * (canvas.width / r.width)));
+                    const y = Math.max(0, Math.min(canvas.height, (p.clientY - r.top)  * (canvas.height / r.height)));
+                    onMove(x, y);
+                    e.preventDefault();
+                };
+                const start = (e) => { dragging = true; move(e); };
+                const end = () => { dragging = false; };
+                canvas.addEventListener('mousedown', start);
+                canvas.addEventListener('touchstart', start, { passive: false });
+                window.addEventListener('mousemove', move);
+                window.addEventListener('touchmove', move, { passive: false });
+                window.addEventListener('mouseup', end);
+                window.addEventListener('touchend', end);
+                return () => {
+                    canvas.removeEventListener('mousedown', start);
+                    canvas.removeEventListener('touchstart', start);
+                    window.removeEventListener('mousemove', move);
+                    window.removeEventListener('touchmove', move);
+                    window.removeEventListener('mouseup', end);
+                    window.removeEventListener('touchend', end);
+                };
+            };
+            const offSV = dragOn(svCanvas, (x, y) => {
+                sat = x / svCanvas.width; val = 1 - (y / svCanvas.height);
+                syncUI();
+            });
+            const offHue = dragOn(hueCanvas, (x) => {
+                hue = (x / hueCanvas.width) * 360;
+                drawSV(); syncUI();
+            });
+            hexInput.oninput = () => {
+                let v = hexInput.value.trim();
+                if (/^#?[0-9a-fA-F]{6}$/.test(v)) {
+                    if (v.charAt(0) !== '#') v = '#' + v;
+                    const [r,g,b] = hex2rgb(v);
+                    [hue, sat, val] = rgb2hsv(r,g,b);
+                    drawSV(); syncUI();
+                }
+            };
+
+            const close = () => {
+                offSV(); offHue();
+                ov.classList.remove('show');
+                setTimeout(() => ov.remove(), 200);
+            };
+            ov.querySelector('.ax-cancel').onclick = close;
+            ov.querySelector('.ax-ok').onclick = () => { onApply(currentHex()); close(); };
+            ov.onclick = (e) => { if (e.target === ov) close(); };
+        }
+
         // --- Selectores de Estilo Avanzado ---
         const _makeStyleBtns = (containerId, options, stateKey) => {
             const cont = document.getElementById(containerId);
@@ -4077,20 +4225,13 @@ document.addEventListener('DOMContentLoaded', () => {
             { l:'CUSTOM',   v:'__picker',
               dot:'conic-gradient(from 90deg, #00e5ff, #00ffcc, #ffd700, #ff2222, #ff00e5, #00e5ff)',
               onClick: (btn, refresh, redraw) => {
-                  // Rueda arcoíris = COLOR PICKER real (input type=color nativo).
-                  let inp = document.getElementById('studio-accent-color-input');
-                  if (!inp) {
-                      inp = document.createElement('input');
-                      inp.type = 'color';
-                      inp.id = 'studio-accent-color-input';
-                      inp.style.cssText = 'position:fixed; left:-9999px; top:0; opacity:0; pointer-events:none;';
-                      document.body.appendChild(inp);
-                  }
-                  inp.value = (typeof studioState.accentColor === 'string' && studioState.accentColor.charAt(0) === '#')
+                  // Rueda arcoíris = picker PROPIO con el tema de la app (ya no <input type=color> nativo).
+                  const cur = (typeof studioState.accentColor === 'string' && studioState.accentColor.charAt(0) === '#')
                       ? studioState.accentColor : '#00e5ff';
-                  // El hex elegido se guarda en studioState (persiste en la sesión) y redibuja.
-                  inp.oninput = () => { studioState.accentColor = inp.value; refresh(); redraw(); };
-                  inp.click();
+                  openAccentColorPicker(cur, (hex) => {
+                      // El hex elegido se guarda en studioState (persiste en la sesión) y redibuja.
+                      studioState.accentColor = hex; refresh(); redraw();
+                  });
               } }
         ], 'accentColor');
 
