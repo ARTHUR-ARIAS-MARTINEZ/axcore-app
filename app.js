@@ -2391,6 +2391,9 @@ document.addEventListener('DOMContentLoaded', () => {
         document.addEventListener('touchstart', (e) => {
             tracking = false;
             fired = false;
+            // FIX: con un modal propio abierto (ej. color picker) el swipe NO debe
+            // cambiar de pestaña — el modal ya maneja su propio gesto internamente.
+            if (window.__axModalSwipeBlock) return;
             if (shouldBlock(e.target)) return;
             sX = e.touches[0].clientX;
             sY = e.touches[0].clientY;
@@ -4047,10 +4050,14 @@ document.addEventListener('DOMContentLoaded', () => {
             ov.innerHTML = `
                 <div class="ax-modal sx-cp-modal">
                     <div class="ax-modal-msg">COLOR PERSONALIZADO</div>
-                    <canvas class="sx-cp-sv" width="260" height="150"></canvas>
-                    <div class="sx-cp-sv-wrap"><div class="sx-cp-sv-cursor"></div></div>
-                    <canvas class="sx-cp-hue" width="260" height="18"></canvas>
-                    <div class="sx-cp-hue-wrap"><div class="sx-cp-hue-cursor"></div></div>
+                    <div class="sx-cp-sv-box">
+                        <canvas class="sx-cp-sv" width="260" height="150"></canvas>
+                        <div class="sx-cp-sv-cursor"></div>
+                    </div>
+                    <div class="sx-cp-hue-box">
+                        <canvas class="sx-cp-hue" width="260" height="18"></canvas>
+                        <div class="sx-cp-hue-cursor"></div>
+                    </div>
                     <div class="sx-cp-row">
                         <div class="sx-cp-preview"></div>
                         <input class="sx-cp-hex" type="text" maxlength="7" autocapitalize="off" autocomplete="off" spellcheck="false">
@@ -4062,6 +4069,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>`;
             document.body.appendChild(ov);
             requestAnimationFrame(() => ov.classList.add('show'));
+            // FIX swipe de fondo: mientras el modal esté abierto, el listener global de
+            // cambio de pestaña lo ignora por completo (flag + stopPropagation abajo).
+            window.__axModalSwipeBlock = true;
 
             const svCanvas = ov.querySelector('.sx-cp-sv');
             const svCtx = svCanvas.getContext('2d');
@@ -4116,19 +4126,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 };
                 const start = (e) => { dragging = true; move(e); };
                 const end = () => { dragging = false; };
+                // move/end en "ov" (no window): ov cubre toda la pantalla (fixed, inset:0)
+                // así que no se pierde área de arrastre, y permite que ov corte la
+                // propagación del gesto hacia el swipe de pestañas SIN romper el drag.
                 canvas.addEventListener('mousedown', start);
                 canvas.addEventListener('touchstart', start, { passive: false });
-                window.addEventListener('mousemove', move);
-                window.addEventListener('touchmove', move, { passive: false });
-                window.addEventListener('mouseup', end);
-                window.addEventListener('touchend', end);
+                ov.addEventListener('mousemove', move);
+                ov.addEventListener('touchmove', move, { passive: false });
+                ov.addEventListener('mouseup', end);
+                ov.addEventListener('touchend', end);
                 return () => {
                     canvas.removeEventListener('mousedown', start);
                     canvas.removeEventListener('touchstart', start);
-                    window.removeEventListener('mousemove', move);
-                    window.removeEventListener('touchmove', move);
-                    window.removeEventListener('mouseup', end);
-                    window.removeEventListener('touchend', end);
+                    ov.removeEventListener('mousemove', move);
+                    ov.removeEventListener('touchmove', move);
+                    ov.removeEventListener('mouseup', end);
+                    ov.removeEventListener('touchend', end);
                 };
             };
             const offSV = dragOn(svCanvas, (x, y) => {
@@ -4151,12 +4164,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const close = () => {
                 offSV(); offHue();
+                window.__axModalSwipeBlock = false;
                 ov.classList.remove('show');
                 setTimeout(() => ov.remove(), 200);
             };
             ov.querySelector('.ax-cancel').onclick = close;
             ov.querySelector('.ax-ok').onclick = () => { onApply(currentHex()); close(); };
             ov.onclick = (e) => { if (e.target === ov) close(); };
+
+            // FIX swipe de fondo (refuerzo): el gesto no debe salir del modal, aunque
+            // el flag de arriba de por sí ya basta para que el swipe-nav lo ignore.
+            const stop = (e) => e.stopPropagation();
+            ov.addEventListener('touchstart', stop, { passive: true });
+            ov.addEventListener('touchmove', stop, { passive: true });
+            ov.addEventListener('touchend', stop, { passive: true });
         }
 
         // --- Selectores de Estilo Avanzado ---
