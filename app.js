@@ -3344,14 +3344,33 @@ document.addEventListener('DOMContentLoaded', () => {
         { key:'hip',     label:'Cadera',        val:() => (userData.hip||0)+'cm', default:false },
         { key:'back',    label:'Espalda',       val:() => (userData.back||0)+'cm', default:false }
     ];
+    // PASO 6 — FRASES: título (líneas ya agrupadas para canvas, máx 3) + subtítulo (2 líneas).
+    // La frase 9 trae 4 palabras agrupadas en 3 líneas equilibradas ("MÁS" / "ALLÁ DEL" / "LÍMITE").
+    // La frase 12 trae solo 2 palabras → 2 líneas (sin línea vacía forzada).
+    const STUDIO_PHRASES = [
+        { id:1,  title:'MI AVANCE HOY',          lines:['MI','AVANCE','HOY'],            sub:['SIGUE ENFOCADO','SIGUE EVOLUCIONANDO'] },
+        { id:2,  title:'SIENTO EL PODER',        lines:['SIENTO','EL','PODER'],          sub:['CADA DÍA','MÁS FUERTE'] },
+        { id:3,  title:'AQUÍ Y AHORA',           lines:['AQUÍ','Y','AHORA'],             sub:['SIN EXCUSAS','SIN LÍMITES'] },
+        { id:4,  title:'ESTO ES DISCIPLINA',     lines:['ESTO','ES','DISCIPLINA'],       sub:['MENTE FIRME','CUERPO FUERTE'] },
+        { id:5,  title:'UN PASO MÁS',            lines:['UN','PASO','MÁS'],              sub:['HACIA LA','MEJOR VERSIÓN'] },
+        { id:6,  title:'NADA ME DETIENE',        lines:['NADA','ME','DETIENE'],          sub:['CONSTANCIA PURA','RESULTADOS REALES'] },
+        { id:7,  title:'FORJANDO MI CAMINO',     lines:['FORJANDO','MI','CAMINO'],       sub:['ESFUERZO HOY','ORGULLO MAÑANA'] },
+        { id:8,  title:'MODO SIN FRENO',         lines:['MODO','SIN','FRENO'],           sub:['LATE FUERTE','RESPIRA HONDO'] },
+        { id:9,  title:'MÁS ALLÁ DEL LÍMITE',    lines:['MÁS','ALLÁ DEL','LÍMITE'],      sub:['ROMPE LA','BARRERA MENTAL'] },
+        { id:10, title:'CONSTRUYO MI FUERZA',    lines:['CONSTRUYO','MI','FUERZA'],      sub:['LADRILLO A','LADRILLO'] },
+        { id:11, title:'HOY GANO YO',            lines:['HOY','GANO','YO'],              sub:['CONTRA MI','PROPIO RÉCORD'] },
+        { id:12, title:'ENERGÍA IMPARABLE',      lines:['ENERGÍA','IMPARABLE'],          sub:['CUERPO ACTIVO','MENTE CLARA'] }
+    ];
 
     let studioState = {
         tpl: 'verde', fmt: 'story', metrics: ['deficit','weight','waist'],
         textColor: 'theme', textSize: 1.0,
-        accentColor: 'theme',      // AUTO por defecto (color insignia de la plantilla) | neon | cyan | gold | blood | fuchsia
+        accentColor: '#22c55e',    // FIJO por defecto (= primer color de COLOR PRINCIPAL,
+                                    // VERDE). Solo cambia desde ahí — la plantilla NO lo toca.
+        phraseId: 1,               // PASO 6 — frase activa (título+subtítulo de la tarjeta)
         hudStyle: 'tech-corners',  // (legacy)
         fontStyle: 'bold-impact',  // bold-impact | tech-mono | elegant-sans
-        overlayFilter: 'clear',    // clear | glitch | grain | vignette
+        overlayFilter: 'clear',    // clear | glitch | grain | vignette (fijo: PASO 6 quitó su UI)
         cardStyle: 'hud-tactical', // hud-tactical | carbon-elite | data-panel | editorial | split-hero | nordic-dark
         heroMetric: 'deficit',     // métrica principal (número grande)
         activeTab: 'diseno'        // tab activo — persiste entre renderStudioPage() calls
@@ -3468,20 +3487,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Columna de contenido (retrato). En paisaje se centra más angosta.
         const isLand = fmtId === 'landscape';
+        // PASO 5h: CUADRADO tiene 20% menos alto que STORY con el mismo CW (texto del
+        // mismo tamaño en px) — sin este flag el grid/progreso/pie quedaban encimados.
+        const isSquare = fmtId === 'square';
         const CW = isLand ? Math.round(H * 0.82) : W;
         const ox = Math.round((W - CW) / 2);
         const padX = ox + Math.round(CW * 0.075);
         const contW = CW - Math.round(CW * 0.075) * 2;
 
-        // ── ACENTO: AUTO ('theme') = color insignia de la plantilla; si no, paleta fija ──
+        // ── ACENTO: SOLO lo decide COLOR PRINCIPAL, nunca la plantilla (FIX: antes 'theme'
+        //    tomaba tpl.colors[0] y el acento cambiaba solo al cambiar de plantilla) ──
         const APAL = { neon:'#00e5ff', cyan:'#00ffcc', gold:'#ffd700', blood:'#ff2222', fuchsia:'#ff00e5' };
         let accent;
-        if (studioState.accentColor === 'theme') {
-            accent = (tpl.colors && tpl.colors[0]) || '#39ff14';
-        } else if (typeof studioState.accentColor === 'string' && studioState.accentColor.charAt(0) === '#') {
+        if (typeof studioState.accentColor === 'string' && studioState.accentColor.charAt(0) === '#') {
             accent = studioState.accentColor;                       // color custom (picker o preset hex)
         } else {
-            accent = APAL[studioState.accentColor] || '#00e5ff';    // compat valores nombrados viejos
+            accent = APAL[studioState.accentColor] || '#22c55e';    // compat valores nombrados viejos (o default fijo)
         }
         const hex = (h) => { h = (h || '#000').replace('#',''); if (h.length === 3) h = h.split('').map(c => c + c).join('');
             return [parseInt(h.slice(0,2),16)||0, parseInt(h.slice(2,4),16)||0, parseInt(h.slice(4,6),16)||0]; };
@@ -3571,8 +3592,17 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.fillStyle = ac(0.92); ctx.font = sans(Math.round(CW*0.023), '800');
         ctx.fillText('BY ARTHUR', headTx, logoTop + logoS*0.82);
 
-        // ── Título MI / AVANCE / HOY ──
-        const tPx = Math.round(CW * 0.14);
+        // ── Título (PASO 6: líneas dinámicas según la FRASE elegida, 2-3 líneas) ──
+        const phrase = STUDIO_PHRASES.find(p => p.id === studioState.phraseId) || STUDIO_PHRASES[0];
+        const titleLines = phrase.lines;
+        let tPx = Math.round(CW * 0.14);
+        // Auto-ajuste: si la línea más ancha no cabe en el contenido (frases con palabras
+        // largas o líneas agrupadas de 4 palabras), se achica el título hasta que quepa,
+        // en AMBOS formatos (contW ya varía por formato).
+        ctx.font = titleFont(tPx);
+        const maxLineW = Math.max(...titleLines.map(w => ctx.measureText(w).width));
+        const maxAllowedW = contW * 0.94;
+        if (maxLineW > maxAllowedW) tPx = Math.round(tPx * (maxAllowedW / maxLineW));
         const lh  = Math.round(tPx * 0.88 * tS);
         let yMI = Math.round(H * 0.18) + Math.round(tPx * tS);
         ctx.textAlign = 'left'; ctx.font = titleFont(tPx);
@@ -3582,16 +3612,19 @@ document.addEventListener('DOMContentLoaded', () => {
             else { ctx.shadowColor = 'rgba(0,0,0,0.6)'; ctx.shadowBlur = Math.round(CW*0.012); ctx.shadowOffsetY = 2; }
             ctx.fillText(txt, padX, yy); ctx.restore();
         };
-        titleLine('MI', '#ffffff', yMI, false);          // blanco fijo
-        titleLine('AVANCE', accent, yMI + lh, true);     // acento
-        titleLine('HOY', '#ffffff', yMI + lh*2, false);  // blanco fijo
+        // Línea de acento = la de en medio (o la última si solo hay 2 líneas) — mismo
+        // ritmo visual blanco/acento/blanco que "MI / AVANCE / HOY".
+        const accentIdx = Math.min(1, titleLines.length - 1);
+        titleLines.forEach((word, i) => {
+            titleLine(word, i === accentIdx ? accent : '#ffffff', yMI + lh * i, i === accentIdx);
+        });
 
-        // ── Subtítulo ──
-        let y = yMI + lh*2 + Math.round(H * 0.042);
+        // ── Subtítulo (2 líneas de la frase elegida) ──
+        let y = yMI + lh * (titleLines.length - 1) + Math.round(H * 0.042);
         ctx.fillStyle = 'rgba(255,255,255,0.85)'; ctx.font = sans(Math.round(CW*0.032), '700');
-        ctx.fillText('SIGUE ENFOCADO', padX, y);
+        ctx.fillText(phrase.sub[0] || '', padX, y);
         y += Math.round(H * 0.033);
-        ctx.fillText('SIGUE EVOLUCIONANDO', padX, y);
+        ctx.fillText(phrase.sub[1] || '', padX, y);
 
         // ── Fecha (acento) ──
         y += Math.round(H * 0.044);
@@ -3599,9 +3632,10 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.save(); ctx.shadowColor = ac(0.6); ctx.shadowBlur = Math.round(CW*0.01);
         ctx.fillText(fechaV, padX, y); ctx.restore();
 
-        // ── Grid 2×2 ──
-        const gy = y + Math.round(H * 0.022);
-        const gW = contW, gH = Math.round(H * 0.13), gx = padX;
+        // ── Grid 2×2 ── (CUADRADO: crece para dar aire entre filas/celdas; PASO 5j lo
+        //    sube un poco más para liberar más espacio en la zona baja)
+        const gy = y + Math.round(H * (isSquare ? 0.004 : 0.022));
+        const gW = contW, gH = Math.round(H * (isSquare ? 0.1407 : 0.13)), gx = padX;
         const cwd = gW/2, chd = gH/2;
         ctx.save(); rr(gx, gy, gW, gH, Math.round(CW*0.022));
         ctx.fillStyle = 'rgba(4,8,10,0.74)'; ctx.fill();
@@ -3664,17 +3698,20 @@ document.addEventListener('DOMContentLoaded', () => {
             drawIcon(c[0], bx, bcy - s*0.5, s);
             const tx = bx + s + Math.round(CW*0.025);
             ctx.textAlign = 'left';
+            // Etiqueta arriba (chica) + valor abajo (mediano) — separados para que el valor
+            // no encime la etiqueta ni se salga del cuadrante (PASO 5g).
             ctx.fillStyle = 'rgba(255,255,255,0.6)'; ctx.font = sans(Math.round(CW*0.021), '800');
-            ctx.fillText(c[1], tx, bcy - s*0.1);
-            ctx.fillStyle = cc; ctx.font = sans(Math.round(CW*0.048), '900');
+            ctx.fillText(c[1], tx, bcy - s*0.30);
+            ctx.fillStyle = cc; ctx.font = sans(Math.round(CW*0.033), '900');
             ctx.save(); ctx.shadowColor = 'rgba(0,0,0,0.6)'; ctx.shadowBlur = Math.round(CW*0.006);
-            ctx.fillText(c[2], tx, bcy + s*0.44); ctx.restore();
+            ctx.fillText(c[2], tx, bcy + s*0.46); ctx.restore();
         });
 
         // ── QR abajo-derecha (se dibuja antes para calcular el área libre de la barra) ──
-        const qrS = Math.round(CW * 0.135);
+        // CUADRADO: se achica y se ancla debajo del grid, con margen real hasta el borde.
+        const qrS = Math.round(CW * (isSquare ? 0.088 : 0.135));
         const qrX = padX + contW - qrS;
-        const qrY = Math.round(H * 0.96) - qrS;
+        const qrY = isSquare ? (gy + gH + Math.round(H * 0.011)) : (Math.round(H * 0.96) - qrS);
         ctx.save();
         const qp = Math.round(CW*0.008);
         rr(qrX - qp, qrY - qp, qrS + qp*2, qrS + qp*2, Math.round(CW*0.01)); ctx.fillStyle = '#ffffff'; ctx.fill();
@@ -3690,11 +3727,14 @@ document.addEventListener('DOMContentLoaded', () => {
             progLabel = 'DÍAS ACTIVOS'; progBig = String(dias);
             barFrac = Math.max(0.06, Math.min(1, dias / 30));
         }
-        const pLabelY = gy + gH + Math.round(H * 0.037);
+        // PASO 5h: en CUADRADO menos espacio hasta el número + número más chico, así
+        // no choca contra la etiqueta de arriba ni empuja el pie fuera del canvas.
+        const pLabelY = gy + gH + Math.round(H * (isSquare ? 0.0222 : 0.037));
         ctx.textAlign = 'left'; ctx.fillStyle = 'rgba(255,255,255,0.7)'; ctx.font = sans(Math.round(CW*0.026), '800');
         ctx.fillText(progLabel, padX, pLabelY);
-        const pPctY = pLabelY + Math.round(H * 0.063);
-        ctx.fillStyle = accent; ctx.font = sans(Math.round(CW*0.078), '900');
+        const pPctY = pLabelY + Math.round(H * (isSquare ? 0.0455 : 0.063));
+        // PASO 5j: número aún más chico en CUADRADO para dejar más aire hacia el pie.
+        ctx.fillStyle = accent; ctx.font = sans(Math.round(CW*(isSquare ? 0.046 : 0.078)), '900');
         ctx.save(); ctx.shadowColor = ac(0.55); ctx.shadowBlur = Math.round(CW*0.012);
         ctx.fillText(progBig, padX, pPctY); ctx.restore();
         const pctW = ctx.measureText(progBig).width;
@@ -3710,11 +3750,14 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.restore();
 
         // ── Pie: tagline + #AXCORE (izquierda) ──
-        const fY = H - Math.round(H * 0.075);
-        ctx.textAlign = 'left'; ctx.fillStyle = 'rgba(255,255,255,0.6)'; ctx.font = sans(Math.round(CW*0.023), '700');
+        // CUADRADO: no se ancla al borde inferior (chocaba con el número de progreso) —
+        // se ancla debajo del progreso. PASO 5j: aún más separación entre renglones
+        // (DÍAS ACTIVOS/barra → tagline → #AXCORE) y más margen real hasta el marco.
+        const fY = isSquare ? (pPctY + Math.round(CW * 0.030)) : (H - Math.round(H * 0.075));
+        ctx.textAlign = 'left'; ctx.fillStyle = 'rgba(255,255,255,0.6)'; ctx.font = sans(Math.round(CW*(isSquare ? 0.018 : 0.023)), '700');
         ctx.fillText('DISCIPLINA. CONSTANCIA. EVOLUCIÓN.', padX, fY);
-        ctx.fillStyle = accent; ctx.font = sans(Math.round(CW*0.03), '900');
-        ctx.fillText('#AXCORE', padX, fY + Math.round(CW*0.04));
+        ctx.fillStyle = accent; ctx.font = sans(Math.round(CW*(isSquare ? 0.023 : 0.03)), '900');
+        ctx.fillText('#AXCORE', padX, fY + Math.round(CW*(isSquare ? 0.034 : 0.04)));
 
         // ── Filtro overlay (se conserva, siempre al final) ──
         const filter = studioState.overlayFilter || 'clear';
@@ -3828,49 +3871,15 @@ document.addEventListener('DOMContentLoaded', () => {
                             <div id="studio-font-btns" class="studio-pro-pills sx-font-pills"></div>
                         </section>
                         <section class="sx-section">
-                            <div class="sx-sn-h">DISEÑO Y EFECTOS</div>
-                            <div class="sx-fx-row">
-                                <div id="studio-filter-btns" class="studio-pro-pills"></div>
-                                <div id="studio-hud-btns" class="studio-pro-pills"></div>
-                            </div>
+                            <div class="sx-sn-h">FRASES</div>
+                            <div id="studio-phrase-btns" class="sx-phrase-row"></div>
                         </section>
                     </div>
 
-                    <!-- FILA: FORMATOS | COMPARTIR -->
-                    <div class="sx-row">
-                        <section class="sx-section">
-                            <div class="sx-sn-h">FORMATOS</div>
-                            <div class="studio-format-btns sx-fmt-seg" id="studio-fmt-btns"></div>
-                        </section>
-                        <section class="sx-section">
-                            <div class="sx-sn-h">COMPARTIR</div>
-                            <div class="sx-share-grid">
-                                <button class="sx-share-ico" title="Descargar" onclick="window.downloadStudioCardHD()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
-                                <button class="sx-share-ico" title="Instagram (menú de compartir)" onclick="window.shareStudioCard()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.6" cy="6.4" r="1.1" fill="currentColor" stroke="none"/></svg></button>
-                                <button class="sx-share-ico" title="WhatsApp (menú de compartir)" onclick="window.shareStudioCard()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></button>
-                                <button class="sx-share-ico" title="Compartir" onclick="window.shareStudioCard()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></button>
-                            </div>
-                        </section>
-                    </div>
-
-                    <!-- DATOS Y TEXTO (colapsable — controles conservados que el mockup no muestra) -->
-                    <section class="sx-section sx-advanced">
-                        <button class="sx-adv-toggle" onclick="this.closest('.sx-advanced').classList.toggle('sx-adv-open')">
-                            <span class="sx-adv-lbl">⚙ DATOS Y TEXTO <span class="sx-adv-hint">avanzado</span></span>
-                            <span class="sx-adv-chevron">›</span>
-                        </button>
-                        <div class="sx-adv-body">
-                            <div class="sx-sec-lbl">MÉTRICAS A MOSTRAR</div>
-                            <div class="studio-metrics" id="studio-met-list"></div>
-                            <div class="sx-sec-lbl" style="margin-top:18px">⭐ MÉTRICA PRINCIPAL</div>
-                            <div id="studio-hero-metric-btns" class="studio-pro-pills"></div>
-                            <div class="sx-sec-lbl" style="margin-top:18px">ESTILO DE TARJETA</div>
-                            <div id="studio-card-style-btns" class="studio-pro-pills sx-card-pills"></div>
-                            <div class="sx-sec-lbl" style="margin-top:18px">COLOR DE TEXTO</div>
-                            <div id="studio-color-swatches" class="studio-pro-swatches sx-swatches"></div>
-                            <div class="sx-sec-lbl" style="margin-top:18px">TAMAÑO DE TEXTO <span class="sx-val-badge" id="studio-size-val">${Math.round(studioState.textSize*100)}%</span></div>
-                            <input type="range" id="studio-size-picker" class="studio-pro-slider sx-slider" min="0.5" max="2.5" step="0.1" value="${studioState.textSize}">
-                        </div>
+                    <!-- FORMATOS (antes compartía fila con COMPARTIR — eliminado en PASO 5g) -->
+                    <section class="sx-section">
+                        <div class="sx-sn-h">FORMATOS</div>
+                        <div class="studio-format-btns sx-fmt-seg" id="studio-fmt-btns"></div>
                     </section>
 
                 </div><!-- /.sx-scroll -->
@@ -3942,6 +3951,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // --- Format buttons ---
+        // PASO 5f: PAISAJE se quita de la interfaz (STUDIO_FORMATS/renderStudioCard lo
+        // conservan intactos por si algo externo aún lo referencia). Si el estado venía
+        // con 'landscape' seleccionado, cae a STORY por defecto.
+        if (studioState.fmt === 'landscape') studioState.fmt = 'story';
         const fmtBtns = document.getElementById('studio-fmt-btns');
         const allFmtBtns = [];
         const refreshFmtBtns = () => {
@@ -3949,7 +3962,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 btn.classList.toggle('active', studioState.fmt === fmt.id);
             });
         };
-        STUDIO_FORMATS.forEach(fmt => {
+        STUDIO_FORMATS.filter(fmt => fmt.id !== 'landscape').forEach(fmt => {
             const btn = document.createElement('button');
             btn.textContent = fmt.label;
             if(studioState.fmt===fmt.id) btn.classList.add('active');
@@ -3963,114 +3976,13 @@ document.addEventListener('DOMContentLoaded', () => {
             fmtBtns.appendChild(btn);
         });
 
-        // --- Metric toggles ---
-        const metList = document.getElementById('studio-met-list');
-        STUDIO_METRICS.forEach(m => {
-            const tog = document.createElement('div');
-            // Leer estado en tiempo real (no closure) para que sea correcto tras renders
-            const getOn = () => studioState.metrics.includes(m.key);
-            tog.className = 'studio-metric-toggle' + (getOn() ? ' on' : '');
-            tog.innerHTML = `<div class="dot"></div> ${m.label}: <strong>${m.val()}</strong>`;
-            tog.onclick = () => {
-                if (getOn()) {
-                    studioState.metrics = studioState.metrics.filter(k => k !== m.key);
-                } else {
-                    studioState.metrics.push(m.key);
-                }
-                // Actualizar clase en-lugar SIN reconstruir toda la página
-                tog.classList.toggle('on', getOn());
-                // Solo redibujar el canvas de preview
-                renderStudioCard(previewCanvas, studioState.tpl, studioState.fmt, studioState.metrics, true);
-            };
-            metList.appendChild(tog);
-        });
-
         // --- Preview ---
         const previewCanvas = document.getElementById('studio-preview-canvas');
         renderStudioCard(previewCanvas, studioState.tpl, studioState.fmt, studioState.metrics, true);
 
-        // --- Eventos controles texto (Paleta extendida) ---
-        const swatchesContainer = document.getElementById('studio-color-swatches');
-        const palette = [
-            { c:'theme',   l:'AUTO', bg:'linear-gradient(45deg,#00ff88,#00d2ff)', glow:true },
-            // Blancos y grises
-            { c:'#ffffff', bg:'#ffffff' },
-            { c:'#d3d3d3', bg:'#d3d3d3' },
-            { c:'#808080', bg:'#808080' },
-            { c:'#36454F', bg:'#36454F' },
-            { c:'#1a1a1a', bg:'#1a1a1a' },
-            // NEONES
-            { c:'#00e5ff', bg:'#00e5ff',  glow:true },  // Cyan neón
-            { c:'#00ffcc', bg:'#00ffcc',  glow:true },  // Aqua neón
-            { c:'#39ff14', bg:'#39ff14',  glow:true },  // Verde eléctrico
-            { c:'#ccff00', bg:'#ccff00',  glow:true },  // Lima neón
-            { c:'#ff073a', bg:'#ff073a',  glow:true },  // Rojo neón sangre
-            { c:'#ff00ff', bg:'#ff00ff',  glow:true },  // Magenta neón
-            { c:'#ff6ec7', bg:'#ff6ec7',  glow:true },  // Rosa hot neón
-            { c:'#ff9500', bg:'#ff9500',  glow:true },  // Ámbar neón
-            { c:'#ffd700', bg:'#ffd700',  glow:true },  // Oro neón
-            { c:'#04d9ff', bg:'#04d9ff',  glow:true },  // Azul eléctrico
-            { c:'#bf5fff', bg:'#bf5fff',  glow:true },  // Violeta neón
-            // Vibrantes
-            { c:'#ff4400', bg:'#ff4400' },
-            { c:'#ff0000', bg:'#ff0000' },
-            { c:'#800080', bg:'#800080' },
-            { c:'#ffb6c1', bg:'#ffb6c1' },
-        ];
-        
-        const allSwatchBtns = [];
-        const refreshSwatches = () => {
-            allSwatchBtns.forEach(({ btn, p }) => {
-                if (studioState.textColor === p.c) {
-                    btn.style.outline = '3px solid var(--accent-main)';
-                    btn.style.transform = 'scale(1.18)';
-                    btn.style.border = '';
-                } else {
-                    btn.style.outline = '';
-                    btn.style.transform = '';
-                    btn.style.border = '1px solid rgba(255,255,255,0.18)';
-                }
-            });
-        };
-        palette.forEach(p => {
-            const btn = document.createElement('button');
-            btn.style.width = '28px'; btn.style.height = '28px';
-            btn.style.borderRadius = '7px'; btn.style.cursor = 'pointer';
-            btn.style.background = p.bg; btn.style.transition = 'transform .15s, box-shadow .15s';
-            if (p.glow) btn.style.boxShadow = `0 0 8px 1px ${p.c === 'theme' ? '#00ff88' : p.c}88`;
-            if (p.l) { btn.textContent = p.l; btn.style.fontSize='9px'; btn.style.fontWeight='900'; btn.style.color='#000'; btn.style.width='44px'; }
-            if (studioState.textColor === p.c) {
-                btn.style.outline = '3px solid var(--accent-main)';
-                btn.style.transform = 'scale(1.18)';
-            } else {
-                btn.style.border = '1px solid rgba(255,255,255,0.18)';
-            }
-            btn.onclick = () => {
-                studioState.textColor = p.c;
-                // Actualizar selección visual en-lugar SIN reconstruir toda la página
-                refreshSwatches();
-                renderStudioCard(previewCanvas, studioState.tpl, studioState.fmt, studioState.metrics, true);
-            };
-            allSwatchBtns.push({ btn, p });
-            swatchesContainer.appendChild(btn);
-        });
-
-        const sizePicker = document.getElementById('studio-size-picker');
-        const sizeVal = document.getElementById('studio-size-val');
-        // Throttle con rAF: oninput dispara decenas de veces por segundo al
-        // arrastrar y cada llamada re-dibuja TODO el canvas → el slider se
-        // trababa. Con rAF se dibuja como mucho 1 vez por frame.
-        let sizeRafPending = false;
-        sizePicker.oninput = (e) => {
-            studioState.textSize = parseFloat(e.target.value);
-            if (sizeVal) sizeVal.textContent = Math.round(studioState.textSize * 100) + '%';
-            if (sizeRafPending) return;
-            sizeRafPending = true;
-            requestAnimationFrame(() => {
-                sizeRafPending = false;
-                renderStudioCard(previewCanvas, studioState.tpl, studioState.fmt, studioState.metrics, true);
-            });
-        };
+        // (Panel "DATOS Y TEXTO — avanzado" eliminado en PASO 5e: métricas, métrica hero,
+        // estilo de tarjeta, color de texto y tamaño de texto quedan fijos en los defaults
+        // de studioState — la tarjeta sigue dibujando igual, solo ya no son editables.)
 
         // --- Lógica de TABS del estudio (DISEÑO / MÉTRICAS / EFECTOS) ---
         document.querySelectorAll('.studio-pro-tab').forEach(tab => {
@@ -4151,44 +4063,6 @@ document.addEventListener('DOMContentLoaded', () => {
             refreshBtns();
         };
 
-        _makeStyleBtns('studio-card-style-btns', [
-            { l:'HUD TACTICAL', v:'hud-tactical'  },
-            { l:'CARBON ELITE', v:'carbon-elite'  },
-            { l:'DATA PANEL',   v:'data-panel'    },
-            { l:'EDITORIAL',    v:'editorial'      },
-            { l:'SPLIT HERO',   v:'split-hero'    },
-            { l:'NORDIC DARK',  v:'nordic-dark'   }
-        ], 'cardStyle');
-
-        // Métrica hero: botones dinámicos según métricas activas
-        const heroContainer = document.getElementById('studio-hero-metric-btns');
-        if (heroContainer) {
-            const accent_main = 'var(--accent-main)';
-            const refreshHero = () => heroContainer.querySelectorAll('.sx-btn').forEach(b => {
-                const active = b.dataset.val === studioState.heroMetric;
-                b.style.background = active ? accent_main : 'var(--pm-s2)';
-                b.style.color      = active ? 'var(--pm-accent-ink)' : 'var(--pm-dim2)';
-                b.style.borderColor = active ? accent_main : 'var(--pm-border)';
-            });
-            STUDIO_METRICS.filter(m => studioState.metrics.includes(m.key)).forEach(m => {
-                const btn = document.createElement('button');
-                btn.className = 'sx-btn'; btn.dataset.val = m.key;
-                btn.textContent = m.label;
-                const isActive = studioState.heroMetric === m.key;
-                btn.style.cssText = `padding:4px 10px; font-size:0.60rem; border-radius:8px; cursor:pointer;
-                    border:1px solid ${isActive ? accent_main : 'var(--pm-border)'};
-                    background:${isActive ? accent_main : 'var(--pm-s2)'};
-                    color:${isActive ? 'var(--pm-accent-ink)' : 'var(--pm-dim2)'};
-                    font-weight:800; letter-spacing:0.5px; transition:all .15s;`;
-                btn.onclick = () => {
-                    studioState.heroMetric = m.key;
-                    refreshHero();
-                    renderStudioCard(previewCanvas, studioState.tpl, studioState.fmt, studioState.metrics, true);
-                };
-                heroContainer.appendChild(btn);
-            });
-        }
-
         _makeStyleBtns('studio-accent-btns', [
             { l:'VERDE',    v:'#22c55e', dot:'#22c55e' },
             { l:'MORADO',   v:'#8b3dff', dot:'#8b3dff' },
@@ -4217,19 +4091,6 @@ document.addEventListener('DOMContentLoaded', () => {
                   inp.click();
               } }
         ], 'accentColor');
-
-        // DISEÑO Y EFECTOS — casillas ícono+etiqueta (PASO 5d). Mismos valores/wiring de siempre
-        // (hudStyle / overlayFilter); solo se agrega opt.icon para la nueva presentación visual.
-        const ICO_CORNERS = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8V4h4M17 4h4v4M21 16v4h-4M7 20H3v-4"/></svg>';
-        const ICO_SCANNER = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="7" x2="21" y2="7"/><line x1="3" y1="12" x2="21" y2="12" stroke-width="3"/><line x1="3" y1="17" x2="21" y2="17"/></svg>';
-        const ICO_MINIMAL = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="6" y1="12" x2="18" y2="12"/></svg>';
-        const ICO_NONE    = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><line x1="5.5" y1="18.5" x2="18.5" y2="5.5"/></svg>';
-        _makeStyleBtns('studio-hud-btns', [
-            { l:'BORDES',  v:'tech-corners',  icon: ICO_CORNERS },
-            { l:'ESCANEO', v:'scanner-lines', icon: ICO_SCANNER },
-            { l:'MINIMAL', v:'minimal',       icon: ICO_MINIMAL },
-            { l:'NINGUNO', v:'none',          icon: ICO_NONE    }
-        ], 'hudStyle');
 
         // TIPOGRAFÍA — 12 tarjetas cuadradas con preview "Aa" REAL en cada fuente, SIN nombre (mockup PASO 5c v2).
         // Las familias coinciden 1:1 con las keys nuevas del objeto FM en renderStudioCard,
@@ -4267,16 +4128,27 @@ document.addEventListener('DOMContentLoaded', () => {
             refresh();
         })();
 
-        const ICO_LIMPIO  = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2.5l1.9 5.8 6.1 0.1-4.9 3.7 1.9 5.8-5-3.6-5 3.6 1.9-5.8-4.9-3.7 6.1-0.1z"/></svg>';
-        const ICO_GLITCH  = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h7l-2 4h8l-2 4h7"/></svg>';
-        const ICO_GRAIN   = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="6" cy="6" r="1.4"/><circle cx="12" cy="6" r="1.4"/><circle cx="18" cy="6" r="1.4"/><circle cx="6" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="18" cy="12" r="1.4"/><circle cx="6" cy="18" r="1.4"/><circle cx="12" cy="18" r="1.4"/><circle cx="18" cy="18" r="1.4"/></svg>';
-        const ICO_VIGNETTE = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="12" cy="12" r="5"/></svg>';
-        _makeStyleBtns('studio-filter-btns', [
-            { l:'LIMPIO', v:'clear',   icon: ICO_LIMPIO   },
-            { l:'GLITCH', v:'glitch',  icon: ICO_GLITCH   },
-            { l:'GRANO',  v:'grain',   icon: ICO_GRAIN    },
-            { l:'VIÑETA', v:'vignette',icon: ICO_VIGNETTE }
-        ], 'overlayFilter');
+        // FRASES — 12 tarjetas cuadradas (mismo tamaño 54×54 que usaban las casillas de
+        // DISEÑO Y EFECTOS que reemplazan) mostrando el TEXTO de la frase en vez de un ícono.
+        // Guarda studioState.phraseId y redibuja; renderStudioCard usa STUDIO_PHRASES para
+        // el título (líneas) + subtítulo de la tarjeta.
+        (() => {
+            const cont = document.getElementById('studio-phrase-btns');
+            if (!cont) return;
+            const redraw = () => renderStudioCard(previewCanvas, studioState.tpl, studioState.fmt, studioState.metrics, true);
+            const refresh = () => cont.querySelectorAll('.sx-phrase-btn').forEach(c =>
+                c.classList.toggle('sx-on', +c.dataset.val === studioState.phraseId));
+            STUDIO_PHRASES.forEach(p => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'sx-phrase-btn';
+                btn.dataset.val = p.id;
+                btn.innerHTML = `<span class="sx-phrase-title">${p.title}</span><span class="sx-phrase-sub">${p.sub[0]}<br>${p.sub[1]}</span>`;
+                btn.onclick = () => { studioState.phraseId = p.id; refresh(); redraw(); };
+                cont.appendChild(btn);
+            });
+            refresh();
+        })();
 
         // --- Funciones de Interacción del Estudio ---
         window.openStudioFullscreenPreview = function() {
@@ -4382,6 +4254,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }, 'image/png');
         };
+
     }
 
 

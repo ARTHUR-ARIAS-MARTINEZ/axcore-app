@@ -1,12 +1,12 @@
-const CACHE_NAME = 'axcore-v5.48-estudio-rediseno-preview';
+const CACHE_NAME = 'axcore-v5.49-estudio-frases-fixes';
 const urlsToCache = [
   './',
-  './index.html?v=20260711',
-  './index.css?v=20260711',
-  './premium.css?v=20260711',
-  './profile-persist.js?v=20260711',
-  './app.js?v=20260711',
-  './knowledge.js?v=20260711',
+  './index.html?v=20260711b',
+  './index.css?v=20260711b',
+  './premium.css?v=20260711b',
+  './profile-persist.js?v=20260711b',
+  './app.js?v=20260711b',
+  './knowledge.js?v=20260711b',
   './logo.png',
   './logo_coach.png',
   './manifest_vip.json',
