@@ -3344,15 +3344,33 @@ document.addEventListener('DOMContentLoaded', () => {
         { key:'hip',     label:'Cadera',        val:() => (userData.hip||0)+'cm', default:false },
         { key:'back',    label:'Espalda',       val:() => (userData.back||0)+'cm', default:false }
     ];
+    // PASO 6 — FRASES: título (líneas ya agrupadas para canvas, máx 3) + subtítulo (2 líneas).
+    // La frase 9 trae 4 palabras agrupadas en 3 líneas equilibradas ("MÁS" / "ALLÁ DEL" / "LÍMITE").
+    // La frase 12 trae solo 2 palabras → 2 líneas (sin línea vacía forzada).
+    const STUDIO_PHRASES = [
+        { id:1,  title:'MI AVANCE HOY',          lines:['MI','AVANCE','HOY'],            sub:['SIGUE ENFOCADO','SIGUE EVOLUCIONANDO'] },
+        { id:2,  title:'SIENTO EL PODER',        lines:['SIENTO','EL','PODER'],          sub:['CADA DÍA','MÁS FUERTE'] },
+        { id:3,  title:'AQUÍ Y AHORA',           lines:['AQUÍ','Y','AHORA'],             sub:['SIN EXCUSAS','SIN LÍMITES'] },
+        { id:4,  title:'ESTO ES DISCIPLINA',     lines:['ESTO','ES','DISCIPLINA'],       sub:['MENTE FIRME','CUERPO FUERTE'] },
+        { id:5,  title:'UN PASO MÁS',            lines:['UN','PASO','MÁS'],              sub:['HACIA LA','MEJOR VERSIÓN'] },
+        { id:6,  title:'NADA ME DETIENE',        lines:['NADA','ME','DETIENE'],          sub:['CONSTANCIA PURA','RESULTADOS REALES'] },
+        { id:7,  title:'FORJANDO MI CAMINO',     lines:['FORJANDO','MI','CAMINO'],       sub:['ESFUERZO HOY','ORGULLO MAÑANA'] },
+        { id:8,  title:'MODO SIN FRENO',         lines:['MODO','SIN','FRENO'],           sub:['LATE FUERTE','RESPIRA HONDO'] },
+        { id:9,  title:'MÁS ALLÁ DEL LÍMITE',    lines:['MÁS','ALLÁ DEL','LÍMITE'],      sub:['ROMPE LA','BARRERA MENTAL'] },
+        { id:10, title:'CONSTRUYO MI FUERZA',    lines:['CONSTRUYO','MI','FUERZA'],      sub:['LADRILLO A','LADRILLO'] },
+        { id:11, title:'HOY GANO YO',            lines:['HOY','GANO','YO'],              sub:['CONTRA MI','PROPIO RÉCORD'] },
+        { id:12, title:'ENERGÍA IMPARABLE',      lines:['ENERGÍA','IMPARABLE'],          sub:['CUERPO ACTIVO','MENTE CLARA'] }
+    ];
 
     let studioState = {
         tpl: 'verde', fmt: 'story', metrics: ['deficit','weight','waist'],
         textColor: 'theme', textSize: 1.0,
         accentColor: '#22c55e',    // FIJO por defecto (= primer color de COLOR PRINCIPAL,
                                     // VERDE). Solo cambia desde ahí — la plantilla NO lo toca.
+        phraseId: 1,               // PASO 6 — frase activa (título+subtítulo de la tarjeta)
         hudStyle: 'tech-corners',  // (legacy)
         fontStyle: 'bold-impact',  // bold-impact | tech-mono | elegant-sans
-        overlayFilter: 'clear',    // clear | glitch | grain | vignette
+        overlayFilter: 'clear',    // clear | glitch | grain | vignette (fijo: PASO 6 quitó su UI)
         cardStyle: 'hud-tactical', // hud-tactical | carbon-elite | data-panel | editorial | split-hero | nordic-dark
         heroMetric: 'deficit',     // métrica principal (número grande)
         activeTab: 'diseno'        // tab activo — persiste entre renderStudioPage() calls
@@ -3574,8 +3592,17 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.fillStyle = ac(0.92); ctx.font = sans(Math.round(CW*0.023), '800');
         ctx.fillText('BY ARTHUR', headTx, logoTop + logoS*0.82);
 
-        // ── Título MI / AVANCE / HOY ──
-        const tPx = Math.round(CW * 0.14);
+        // ── Título (PASO 6: líneas dinámicas según la FRASE elegida, 2-3 líneas) ──
+        const phrase = STUDIO_PHRASES.find(p => p.id === studioState.phraseId) || STUDIO_PHRASES[0];
+        const titleLines = phrase.lines;
+        let tPx = Math.round(CW * 0.14);
+        // Auto-ajuste: si la línea más ancha no cabe en el contenido (frases con palabras
+        // largas o líneas agrupadas de 4 palabras), se achica el título hasta que quepa,
+        // en AMBOS formatos (contW ya varía por formato).
+        ctx.font = titleFont(tPx);
+        const maxLineW = Math.max(...titleLines.map(w => ctx.measureText(w).width));
+        const maxAllowedW = contW * 0.94;
+        if (maxLineW > maxAllowedW) tPx = Math.round(tPx * (maxAllowedW / maxLineW));
         const lh  = Math.round(tPx * 0.88 * tS);
         let yMI = Math.round(H * 0.18) + Math.round(tPx * tS);
         ctx.textAlign = 'left'; ctx.font = titleFont(tPx);
@@ -3585,16 +3612,19 @@ document.addEventListener('DOMContentLoaded', () => {
             else { ctx.shadowColor = 'rgba(0,0,0,0.6)'; ctx.shadowBlur = Math.round(CW*0.012); ctx.shadowOffsetY = 2; }
             ctx.fillText(txt, padX, yy); ctx.restore();
         };
-        titleLine('MI', '#ffffff', yMI, false);          // blanco fijo
-        titleLine('AVANCE', accent, yMI + lh, true);     // acento
-        titleLine('HOY', '#ffffff', yMI + lh*2, false);  // blanco fijo
+        // Línea de acento = la de en medio (o la última si solo hay 2 líneas) — mismo
+        // ritmo visual blanco/acento/blanco que "MI / AVANCE / HOY".
+        const accentIdx = Math.min(1, titleLines.length - 1);
+        titleLines.forEach((word, i) => {
+            titleLine(word, i === accentIdx ? accent : '#ffffff', yMI + lh * i, i === accentIdx);
+        });
 
-        // ── Subtítulo ──
-        let y = yMI + lh*2 + Math.round(H * 0.042);
+        // ── Subtítulo (2 líneas de la frase elegida) ──
+        let y = yMI + lh * (titleLines.length - 1) + Math.round(H * 0.042);
         ctx.fillStyle = 'rgba(255,255,255,0.85)'; ctx.font = sans(Math.round(CW*0.032), '700');
-        ctx.fillText('SIGUE ENFOCADO', padX, y);
+        ctx.fillText(phrase.sub[0] || '', padX, y);
         y += Math.round(H * 0.033);
-        ctx.fillText('SIGUE EVOLUCIONANDO', padX, y);
+        ctx.fillText(phrase.sub[1] || '', padX, y);
 
         // ── Fecha (acento) ──
         y += Math.round(H * 0.044);
@@ -3841,11 +3871,8 @@ document.addEventListener('DOMContentLoaded', () => {
                             <div id="studio-font-btns" class="studio-pro-pills sx-font-pills"></div>
                         </section>
                         <section class="sx-section">
-                            <div class="sx-sn-h">DISEÑO Y EFECTOS</div>
-                            <div class="sx-fx-row">
-                                <div id="studio-filter-btns" class="studio-pro-pills"></div>
-                                <div id="studio-hud-btns" class="studio-pro-pills"></div>
-                            </div>
+                            <div class="sx-sn-h">FRASES</div>
+                            <div id="studio-phrase-btns" class="sx-phrase-row"></div>
                         </section>
                     </div>
 
@@ -4065,19 +4092,6 @@ document.addEventListener('DOMContentLoaded', () => {
               } }
         ], 'accentColor');
 
-        // DISEÑO Y EFECTOS — casillas ícono+etiqueta (PASO 5d). Mismos valores/wiring de siempre
-        // (hudStyle / overlayFilter); solo se agrega opt.icon para la nueva presentación visual.
-        const ICO_CORNERS = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8V4h4M17 4h4v4M21 16v4h-4M7 20H3v-4"/></svg>';
-        const ICO_SCANNER = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="7" x2="21" y2="7"/><line x1="3" y1="12" x2="21" y2="12" stroke-width="3"/><line x1="3" y1="17" x2="21" y2="17"/></svg>';
-        const ICO_MINIMAL = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="6" y1="12" x2="18" y2="12"/></svg>';
-        const ICO_NONE    = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><line x1="5.5" y1="18.5" x2="18.5" y2="5.5"/></svg>';
-        _makeStyleBtns('studio-hud-btns', [
-            { l:'BORDES',  v:'tech-corners',  icon: ICO_CORNERS },
-            { l:'ESCANEO', v:'scanner-lines', icon: ICO_SCANNER },
-            { l:'MINIMAL', v:'minimal',       icon: ICO_MINIMAL },
-            { l:'NINGUNO', v:'none',          icon: ICO_NONE    }
-        ], 'hudStyle');
-
         // TIPOGRAFÍA — 12 tarjetas cuadradas con preview "Aa" REAL en cada fuente, SIN nombre (mockup PASO 5c v2).
         // Las familias coinciden 1:1 con las keys nuevas del objeto FM en renderStudioCard,
         // así el preview del recuadro es exactamente la fuente que va a usar la tarjeta.
@@ -4114,16 +4128,27 @@ document.addEventListener('DOMContentLoaded', () => {
             refresh();
         })();
 
-        const ICO_LIMPIO  = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2.5l1.9 5.8 6.1 0.1-4.9 3.7 1.9 5.8-5-3.6-5 3.6 1.9-5.8-4.9-3.7 6.1-0.1z"/></svg>';
-        const ICO_GLITCH  = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h7l-2 4h8l-2 4h7"/></svg>';
-        const ICO_GRAIN   = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="6" cy="6" r="1.4"/><circle cx="12" cy="6" r="1.4"/><circle cx="18" cy="6" r="1.4"/><circle cx="6" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="18" cy="12" r="1.4"/><circle cx="6" cy="18" r="1.4"/><circle cx="12" cy="18" r="1.4"/><circle cx="18" cy="18" r="1.4"/></svg>';
-        const ICO_VIGNETTE = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="12" cy="12" r="5"/></svg>';
-        _makeStyleBtns('studio-filter-btns', [
-            { l:'LIMPIO', v:'clear',   icon: ICO_LIMPIO   },
-            { l:'GLITCH', v:'glitch',  icon: ICO_GLITCH   },
-            { l:'GRANO',  v:'grain',   icon: ICO_GRAIN    },
-            { l:'VIÑETA', v:'vignette',icon: ICO_VIGNETTE }
-        ], 'overlayFilter');
+        // FRASES — 12 tarjetas cuadradas (mismo tamaño 54×54 que usaban las casillas de
+        // DISEÑO Y EFECTOS que reemplazan) mostrando el TEXTO de la frase en vez de un ícono.
+        // Guarda studioState.phraseId y redibuja; renderStudioCard usa STUDIO_PHRASES para
+        // el título (líneas) + subtítulo de la tarjeta.
+        (() => {
+            const cont = document.getElementById('studio-phrase-btns');
+            if (!cont) return;
+            const redraw = () => renderStudioCard(previewCanvas, studioState.tpl, studioState.fmt, studioState.metrics, true);
+            const refresh = () => cont.querySelectorAll('.sx-phrase-btn').forEach(c =>
+                c.classList.toggle('sx-on', +c.dataset.val === studioState.phraseId));
+            STUDIO_PHRASES.forEach(p => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'sx-phrase-btn';
+                btn.dataset.val = p.id;
+                btn.innerHTML = `<span class="sx-phrase-title">${p.title}</span><span class="sx-phrase-sub">${p.sub[0]}<br>${p.sub[1]}</span>`;
+                btn.onclick = () => { studioState.phraseId = p.id; refresh(); redraw(); };
+                cont.appendChild(btn);
+            });
+            refresh();
+        })();
 
         // --- Funciones de Interacción del Estudio ---
         window.openStudioFullscreenPreview = function() {

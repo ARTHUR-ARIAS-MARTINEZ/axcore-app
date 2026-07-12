@@ -2672,11 +2672,10 @@ body {
 }
 #page-studio .studio-pro-pills .sx-btn:active { transform: scale(0.97); }
 
-/* PASO 5d — DISEÑO Y EFECTOS: casillas cuadradas ÍCONO + etiqueta corta, fila única
-   scrollable (fusiona visualmente #studio-filter-btns + #studio-hud-btns sin tocar
-   sus ids/wiring: display:contents los convierte en flex-items directos de .sx-fx-row).
-   El color activo/inactivo lo sigue manejando _makeStyleBtns inline — solo geometría aquí. */
-#page-studio .sx-fx-row {
+/* PASO 6 — FRASES: mismas casillas cuadradas 54×54 que antes usaba DISEÑO Y EFECTOS
+   (icono+etiqueta) — ahora muestran el TEXTO de la frase (título+subtítulo) en vez de
+   un ícono. Fila única scrollable. Tamaño de recuadro SIN CAMBIOS respecto a lo anterior. */
+#page-studio .sx-phrase-row {
     display: flex !important;
     flex-wrap: nowrap !important;
     gap: 8px !important;
@@ -2685,36 +2684,46 @@ body {
     padding-bottom: 2px;
     -webkit-overflow-scrolling: touch;
 }
-#page-studio .sx-fx-row::-webkit-scrollbar { display: none; }
-#page-studio .sx-fx-row #studio-filter-btns,
-#page-studio .sx-fx-row #studio-hud-btns {
-    display: contents !important;
+#page-studio .sx-phrase-row::-webkit-scrollbar { display: none; }
+#page-studio .sx-phrase-btn {
+    flex: 0 0 auto;
+    width: 54px;
+    height: 54px;
+    padding: 3px 2px;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1px;
+    overflow: hidden;
+    cursor: pointer;
+    background: var(--pm-s2, rgba(255,255,255,0.04));
+    border: 1.5px solid var(--pm-border, rgba(255,255,255,0.1));
+    -webkit-tap-highlight-color: transparent;
+    transition: border-color .18s ease, background .18s ease, transform .15s ease;
 }
-#page-studio #studio-filter-btns .sx-btn,
-#page-studio #studio-hud-btns .sx-btn {
-    flex: 0 0 auto !important;
-    width: 54px !important;
-    height: 54px !important;
-    padding: 0 !important;
-    border-radius: 12px !important;
-    flex-direction: column !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 4px !important;
+#page-studio .sx-phrase-btn:active { transform: scale(0.97); }
+#page-studio .sx-phrase-title {
+    font-size: 4.6px;
+    line-height: 1.1;
+    font-weight: 800;
+    letter-spacing: 0.1px;
+    color: var(--pm-text, #eaf2ff);
+    text-align: center;
 }
-#page-studio #studio-filter-btns .sx-btn svg,
-#page-studio #studio-hud-btns .sx-btn svg {
-    flex-shrink: 0;
+#page-studio .sx-phrase-sub {
+    font-size: 3.7px;
+    line-height: 1.15;
+    font-weight: 600;
+    color: var(--pm-dim2, #5a7a99);
+    text-align: center;
 }
-#page-studio #studio-filter-btns .sx-btn .sx-fx-lbl,
-#page-studio #studio-hud-btns .sx-btn .sx-fx-lbl {
-    font-size: 0.42rem !important;
-    font-weight: 800 !important;
-    letter-spacing: 0.3px !important;
-    text-transform: uppercase !important;
-    line-height: 1;
+#page-studio .sx-phrase-btn.sx-on {
+    border-color: var(--accent-main) !important;
+    background: color-mix(in srgb, var(--accent-main) 14%, transparent);
 }
+#page-studio .sx-phrase-btn.sx-on .sx-phrase-title { color: var(--accent-main); }
 
 /* Acento pills — más grandes y con buen padding */
 #page-studio .sx-accent-pills {

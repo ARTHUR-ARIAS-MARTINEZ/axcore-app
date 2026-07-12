@@ -1421,8 +1421,7 @@ body.premium-mode #studio-fmt-btns button,
 body.premium-mode #studio-card-style-btns button,
 body.premium-mode #studio-accent-btns button,
 body.premium-mode #studio-font-btns button,
-body.premium-mode #studio-filter-btns button,
-body.premium-mode #studio-hud-btns button,
+body.premium-mode #studio-phrase-btns button,
 body.premium-mode #studio-hero-metric-btns button {
   background: rgba(255,255,255,0.05);
   border: 1px solid rgba(255,255,255,0.12);
