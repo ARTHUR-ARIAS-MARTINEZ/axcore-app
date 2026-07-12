@@ -1,12 +1,12 @@
-const CACHE_NAME = 'axcore-v5.50-swipe-fix-fuente-fitness';
+const CACHE_NAME = 'axcore-v5.51-swipe-real-fix-color-picker';
 const urlsToCache = [
   './',
-  './index.html?v=20260712',
-  './index.css?v=20260712',
-  './premium.css?v=20260712',
-  './profile-persist.js?v=20260712',
-  './app.js?v=20260712',
-  './knowledge.js?v=20260712',
+  './index.html?v=20260712b',
+  './index.css?v=20260712b',
+  './premium.css?v=20260712b',
+  './profile-persist.js?v=20260712b',
+  './app.js?v=20260712b',
+  './knowledge.js?v=20260712b',
   './logo.png',
   './logo_coach.png',
   './manifest_vip.json',

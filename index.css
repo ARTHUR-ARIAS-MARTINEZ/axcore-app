@@ -3208,6 +3208,83 @@ body.premium-mode #btn-studio-share.sx-share-btn {
 }
 
 /* ════════════════════════════════════════════════════════════════
+   COLOR PERSONALIZADO — picker propio (reemplaza <input type=color>
+   nativo). Reusa el shell .ax-modal-ov/.ax-modal ya existente; estas
+   reglas solo estilizan el contenido propio del picker (SV + hue +
+   hex + preview), con tokens --pm-*.
+   ════════════════════════════════════════════════════════════════ */
+.sx-cp-modal { max-width: 300px; }
+.sx-cp-sv {
+    display: block;
+    width: 100%;
+    height: 150px;
+    border-radius: 10px;
+    cursor: crosshair;
+    touch-action: none;
+    margin-bottom: 2px;
+}
+.sx-cp-sv-wrap { position: relative; height: 0; }
+.sx-cp-sv-cursor {
+    position: absolute;
+    top: -152px; left: 0;
+    width: 16px; height: 16px;
+    margin: -8px 0 0 -8px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.4), 0 2px 6px rgba(0,0,0,0.5);
+    pointer-events: none;
+}
+.sx-cp-hue {
+    display: block;
+    width: 100%;
+    height: 18px;
+    border-radius: 9px;
+    cursor: pointer;
+    touch-action: none;
+    margin: 14px 0 2px;
+}
+.sx-cp-hue-wrap { position: relative; height: 0; }
+.sx-cp-hue-cursor {
+    position: absolute;
+    top: -18px; left: 0;
+    width: 18px; height: 18px;
+    margin-left: -9px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    background: transparent;
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.4), 0 2px 6px rgba(0,0,0,0.5);
+    pointer-events: none;
+}
+.sx-cp-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 16px 0 18px;
+}
+.sx-cp-preview {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    flex-shrink: 0;
+    border: 1px solid var(--pm-border, rgba(255,255,255,0.18));
+    box-shadow: inset 0 0 0 2px rgba(0,0,0,0.15);
+}
+.sx-cp-hex {
+    flex: 1;
+    background: var(--pm-s2, #111f30);
+    border: 1px solid var(--pm-dim, #3d5570);
+    border-radius: 10px;
+    color: var(--text-primary, #e8edf5);
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 10px 12px;
+    box-sizing: border-box;
+}
+.sx-cp-hex:focus { outline: 1.5px solid var(--accent-main, #00c97a); }
+
+/* ════════════════════════════════════════════════════════════════
    RECORTADOR DE FOTO DE PERFIL (acercar/alejar + reposicionar)
    ════════════════════════════════════════════════════════════════ */
 .pm-crop-ov {
@@ -3445,6 +3522,12 @@ body.premium-mode #btn-studio-share.sx-share-btn {
 }
 #page-studio .sx-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 @media (max-width: 440px) { #page-studio .sx-row { grid-template-columns: 1fr; } }
+/* FIX swipe TIPOGRAFÍA/FRASES: un item de grid con "1fr" por defecto tiene
+   min-width:auto y NO se achica por debajo del ancho intrínseco de su contenido
+   (las 12 tarjetas en una fila nowrap, ~744px). Sin esto la sección crecía para
+   caber todo y el excedente quedaba recortado por #page-studio{overflow-x:hidden}
+   en vez de ser scrolleable dentro de la fila — por eso el swipe no hacía nada. */
+#page-studio .sx-row > .sx-section { min-width: 0; }
 
 /* Encabezado de sección (PASO 5c v2: chip numerado eliminado de raíz — solo título) */
 #page-studio .sx-sn-h {
