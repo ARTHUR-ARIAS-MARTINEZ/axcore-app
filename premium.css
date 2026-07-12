@@ -4017,3 +4017,101 @@ body.premium-mode #page-evolution .history-table-container tbody td:first-child 
 body.premium-mode #page-evolution .evolution-panel .measurement-form {
   position: relative;
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   BADGE MEDAL SYSTEM — medallón SVG estilo AX-CORE (HUD)
+   ───────────────────────────────────────────────────────────────
+   NO se usa todavía en ningún render real (INICIO / ESTUDIO / modal).
+   Solo lo consumen badge-medal.js + PREVIEW_INSIGNIAS.html.
+
+   Fuente ÚNICA del color por tier (borde/glow/tinta). Fijos: NO
+   dependen de --pm-cyan-rgb / --pm-green-rgb (esos cambian con el
+   tema; el material de una medalla bronce/plata/oro no debe cambiar
+   con el tema de la app). No requieren .premium-mode.
+   ═══════════════════════════════════════════════════════════════ */
+:root {
+  --pm-tier1-border: #e0954a; --pm-tier1-glow: #e08a2e; --pm-tier1-ink: #ffdca6; /* BRONCE */
+  --pm-tier2-border: #d6dbe6; --pm-tier2-glow: #c4cad6; --pm-tier2-ink: #ffffff; /* PLATA */
+  --pm-tier3-border: #f0c94a; --pm-tier3-glow: #f0c020; --pm-tier3-ink: #fff3c0; /* ORO */
+  --pm-tier4-border: #56d8ee; --pm-tier4-glow: #38c8e0; --pm-tier4-ink: #d6fbff; /* PLATINO */
+  --pm-tier5-border: #2BFF0F; --pm-tier5-glow: #2BFF0F; --pm-tier5-ink: #e2ffe6; /* LEYENDA */
+}
+
+.axb-medal {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 26%;
+  background: radial-gradient(circle at 32% 26%, #1c2128 0%, #0a0c10 65%, #060708 100%);
+  --axb-border: var(--pm-tier1-border);
+  --axb-glow:   var(--pm-tier1-glow);
+  --axb-ink:    var(--pm-tier1-ink);
+  border: 2px solid var(--axb-border);
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.6) inset, 0 0 18px 1px var(--axb-glow);
+}
+.axb-medal.axb-t2 { --axb-border: var(--pm-tier2-border); --axb-glow: var(--pm-tier2-glow); --axb-ink: var(--pm-tier2-ink); }
+.axb-medal.axb-t3 { --axb-border: var(--pm-tier3-border); --axb-glow: var(--pm-tier3-glow); --axb-ink: var(--pm-tier3-ink); }
+.axb-medal.axb-t4 { --axb-border: var(--pm-tier4-border); --axb-glow: var(--pm-tier4-glow); --axb-ink: var(--pm-tier4-ink); }
+.axb-medal.axb-t5 {
+  --axb-border: var(--pm-tier5-border); --axb-glow: var(--pm-tier5-glow); --axb-ink: var(--pm-tier5-ink);
+  animation: axbLegendPulse 2.2s ease-in-out infinite;
+}
+@keyframes axbLegendPulse {
+  0%, 100% { box-shadow: 0 0 0 1px rgba(0,0,0,0.6) inset, 0 0 16px 1px var(--axb-glow); }
+  50%      { box-shadow: 0 0 0 1px rgba(0,0,0,0.6) inset, 0 0 28px 3px var(--axb-glow); }
+}
+
+.axb-medal.axb-locked {
+  border-color: rgba(255,255,255,0.18);
+  box-shadow: none;
+  background: radial-gradient(circle at 32% 26%, #14171c 0%, #0a0c10 70%, #060708 100%);
+  animation: none !important;
+}
+
+.axb-hud {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.axb-ticks { fill: none; stroke: var(--axb-border); stroke-width: 1; stroke-dasharray: 1 4.2; opacity: 0.5; }
+.axb-seg   { fill: none; stroke: var(--axb-border); stroke-width: 2.2; stroke-dasharray: 9 7; opacity: 0.75; }
+.axb-node  { fill: var(--axb-glow); opacity: 0.9; }
+.axb-medal.axb-locked .axb-ticks,
+.axb-medal.axb-locked .axb-seg { stroke: rgba(255,255,255,0.15); opacity: 0.4; }
+.axb-medal.axb-locked .axb-node { fill: rgba(255,255,255,0.2); }
+
+.axb-glyph-glow  { color: var(--axb-glow); fill: currentColor; filter: blur(2.4px); opacity: 0.85; }
+.axb-glyph-crisp { color: var(--axb-ink);  fill: currentColor; }
+.axb-medal.axb-locked .axb-glyph-glow  { display: none; }
+.axb-medal.axb-locked .axb-glyph-crisp { color: rgba(255,255,255,0.3); }
+
+.axb-pill {
+  position: absolute;
+  left: 50%;
+  bottom: -8%;
+  transform: translateX(-50%);
+  background: #0d0f13;
+  border: 1.5px solid var(--axb-border);
+  color: var(--axb-ink);
+  font-family: 'Oswald', sans-serif;
+  font-weight: 700;
+  font-size: 0.24em;
+  line-height: 1.3;
+  padding: 2px 7px;
+  border-radius: 99px;
+  white-space: nowrap;
+}
+.axb-medal.axb-locked .axb-pill {
+  border-color: rgba(255,255,255,0.18);
+  color: rgba(255,255,255,0.4);
+  background: #0a0c10;
+}
+
+.axb-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
