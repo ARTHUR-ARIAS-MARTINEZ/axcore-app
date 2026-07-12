@@ -3348,7 +3348,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let studioState = {
         tpl: 'verde', fmt: 'story', metrics: ['deficit','weight','waist'],
         textColor: 'theme', textSize: 1.0,
-        accentColor: 'theme',      // AUTO por defecto (color insignia de la plantilla) | neon | cyan | gold | blood | fuchsia
+        accentColor: '#22c55e',    // FIJO por defecto (= primer color de COLOR PRINCIPAL,
+                                    // VERDE). Solo cambia desde ahí — la plantilla NO lo toca.
         hudStyle: 'tech-corners',  // (legacy)
         fontStyle: 'bold-impact',  // bold-impact | tech-mono | elegant-sans
         overlayFilter: 'clear',    // clear | glitch | grain | vignette
@@ -3476,15 +3477,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const padX = ox + Math.round(CW * 0.075);
         const contW = CW - Math.round(CW * 0.075) * 2;
 
-        // ── ACENTO: AUTO ('theme') = color insignia de la plantilla; si no, paleta fija ──
+        // ── ACENTO: SOLO lo decide COLOR PRINCIPAL, nunca la plantilla (FIX: antes 'theme'
+        //    tomaba tpl.colors[0] y el acento cambiaba solo al cambiar de plantilla) ──
         const APAL = { neon:'#00e5ff', cyan:'#00ffcc', gold:'#ffd700', blood:'#ff2222', fuchsia:'#ff00e5' };
         let accent;
-        if (studioState.accentColor === 'theme') {
-            accent = (tpl.colors && tpl.colors[0]) || '#39ff14';
-        } else if (typeof studioState.accentColor === 'string' && studioState.accentColor.charAt(0) === '#') {
+        if (typeof studioState.accentColor === 'string' && studioState.accentColor.charAt(0) === '#') {
             accent = studioState.accentColor;                       // color custom (picker o preset hex)
         } else {
-            accent = APAL[studioState.accentColor] || '#00e5ff';    // compat valores nombrados viejos
+            accent = APAL[studioState.accentColor] || '#22c55e';    // compat valores nombrados viejos (o default fijo)
         }
         const hex = (h) => { h = (h || '#000').replace('#',''); if (h.length === 3) h = h.split('').map(c => c + c).join('');
             return [parseInt(h.slice(0,2),16)||0, parseInt(h.slice(2,4),16)||0, parseInt(h.slice(4,6),16)||0]; };
