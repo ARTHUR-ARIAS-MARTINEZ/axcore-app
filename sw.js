@@ -1,12 +1,12 @@
-const CACHE_NAME = 'axcore-v5.49-estudio-frases-fixes';
+const CACHE_NAME = 'axcore-v5.50-swipe-fix-fuente-fitness';
 const urlsToCache = [
   './',
-  './index.html?v=20260711b',
-  './index.css?v=20260711b',
-  './premium.css?v=20260711b',
-  './profile-persist.js?v=20260711b',
-  './app.js?v=20260711b',
-  './knowledge.js?v=20260711b',
+  './index.html?v=20260712',
+  './index.css?v=20260712',
+  './premium.css?v=20260712',
+  './profile-persist.js?v=20260712',
+  './app.js?v=20260712',
+  './knowledge.js?v=20260712',
   './logo.png',
   './logo_coach.png',
   './manifest_vip.json',
