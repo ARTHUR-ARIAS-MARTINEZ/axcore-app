@@ -3312,23 +3312,22 @@ document.addEventListener('DOMContentLoaded', () => {
     // ============================================================
     // ESTUDIO DE LOGROS — SECCIÓN INDEPENDIENTE COMPLETA
     // ============================================================
+    // 12 plantillas nuevas (JPEG web-safe en assets/). Campo `accent` = acento sugerido por plantilla
+    // (neon|cyan|blood|fuchsia|gold). OJO: hoy el render NO lee este campo — el acento "auto" sale de
+    // TACC[tpl.id] dentro de renderStudioCard. Queda como dato listo para cablear (ver reporte).
     const STUDIO_TEMPLATES = [
-        { id:'militar',   name:'MILITAR',       bg: 'assets/bg_studio_militar_1774133302683.png', colors:['#2d3a1a','#1a2410','#4a5c2a','#0d1508'] },
-        { id:'neon',      name:'NEÓN NOCTURNO', bg: 'assets/bg_studio_neon_1774133316841.png', colors:['#0a0a1a','#000','#00e5ff','#ff00e5'] },
-        { id:'fuego',     name:'FUEGO',         bg: 'assets/bg_studio_fuego_1774133335029.png', colors:['#ff6b00','#cc2200','#ff9933','#1a0500'] },
-        { id:'hielo',     name:'HIELO',         bg: 'assets/bg_studio_hielo_1774133351235.png', colors:['#b3e0ff','#e8f4ff','#0077b3','#003d5c'] },
-        { id:'carbono',   name:'CARBONO',       bg: 'assets/bg_studio_carbono_1774133370189.png', colors:['#1a1a1a','#0d0d0d','#d4af37','#8a7220'] },
-        { id:'blood',     name:'BLOOD & IRON',  bg: 'assets/bg_studio_blood_1774133388279.png', colors:['#5c0a0a','#1a0000','#cc1a1a','#330000'] },
-        { id:'fem1',      name:'YOGA SUNRISE',  bg: 'assets/bg_studio_fem1_1774134638293.png', colors:['#ffd1dc','#3a2c2e','#ffcccc','#1a1516'] },
-        { id:'fem2',      name:'ELEGANCE GYM',  bg: 'assets/bg_studio_fem2_1774134660838.png', colors:['#b76e79','#1a0d0f','#cccccc','#0d0607'] },
-        { id:'fem3',      name:'SUNSET HEALTH', bg: 'assets/bg_studio_fem3_1774134674212.png', colors:['#ffb347','#331100','#ffaa33','#1a0800'] },
-        { id:'fem4',      name:'CYAN AESTHETIC',bg: 'assets/bg_studio_fem4_1774134698585.png', colors:['#00ced1','#001a1a','#48d1cc','#000d0d'] },
-        { id:'gay_m1',    name:'PRIDE NEON',    bg: 'assets/bg_studio_gay_m1_1774134716984.png', colors:['#ff00ff','#0a000a','#00ffff','#1a001a'] },
-        { id:'gay_m2',    name:'LUXURY CLUB',   bg: 'assets/bg_studio_gay_m2_1774134733585.png', colors:['#ffb6c1','#1a0a0f','#add8e6','#0d0508'] },
-        { id:'gay_m3',    name:'BEACH POWER',   bg: 'assets/bg_studio_gay_m3_1774134754666.png', colors:['#ffd700','#1a1500','#ffaa00','#0d0a00'] },
-        { id:'gay_f1',    name:'URBAN PRIDE',   bg: 'assets/bg_studio_gay_f1_1774134772023.png', colors:['#ff4500','#1a0500','#ff1493','#0d0200'] },
-        { id:'gay_f2',    name:'STREET ENERGY', bg: 'assets/bg_studio_gay_f2_1774134789052.png', colors:['#8a2be2','#0a001a','#00ced1','#05000d'] },
-        { id:'gay_f3',    name:'NATURE PEACE',  bg: 'assets/bg_studio_gay_f3_1774134806610.png', colors:['#8fbc8f','#0a1a0f','#556b2f','#050d08'] }
+        { id:'verde',          name:'Verde',          accent:'neon',    bg: 'assets/plantilla-verde.jpg',          colors:['#39ff14','#0a1a0f','#8aff7a','#050d08'] },
+        { id:'verde-lima',     name:'Verde Lima',     accent:'neon',    bg: 'assets/plantilla-verde-lima.jpg',     colors:['#ccff00','#131a05','#a8e000','#0a0d02'] },
+        { id:'cian',           name:'Cian',           accent:'cyan',    bg: 'assets/plantilla-cian.jpg',           colors:['#00ffcc','#001a1a','#00e5ff','#000d0d'] },
+        { id:'azul-electrico', name:'Azul Eléctrico', accent:'cyan',    bg: 'assets/plantilla-azul-electrico.jpg', colors:['#04d9ff','#00121f','#00a2ff','#00090f'] },
+        { id:'azul-profundo',  name:'Azul Profundo',  accent:'cyan',    bg: 'assets/plantilla-azul-profundo.jpg',  colors:['#0077b3','#001522','#0099cc','#000b12'] },
+        { id:'blanco',         name:'Blanco Hielo',   accent:'cyan',    bg: 'assets/plantilla-blanco.jpg',         colors:['#e8f4ff','#0d1218','#b3e0ff','#05080c'] },
+        { id:'rojo',           name:'Rojo Carmesí',   accent:'blood',   bg: 'assets/plantilla-rojo.jpg',           colors:['#ff2222','#1a0000','#cc1a1a','#0d0000'] },
+        { id:'rosa',           name:'Rosa Magenta',   accent:'fuchsia', bg: 'assets/plantilla-rosa.jpg',           colors:['#ff6ec7','#1a0512','#ff00ff','#0d0209'] },
+        { id:'morado',         name:'Morado Violeta', accent:'fuchsia', bg: 'assets/plantilla-morado.jpg',         colors:['#bf5fff','#0f0620','#8a2be2','#080310'] },
+        { id:'dorado',         name:'Dorado Campeón', accent:'gold',    bg: 'assets/plantilla-dorado.jpg',         colors:['#ffd700','#1a1500','#d4af37','#0d0a00'] },
+        { id:'naranja',        name:'Naranja Ámbar',  accent:'gold',    bg: 'assets/plantilla-naranja.jpg',        colors:['#ff9500','#1a0d00','#ffaa33','#0d0600'] },
+        { id:'atardecer',      name:'Atardecer',      accent:'gold',    bg: 'assets/plantilla-atardecer.jpg',      colors:['#ff6b3d','#1a0a05','#ffb347','#0d0502'] }
     ];
     const STUDIO_FORMATS = [
         { id:'story', label:'STORY', w:1080, h:1350 },
@@ -3347,9 +3346,9 @@ document.addEventListener('DOMContentLoaded', () => {
     ];
 
     let studioState = {
-        tpl: 'neon', fmt: 'story', metrics: ['deficit','weight','waist'],
+        tpl: 'verde', fmt: 'story', metrics: ['deficit','weight','waist'],
         textColor: 'theme', textSize: 1.0,
-        accentColor: 'neon',       // neon | cyan | gold | blood | fuchsia
+        accentColor: 'theme',      // AUTO por defecto (color insignia de la plantilla) | neon | cyan | gold | blood | fuchsia
         hudStyle: 'tech-corners',  // (legacy)
         fontStyle: 'bold-impact',  // bold-impact | tech-mono | elegant-sans
         overlayFilter: 'clear',    // clear | glitch | grain | vignette
@@ -3361,6 +3360,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const STUDIO_BG_IMAGES = {};
     let isStudioPreloading = false;
     let STUDIO_LOGO_IMG = null;
+    let STUDIO_QR_IMG = null;   // QR del enlace de la app (QR_APP_ATLETA.png) para la tarjeta
 
     let _studioLoadPromise = null;
 
@@ -3379,6 +3379,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     l.onload = () => { STUDIO_LOGO_IMG = l; _studioTryRedraw(); r(); };
                     l.onerror = () => { r(); };
                     l.src = 'logo.png';
+                }),
+                new Promise((r) => {
+                    const q = new Image(); q.crossOrigin = 'anonymous';
+                    q.onload = () => { STUDIO_QR_IMG = q; _studioTryRedraw(); r(); };
+                    q.onerror = () => { r(); };
+                    q.src = 'QR_APP_ATLETA.png';
                 }),
                 new Promise((r) => {
                     if (activeTplId === 'custom') { r(); return; }
@@ -3449,415 +3455,281 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderStudioCard(canvas, tplId, fmtId, activeMetrics, isPreview) {
+        // ── PASO 3: tarjeta "MI AVANCE HOY" (diseño fijo). Lee: tpl (foto), accentColor
+        //    (acento; AUTO=color insignia de la plantilla), fmt, fontStyle/textColor/textSize
+        //    y overlayFilter. Datos reales: déficit, peso, entrenamientos, racha, progreso %.
         let tpl = STUDIO_TEMPLATES.find(t => t.id === tplId);
-        if (tplId === 'custom') tpl = { id:'custom', colors:['#fff','#111','#00e5ff','#000'] };
+        if (tplId === 'custom') tpl = { id:'custom', colors:['#39ff14','#0a1a0f','#8aff7a','#050d08'] };
         else if (!tpl) tpl = STUDIO_TEMPLATES[0];
         const fmt = STUDIO_FORMATS.find(f => f.id === fmtId) || STUDIO_FORMATS[0];
-        const W = fmt.w, H = fmt.h, isL = fmtId === 'landscape';
+        const W = fmt.w, H = fmt.h;
         canvas.width = W; canvas.height = H;
         const ctx = canvas.getContext('2d');
-        const cx = W / 2, pad = Math.floor(W * 0.065);
 
-        // ─── ACCENT ──────────────────────────────────────────────────────────
+        // Columna de contenido (retrato). En paisaje se centra más angosta.
+        const isLand = fmtId === 'landscape';
+        const CW = isLand ? Math.round(H * 0.82) : W;
+        const ox = Math.round((W - CW) / 2);
+        const padX = ox + Math.round(CW * 0.075);
+        const contW = CW - Math.round(CW * 0.075) * 2;
+
+        // ── ACENTO: AUTO ('theme') = color insignia de la plantilla; si no, paleta fija ──
         const APAL = { neon:'#00e5ff', cyan:'#00ffcc', gold:'#ffd700', blood:'#ff2222', fuchsia:'#ff00e5' };
-        const TACC = { hielo:'#0099cc',carbono:'#d4af37',neon:'#00e5ff',fuego:'#ffcc00',blood:'#ff3333',
-            militar:'#8aff7a',custom:'#00e5ff',fem1:'#ffcccc',fem2:'#d4a0a8',fem3:'#ffb347',
-            fem4:'#00ced1',gay_m1:'#ff00ff',gay_m2:'#add8e6',gay_m3:'#ffd700',
-            gay_f1:'#ff4500',gay_f2:'#8a2be2',gay_f3:'#8fbc8f' };
-        const accent = studioState.accentColor === 'theme'
-            ? (TACC[tpl.id] || '#8aff7a') : (APAL[studioState.accentColor] || '#00e5ff');
+        let accent;
+        if (studioState.accentColor === 'theme') {
+            accent = (tpl.colors && tpl.colors[0]) || '#39ff14';
+        } else if (typeof studioState.accentColor === 'string' && studioState.accentColor.charAt(0) === '#') {
+            accent = studioState.accentColor;                       // color custom (picker o preset hex)
+        } else {
+            accent = APAL[studioState.accentColor] || '#00e5ff';    // compat valores nombrados viejos
+        }
+        const hex = (h) => { h = (h || '#000').replace('#',''); if (h.length === 3) h = h.split('').map(c => c + c).join('');
+            return [parseInt(h.slice(0,2),16)||0, parseInt(h.slice(2,4),16)||0, parseInt(h.slice(4,6),16)||0]; };
+        const AR = hex(accent);
+        const ac = (a) => `rgba(${AR[0]},${AR[1]},${AR[2]},${a})`;
 
-        // ─── FONT ────────────────────────────────────────────────────────────
+        // ── Tipografía / color / escala (siguen vivos desde el chrome) ──
+        // Los 3 valores originales se conservan intactos (compat con estado guardado).
+        // PASO 5d: 12 familias RADICALMENTE distintas (una por categoría tipográfica)
+        // para las tarjetas de TIPOGRAFÍA (solo "Aa").
         const FM = {
-            'bold-impact':  { fam:"Impact,'Arial Narrow',sans-serif", wt:'900', itl:false },
-            'tech-mono':    { fam:"'Courier New',Courier,monospace",  wt:'700', itl:false },
-            'elegant-sans': { fam:"'Trebuchet MS',Arial,sans-serif",  wt:'600', itl:true  }
+            'bold-impact':   { fam:"Impact,'Arial Narrow',sans-serif", wt:'900' },
+            'tech-mono':     { fam:"'Courier New',Courier,monospace",  wt:'800' },
+            'elegant-sans':  { fam:"'Trebuchet MS',Arial,sans-serif",  wt:'800' },
+            'orbitron':      { fam:"'Orbitron',sans-serif",      wt:'800' },  // display/tech geométrica
+            'bebas-neue':    { fam:"'Bebas Neue',sans-serif",    wt:'400' },  // condensada alta
+            'playfair':      { fam:"'Playfair Display',serif",  wt:'700' },  // serif clásica
+            'space-mono':    { fam:"'Space Mono',monospace",    wt:'700' },  // monoespaciada
+            'pacifico':      { fam:"'Pacifico',cursive",        wt:'400' },  // manuscrita/script
+            'fredoka':       { fam:"'Fredoka',sans-serif",      wt:'600' },  // redondeada
+            'rokkitt':       { fam:"'Rokkitt',serif",           wt:'700' },  // slab
+            'montserrat':    { fam:"'Montserrat',sans-serif",   wt:'800' },  // humanista limpia
+            'archivo-black': { fam:"'Archivo Black',sans-serif",wt:'400' },  // grotesk pesada
+            'russo-one':     { fam:"'Russo One',sans-serif",    wt:'400' },  // futurista
+            'raleway-light': { fam:"'Raleway',sans-serif",      wt:'300' },  // elegante fina
+            'bungee':        { fam:"'Bungee',cursive",          wt:'400' }   // graffiti/impact
         };
         const fd = FM[studioState.fontStyle] || FM['bold-impact'];
-        const fi = fd.itl ? 'italic ' : '';
-        const tS = Math.max(0.5, Math.min(2.5, studioState.textSize));
-        const cc = studioState.textColor === 'theme' ? '#ffffff' : studioState.textColor;
-        const isAuto = studioState.textColor === 'theme';
+        const tS = Math.max(0.5, Math.min(2.5, studioState.textSize || 1));
+        const cc = (studioState.textColor && studioState.textColor !== 'theme') ? studioState.textColor : '#ffffff';
+        const titleFont = (px) => `${fd.wt} ${Math.round(px * tS)}px ${fd.fam}`;
+        const sans = (px, wt) => `${wt || '700'} ${Math.round(px * tS)}px 'Segoe UI',Arial,sans-serif`;
+        const rr = (x,y,w,h,r) => { ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(x,y,w,h,r); else ctx.rect(x,y,w,h); };
 
-        // ─── METRICS & DATA ───────────────────────────────────────────────────
-        const allM  = STUDIO_METRICS.filter(m => activeMetrics.includes(m.key));
-        const heroK = studioState.heroMetric || activeMetrics[0] || 'deficit';
-        const heroM = allM.find(m => m.key === heroK) || allM[0];
-        const secM  = allM.filter(m => m !== heroM).slice(0, isL ? 5 : 3);
-        const name  = (userData.username || userData.userName || 'USUARIO').toUpperCase();
-        const weeks = Math.min(8, Math.max(1, Math.ceil(((userData.history||[]).length)/7)||1));
-        const PHRASES = ["La disciplina paga.","Deficit achieved.",`Week ${weeks} complete.`,
-                         "No excuses, only results.","Powering your biology.","Results don't lie."];
-        const phrase = PHRASES[(weeks + allM.length) % PHRASES.length];
-        const ICONS = { deficit:'🔥',weight:'⚖️',waist:'📏',bicep:'💪',chest:'🏋️',leg:'🦵',hip:'🎯',back:'🔩' };
+        // ── Datos reales ──
+        const deficitV = (userData.totalNetDeficit || 0).toLocaleString('es-MX');
+        const pesoV    = (userData.weight || 0) + 'kg';
+        const workV    = String(userData.totalWorkouts || 0);
+        const streak   = (typeof streakDays === 'function') ? streakDays() : ((userData.history && userData.history.length) || 0);
+        const rachaV   = streak + (streak === 1 ? ' día' : ' días');
+        const wNow = +(userData.weight || 0), twG = +(userData.target_weight || 0);
+        const swG  = +(userData.startWeight || (userData.history && userData.history[0] && userData.history[0].weight) || wNow);
+        let pct = 0;
+        if (swG > twG && swG > 0) pct = Math.max(0, Math.min(100, Math.round((Math.max(0, swG - wNow) / (swG - twG)) * 100)));
+        const MESES = ['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'];
+        const nd = new Date();
+        const fechaV = `${nd.getDate()} ${MESES[nd.getMonth()]} ${nd.getFullYear()}`;
 
-        // ─── HELPERS ─────────────────────────────────────────────────────────
-        const ac = (a) => {
-            const r=parseInt(accent.slice(1,3),16),g=parseInt(accent.slice(3,5),16),b=parseInt(accent.slice(5,7),16);
-            return `rgba(${r},${g},${b},${a})`;
-        };
-        const gradH = (x1,x2,a0=0,a1=1) => {
-            const g=ctx.createLinearGradient(x1,0,x2,0);
-            g.addColorStop(0,ac(a0)); g.addColorStop(0.5,ac(a1)); g.addColorStop(1,ac(a0)); return g;
-        };
-        const autoText = (txt,x,y,sz) => {
-            ctx.font=`${fi}${fd.wt} ${sz}px ${fd.fam}`; ctx.textAlign='center';
-            if (isAuto) {
-                ctx.fillStyle=accent; ctx.shadowColor=accent; ctx.shadowBlur=38; ctx.globalCompositeOperation='screen';
-                ctx.fillText(txt,x,y); ctx.globalCompositeOperation='source-over'; ctx.shadowBlur=0;
-                ctx.fillStyle='#fff'; ctx.shadowColor='rgba(0,0,0,0.95)'; ctx.shadowBlur=12;
-                ctx.fillText(txt,x,y); ctx.shadowBlur=0;
-            } else {
-                ctx.fillStyle=cc; ctx.shadowColor='rgba(0,0,0,0.9)'; ctx.shadowBlur=14;
-                ctx.fillText(txt,x,y); ctx.shadowBlur=0;
-            }
-        };
-        const weekBar = (y) => {
-            const bW=W-pad*2, sW=bW/8, gap=sW*0.1;
-            for(let i=0;i<8;i++){
-                const bx=pad+i*sW, done=i<weeks, last=i===weeks-1, h=last?14:10;
-                ctx.beginPath(); if(ctx.roundRect) ctx.roundRect(bx,y,sW-gap,h,2); else ctx.rect(bx,y,sW-gap,h);
-                ctx.fillStyle=done?accent:ac(0.08); ctx.fill();
-                if(last){ctx.fillStyle='rgba(255,255,255,0.2)';ctx.fill();}
-                ctx.font=`700 ${Math.floor(9*tS)}px Arial`; ctx.textAlign='center';
-                ctx.fillStyle=done?ac(0.7):ac(0.2);
-                ctx.fillText(`S${i+1}`,bx+(sW-gap)/2,y+h+13);
-            }
-        };
-        const radar = (rcx,rcy,rMax) => {
-            ctx.save();
-            [rMax,rMax*.72,rMax*.44,rMax*.22].forEach((r,i)=>{
-                ctx.beginPath(); ctx.arc(rcx,rcy,r,0,Math.PI*2);
-                ctx.strokeStyle=ac(.07+i*.02); ctx.lineWidth=0.8; ctx.stroke();
-            });
-            ctx.beginPath(); ctx.arc(rcx,rcy,5,0,Math.PI*2); ctx.fillStyle=ac(0.5); ctx.fill();
-            ctx.restore();
-        };
-        const footer = (fy) => {
-            ctx.fillStyle='#181818'; ctx.fillRect(pad,fy-20,W-pad*2,1);
-            ctx.font=`300 ${Math.floor(9.5*tS)}px sans-serif`; ctx.textAlign='start';
-            ctx.fillStyle='rgba(255,255,255,0.4)';
-            ctx.fillText('✦ AX-CORE · PREMIUM LOGROS',pad,fy);
-            ctx.textAlign='end'; ctx.fillStyle='rgba(255,255,255,0.2)';
-            ctx.fillText('BY ARTHUR',W-pad,fy);
-            [0,10,20].forEach((dx,i)=>{
-                ctx.beginPath(); ctx.arc(pad+dx,fy+16,2.5,0,Math.PI*2);
-                ctx.fillStyle=ac(0.5-i*0.15); ctx.fill();
-            });
-            ctx.fillStyle=accent; ctx.fillRect(0,H-8,W,8);
-            ctx.fillStyle='rgba(255,255,255,0.15)'; ctx.fillRect(0,H-8,W*.3,8);
-        };
-        const grid = () => {
-            ctx.save(); ctx.lineWidth=0.4; ctx.strokeStyle=ac(0.055);
-            for(let x=0;x<=W;x+=W/6){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
-            for(let y=0;y<=H;y+=H/10){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
-            ctx.restore();
-        };
-        const secBoxes = (y, mArr) => {
-            const n=Math.max(mArr.length,1), cW=(W-pad*2)/n;
-            mArr.forEach((m,i)=>{
-                const bx=pad+i*cW;
-                ctx.fillStyle='rgba(8,10,18,0.75)';
-                ctx.beginPath(); if(ctx.roundRect) ctx.roundRect(bx,y,cW-8,Math.floor(95*tS),5); else ctx.rect(bx,y,cW-8,Math.floor(95*tS));
-                ctx.fill(); ctx.fillStyle=ac(0.7); ctx.fillRect(bx,y,cW-8,2);
-                const mx=bx+(cW-8)/2;
-                ctx.font=`700 ${Math.floor(10*tS)}px ${fd.fam}`; ctx.textAlign='center'; ctx.fillStyle='#444';
-                ctx.fillText(m.label.toUpperCase(),mx,y+18);
-                ctx.font=`${fi}${fd.wt} ${Math.floor(28*tS)}px ${fd.fam}`; ctx.fillStyle='#fff';
-                ctx.shadowColor='rgba(0,0,0,0.9)'; ctx.shadowBlur=8;
-                ctx.fillText(m.val(),mx,y+Math.floor(52*tS)); ctx.shadowBlur=0;
-                ctx.font=`700 ${Math.floor(10*tS)}px ${fd.fam}`; ctx.fillStyle=accent;
-                ctx.fillText(m.key==='deficit'?'kcal total':m.key==='weight'?'kg actual':'cm',mx,y+Math.floor(68*tS));
-            });
-        };
-        const secCols = (y, mArr) => {
-            const n=Math.max(mArr.length,1), cW=(W-pad*2)/n;
-            mArr.forEach((m,i)=>{
-                const mx=pad+i*cW+cW/2;
-                ctx.font=`700 ${Math.floor(10*tS)}px ${fd.fam}`; ctx.textAlign='center'; ctx.fillStyle='#4a5060';
-                ctx.fillText(m.label.toUpperCase(),mx,y);
-                ctx.font=`${fi}${fd.wt} ${Math.floor(30*tS)}px ${fd.fam}`; ctx.fillStyle='#fff';
-                ctx.shadowColor='rgba(0,0,0,0.85)'; ctx.shadowBlur=8;
-                ctx.fillText(m.val(),mx,y+Math.floor(36*tS)); ctx.shadowBlur=0;
-                ctx.font=`700 ${Math.floor(10*tS)}px ${fd.fam}`; ctx.fillStyle=accent;
-                ctx.fillText(m.key==='deficit'?'kcal':m.key==='weight'?'kg':'cm',mx,y+Math.floor(50*tS));
-                if(i<mArr.length-1){ctx.strokeStyle='#1e2228';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(pad+i*cW+cW-12,y-8);ctx.lineTo(pad+i*cW+cW-12,y+Math.floor(62*tS));ctx.stroke();}
-            });
-        };
-        const progressZone = (y) => {
-            ctx.strokeStyle='#1c1c1c'; ctx.lineWidth=1;
-            ctx.beginPath(); ctx.moveTo(pad,y); ctx.lineTo(W-pad,y); ctx.stroke();
-            ctx.font=`700 ${Math.floor(10*tS)}px ${fd.fam}`; ctx.textAlign='start'; ctx.fillStyle='#3a3a3a';
-            ctx.fillText('PROGRESO — 8 SEMANAS',pad,y+18);
-            weekBar(y+26);
-        };
-        const lowerZone = (y) => {
-            ctx.fillStyle='rgba(0,0,0,0.48)'; ctx.fillRect(0,y,W,H-y-8);
-            radar(W*0.82,H*0.89,W*0.24);
-            ctx.font=`900 ${Math.floor(68*tS)}px 'Arial Black',Arial,sans-serif`;
-            ctx.textAlign='start'; ctx.fillStyle='rgba(255,255,255,0.05)';
-            ctx.fillText('AX-CORE',pad,y+H*0.065);
-            ctx.font=`700 ${Math.floor(10*tS)}px ${fd.fam}`; ctx.fillStyle='#333';
-            ctx.fillText('SISTEMA DE CONTROL',pad,H*0.884);
-            ctx.fillText('PESO · RENDIMIENTO · DISCIPLINA',pad,H*0.908);
-        };
-
-        // ── BACKGROUND + BASE OVERLAY ─────────────────────────────────────────
+        // ── Fondo (foto) + oscurecido izquierda/base + tinte de acento ──
         drawStudioBg(ctx, W, H, tpl);
-        const ov=ctx.createLinearGradient(0,0,0,H);
-        ov.addColorStop(0,'rgba(0,0,0,0.28)'); ov.addColorStop(.45,'rgba(0,0,0,0.55)'); ov.addColorStop(1,'rgba(0,0,0,0.90)');
-        ctx.fillStyle=ov; ctx.fillRect(0,0,W,H);
+        // Oscurecer SOLO la izquierda (para el texto). La foto de la persona queda nítida a la derecha.
+        let g1 = ctx.createLinearGradient(ox, 0, ox + CW, 0);
+        g1.addColorStop(0,'rgba(2,5,4,0.88)'); g1.addColorStop(0.30,'rgba(2,5,4,0.55)');
+        g1.addColorStop(0.50,'rgba(2,5,4,0.06)'); g1.addColorStop(0.72,'rgba(2,5,4,0)');
+        ctx.fillStyle = g1; ctx.fillRect(0, 0, W, H);
+        if (isLand) { ctx.fillStyle = 'rgba(2,5,4,0.45)'; ctx.fillRect(0,0,ox,H); ctx.fillRect(ox+CW,0,W-(ox+CW),H); }
+        // Oscurecer solo la base (para el pie/QR y el grid), dejando libre la parte alta de la foto.
+        let g2 = ctx.createLinearGradient(0, H*0.66, 0, H);
+        g2.addColorStop(0,'rgba(2,5,4,0)'); g2.addColorStop(0.5,'rgba(2,5,4,0.55)'); g2.addColorStop(1,'rgba(2,5,4,0.9)');
+        ctx.fillStyle = g2; ctx.fillRect(0, Math.round(H*0.66), W, Math.round(H*0.34));
 
-        // ── CARD STYLE ────────────────────────────────────────────────────────
-        const style = studioState.cardStyle || 'hud-tactical';
+        // Marco interior con brillo de acento
+        const ins = Math.round(CW * 0.022);
+        ctx.save();
+        ctx.strokeStyle = ac(0.5); ctx.lineWidth = Math.max(2, CW*0.004);
+        ctx.shadowColor = ac(0.5); ctx.shadowBlur = Math.round(CW*0.02);
+        rr(ox+ins, ins, CW-ins*2, H-ins*2, Math.round(CW*0.035)); ctx.stroke();
+        ctx.restore();
 
-        if (style === 'hud-tactical') {
-            // SVG1-INSPIRED: left bar + tech grid + week badges + metric boxes + progress bar
-            grid();
-            ctx.fillStyle=accent; ctx.fillRect(0,0,6,H);
-            ctx.fillStyle=ac(0.25); ctx.fillRect(7.5,0,1.5,H);
-            const halo=ctx.createLinearGradient(0,0,W,0); halo.addColorStop(0,ac(0.08)); halo.addColorStop(1,ac(0));
-            ctx.fillStyle=halo; ctx.fillRect(0,150,W,200);
-            ctx.fillStyle=gradH(0,W*.6,0,0.5); ctx.fillRect(0,153,W*.6,1.5);
-            // Week badges
-            ctx.beginPath(); if(ctx.roundRect) ctx.roundRect(pad,38,116,26,4); else ctx.rect(pad,38,116,26);
-            ctx.fillStyle=accent; ctx.fill();
-            ctx.font=`700 ${Math.floor(11*tS)}px ${fd.fam}`; ctx.textAlign='center'; ctx.fillStyle='#040a0a';
-            ctx.fillText(`WEEK ${String(weeks).padStart(2,'0')}`,pad+58,56);
-            ctx.beginPath(); if(ctx.roundRect) ctx.roundRect(pad+124,38,130,26,4); else ctx.rect(pad+124,38,130,26);
-            ctx.strokeStyle=accent; ctx.lineWidth=1; ctx.stroke();
-            ctx.fillStyle=accent; ctx.fillText('COMPLETADO',pad+189,56);
-            // Name
-            ctx.font=`${fi}700 ${Math.floor(17*tS)}px ${fd.fam}`; ctx.textAlign='start'; ctx.fillStyle='#cccccc';
-            ctx.fillText(name,pad,100); ctx.fillStyle=accent; ctx.fillRect(pad,106,Math.min(name.length*9*tS,200),2);
-            // Hero label + value
-            ctx.font=`700 ${Math.floor(10*tS)}px ${fd.fam}`; ctx.fillStyle=ac(0.85);
-            ctx.fillText(heroM?heroM.label.toUpperCase():'MÉTRICA',pad,138);
-            const hSz=Math.floor((isL?82:112)*tS);
-            ctx.font=`${fi}${fd.wt} ${hSz}px ${fd.fam}`; ctx.textAlign='start';
-            ctx.fillStyle='#fff'; ctx.shadowColor='rgba(0,0,0,0.9)'; ctx.shadowBlur=14;
-            ctx.fillText(heroM?heroM.val():'—',pad,Math.floor(280*tS)); ctx.shadowBlur=0;
-            const sep1Y=Math.floor(280*tS)+26;
-            ctx.fillStyle=ac(0.4); ctx.fillRect(pad,sep1Y,W-pad*2,1);
-            ctx.fillStyle='#111'; ctx.fillRect(pad,sep1Y+1,W-pad*2,1);
-            // Phrase
-            ctx.font=`italic 300 ${Math.floor(17*tS)}px 'Trebuchet MS',Arial,sans-serif`;
-            ctx.textAlign='start'; ctx.fillStyle='#888';
-            ctx.fillText(`"${phrase}"`,pad,sep1Y+52);
-            ctx.strokeStyle='#1c1c1c'; ctx.lineWidth=1;
-            ctx.beginPath(); ctx.moveTo(pad,sep1Y+72); ctx.lineTo(W-pad,sep1Y+72); ctx.stroke();
-            // Secondary metric boxes
-            secBoxes(sep1Y+88, secM);
-            // Progress
-            progressZone(H*0.70);
-            lowerZone(H*0.80);
-            footer(H-50);
+        ctx.textBaseline = 'alphabetic';
 
-        } else if (style === 'carbon-elite') {
-            // IMAGE2-INSPIRED: top/bottom bars + diamond chevron + open columns
-            const tg=ctx.createLinearGradient(0,0,W,0);
-            tg.addColorStop(0,accent); tg.addColorStop(0.6,ac(1)); tg.addColorStop(1,ac(0.3));
-            ctx.fillStyle=tg; ctx.fillRect(0,0,W,4);
-            // Side diagonal chevrons
-            ctx.save(); ctx.strokeStyle=ac(0.55); ctx.lineWidth=3;
-            [20,36,52].forEach(off=>{
-                ctx.beginPath(); ctx.moveTo(pad,H*.2+off); ctx.lineTo(pad+44,H*.18+off); ctx.stroke();
-                ctx.beginPath(); ctx.moveTo(W-pad,H*.2+off); ctx.lineTo(W-pad-44,H*.18+off); ctx.stroke();
-            }); ctx.restore();
-            // Name centered
-            ctx.font=`${fi}700 ${Math.floor(22*tS)}px ${fd.fam}`; ctx.textAlign='center'; ctx.fillStyle='#fff';
-            ctx.shadowColor='rgba(0,0,0,0.85)'; ctx.shadowBlur=10;
-            ctx.fillText(name,cx,68); ctx.shadowBlur=0;
-            ctx.fillStyle=ac(0.55); ctx.fillRect(cx-50,74,100,1.5);
-            // Diamond shape behind hero
-            const dcy=H*.34, dh=H*.28, dw=W*.72;
-            ctx.save(); ctx.beginPath();
-            ctx.moveTo(cx,dcy-dh/2); ctx.lineTo(cx+dw/2,dcy); ctx.lineTo(cx,dcy+dh/2); ctx.lineTo(cx-dw/2,dcy); ctx.closePath();
-            ctx.fillStyle=ac(0.055); ctx.fill(); ctx.strokeStyle=ac(0.32); ctx.lineWidth=2; ctx.stroke();
-            // Inner chevrons
-            ctx.strokeStyle=ac(0.22); ctx.lineWidth=1.5;
-            [-60,-30,0].forEach(off=>{
-                ctx.beginPath(); ctx.moveTo(cx-W*.25,dcy+off+28); ctx.lineTo(cx,dcy+off); ctx.lineTo(cx+W*.25,dcy+off+28); ctx.stroke();
-            }); ctx.restore();
-            // Hero value (centered in diamond)
-            const hSz2=Math.floor((isL?80:118)*tS);
-            ctx.font=`700 ${Math.floor(10*tS)}px ${fd.fam}`; ctx.fillStyle=ac(0.75); ctx.textAlign='center';
-            ctx.fillText(heroM?heroM.label.toUpperCase():'MÉTRICA',cx,dcy-hSz2*.55);
-            autoText(heroM?heroM.val():'—',cx,dcy+hSz2*.42,hSz2);
-            // Separator
-            const sep2Y=dcy+dh/2+28;
-            ctx.fillStyle=gradH(pad,W-pad,0,0.4); ctx.fillRect(pad,sep2Y,W-pad*2,2);
-            // Secondary cols (open)
-            secCols(sep2Y+36, secM);
-            const sm2bot=sep2Y+Math.floor(80*tS);
-            // Phrase
-            ctx.font=`italic 300 ${Math.floor(16*tS)}px 'Trebuchet MS',Arial,sans-serif`;
-            ctx.textAlign='center'; ctx.fillStyle='#666';
-            ctx.fillText(`"${phrase}"`,cx,sm2bot+22);
-            progressZone(sm2bot+42);
-            footer(H-50);
-
-        } else if (style === 'data-panel') {
-            // IMAGE3-INSPIRED: big icon panels + centered hero
-            const tg3=ctx.createLinearGradient(0,0,W,0);
-            tg3.addColorStop(0,ac(0)); tg3.addColorStop(0.5,accent); tg3.addColorStop(1,ac(0));
-            ctx.fillStyle=tg3; ctx.fillRect(0,0,W,4);
-            ctx.font=`${fi}700 ${Math.floor(20*tS)}px ${fd.fam}`; ctx.textAlign='center'; ctx.fillStyle='#ccc';
-            ctx.fillText(name,cx,58); ctx.fillStyle=gradH(cx-60,cx+60,0,0.6); ctx.fillRect(cx-60,64,120,1.5);
-            // Hero
-            ctx.font=`700 ${Math.floor(10*tS)}px ${fd.fam}`; ctx.fillStyle=ac(0.8); ctx.textAlign='center';
-            ctx.fillText(heroM?heroM.label.toUpperCase():'MÉTRICA',cx,96);
-            const hSz3=Math.floor((isL?78:122)*tS);
-            autoText(heroM?heroM.val():'—',cx,96+hSz3,hSz3);
-            const ph3Y=96+hSz3*1.12+28;
-            ctx.font=`italic 300 ${Math.floor(15*tS)}px 'Trebuchet MS',Arial,sans-serif`;
-            ctx.textAlign='center'; ctx.fillStyle=isAuto?accent:'#aaa';
-            ctx.fillText(`"${phrase}"`,cx,ph3Y);
-            ctx.fillStyle=gradH(pad,W-pad,0,0.35); ctx.fillRect(pad,ph3Y+16,W-pad*2,2);
-            // Large icon panels
-            const panY=ph3Y+34, nP=Math.min(secM.length,3);
-            const panW=(W-pad*2-(nP-1)*12)/Math.max(nP,1), panH=Math.floor(118*tS);
-            secM.slice(0,nP).forEach((m,i)=>{
-                const bx=pad+i*(panW+12), pcx=bx+panW/2;
-                ctx.fillStyle='rgba(8,12,22,0.72)';
-                ctx.beginPath(); if(ctx.roundRect) ctx.roundRect(bx,panY,panW,panH,12); else ctx.rect(bx,panY,panW,panH);
-                ctx.fill(); ctx.strokeStyle=ac(0.45); ctx.lineWidth=1.5; ctx.stroke();
-                ctx.fillStyle=accent; ctx.fillRect(bx+12,panY,panW-24,2);
-                ctx.font=`${Math.floor(22*tS)}px sans-serif`; ctx.textAlign='center';
-                ctx.fillText(ICONS[m.key]||'📊',pcx,panY+Math.floor(34*tS));
-                ctx.font=`${fi}${fd.wt} ${Math.floor(36*tS)}px ${fd.fam}`; ctx.fillStyle='#fff';
-                ctx.shadowColor='rgba(0,0,0,0.9)'; ctx.shadowBlur=8;
-                ctx.fillText(m.val(),pcx,panY+Math.floor(76*tS)); ctx.shadowBlur=0;
-                ctx.font=`700 ${Math.floor(10*tS)}px ${fd.fam}`; ctx.fillStyle=accent;
-                ctx.fillText(m.label.toUpperCase(),pcx,panY+Math.floor(92*tS));
-            });
-            progressZone(panY+panH+28);
-            radar(W*.8,H*.87,W*.22);
-            ctx.font=`900 ${Math.floor(66*tS)}px 'Arial Black',Arial,sans-serif`;
-            ctx.textAlign='center'; ctx.fillStyle='rgba(255,255,255,0.04)';
-            ctx.fillText('AX-CORE',cx,H*.88);
-            footer(H-50);
-
-        } else if (style === 'editorial') {
-            // SVG2-INSPIRED: left thin bar + week badge top-right + open columns
-            ctx.fillStyle=accent; ctx.fillRect(pad-12,80,3,H*.6);
-            const wbW=144, wbH=54;
-            ctx.beginPath(); if(ctx.roundRect) ctx.roundRect(W-pad-wbW,32,wbW,wbH,4); else ctx.rect(W-pad-wbW,32,wbW,wbH);
-            ctx.strokeStyle=accent; ctx.lineWidth=1; ctx.stroke();
-            ctx.font=`900 ${Math.floor(11*tS)}px ${fd.fam}`; ctx.textAlign='center'; ctx.fillStyle=accent;
-            ctx.fillText('WEEK',W-pad-wbW/2,52);
-            ctx.font=`900 ${Math.floor(22*tS)}px ${fd.fam}`;
-            ctx.fillText(String(weeks).padStart(2,'0'),W-pad-wbW/2,76);
-            ctx.font=`700 ${Math.floor(13*tS)}px ${fd.fam}`; ctx.textAlign='start'; ctx.fillStyle='#888';
-            ctx.fillText(name,pad,56);
-            ctx.strokeStyle=accent; ctx.lineWidth=0.5; ctx.setLineDash([3,6]);
-            ctx.beginPath(); ctx.moveTo(pad,62); ctx.lineTo(W-pad-wbW-20,62); ctx.stroke(); ctx.setLineDash([]);
-            ctx.font=`700 ${Math.floor(10*tS)}px ${fd.fam}`; ctx.fillStyle=ac(0.7);
-            ctx.fillText(heroM?heroM.label.toUpperCase():'MÉTRICA',pad,108);
-            const hSz4=Math.floor((isL?78:110)*tS);
-            ctx.font=`${fi}${fd.wt} ${hSz4}px ${fd.fam}`; ctx.textAlign='start';
-            ctx.fillStyle='#fff'; ctx.shadowColor='rgba(0,0,0,0.9)'; ctx.shadowBlur=12;
-            ctx.fillText(heroM?heroM.val():'—',pad,108+hSz4); ctx.shadowBlur=0;
-            const hy4=108+hSz4;
-            ctx.fillStyle=gradH(pad,W-pad*3,0,0.6); ctx.fillRect(pad,hy4+20,W-pad*3,2);
-            ctx.fillStyle='rgba(255,255,255,0.06)'; ctx.fillRect(pad,hy4+22,W-pad*3,1);
-            ctx.font=`italic 400 ${Math.floor(17*tS)}px Georgia,serif`; ctx.textAlign='start'; ctx.fillStyle='#666';
-            ctx.fillText(`"${phrase}"`,pad,hy4+58);
-            ctx.strokeStyle='#1e1e1e'; ctx.lineWidth=1;
-            ctx.beginPath(); ctx.moveTo(pad,hy4+78); ctx.lineTo(W-pad,hy4+78); ctx.stroke();
-            secCols(hy4+102, secM);
-            progressZone(hy4+Math.floor(170*tS));
-            // Lower zone editorial
-            const lz4=H*.78; ctx.fillStyle='rgba(0,0,0,0.5)'; ctx.fillRect(0,lz4,W,H-lz4-6);
-            radar(cx,H*.875,W*.2);
-            ctx.save(); ctx.strokeStyle=ac(0.06); ctx.lineWidth=0.5;
-            ctx.beginPath(); ctx.moveTo(cx,lz4+8); ctx.lineTo(cx,H-10); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(pad,H*.875); ctx.lineTo(W-pad,H*.875); ctx.stroke();
+        // ── Header: logo + AX-CORE / BY ARTHUR ──
+        const logoTop = Math.round(H * 0.065);
+        const logoS = Math.round(CW * 0.085);
+        if (STUDIO_LOGO_IMG) {
+            ctx.save();
+            ctx.beginPath(); ctx.arc(padX + logoS/2, logoTop + logoS/2, logoS/2, 0, Math.PI*2); ctx.clip();
+            ctx.drawImage(STUDIO_LOGO_IMG, padX, logoTop, logoS, logoS);
             ctx.restore();
-            ctx.font=`900 ${Math.floor(68*tS)}px 'Arial Black',Arial,sans-serif`;
-            ctx.textAlign='start'; ctx.fillStyle='rgba(255,255,255,0.04)';
-            ctx.fillText('AX-CORE',pad,lz4+H*.055);
-            ctx.font=`700 ${Math.floor(10*tS)}px ${fd.fam}`; ctx.fillStyle='#2c3038';
-            ctx.fillText('CONTROL · PESO · RENDIMIENTO',pad,H*.9);
-            footer(H-50);
-
-        } else if (style === 'split-hero') {
-            // SPLIT: Left = giant hero, Right = stacked metrics
-            const splitX=W*.5;
-            ctx.fillStyle='rgba(0,0,0,0.22)'; ctx.fillRect(0,0,splitX,H);
-            ctx.fillStyle=ac(0.28); ctx.fillRect(splitX-1.5,50,2,H-100);
-            ctx.font=`${fi}700 ${Math.floor(13*tS)}px ${fd.fam}`; ctx.textAlign='start'; ctx.fillStyle='#888';
-            ctx.fillText(name,pad,56); ctx.fillStyle=accent; ctx.fillRect(pad,62,80,1.5);
-            ctx.save(); ctx.translate(pad+14,H*.5); ctx.rotate(-Math.PI/2);
-            ctx.font=`700 ${Math.floor(10*tS)}px ${fd.fam}`; ctx.textAlign='center'; ctx.fillStyle=ac(0.5);
-            ctx.fillText(heroM?heroM.label.toUpperCase():'RESULTADO',0,0); ctx.restore();
-            const hcx=splitX*.5+pad/2, hSz5=Math.floor((isL?70:108)*tS);
-            autoText(heroM?heroM.val():'—',hcx,H*.52,hSz5);
-            ctx.font=`italic 300 ${Math.floor(14*tS)}px 'Trebuchet MS',Arial,sans-serif`;
-            ctx.textAlign='center'; ctx.fillStyle='#555';
-            ctx.fillText(`"${phrase}"`,hcx,H*.66);
-            const rx=splitX+pad, rw=W-splitX-pad;
-            ctx.beginPath(); if(ctx.roundRect) ctx.roundRect(rx,40,rw-pad,32,4); else ctx.rect(rx,40,rw-pad,32);
-            ctx.fillStyle=accent; ctx.fill();
-            ctx.font=`700 ${Math.floor(12*tS)}px ${fd.fam}`; ctx.textAlign='center'; ctx.fillStyle='#000';
-            ctx.fillText(`WEEK ${String(weeks).padStart(2,'0')} ✓`,rx+(rw-pad)/2,61);
-            const sm5Y=96, sm5H=Math.floor((H*.65)/Math.max(secM.length,1));
-            secM.forEach((m,i)=>{
-                const my5=sm5Y+i*sm5H;
-                ctx.font=`700 ${Math.floor(10*tS)}px ${fd.fam}`; ctx.textAlign='start'; ctx.fillStyle='#444';
-                ctx.fillText(m.label.toUpperCase(),rx,my5);
-                ctx.font=`${fi}${fd.wt} ${Math.floor(32*tS)}px ${fd.fam}`; ctx.fillStyle='#fff';
-                ctx.shadowColor='rgba(0,0,0,0.9)'; ctx.shadowBlur=8;
-                ctx.fillText(m.val(),rx,my5+Math.floor(36*tS)); ctx.shadowBlur=0;
-                ctx.font=`700 ${Math.floor(10*tS)}px ${fd.fam}`; ctx.fillStyle=accent;
-                ctx.fillText(m.key==='deficit'?'kcal':m.key==='weight'?'kg':'cm',rx,my5+Math.floor(50*tS));
-                if(i<secM.length-1){ctx.strokeStyle='#2a2a2a';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(rx,my5+sm5H-10);ctx.lineTo(W-pad,my5+sm5H-10);ctx.stroke();}
-            });
-            progressZone(H*.72);
-            radar(W*.82,H*.89,W*.2);
-            footer(H-50);
-
-        } else {
-            // NORDIC DARK: Ultra minimal — typography dominates, no frame decoration
-            ctx.fillStyle=gradH(0,W,0,1); ctx.fillRect(0,0,W,3);
-            ctx.font=`${fi}700 ${Math.floor(16*tS)}px ${fd.fam}`; ctx.textAlign='center'; ctx.fillStyle='#777';
-            ctx.fillText(name,cx,68); ctx.fillStyle=gradH(cx-40,cx+40,0,0.5); ctx.fillRect(cx-40,74,80,1);
-            ctx.font=`700 ${Math.floor(10*tS)}px ${fd.fam}`; ctx.fillStyle=ac(0.6);
-            ctx.fillText(`SEMANA ${weeks} DE 8`,cx,90);
-            ctx.font=`700 ${Math.floor(10*tS)}px ${fd.fam}`; ctx.fillStyle=ac(0.72); ctx.textAlign='center';
-            ctx.fillText(heroM?heroM.label.toUpperCase():'MÉTRICA',cx,118);
-            const hSz6=Math.floor((isL?85:132)*tS);
-            autoText(heroM?heroM.val():'—',cx,118+hSz6,hSz6);
-            const hy6=118+hSz6;
-            ctx.fillStyle=gradH(cx-W*.3,cx+W*.3,0,0.4); ctx.fillRect(cx-W*.3,hy6+26,W*.6,2);
-            ctx.font=`italic 300 ${Math.floor(16*tS)}px Georgia,serif`; ctx.textAlign='center'; ctx.fillStyle='#5a5a5a';
-            ctx.fillText(`"${phrase}"`,cx,hy6+58);
-            ctx.strokeStyle='#1a1a1a'; ctx.lineWidth=1;
-            ctx.beginPath(); ctx.moveTo(pad,hy6+76); ctx.lineTo(W-pad,hy6+76); ctx.stroke();
-            secCols(hy6+102, secM);
-            progressZone(hy6+Math.floor(178*tS));
-            const lz6=H*.78; ctx.fillStyle='rgba(0,0,0,0.5)'; ctx.fillRect(0,lz6,W,H-lz6-6);
-            radar(cx,H*.875,W*.2);
-            ctx.font=`900 ${Math.floor(66*tS)}px 'Arial Black',Arial,sans-serif`;
-            ctx.textAlign='center'; ctx.fillStyle='rgba(255,255,255,0.04)';
-            ctx.fillText('AX-CORE',cx,H*.88+28);
-            footer(H-50);
+            ctx.beginPath(); ctx.arc(padX + logoS/2, logoTop + logoS/2, logoS/2, 0, Math.PI*2);
+            ctx.strokeStyle = ac(0.75); ctx.lineWidth = Math.max(1.5, CW*0.003); ctx.stroke();
         }
+        const headTx = padX + logoS + Math.round(CW * 0.028);
+        ctx.textAlign = 'left';
+        ctx.fillStyle = cc; ctx.font = sans(Math.round(CW*0.05), '900');
+        ctx.fillText('AX-CORE', headTx, logoTop + logoS*0.48);
+        ctx.fillStyle = ac(0.92); ctx.font = sans(Math.round(CW*0.023), '800');
+        ctx.fillText('BY ARTHUR', headTx, logoTop + logoS*0.82);
 
-        // ── OVERLAY FILTER (always last) ──────────────────────────────────────
+        // ── Título MI / AVANCE / HOY ──
+        const tPx = Math.round(CW * 0.14);
+        const lh  = Math.round(tPx * 0.88 * tS);
+        let yMI = Math.round(H * 0.18) + Math.round(tPx * tS);
+        ctx.textAlign = 'left'; ctx.font = titleFont(tPx);
+        const titleLine = (txt, color, yy, glow) => {
+            ctx.save(); ctx.fillStyle = color;
+            if (glow) { ctx.shadowColor = ac(0.85); ctx.shadowBlur = Math.round(CW*0.03); }
+            else { ctx.shadowColor = 'rgba(0,0,0,0.6)'; ctx.shadowBlur = Math.round(CW*0.012); ctx.shadowOffsetY = 2; }
+            ctx.fillText(txt, padX, yy); ctx.restore();
+        };
+        titleLine('MI', '#ffffff', yMI, false);          // blanco fijo
+        titleLine('AVANCE', accent, yMI + lh, true);     // acento
+        titleLine('HOY', '#ffffff', yMI + lh*2, false);  // blanco fijo
+
+        // ── Subtítulo ──
+        let y = yMI + lh*2 + Math.round(H * 0.042);
+        ctx.fillStyle = 'rgba(255,255,255,0.85)'; ctx.font = sans(Math.round(CW*0.032), '700');
+        ctx.fillText('SIGUE ENFOCADO', padX, y);
+        y += Math.round(H * 0.033);
+        ctx.fillText('SIGUE EVOLUCIONANDO', padX, y);
+
+        // ── Fecha (acento) ──
+        y += Math.round(H * 0.044);
+        ctx.fillStyle = accent; ctx.font = sans(Math.round(CW*0.036), '800');
+        ctx.save(); ctx.shadowColor = ac(0.6); ctx.shadowBlur = Math.round(CW*0.01);
+        ctx.fillText(fechaV, padX, y); ctx.restore();
+
+        // ── Grid 2×2 ──
+        const gy = y + Math.round(H * 0.022);
+        const gW = contW, gH = Math.round(H * 0.13), gx = padX;
+        const cwd = gW/2, chd = gH/2;
+        ctx.save(); rr(gx, gy, gW, gH, Math.round(CW*0.022));
+        ctx.fillStyle = 'rgba(4,8,10,0.74)'; ctx.fill();
+        ctx.strokeStyle = ac(0.55); ctx.lineWidth = Math.max(2, CW*0.0035); ctx.stroke(); ctx.restore();
+        // Divisores completos (tenues con acento) para paneles bien definidos
+        ctx.save(); ctx.strokeStyle = ac(0.30); ctx.lineWidth = Math.max(1.2, CW*0.002);
+        ctx.beginPath(); ctx.moveTo(gx+cwd, gy+chd*0.12); ctx.lineTo(gx+cwd, gy+gH-chd*0.12); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(gx+cwd*0.05, gy+chd); ctx.lineTo(gx+gW-cwd*0.05, gy+chd); ctx.stroke();
+        ctx.restore();
+
+        const drawIcon = (type, ix, iy, s) => {
+            ctx.save(); ctx.strokeStyle = accent; ctx.fillStyle = accent;
+            ctx.lineWidth = Math.max(1.6, s*0.09); ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.translate(ix, iy);
+            if (type === 'deficit') {
+                ctx.beginPath(); ctx.moveTo(s*0.5,s*0.02); ctx.bezierCurveTo(s*0.98,s*0.55,s*0.78,s,s*0.5,s);
+                ctx.bezierCurveTo(s*0.22,s,s*0.02,s*0.55,s*0.5,s*0.02); ctx.stroke();
+            } else if (type === 'peso') {
+                ctx.beginPath(); ctx.moveTo(s*0.18,s*0.5); ctx.lineTo(s*0.82,s*0.5); ctx.stroke();
+                ctx.strokeRect(s*0.04,s*0.3,s*0.14,s*0.4); ctx.strokeRect(s*0.82,s*0.3,s*0.14,s*0.4);
+            } else if (type === 'work') {
+                ctx.beginPath(); ctx.arc(s*0.5,s*0.18,s*0.15,0,Math.PI*2); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(s*0.5,s*0.33); ctx.lineTo(s*0.5,s*0.66);
+                ctx.moveTo(s*0.18,s*0.46); ctx.lineTo(s*0.82,s*0.46);
+                ctx.moveTo(s*0.5,s*0.66); ctx.lineTo(s*0.28,s); ctx.moveTo(s*0.5,s*0.66); ctx.lineTo(s*0.72,s); ctx.stroke();
+            } else {
+                ctx.beginPath(); ctx.moveTo(s*0.5,0); ctx.bezierCurveTo(s*0.95,s*0.38,s*0.72,s*0.72,s*0.5,s);
+                ctx.bezierCurveTo(s*0.28,s*0.72,s*0.12,s*0.4,s*0.42,s*0.18);
+                ctx.bezierCurveTo(s*0.46,s*0.42,s*0.62,s*0.42,s*0.5,0); ctx.stroke();
+            }
+            ctx.restore();
+        };
+        // Grid: 4 métricas REALES con valor (nunca 0). Se sustituye automáticamente por otra que sí exista.
+        const _num = (v) => +v || 0;
+        const diasAct = (userData.history && userData.history.length) || 0;
+        const pool = [
+            ['deficit','DÉFICIT KCAL',   _num(userData.totalNetDeficit) !== 0,    deficitV],
+            ['peso',   'PESO ACTUAL',    _num(userData.weight) > 0,               pesoV],
+            ['work',   'ENTRENAMIENTOS', _num(userData.totalWorkouts) > 0,        workV],
+            ['racha',  'RACHA',          _num(streak) > 0,                        rachaV],
+            ['racha',  'DÍAS ACTIVOS',   diasAct > 0,                             String(diasAct)],
+            ['deficit','CAL. QUEMADAS',  _num(userData.totalCaloriesBurned) > 0,  _num(userData.totalCaloriesBurned).toLocaleString('es-MX')],
+            ['peso',   'CINTURA',        _num(userData.waist) > 0,                _num(userData.waist)+'cm'],
+            ['work',   'BÍCEPS',         _num(userData.bicep) > 0,                _num(userData.bicep)+'cm'],
+            ['peso',   'PECHO',          _num(userData.chest) > 0,                _num(userData.chest)+'cm'],
+            ['peso',   'PIERNA',         _num(userData.leg) > 0,                  _num(userData.leg)+'cm'],
+            ['peso',   'META PESO',      _num(userData.target_weight) > 0,        _num(userData.target_weight)+'kg'],
+            ['peso',   'ALTURA',         _num(userData.height) > 0,               _num(userData.height)+'cm']
+        ];
+        let cells = pool.filter(p => p[2]).map(p => [p[0], p[1], p[3]]);
+        if (cells.length < 4) {
+            const fb = [['deficit','DÉFICIT KCAL',deficitV],['peso','PESO ACTUAL',pesoV],['work','ENTRENAMIENTOS',workV],['racha','RACHA',rachaV]];
+            for (const f of fb) { if (cells.length >= 4) break; if (!cells.some(c => c[1] === f[1])) cells.push(f); }
+        }
+        cells = cells.slice(0, 4);
+        cells.forEach((c, i) => {
+            const col = i % 2, row = Math.floor(i / 2);
+            const bx = gx + col*cwd + Math.round(CW*0.03);
+            const bcy = gy + row*chd + chd*0.5;
+            const s = Math.round(CW*0.052);
+            drawIcon(c[0], bx, bcy - s*0.5, s);
+            const tx = bx + s + Math.round(CW*0.025);
+            ctx.textAlign = 'left';
+            ctx.fillStyle = 'rgba(255,255,255,0.6)'; ctx.font = sans(Math.round(CW*0.021), '800');
+            ctx.fillText(c[1], tx, bcy - s*0.1);
+            ctx.fillStyle = cc; ctx.font = sans(Math.round(CW*0.048), '900');
+            ctx.save(); ctx.shadowColor = 'rgba(0,0,0,0.6)'; ctx.shadowBlur = Math.round(CW*0.006);
+            ctx.fillText(c[2], tx, bcy + s*0.44); ctx.restore();
+        });
+
+        // ── QR abajo-derecha (se dibuja antes para calcular el área libre de la barra) ──
+        const qrS = Math.round(CW * 0.135);
+        const qrX = padX + contW - qrS;
+        const qrY = Math.round(H * 0.96) - qrS;
+        ctx.save();
+        const qp = Math.round(CW*0.008);
+        rr(qrX - qp, qrY - qp, qrS + qp*2, qrS + qp*2, Math.round(CW*0.01)); ctx.fillStyle = '#ffffff'; ctx.fill();
+        if (STUDIO_QR_IMG) ctx.drawImage(STUDIO_QR_IMG, qrX, qrY, qrS, qrS);
+        ctx.restore();
+
+        // ── Progreso general (o métrica motivadora real si no hay meta de peso) ──
+        let progLabel, progBig, barFrac;
+        if (twG > 0 && swG > twG) {
+            progLabel = 'PROGRESO GENERAL'; progBig = pct + '%'; barFrac = pct / 100;
+        } else {
+            const dias = (userData.history && userData.history.length) || streak || 0;
+            progLabel = 'DÍAS ACTIVOS'; progBig = String(dias);
+            barFrac = Math.max(0.06, Math.min(1, dias / 30));
+        }
+        const pLabelY = gy + gH + Math.round(H * 0.037);
+        ctx.textAlign = 'left'; ctx.fillStyle = 'rgba(255,255,255,0.7)'; ctx.font = sans(Math.round(CW*0.026), '800');
+        ctx.fillText(progLabel, padX, pLabelY);
+        const pPctY = pLabelY + Math.round(H * 0.063);
+        ctx.fillStyle = accent; ctx.font = sans(Math.round(CW*0.078), '900');
+        ctx.save(); ctx.shadowColor = ac(0.55); ctx.shadowBlur = Math.round(CW*0.012);
+        ctx.fillText(progBig, padX, pPctY); ctx.restore();
+        const pctW = ctx.measureText(progBig).width;
+        const barX = padX + pctW + Math.round(CW*0.045);
+        const barRight = (qrY - Math.round(CW*0.04) < pPctY) ? (qrX - Math.round(CW*0.05)) : (padX + contW);
+        const barW = Math.max(Math.round(CW*0.15), barRight - barX);
+        const barH = Math.round(H * 0.016);
+        const barY = pPctY - Math.round(H * 0.019);
+        ctx.save();
+        rr(barX, barY, barW, barH, barH/2); ctx.fillStyle = 'rgba(255,255,255,0.14)'; ctx.fill();
+        rr(barX, barY, Math.max(barH, barW * barFrac), barH, barH/2);
+        ctx.fillStyle = accent; ctx.shadowColor = ac(0.5); ctx.shadowBlur = Math.round(CW*0.008); ctx.fill();
+        ctx.restore();
+
+        // ── Pie: tagline + #AXCORE (izquierda) ──
+        const fY = H - Math.round(H * 0.075);
+        ctx.textAlign = 'left'; ctx.fillStyle = 'rgba(255,255,255,0.6)'; ctx.font = sans(Math.round(CW*0.023), '700');
+        ctx.fillText('DISCIPLINA. CONSTANCIA. EVOLUCIÓN.', padX, fY);
+        ctx.fillStyle = accent; ctx.font = sans(Math.round(CW*0.03), '900');
+        ctx.fillText('#AXCORE', padX, fY + Math.round(CW*0.04));
+
+        // ── Filtro overlay (se conserva, siempre al final) ──
         const filter = studioState.overlayFilter || 'clear';
         if (filter === 'vignette') {
-            const vg=ctx.createRadialGradient(cx,H/2,H*.28,cx,H/2,H*.72);
-            vg.addColorStop(0,'rgba(0,0,0,0)'); vg.addColorStop(1,'rgba(0,0,0,0.70)');
-            ctx.fillStyle=vg; ctx.fillRect(0,0,W,H);
+            const vg = ctx.createRadialGradient(W/2,H/2,H*0.28,W/2,H/2,H*0.72);
+            vg.addColorStop(0,'rgba(0,0,0,0)'); vg.addColorStop(1,'rgba(0,0,0,0.7)');
+            ctx.fillStyle = vg; ctx.fillRect(0,0,W,H);
         } else if (filter === 'grain') {
             ctx.save();
-            for(let yy=0;yy<H;yy+=2){ctx.fillStyle=`rgba(255,255,255,${Math.random()*.035})`;ctx.fillRect(0,yy,W,1);}
+            for (let yy=0; yy<H; yy+=2) { ctx.fillStyle = `rgba(255,255,255,${Math.random()*0.035})`; ctx.fillRect(0,yy,W,1); }
             ctx.restore();
         } else if (filter === 'glitch') {
-            ctx.save(); ctx.lineWidth=1; ctx.strokeStyle='rgba(0,0,0,0.18)';
-            for(let yy=0;yy<H;yy+=4){ctx.beginPath();ctx.moveTo(0,yy);ctx.lineTo(W,yy);ctx.stroke();}
-            for(let i=0;i<6;i++){ctx.fillStyle=(i%2===0?accent:'#ff2222')+'2a';ctx.fillRect(0,Math.random()*H,W,Math.random()*5+1);}
+            ctx.save(); ctx.lineWidth = 1; ctx.strokeStyle = 'rgba(0,0,0,0.18)';
+            for (let yy=0; yy<H; yy+=4) { ctx.beginPath(); ctx.moveTo(0,yy); ctx.lineTo(W,yy); ctx.stroke(); }
+            for (let i=0; i<6; i++) { ctx.fillStyle = (i%2===0?accent:'#ff2222')+'2a'; ctx.fillRect(0,Math.random()*H,W,Math.random()*5+1); }
             ctx.restore();
         }
     }
@@ -3885,10 +3757,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             </div>
 
-            <!-- ═══ STUDIO CORE ═══ -->
-            <div class="sx-core">
+            <!-- ═══ STUDIO CORE — SCROLL VERTICAL (rediseño v5.48) ═══ -->
+            <div class="sx-core sx-scrollmode">
 
-                <!-- HEADER COMPACTO -->
+                <!-- TÍTULO DE SECCIÓN -->
                 <div class="sx-hdr">
                     <div class="sx-hdr-left">
                         <span class="sx-hdr-ico">🏆</span>
@@ -3903,108 +3775,105 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 </div>
 
-                <!-- PREVIEW HERO -->
-                <div class="sx-hero">
-
-                    <!-- BOTONES FLOTANTES SUPERIORES (glassmorphism, icon-only) -->
-                    <div class="sx-float-bar">
-                        <button class="sx-fab" id="sx-fab-preview" title="Vista previa en pantalla completa" onclick="window.openStudioFullscreenPreview()">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                        </button>
-                        <button class="sx-fab" id="sx-fab-save" title="Guardar en descargas" onclick="window.downloadStudioCardHD()">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                        </button>
-                        <button class="sx-fab sx-fab-primary" id="sx-fab-share" title="Compartir logros" onclick="window.shareStudioCard()">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-                        </button>
-                    </div>
-
+                <!-- TARJETA (canvas) + ACCIONES LATERALES (VISTA / DESCARGAR / COMPARTIR) -->
+                <div class="sx-stage">
                     <div class="sx-canvas-frame">
                         <div class="sx-canvas-glow"></div>
                         <canvas id="studio-preview-canvas"></canvas>
                     </div>
-                </div>
-
-                <!-- BOTTOM SHEET -->
-                <div class="sx-sheet">
-                    <div class="sx-notch"></div>
-
-                    <!-- TAB BAR (clases originales preservadas para JS) -->
-                    <div class="studio-pro-tabs sx-tabbar">
-                        <button class="studio-pro-tab active" data-stab="diseno">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-                            <span>DISEÑO</span>
+                    <div class="sx-actions">
+                        <button class="sx-act" title="Vista previa en pantalla completa" onclick="window.openStudioFullscreenPreview()">
+                            <span class="sx-act-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></span>
+                            <span class="sx-act-lbl">VISTA</span>
                         </button>
-                        <button class="studio-pro-tab" data-stab="metricas">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-                            <span>DATOS</span>
+                        <button class="sx-act" title="Guardar en descargas" onclick="window.downloadStudioCardHD()">
+                            <span class="sx-act-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></span>
+                            <span class="sx-act-lbl">DESCARGAR</span>
                         </button>
-                        <button class="studio-pro-tab" data-stab="estilo">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/></svg>
-                            <span>ESTILO</span>
-                        </button>
-                        <button class="studio-pro-tab" data-stab="fondo">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18"/></svg>
-                            <span>FONDO</span>
-                        </button>
-                        <button class="studio-pro-tab" data-stab="fx">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                            <span>FX</span>
+                        <button class="sx-act sx-act-primary" title="Compartir logros" onclick="window.shareStudioCard()">
+                            <span class="sx-act-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></span>
+                            <span class="sx-act-lbl">COMPARTIR</span>
                         </button>
                     </div>
+                </div>
 
-                    <!-- CONTENIDO DE TABS -->
-                    <div class="sx-tabscroll">
+                <!-- PESTAÑAS OCULTAS — se conservan .studio-pro-tab y [data-stab] para NO tocar el wiring/restorer -->
+                <div class="studio-pro-tabs sx-tabbar" style="display:none" aria-hidden="true">
+                    <button class="studio-pro-tab active" data-stab="diseno"></button>
+                    <button class="studio-pro-tab" data-stab="metricas"></button>
+                    <button class="studio-pro-tab" data-stab="estilo"></button>
+                    <button class="studio-pro-tab" data-stab="fondo"></button>
+                    <button class="studio-pro-tab" data-stab="fx"></button>
+                </div>
 
-                        <!-- DISEÑO: plantillas + estilo de tarjeta -->
-                        <div class="studio-pro-tab-content active" id="stab-diseno">
-                            <div class="sx-sec-lbl">PLANTILLAS</div>
-                            <div class="studio-templates" id="studio-tpl-list"></div>
-                            <div class="sx-sec-lbl" style="margin-top:20px">ESTILO DE TARJETA</div>
-                            <div id="studio-card-style-btns" class="studio-pro-pills sx-card-pills"></div>
-                        </div>
+                <!-- SECCIONES EN SCROLL VERTICAL -->
+                <div class="sx-scroll">
 
-                        <!-- DATOS: métricas + hero metric -->
-                        <div class="studio-pro-tab-content" id="stab-metricas">
+                    <!-- 1. PLANTILLAS -->
+                    <section class="sx-section">
+                        <div class="sx-sn-h">PLANTILLAS</div>
+                        <div class="studio-templates" id="studio-tpl-list"></div>
+                    </section>
+
+                    <!-- 2. COLOR PRINCIPAL (acento — ya existe: studioState.accentColor) -->
+                    <section class="sx-section">
+                        <div class="sx-sn-h">COLOR PRINCIPAL</div>
+                        <div id="studio-accent-btns" class="studio-pro-pills sx-accent-pills sx-color-row"></div>
+                    </section>
+
+                    <!-- FILA: 3. TIPOGRAFÍA | 4. DISEÑO Y EFECTOS -->
+                    <div class="sx-row">
+                        <section class="sx-section">
+                            <div class="sx-sn-h">TIPOGRAFÍA</div>
+                            <div id="studio-font-btns" class="studio-pro-pills sx-font-pills"></div>
+                        </section>
+                        <section class="sx-section">
+                            <div class="sx-sn-h">DISEÑO Y EFECTOS</div>
+                            <div class="sx-fx-row">
+                                <div id="studio-filter-btns" class="studio-pro-pills"></div>
+                                <div id="studio-hud-btns" class="studio-pro-pills"></div>
+                            </div>
+                        </section>
+                    </div>
+
+                    <!-- FILA: FORMATOS | COMPARTIR -->
+                    <div class="sx-row">
+                        <section class="sx-section">
+                            <div class="sx-sn-h">FORMATOS</div>
+                            <div class="studio-format-btns sx-fmt-seg" id="studio-fmt-btns"></div>
+                        </section>
+                        <section class="sx-section">
+                            <div class="sx-sn-h">COMPARTIR</div>
+                            <div class="sx-share-grid">
+                                <button class="sx-share-ico" title="Descargar" onclick="window.downloadStudioCardHD()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+                                <button class="sx-share-ico" title="Instagram (menú de compartir)" onclick="window.shareStudioCard()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.6" cy="6.4" r="1.1" fill="currentColor" stroke="none"/></svg></button>
+                                <button class="sx-share-ico" title="WhatsApp (menú de compartir)" onclick="window.shareStudioCard()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></button>
+                                <button class="sx-share-ico" title="Compartir" onclick="window.shareStudioCard()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></button>
+                            </div>
+                        </section>
+                    </div>
+
+                    <!-- DATOS Y TEXTO (colapsable — controles conservados que el mockup no muestra) -->
+                    <section class="sx-section sx-advanced">
+                        <button class="sx-adv-toggle" onclick="this.closest('.sx-advanced').classList.toggle('sx-adv-open')">
+                            <span class="sx-adv-lbl">⚙ DATOS Y TEXTO <span class="sx-adv-hint">avanzado</span></span>
+                            <span class="sx-adv-chevron">›</span>
+                        </button>
+                        <div class="sx-adv-body">
                             <div class="sx-sec-lbl">MÉTRICAS A MOSTRAR</div>
                             <div class="studio-metrics" id="studio-met-list"></div>
-                            <div class="sx-sec-lbl" style="margin-top:20px">⭐ MÉTRICA PRINCIPAL</div>
+                            <div class="sx-sec-lbl" style="margin-top:18px">⭐ MÉTRICA PRINCIPAL</div>
                             <div id="studio-hero-metric-btns" class="studio-pro-pills"></div>
-                        </div>
-
-                        <!-- ESTILO: acento · tipografía · colores · tamaño -->
-                        <div class="studio-pro-tab-content" id="stab-estilo">
-                            <div class="sx-sec-lbl">ACENTO DE COLOR</div>
-                            <div id="studio-accent-btns" class="studio-pro-pills sx-accent-pills"></div>
-                            <div class="sx-sec-lbl" style="margin-top:20px">TIPOGRAFÍA</div>
-                            <div id="studio-font-btns" class="studio-pro-pills sx-font-pills"></div>
-                            <div class="sx-sec-lbl" style="margin-top:20px">COLOR DE TEXTO</div>
+                            <div class="sx-sec-lbl" style="margin-top:18px">ESTILO DE TARJETA</div>
+                            <div id="studio-card-style-btns" class="studio-pro-pills sx-card-pills"></div>
+                            <div class="sx-sec-lbl" style="margin-top:18px">COLOR DE TEXTO</div>
                             <div id="studio-color-swatches" class="studio-pro-swatches sx-swatches"></div>
-                            <div class="sx-sec-lbl" style="margin-top:20px">TAMAÑO DE TEXTO <span class="sx-val-badge" id="studio-size-val">${Math.round(studioState.textSize*100)}%</span></div>
+                            <div class="sx-sec-lbl" style="margin-top:18px">TAMAÑO DE TEXTO <span class="sx-val-badge" id="studio-size-val">${Math.round(studioState.textSize*100)}%</span></div>
                             <input type="range" id="studio-size-picker" class="studio-pro-slider sx-slider" min="0.5" max="2.5" step="0.1" value="${studioState.textSize}">
                         </div>
+                    </section>
 
-                        <!-- FONDO: formato de tarjeta -->
-                        <div class="studio-pro-tab-content" id="stab-fondo">
-                            <div class="sx-sec-lbl">FORMATO DE TARJETA</div>
-                            <div class="studio-format-btns sx-fmt-seg" id="studio-fmt-btns"></div>
-                            <div class="sx-fmt-hint">
-                                <span class="sx-fmt-hint-item">STORY · 4:5</span>
-                                <span class="sx-fmt-hint-item">CUADRADO · 1:1</span>
-                                <span class="sx-fmt-hint-item">PAISAJE · 16:9</span>
-                            </div>
-                        </div>
-
-                        <!-- FX: overlay + HUD -->
-                        <div class="studio-pro-tab-content" id="stab-fx">
-                            <div class="sx-sec-lbl">FILTRO OVERLAY</div>
-                            <div id="studio-filter-btns" class="studio-pro-pills"></div>
-                            <div class="sx-sec-lbl" style="margin-top:20px">ESTILO HUD</div>
-                            <div id="studio-hud-btns" class="studio-pro-pills"></div>
-                        </div>
-
-                    </div><!-- /.sx-tabscroll -->
-                </div><!-- /.sx-sheet -->
+                </div><!-- /.sx-scroll -->
 
             </div><!-- /.sx-core -->
         `;
@@ -4237,17 +4106,31 @@ document.addEventListener('DOMContentLoaded', () => {
             // Colores adaptativos al tema (funcionan en oscuros Y en BLANCO):
             //  activo   → fondo acento + tinta que contrasta (--pm-accent-ink)
             //  inactivo → superficie del tema + texto tenue + borde del tema
-            const refreshBtns = () => cont.querySelectorAll('.sx-btn').forEach(b => {
-                const active = b.dataset.val === studioState[stateKey];
-                b.style.background = active ? accent_css : 'var(--pm-s2)';
-                b.style.color      = active ? 'var(--pm-accent-ink)' : 'var(--pm-dim2)';
-                b.style.borderColor = active ? accent_css : 'var(--pm-border)';
-            });
+            const refreshBtns = () => {
+                const val = studioState[stateKey];
+                const btns = cont.querySelectorAll('.sx-btn');
+                const anyPreset = Array.from(btns).some(x => x.dataset.val === val);
+                btns.forEach(b => {
+                    let active = b.dataset.val === val;
+                    // La rueda/picker se marca activa con un color custom (hex fuera de los presets)
+                    if (b.dataset.val === '__picker' && !anyPreset && typeof val === 'string' && val.charAt(0) === '#') active = true;
+                    b.style.background = active ? accent_css : 'var(--pm-s2)';
+                    b.style.color      = active ? 'var(--pm-accent-ink)' : 'var(--pm-dim2)';
+                    b.style.borderColor = active ? accent_css : 'var(--pm-border)';
+                    b.classList.toggle('sx-on', active);
+                });
+            };
             options.forEach(opt => {
                 const btn = document.createElement('button');
                 btn.className = 'sx-btn';
                 btn.dataset.val = opt.v;
-                btn.textContent = opt.l;
+                // opt.icon (svg) → casilla ícono+etiqueta (DISEÑO Y EFECTOS, PASO 5d).
+                // Sin opt.icon → comportamiento original (pill de texto), intacto para el resto.
+                if (opt.icon) {
+                    btn.innerHTML = `${opt.icon}<span class="sx-fx-lbl">${opt.l}</span>`;
+                } else {
+                    btn.textContent = opt.l;
+                }
                 const isActive = studioState[stateKey] === opt.v;
                 btn.style.cssText = `padding:4px 9px; font-size:0.60rem; border-radius:8px; cursor:pointer;
                     border:1px solid ${isActive ? accent_css : 'var(--pm-border)'};
@@ -4259,9 +4142,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     dot.style.cssText = `display:inline-block; width:8px; height:8px; border-radius:50%; background:${opt.dot}; margin-right:4px; vertical-align:middle;`;
                     btn.prepend(dot);
                 }
-                btn.onclick = () => { studioState[stateKey] = opt.v; refreshBtns(); redraw(); };
+                btn.classList.toggle('sx-on', isActive);
+                btn.onclick = opt.onClick
+                    ? () => opt.onClick(btn, refreshBtns, redraw)
+                    : () => { studioState[stateKey] = opt.v; refreshBtns(); redraw(); };
                 cont.appendChild(btn);
             });
+            refreshBtns();
         };
 
         _makeStyleBtns('studio-card-style-btns', [
@@ -4303,31 +4190,92 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         _makeStyleBtns('studio-accent-btns', [
-            { l:'NEON',    v:'neon',    dot:'#00e5ff' },
-            { l:'CYAN',    v:'cyan',    dot:'#00ffcc' },
-            { l:'GOLD',    v:'gold',    dot:'#ffd700' },
-            { l:'BLOOD',   v:'blood',   dot:'#ff2222' },
-            { l:'FUCHSIA', v:'fuchsia', dot:'#ff00e5' }
+            { l:'VERDE',    v:'#22c55e', dot:'#22c55e' },
+            { l:'MORADO',   v:'#8b3dff', dot:'#8b3dff' },
+            { l:'NARANJA',  v:'#ff6a1a', dot:'#ff6a1a' },
+            { l:'DORADO',   v:'#ffc21a', dot:'#ffc21a' },
+            { l:'AZUL',     v:'#2f7bff', dot:'#2f7bff' },
+            { l:'ROJO',     v:'#ff3b3b', dot:'#ff3b3b' },
+            { l:'ROSA',     v:'#ff2ea6', dot:'#ff2ea6' },
+            { l:'TURQUESA', v:'#00e0c6', dot:'#00e0c6' },
+            { l:'CUSTOM',   v:'__picker',
+              dot:'conic-gradient(from 90deg, #00e5ff, #00ffcc, #ffd700, #ff2222, #ff00e5, #00e5ff)',
+              onClick: (btn, refresh, redraw) => {
+                  // Rueda arcoíris = COLOR PICKER real (input type=color nativo).
+                  let inp = document.getElementById('studio-accent-color-input');
+                  if (!inp) {
+                      inp = document.createElement('input');
+                      inp.type = 'color';
+                      inp.id = 'studio-accent-color-input';
+                      inp.style.cssText = 'position:fixed; left:-9999px; top:0; opacity:0; pointer-events:none;';
+                      document.body.appendChild(inp);
+                  }
+                  inp.value = (typeof studioState.accentColor === 'string' && studioState.accentColor.charAt(0) === '#')
+                      ? studioState.accentColor : '#00e5ff';
+                  // El hex elegido se guarda en studioState (persiste en la sesión) y redibuja.
+                  inp.oninput = () => { studioState.accentColor = inp.value; refresh(); redraw(); };
+                  inp.click();
+              } }
         ], 'accentColor');
 
+        // DISEÑO Y EFECTOS — casillas ícono+etiqueta (PASO 5d). Mismos valores/wiring de siempre
+        // (hudStyle / overlayFilter); solo se agrega opt.icon para la nueva presentación visual.
+        const ICO_CORNERS = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8V4h4M17 4h4v4M21 16v4h-4M7 20H3v-4"/></svg>';
+        const ICO_SCANNER = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="7" x2="21" y2="7"/><line x1="3" y1="12" x2="21" y2="12" stroke-width="3"/><line x1="3" y1="17" x2="21" y2="17"/></svg>';
+        const ICO_MINIMAL = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="6" y1="12" x2="18" y2="12"/></svg>';
+        const ICO_NONE    = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><line x1="5.5" y1="18.5" x2="18.5" y2="5.5"/></svg>';
         _makeStyleBtns('studio-hud-btns', [
-            { l:'CORNERS', v:'tech-corners'  },
-            { l:'SCANNER', v:'scanner-lines' },
-            { l:'MINIMAL', v:'minimal'       },
-            { l:'NONE',    v:'none'          }
+            { l:'BORDES',  v:'tech-corners',  icon: ICO_CORNERS },
+            { l:'ESCANEO', v:'scanner-lines', icon: ICO_SCANNER },
+            { l:'MINIMAL', v:'minimal',       icon: ICO_MINIMAL },
+            { l:'NINGUNO', v:'none',          icon: ICO_NONE    }
         ], 'hudStyle');
 
-        _makeStyleBtns('studio-font-btns', [
-            { l:'IMPACT',  v:'bold-impact'  },
-            { l:'MONO',    v:'tech-mono'    },
-            { l:'ELEGANT', v:'elegant-sans' }
-        ], 'fontStyle');
+        // TIPOGRAFÍA — 12 tarjetas cuadradas con preview "Aa" REAL en cada fuente, SIN nombre (mockup PASO 5c v2).
+        // Las familias coinciden 1:1 con las keys nuevas del objeto FM en renderStudioCard,
+        // así el preview del recuadro es exactamente la fuente que va a usar la tarjeta.
+        (() => {
+            const cont = document.getElementById('studio-font-btns');
+            if (!cont) return;
+            const redraw = () => renderStudioCard(previewCanvas, studioState.tpl, studioState.fmt, studioState.metrics, true);
+            // PASO 5d — 12 categorías RADICALMENTE distintas (no solo variaciones de grosor).
+            const FONTS = [
+                { v:'orbitron',      fam:"'Orbitron',sans-serif",         wt:800 }, // display/tech geométrica
+                { v:'bebas-neue',    fam:"'Bebas Neue',sans-serif",       wt:400 }, // condensada alta
+                { v:'playfair',      fam:"'Playfair Display',serif",      wt:700 }, // serif clásica
+                { v:'space-mono',    fam:"'Space Mono',monospace",        wt:700 }, // monoespaciada
+                { v:'pacifico',      fam:"'Pacifico',cursive",            wt:400 }, // manuscrita/script
+                { v:'fredoka',       fam:"'Fredoka',sans-serif",          wt:600 }, // redondeada
+                { v:'rokkitt',       fam:"'Rokkitt',serif",               wt:700 }, // slab
+                { v:'montserrat',    fam:"'Montserrat',sans-serif",       wt:800 }, // humanista limpia
+                { v:'archivo-black', fam:"'Archivo Black',sans-serif",    wt:400 }, // grotesk pesada
+                { v:'russo-one',     fam:"'Russo One',sans-serif",        wt:400 }, // futurista
+                { v:'raleway-light', fam:"'Raleway',sans-serif",          wt:300 }, // elegante fina
+                { v:'bungee',        fam:"'Bungee',cursive",              wt:400 }  // graffiti/impact
+            ];
+            const refresh = () => cont.querySelectorAll('.sx-font-card').forEach(c =>
+                c.classList.toggle('sx-on', c.dataset.val === studioState.fontStyle));
+            FONTS.forEach(f => {
+                const card = document.createElement('button');
+                card.type = 'button';
+                card.className = 'sx-font-card';
+                card.dataset.val = f.v;
+                card.innerHTML = `<span class="sx-font-aa" style="font-family:${f.fam}; font-weight:${f.wt};">Aa</span>`;
+                card.onclick = () => { studioState.fontStyle = f.v; refresh(); redraw(); };
+                cont.appendChild(card);
+            });
+            refresh();
+        })();
 
+        const ICO_LIMPIO  = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2.5l1.9 5.8 6.1 0.1-4.9 3.7 1.9 5.8-5-3.6-5 3.6 1.9-5.8-4.9-3.7 6.1-0.1z"/></svg>';
+        const ICO_GLITCH  = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h7l-2 4h8l-2 4h7"/></svg>';
+        const ICO_GRAIN   = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="6" cy="6" r="1.4"/><circle cx="12" cy="6" r="1.4"/><circle cx="18" cy="6" r="1.4"/><circle cx="6" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="18" cy="12" r="1.4"/><circle cx="6" cy="18" r="1.4"/><circle cx="12" cy="18" r="1.4"/><circle cx="18" cy="18" r="1.4"/></svg>';
+        const ICO_VIGNETTE = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="12" cy="12" r="5"/></svg>';
         _makeStyleBtns('studio-filter-btns', [
-            { l:'LIMPIO', v:'clear'    },
-            { l:'GLITCH', v:'glitch'   },
-            { l:'GRAIN',  v:'grain'    },
-            { l:'VIÑETA', v:'vignette' }
+            { l:'LIMPIO', v:'clear',   icon: ICO_LIMPIO   },
+            { l:'GLITCH', v:'glitch',  icon: ICO_GLITCH   },
+            { l:'GRANO',  v:'grain',   icon: ICO_GRAIN    },
+            { l:'VIÑETA', v:'vignette',icon: ICO_VIGNETTE }
         ], 'overlayFilter');
 
         // --- Funciones de Interacción del Estudio ---

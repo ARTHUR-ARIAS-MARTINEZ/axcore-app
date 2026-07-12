@@ -2552,10 +2552,10 @@ body {
 .sx-fmt-seg {
     display: flex !important;
     gap: 0 !important;
-    background: rgba(255,255,255,0.05) !important;
+    background: var(--pm-s3) !important;
     border-radius: 14px !important;
     padding: 4px !important;
-    border: 1px solid rgba(255,255,255,0.09) !important;
+    border: 1px solid var(--pm-border) !important;
     overflow: hidden;
 }
 .sx-fmt-seg button {
@@ -2564,7 +2564,7 @@ body {
     border: none !important;
     border-radius: 11px !important;
     padding: 11px 8px !important;
-    color: rgba(255,255,255,0.45) !important;
+    color: var(--pm-dim2) !important;
     font-family: var(--font-accent) !important;
     font-size: 0.68rem !important;
     letter-spacing: 1px !important;
@@ -2672,6 +2672,50 @@ body {
 }
 #page-studio .studio-pro-pills .sx-btn:active { transform: scale(0.97); }
 
+/* PASO 5d — DISEÑO Y EFECTOS: casillas cuadradas ÍCONO + etiqueta corta, fila única
+   scrollable (fusiona visualmente #studio-filter-btns + #studio-hud-btns sin tocar
+   sus ids/wiring: display:contents los convierte en flex-items directos de .sx-fx-row).
+   El color activo/inactivo lo sigue manejando _makeStyleBtns inline — solo geometría aquí. */
+#page-studio .sx-fx-row {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    gap: 8px !important;
+    overflow-x: auto !important;
+    scrollbar-width: none !important;
+    padding-bottom: 2px;
+    -webkit-overflow-scrolling: touch;
+}
+#page-studio .sx-fx-row::-webkit-scrollbar { display: none; }
+#page-studio .sx-fx-row #studio-filter-btns,
+#page-studio .sx-fx-row #studio-hud-btns {
+    display: contents !important;
+}
+#page-studio #studio-filter-btns .sx-btn,
+#page-studio #studio-hud-btns .sx-btn {
+    flex: 0 0 auto !important;
+    width: 54px !important;
+    height: 54px !important;
+    padding: 0 !important;
+    border-radius: 12px !important;
+    flex-direction: column !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 4px !important;
+}
+#page-studio #studio-filter-btns .sx-btn svg,
+#page-studio #studio-hud-btns .sx-btn svg {
+    flex-shrink: 0;
+}
+#page-studio #studio-filter-btns .sx-btn .sx-fx-lbl,
+#page-studio #studio-hud-btns .sx-btn .sx-fx-lbl {
+    font-size: 0.42rem !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.3px !important;
+    text-transform: uppercase !important;
+    line-height: 1;
+}
+
 /* Acento pills — más grandes y con buen padding */
 #page-studio .sx-accent-pills {
     gap: 10px !important;
@@ -2692,32 +2736,47 @@ body {
     box-shadow: 0 0 10px currentColor, inset 0 0 4px rgba(255,255,255,0.2);
 }
 
-/* Font pills — preview tipográfico (la fuente se aplica al texto) */
-#page-studio .sx-font-pills .sx-btn {
-    padding: 12px 18px !important;
-    font-size: 0.78rem !important;
-    border-radius: 14px !important;
-    letter-spacing: 0.5px !important;
-    text-transform: none !important;
+/* ── PASO 5c v2 — TIPOGRAFÍA: 12 tarjetas cuadradas, solo "Aa" dibujado en cada fuente ──
+   Fila scrollable horizontal (nowrap), recuadros del mismo tamaño, sin nombre de fuente. */
+#page-studio #studio-font-btns.sx-font-pills {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    gap: 9px !important;
+    overflow-x: auto !important;
+    scrollbar-width: none !important;
+    padding-bottom: 2px;
+    -webkit-overflow-scrolling: touch;
 }
-/* IMPACT */
-#page-studio .sx-font-pills .sx-btn[data-val="bold-impact"] {
-    font-family: Impact, 'Arial Narrow', sans-serif !important;
-    font-weight: 900 !important;
-    letter-spacing: 2px !important;
-    text-transform: uppercase !important;
+#page-studio #studio-font-btns.sx-font-pills::-webkit-scrollbar { display: none; }
+#page-studio .sx-font-card {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 54px;
+    height: 54px;
+    padding: 0;
+    border-radius: 12px;
+    background: var(--pm-s2, rgba(255,255,255,0.04));
+    border: 1.5px solid var(--pm-border, rgba(255,255,255,0.1));
+    color: var(--pm-text, #eaf2ff);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: border-color 0.18s ease, background 0.18s ease, transform 0.15s ease;
 }
-/* MONO */
-#page-studio .sx-font-pills .sx-btn[data-val="tech-mono"] {
-    font-family: 'Courier New', Courier, monospace !important;
-    font-weight: 700 !important;
+#page-studio .sx-font-card:hover { transform: translateY(-1px); }
+#page-studio .sx-font-card:active { transform: scale(0.97); }
+#page-studio .sx-font-card .sx-font-aa {
+    font-size: 1.4rem;
+    line-height: 1;
+    color: inherit;
 }
-/* ELEGANT */
-#page-studio .sx-font-pills .sx-btn[data-val="elegant-sans"] {
-    font-family: 'Trebuchet MS', Arial, sans-serif !important;
-    font-style: italic !important;
-    font-weight: 600 !important;
+/* Activa: borde + tinte de acento */
+#page-studio .sx-font-card.sx-on {
+    border-color: var(--accent-main) !important;
+    background: color-mix(in srgb, var(--accent-main) 14%, transparent);
 }
+#page-studio .sx-font-card.sx-on .sx-font-aa { color: var(--accent-main); }
 
 /* ────────────────────────────────────────────────────────────
    COLOR SWATCHES
@@ -3288,3 +3347,191 @@ body.premium-mode #btn-studio-share.sx-share-btn {
     flex-shrink: 0;
     white-space: nowrap;
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   ESTUDIO — REDISEÑO SCROLL VERTICAL (v5.48)
+   Chrome 100% con tokens --pm-* (base como fallback). Un solo scroll:
+   título → tarjeta+acciones → 1.Plantillas → 2.Color → (3.Tipografía |
+   4.Diseño y efectos) → (Formatos | Compartir) → Datos y texto (colapsable).
+   NO toca canvas/export ni la lógica (ids y data-stab conservados).
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Modo scroll: anula el grid de escritorio del layout viejo (.sx-hero/.sx-sheet
+   ya no existen). En pantallas grandes centramos con un ancho cómodo. */
+@media (min-width: 681px) {
+    .sx-core.sx-scrollmode {
+        display: flex !important;
+        flex-direction: column !important;
+        grid-template-columns: none !important;
+        grid-template-rows: none !important;
+        min-height: 0 !important;
+        overflow: visible !important;
+    }
+    #page-studio .sx-scrollmode .sx-scroll,
+    #page-studio .sx-scrollmode .sx-stage { max-width: 880px; margin-left: auto; margin-right: auto; width: 100%; }
+}
+
+/* ---- STAGE: tarjeta (canvas) + columna de acciones VISTA/DESCARGAR/COMPARTIR ---- */
+#page-studio .sx-stage {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 16px 16px 20px;
+    background: radial-gradient(ellipse 80% 55% at 40% 28%, rgba(var(--pm-green-rgb, 0,201,122), 0.07) 0%, transparent 70%);
+}
+#page-studio .sx-stage .sx-canvas-frame { flex: 0 1 auto; width: auto; min-width: 0; }
+#page-studio .sx-actions {
+    flex: 0 0 auto;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 15px;
+}
+#page-studio .sx-act {
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    background: none; border: none; padding: 0; cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+#page-studio .sx-act-ico {
+    width: 46px; height: 46px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--pm-s2, #111f30);
+    border: 1px solid var(--pm-border, rgba(255,255,255,0.06));
+    color: var(--pm-white, #e8edf5);
+    transition: transform .18s cubic-bezier(.34,1.56,.64,1), background .2s, border-color .2s, color .2s, box-shadow .2s;
+}
+#page-studio .sx-act:hover .sx-act-ico {
+    transform: translateY(-2px);
+    border-color: var(--pm-green, #00c97a);
+    color: var(--pm-green, #00c97a);
+    box-shadow: 0 6px 18px rgba(var(--pm-green-rgb, 0,201,122), 0.22);
+}
+#page-studio .sx-act:active .sx-act-ico { transform: scale(.92); }
+#page-studio .sx-act-primary .sx-act-ico {
+    background: linear-gradient(135deg, var(--pm-green, #00c97a), var(--pm-cyan, #00e5ff));
+    border-color: transparent;
+    color: var(--pm-accent-ink, #000);
+    box-shadow: var(--pm-glow, 0 0 24px rgba(0,201,122,0.35));
+}
+#page-studio .sx-act-primary:hover .sx-act-ico { color: var(--pm-accent-ink, #000); }
+#page-studio .sx-act-lbl {
+    font-family: var(--font-accent, 'Oswald', sans-serif);
+    font-size: 0.56rem; font-weight: 700; letter-spacing: 1.4px;
+    color: var(--pm-dim2, #5a7a99); text-transform: uppercase; text-align: center;
+}
+
+/* ---- SCROLL de secciones ---- */
+#page-studio .sx-scroll { display: flex; flex-direction: column; gap: 12px; padding: 4px 14px 26px; }
+#page-studio .sx-section {
+    background: var(--pm-s1, #0d1826);
+    border: 1px solid var(--pm-border, rgba(255,255,255,0.06));
+    border-radius: var(--pm-r2, 14px);
+    padding: 14px 15px 16px;
+}
+#page-studio .sx-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 440px) { #page-studio .sx-row { grid-template-columns: 1fr; } }
+
+/* Encabezado de sección (PASO 5c v2: chip numerado eliminado de raíz — solo título) */
+#page-studio .sx-sn-h {
+    display: flex; align-items: center; gap: 8px;
+    font-family: var(--font-accent, 'Oswald', sans-serif);
+    font-size: 0.72rem; font-weight: 700; letter-spacing: 2px;
+    color: var(--pm-white, #e8edf5); text-transform: uppercase;
+    margin-bottom: 13px;
+}
+#page-studio .sx-sub-lbl {
+    font-family: var(--font-accent, 'Oswald', sans-serif);
+    font-size: 0.55rem; font-weight: 700; letter-spacing: 1.5px;
+    color: var(--pm-dim2, #5a7a99); text-transform: uppercase;
+    margin: 12px 0 7px;
+}
+#page-studio .sx-sub-lbl:first-of-type { margin-top: 0; }
+
+/* Controles planos dentro del scroll (la tarjeta es .sx-section; se anula la
+   "tarjeta tintada" premium de estos grupos para no anidar dos tarjetas). */
+body.premium-mode #page-studio .sx-scroll .studio-pro-pills,
+body.premium-mode #page-studio .sx-scroll .studio-metrics,
+body.premium-mode #page-studio .sx-scroll .studio-pro-swatches {
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+}
+
+/* ---- 2. COLOR PRINCIPAL: fila de círculos (re-estilo de #studio-accent-btns) ---- */
+#page-studio .sx-accent-pills.sx-color-row { gap: 11px !important; justify-content: flex-start; align-items: center; }
+#page-studio .sx-accent-pills.sx-color-row .sx-btn {
+    width: 40px !important; height: 40px !important; min-width: 40px !important;
+    padding: 0 !important; border-radius: 50% !important;
+    font-size: 0 !important; letter-spacing: 0 !important; gap: 0 !important;
+    overflow: hidden; position: relative;
+    justify-content: center !important;
+    border-width: 2px !important;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+}
+#page-studio .sx-accent-pills.sx-color-row .sx-btn span {
+    width: 100% !important; height: 100% !important;
+    margin: 0 !important; border-radius: 50% !important;
+    box-shadow: inset 0 0 0 2px rgba(0,0,0,0.18) !important;
+    flex-shrink: 0;
+}
+
+/* ── PASO 5b — COLOR PRINCIPAL: paleta completa en una sola fila (scroll si no cabe) ── */
+#page-studio #studio-accent-btns.sx-color-row {
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    scrollbar-width: none !important;
+    justify-content: flex-start !important;
+    padding-bottom: 2px;
+}
+#page-studio #studio-accent-btns.sx-color-row::-webkit-scrollbar { display: none; }
+/* Círculo ACTIVO: palomita (check) centrada sobre el color */
+#page-studio .sx-accent-pills.sx-color-row .sx-btn.sx-on::after {
+    content: '\2713';
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--pm-white, #fff);
+    font-size: 17px; font-weight: 900;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.55);
+    pointer-events: none;
+}
+
+/* ---- COMPARTIR: grid de iconos (mismos handlers existentes) ---- */
+#page-studio .sx-share-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 9px; }
+#page-studio .sx-share-ico {
+    aspect-ratio: 1 / 1;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 14px;
+    background: var(--pm-s2, #111f30);
+    border: 1px solid var(--pm-border, rgba(255,255,255,0.06));
+    color: var(--pm-dim2, #5a7a99);
+    cursor: pointer;
+    transition: transform .16s, background .2s, border-color .2s, color .2s;
+    -webkit-tap-highlight-color: transparent;
+}
+#page-studio .sx-share-ico:hover {
+    transform: translateY(-2px);
+    border-color: var(--pm-green, #00c97a); color: var(--pm-green, #00c97a);
+    background: rgba(var(--pm-green-rgb, 0,201,122), 0.08);
+}
+#page-studio .sx-share-ico:active { transform: scale(.94); }
+
+/* ---- DATOS Y TEXTO (colapsable — controles conservados que el mockup no muestra) ---- */
+#page-studio .sx-advanced { padding: 0; overflow: hidden; }
+#page-studio .sx-adv-toggle {
+    width: 100%; display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 15px; background: none; border: none; cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+#page-studio .sx-adv-lbl {
+    font-family: var(--font-accent, 'Oswald', sans-serif);
+    font-size: 0.68rem; font-weight: 700; letter-spacing: 1.5px;
+    color: var(--pm-white, #e8edf5); text-transform: uppercase;
+}
+#page-studio .sx-adv-hint { font-size: 0.5rem; color: var(--pm-dim2, #5a7a99); letter-spacing: 1px; margin-left: 5px; }
+#page-studio .sx-adv-chevron {
+    font-size: 1.3rem; line-height: 1; color: var(--pm-green, #00c97a);
+    transition: transform .3s cubic-bezier(.34,1.56,.64,1);
+}
+#page-studio .sx-advanced.sx-adv-open .sx-adv-chevron { transform: rotate(90deg); }
+#page-studio .sx-adv-body { max-height: 0; overflow: hidden; transition: max-height .45s ease; padding: 0 15px; }
+#page-studio .sx-advanced.sx-adv-open .sx-adv-body { max-height: 1400px; padding: 0 15px 18px; }
