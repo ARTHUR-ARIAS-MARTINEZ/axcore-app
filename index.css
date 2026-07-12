@@ -3495,26 +3495,6 @@ body.premium-mode #page-studio .sx-scroll .studio-pro-swatches {
     pointer-events: none;
 }
 
-/* ---- COMPARTIR: grid de iconos (mismos handlers existentes) ---- */
-#page-studio .sx-share-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 9px; }
-#page-studio .sx-share-ico {
-    aspect-ratio: 1 / 1;
-    display: flex; align-items: center; justify-content: center;
-    border-radius: 14px;
-    background: var(--pm-s2, #111f30);
-    border: 1px solid var(--pm-border, rgba(255,255,255,0.06));
-    color: var(--pm-dim2, #5a7a99);
-    cursor: pointer;
-    transition: transform .16s, background .2s, border-color .2s, color .2s;
-    -webkit-tap-highlight-color: transparent;
-}
-#page-studio .sx-share-ico:hover {
-    transform: translateY(-2px);
-    border-color: var(--pm-green, #00c97a); color: var(--pm-green, #00c97a);
-    background: rgba(var(--pm-green-rgb, 0,201,122), 0.08);
-}
-#page-studio .sx-share-ico:active { transform: scale(.94); }
-
 /* ---- DATOS Y TEXTO (colapsable — controles conservados que el mockup no muestra) ---- */
 #page-studio .sx-advanced { padding: 0; overflow: hidden; }
 #page-studio .sx-adv-toggle {
