@@ -2330,6 +2330,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     el.classList.contains('studio-pro-swatches') ||
                     el.classList.contains('studio-pro-tabs') ||
                     el.classList.contains('sx-tabbar') ||
+                    el.classList.contains('sx-font-pills') ||    // fila TIPOGRAFÍA (12 fuentes)
+                    el.classList.contains('sx-phrase-row') ||    // fila FRASES (12 frases)
                     el.classList.contains('pm-workout-filters') ||
                     el.classList.contains('pd-badges-scroll')) {   // carrusel de insignias del tablero
                     return true;
@@ -3521,7 +3523,7 @@ document.addEventListener('DOMContentLoaded', () => {
             'bebas-neue':    { fam:"'Bebas Neue',sans-serif",    wt:'400' },  // condensada alta
             'playfair':      { fam:"'Playfair Display',serif",  wt:'700' },  // serif clásica
             'space-mono':    { fam:"'Space Mono',monospace",    wt:'700' },  // monoespaciada
-            'pacifico':      { fam:"'Pacifico',cursive",        wt:'400' },  // manuscrita/script
+            'fjalla-one':    { fam:"'Fjalla One',sans-serif",   wt:'400' },  // condensada deportiva (reemplaza script, no pegaba con fitness)
             'fredoka':       { fam:"'Fredoka',sans-serif",      wt:'600' },  // redondeada
             'rokkitt':       { fam:"'Rokkitt',serif",           wt:'700' },  // slab
             'montserrat':    { fam:"'Montserrat',sans-serif",   wt:'800' },  // humanista limpia
@@ -4105,7 +4107,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 { v:'bebas-neue',    fam:"'Bebas Neue',sans-serif",       wt:400 }, // condensada alta
                 { v:'playfair',      fam:"'Playfair Display',serif",      wt:700 }, // serif clásica
                 { v:'space-mono',    fam:"'Space Mono',monospace",        wt:700 }, // monoespaciada
-                { v:'pacifico',      fam:"'Pacifico',cursive",            wt:400 }, // manuscrita/script
+                { v:'fjalla-one',    fam:"'Fjalla One',sans-serif",       wt:400 }, // condensada deportiva
                 { v:'fredoka',       fam:"'Fredoka',sans-serif",          wt:600 }, // redondeada
                 { v:'rokkitt',       fam:"'Rokkitt',serif",               wt:700 }, // slab
                 { v:'montserrat',    fam:"'Montserrat',sans-serif",       wt:800 }, // humanista limpia
