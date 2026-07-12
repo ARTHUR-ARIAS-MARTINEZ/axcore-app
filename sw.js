@@ -1,12 +1,12 @@
-const CACHE_NAME = 'axcore-v5.47-correo-llave-permanente-logout-limpio';
+const CACHE_NAME = 'axcore-v5.48-estudio-rediseno-preview';
 const urlsToCache = [
   './',
-  './index.html?v=20260706s',
-  './index.css?v=20260706s',
-  './premium.css?v=20260706s',
-  './profile-persist.js?v=20260706s',
-  './app.js?v=20260706s',
-  './knowledge.js?v=20260706s',
+  './index.html?v=20260711',
+  './index.css?v=20260711',
+  './premium.css?v=20260711',
+  './profile-persist.js?v=20260711',
+  './app.js?v=20260711',
+  './knowledge.js?v=20260711',
   './logo.png',
   './logo_coach.png',
   './manifest_vip.json',
