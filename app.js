@@ -3490,23 +3490,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // ── Tipografía / color / escala (siguen vivos desde el chrome) ──
         // Los 3 valores originales se conservan intactos (compat con estado guardado).
-        // PASO 5c v2: + 12 familias nuevas para las tarjetas de TIPOGRAFÍA (solo "Aa").
+        // PASO 5d: 12 familias RADICALMENTE distintas (una por categoría tipográfica)
+        // para las tarjetas de TIPOGRAFÍA (solo "Aa").
         const FM = {
-            'bold-impact':  { fam:"Impact,'Arial Narrow',sans-serif", wt:'900' },
-            'tech-mono':    { fam:"'Courier New',Courier,monospace",  wt:'800' },
-            'elegant-sans': { fam:"'Trebuchet MS',Arial,sans-serif",  wt:'800' },
-            'orbitron':      { fam:"'Orbitron',sans-serif",      wt:'800' },
-            'oswald':        { fam:"'Oswald',sans-serif",        wt:'700' },
-            'bebas-neue':    { fam:"'Bebas Neue',sans-serif",    wt:'400' },
-            'montserrat':    { fam:"'Montserrat',sans-serif",    wt:'800' },
-            'raleway':       { fam:"'Raleway',sans-serif",       wt:'800' },
-            'anton':         { fam:"'Anton',sans-serif",         wt:'400' },
-            'archivo-black': { fam:"'Archivo Black',sans-serif", wt:'400' },
-            'teko':          { fam:"'Teko',sans-serif",          wt:'700' },
-            'rajdhani':      { fam:"'Rajdhani',sans-serif",      wt:'700' },
-            'russo-one':     { fam:"'Russo One',sans-serif",     wt:'400' },
-            'saira':         { fam:"'Saira',sans-serif",         wt:'800' },
-            'play':          { fam:"'Play',sans-serif",          wt:'700' }
+            'bold-impact':   { fam:"Impact,'Arial Narrow',sans-serif", wt:'900' },
+            'tech-mono':     { fam:"'Courier New',Courier,monospace",  wt:'800' },
+            'elegant-sans':  { fam:"'Trebuchet MS',Arial,sans-serif",  wt:'800' },
+            'orbitron':      { fam:"'Orbitron',sans-serif",      wt:'800' },  // display/tech geométrica
+            'bebas-neue':    { fam:"'Bebas Neue',sans-serif",    wt:'400' },  // condensada alta
+            'playfair':      { fam:"'Playfair Display',serif",  wt:'700' },  // serif clásica
+            'space-mono':    { fam:"'Space Mono',monospace",    wt:'700' },  // monoespaciada
+            'pacifico':      { fam:"'Pacifico',cursive",        wt:'400' },  // manuscrita/script
+            'fredoka':       { fam:"'Fredoka',sans-serif",      wt:'600' },  // redondeada
+            'rokkitt':       { fam:"'Rokkitt',serif",           wt:'700' },  // slab
+            'montserrat':    { fam:"'Montserrat',sans-serif",   wt:'800' },  // humanista limpia
+            'archivo-black': { fam:"'Archivo Black',sans-serif",wt:'400' },  // grotesk pesada
+            'russo-one':     { fam:"'Russo One',sans-serif",    wt:'400' },  // futurista
+            'raleway-light': { fam:"'Raleway',sans-serif",      wt:'300' },  // elegante fina
+            'bungee':        { fam:"'Bungee',cursive",          wt:'400' }   // graffiti/impact
         };
         const fd = FM[studioState.fontStyle] || FM['bold-impact'];
         const tS = Math.max(0.5, Math.min(2.5, studioState.textSize || 1));
@@ -3828,10 +3829,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         </section>
                         <section class="sx-section">
                             <div class="sx-sn-h">DISEÑO Y EFECTOS</div>
-                            <div class="sx-sub-lbl">Overlay</div>
-                            <div id="studio-filter-btns" class="studio-pro-pills"></div>
-                            <div class="sx-sub-lbl">HUD</div>
-                            <div id="studio-hud-btns" class="studio-pro-pills"></div>
+                            <div class="sx-fx-row">
+                                <div id="studio-filter-btns" class="studio-pro-pills"></div>
+                                <div id="studio-hud-btns" class="studio-pro-pills"></div>
+                            </div>
                         </section>
                     </div>
 
@@ -4123,7 +4124,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 const btn = document.createElement('button');
                 btn.className = 'sx-btn';
                 btn.dataset.val = opt.v;
-                btn.textContent = opt.l;
+                // opt.icon (svg) → casilla ícono+etiqueta (DISEÑO Y EFECTOS, PASO 5d).
+                // Sin opt.icon → comportamiento original (pill de texto), intacto para el resto.
+                if (opt.icon) {
+                    btn.innerHTML = `${opt.icon}<span class="sx-fx-lbl">${opt.l}</span>`;
+                } else {
+                    btn.textContent = opt.l;
+                }
                 const isActive = studioState[stateKey] === opt.v;
                 btn.style.cssText = `padding:4px 9px; font-size:0.60rem; border-radius:8px; cursor:pointer;
                     border:1px solid ${isActive ? accent_css : 'var(--pm-border)'};
@@ -4211,11 +4218,17 @@ document.addEventListener('DOMContentLoaded', () => {
               } }
         ], 'accentColor');
 
+        // DISEÑO Y EFECTOS — casillas ícono+etiqueta (PASO 5d). Mismos valores/wiring de siempre
+        // (hudStyle / overlayFilter); solo se agrega opt.icon para la nueva presentación visual.
+        const ICO_CORNERS = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8V4h4M17 4h4v4M21 16v4h-4M7 20H3v-4"/></svg>';
+        const ICO_SCANNER = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="7" x2="21" y2="7"/><line x1="3" y1="12" x2="21" y2="12" stroke-width="3"/><line x1="3" y1="17" x2="21" y2="17"/></svg>';
+        const ICO_MINIMAL = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="6" y1="12" x2="18" y2="12"/></svg>';
+        const ICO_NONE    = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><line x1="5.5" y1="18.5" x2="18.5" y2="5.5"/></svg>';
         _makeStyleBtns('studio-hud-btns', [
-            { l:'CORNERS', v:'tech-corners'  },
-            { l:'SCANNER', v:'scanner-lines' },
-            { l:'MINIMAL', v:'minimal'       },
-            { l:'NONE',    v:'none'          }
+            { l:'BORDES',  v:'tech-corners',  icon: ICO_CORNERS },
+            { l:'ESCANEO', v:'scanner-lines', icon: ICO_SCANNER },
+            { l:'MINIMAL', v:'minimal',       icon: ICO_MINIMAL },
+            { l:'NINGUNO', v:'none',          icon: ICO_NONE    }
         ], 'hudStyle');
 
         // TIPOGRAFÍA — 12 tarjetas cuadradas con preview "Aa" REAL en cada fuente, SIN nombre (mockup PASO 5c v2).
@@ -4225,19 +4238,20 @@ document.addEventListener('DOMContentLoaded', () => {
             const cont = document.getElementById('studio-font-btns');
             if (!cont) return;
             const redraw = () => renderStudioCard(previewCanvas, studioState.tpl, studioState.fmt, studioState.metrics, true);
+            // PASO 5d — 12 categorías RADICALMENTE distintas (no solo variaciones de grosor).
             const FONTS = [
-                { v:'orbitron',      fam:"'Orbitron',sans-serif",      wt:800 },
-                { v:'oswald',        fam:"'Oswald',sans-serif",        wt:700 },
-                { v:'bebas-neue',    fam:"'Bebas Neue',sans-serif",    wt:400 },
-                { v:'montserrat',    fam:"'Montserrat',sans-serif",    wt:800 },
-                { v:'raleway',       fam:"'Raleway',sans-serif",       wt:800 },
-                { v:'anton',         fam:"'Anton',sans-serif",         wt:400 },
-                { v:'archivo-black', fam:"'Archivo Black',sans-serif", wt:400 },
-                { v:'teko',          fam:"'Teko',sans-serif",          wt:700 },
-                { v:'rajdhani',      fam:"'Rajdhani',sans-serif",      wt:700 },
-                { v:'russo-one',     fam:"'Russo One',sans-serif",     wt:400 },
-                { v:'saira',         fam:"'Saira',sans-serif",         wt:800 },
-                { v:'play',          fam:"'Play',sans-serif",          wt:700 }
+                { v:'orbitron',      fam:"'Orbitron',sans-serif",         wt:800 }, // display/tech geométrica
+                { v:'bebas-neue',    fam:"'Bebas Neue',sans-serif",       wt:400 }, // condensada alta
+                { v:'playfair',      fam:"'Playfair Display',serif",      wt:700 }, // serif clásica
+                { v:'space-mono',    fam:"'Space Mono',monospace",        wt:700 }, // monoespaciada
+                { v:'pacifico',      fam:"'Pacifico',cursive",            wt:400 }, // manuscrita/script
+                { v:'fredoka',       fam:"'Fredoka',sans-serif",          wt:600 }, // redondeada
+                { v:'rokkitt',       fam:"'Rokkitt',serif",               wt:700 }, // slab
+                { v:'montserrat',    fam:"'Montserrat',sans-serif",       wt:800 }, // humanista limpia
+                { v:'archivo-black', fam:"'Archivo Black',sans-serif",    wt:400 }, // grotesk pesada
+                { v:'russo-one',     fam:"'Russo One',sans-serif",        wt:400 }, // futurista
+                { v:'raleway-light', fam:"'Raleway',sans-serif",          wt:300 }, // elegante fina
+                { v:'bungee',        fam:"'Bungee',cursive",              wt:400 }  // graffiti/impact
             ];
             const refresh = () => cont.querySelectorAll('.sx-font-card').forEach(c =>
                 c.classList.toggle('sx-on', c.dataset.val === studioState.fontStyle));
@@ -4253,11 +4267,15 @@ document.addEventListener('DOMContentLoaded', () => {
             refresh();
         })();
 
+        const ICO_LIMPIO  = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2.5l1.9 5.8 6.1 0.1-4.9 3.7 1.9 5.8-5-3.6-5 3.6 1.9-5.8-4.9-3.7 6.1-0.1z"/></svg>';
+        const ICO_GLITCH  = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h7l-2 4h8l-2 4h7"/></svg>';
+        const ICO_GRAIN   = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="6" cy="6" r="1.4"/><circle cx="12" cy="6" r="1.4"/><circle cx="18" cy="6" r="1.4"/><circle cx="6" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="18" cy="12" r="1.4"/><circle cx="6" cy="18" r="1.4"/><circle cx="12" cy="18" r="1.4"/><circle cx="18" cy="18" r="1.4"/></svg>';
+        const ICO_VIGNETTE = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="12" cy="12" r="5"/></svg>';
         _makeStyleBtns('studio-filter-btns', [
-            { l:'LIMPIO', v:'clear'    },
-            { l:'GLITCH', v:'glitch'   },
-            { l:'GRAIN',  v:'grain'    },
-            { l:'VIÑETA', v:'vignette' }
+            { l:'LIMPIO', v:'clear',   icon: ICO_LIMPIO   },
+            { l:'GLITCH', v:'glitch',  icon: ICO_GLITCH   },
+            { l:'GRANO',  v:'grain',   icon: ICO_GRAIN    },
+            { l:'VIÑETA', v:'vignette',icon: ICO_VIGNETTE }
         ], 'overlayFilter');
 
         // --- Funciones de Interacción del Estudio ---

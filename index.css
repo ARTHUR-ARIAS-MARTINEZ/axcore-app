@@ -2672,21 +2672,48 @@ body {
 }
 #page-studio .studio-pro-pills .sx-btn:active { transform: scale(0.97); }
 
-/* PASO 4 — TIPOGRAFÍA + DISEÑO Y EFECTOS: pills grandes (solo geometría; el color
-   activo/inactivo lo maneja _makeStyleBtns inline — no hay clase .active). No toca
-   las circulares .sx-accent-pills.sx-color-row (targeteo por id de contenedor). */
-#page-studio #studio-font-btns .sx-btn,
+/* PASO 5d — DISEÑO Y EFECTOS: casillas cuadradas ÍCONO + etiqueta corta, fila única
+   scrollable (fusiona visualmente #studio-filter-btns + #studio-hud-btns sin tocar
+   sus ids/wiring: display:contents los convierte en flex-items directos de .sx-fx-row).
+   El color activo/inactivo lo sigue manejando _makeStyleBtns inline — solo geometría aquí. */
+#page-studio .sx-fx-row {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    gap: 8px !important;
+    overflow-x: auto !important;
+    scrollbar-width: none !important;
+    padding-bottom: 2px;
+    -webkit-overflow-scrolling: touch;
+}
+#page-studio .sx-fx-row::-webkit-scrollbar { display: none; }
+#page-studio .sx-fx-row #studio-filter-btns,
+#page-studio .sx-fx-row #studio-hud-btns {
+    display: contents !important;
+}
 #page-studio #studio-filter-btns .sx-btn,
 #page-studio #studio-hud-btns .sx-btn {
-    min-height: 42px !important;
-    padding: 10px 16px !important;
-    font-size: 0.72rem !important;
+    flex: 0 0 auto !important;
+    width: 54px !important;
+    height: 54px !important;
+    padding: 0 !important;
     border-radius: 12px !important;
-    flex: 1 1 auto !important;
-    gap: 8px !important;
+    flex-direction: column !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
+    gap: 4px !important;
+}
+#page-studio #studio-filter-btns .sx-btn svg,
+#page-studio #studio-hud-btns .sx-btn svg {
+    flex-shrink: 0;
+}
+#page-studio #studio-filter-btns .sx-btn .sx-fx-lbl,
+#page-studio #studio-hud-btns .sx-btn .sx-fx-lbl {
+    font-size: 0.42rem !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.3px !important;
+    text-transform: uppercase !important;
+    line-height: 1;
 }
 
 /* Acento pills — más grandes y con buen padding */
