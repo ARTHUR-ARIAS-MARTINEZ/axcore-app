@@ -1,12 +1,12 @@
-const CACHE_NAME = 'axcore-v5.51-swipe-real-fix-color-picker';
+const CACHE_NAME = 'axcore-v5.52-color-picker-cursor-swipe-block';
 const urlsToCache = [
   './',
-  './index.html?v=20260712b',
-  './index.css?v=20260712b',
-  './premium.css?v=20260712b',
-  './profile-persist.js?v=20260712b',
-  './app.js?v=20260712b',
-  './knowledge.js?v=20260712b',
+  './index.html?v=20260712c',
+  './index.css?v=20260712c',
+  './premium.css?v=20260712c',
+  './profile-persist.js?v=20260712c',
+  './app.js?v=20260712c',
+  './knowledge.js?v=20260712c',
   './logo.png',
   './logo_coach.png',
   './manifest_vip.json',

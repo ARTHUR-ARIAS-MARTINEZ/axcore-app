@@ -3213,7 +3213,12 @@ body.premium-mode #btn-studio-share.sx-share-btn {
    reglas solo estilizan el contenido propio del picker (SV + hue +
    hex + preview), con tokens --pm-*.
    ════════════════════════════════════════════════════════════════ */
+.sx-cp-ov { touch-action: none; }   /* FIX: el gesto sobre el overlay no se filtra al fondo */
 .sx-cp-modal { max-width: 300px; }
+/* Cursor SV/hue: el wrapper (position:relative) tiene EXACTAMENTE el tamaño del
+   canvas, así top/left en % (seteados por JS) se resuelven contra el canvas mismo
+   — sin este wrapper, fijar top+left por JS pisa cualquier truco puesto en CSS. */
+.sx-cp-sv-box { position: relative; margin-bottom: 14px; }
 .sx-cp-sv {
     display: block;
     width: 100%;
@@ -3221,12 +3226,10 @@ body.premium-mode #btn-studio-share.sx-share-btn {
     border-radius: 10px;
     cursor: crosshair;
     touch-action: none;
-    margin-bottom: 2px;
 }
-.sx-cp-sv-wrap { position: relative; height: 0; }
 .sx-cp-sv-cursor {
     position: absolute;
-    top: -152px; left: 0;
+    top: 0; left: 0;
     width: 16px; height: 16px;
     margin: -8px 0 0 -8px;
     border-radius: 50%;
@@ -3234,6 +3237,7 @@ body.premium-mode #btn-studio-share.sx-share-btn {
     box-shadow: 0 0 0 1px rgba(0,0,0,0.4), 0 2px 6px rgba(0,0,0,0.5);
     pointer-events: none;
 }
+.sx-cp-hue-box { position: relative; margin-bottom: 2px; }
 .sx-cp-hue {
     display: block;
     width: 100%;
@@ -3241,14 +3245,12 @@ body.premium-mode #btn-studio-share.sx-share-btn {
     border-radius: 9px;
     cursor: pointer;
     touch-action: none;
-    margin: 14px 0 2px;
 }
-.sx-cp-hue-wrap { position: relative; height: 0; }
 .sx-cp-hue-cursor {
     position: absolute;
-    top: -18px; left: 0;
+    top: 0; left: 0;
     width: 18px; height: 18px;
-    margin-left: -9px;
+    margin: 0 0 0 -9px;
     border-radius: 50%;
     border: 2px solid #fff;
     background: transparent;
