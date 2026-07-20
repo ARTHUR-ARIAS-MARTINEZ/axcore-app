@@ -964,7 +964,154 @@ const FOOD_DATABASE = [
   { name: "fresas 1 taza", cal: 50, p: 1, c: 12, f: 0 },
   { name: "uvas 1 taza", cal: 62, p: 1, c: 16, f: 0 },
   { name: "yogur griego natural 1 taza", cal: 130, p: 20, c: 8, f: 2 },
-  { name: "queso cottage 1 taza", cal: 180, p: 24, c: 8, f: 5 }
+  { name: "queso cottage 1 taza", cal: 180, p: 24, c: 8, f: 5 },
+  // === COMIDA INTERNACIONAL AMPLIADA (v5.49 — sin marcas) ===
+  { name: "curry de pollo con arroz 1 plato", cal: 450, p: 28, c: 45, f: 18 },
+  { name: "curry verde tailandés con pollo 1 plato", cal: 420, p: 24, c: 20, f: 28 },
+  { name: "curry rojo con verduras 1 plato", cal: 340, p: 8, c: 30, f: 22 },
+  { name: "falafel 4 piezas", cal: 220, p: 8, c: 24, f: 11 },
+  { name: "pan pita integral 1 pieza", cal: 165, p: 6, c: 33, f: 2 },
+  { name: "gyro (döner) de cordero 1 pieza", cal: 430, p: 24, c: 34, f: 22 },
+  { name: "gyro (döner) de pollo 1 pieza", cal: 380, p: 26, c: 34, f: 15 },
+  { name: "empanada de carne horneada 1 pieza", cal: 250, p: 9, c: 26, f: 12 },
+  { name: "empanada de pollo horneada 1 pieza", cal: 230, p: 9, c: 24, f: 10 },
+  { name: "empanada frita de carne 1 pieza", cal: 290, p: 8, c: 26, f: 17 },
+  { name: "paella de mariscos 1 plato", cal: 480, p: 28, c: 58, f: 14 },
+  { name: "risotto de champiñones 1 plato", cal: 420, p: 10, c: 60, f: 14 },
+  { name: "gnocchi con salsa de tomate 1 plato", cal: 380, p: 10, c: 68, f: 8 },
+  { name: "tiramisú 1 rebanada", cal: 350, p: 6, c: 34, f: 21 },
+  { name: "croissant sencillo 1 pieza", cal: 230, p: 5, c: 26, f: 12 },
+  { name: "croissant de jamón y queso 1 pieza", cal: 320, p: 13, c: 28, f: 18 },
+  { name: "dim sum al vapor 4 piezas", cal: 220, p: 10, c: 26, f: 8 },
+  { name: "chow mein de pollo 1 plato", cal: 420, p: 22, c: 50, f: 14 },
+  { name: "arroz frito con verduras 1 plato", cal: 380, p: 8, c: 62, f: 10 },
+  { name: "pho de res 1 plato", cal: 420, p: 26, c: 50, f: 10 },
+  { name: "bibimbap con res 1 plato", cal: 520, p: 26, c: 62, f: 16 },
+  { name: "kimchi 1/2 taza", cal: 25, p: 2, c: 5, f: 0 },
+  { name: "tikka masala de pollo con arroz 1 plato", cal: 520, p: 32, c: 50, f: 22 },
+  { name: "biryani de pollo 1 plato", cal: 480, p: 26, c: 60, f: 14 },
+  { name: "shakshuka 1 plato", cal: 280, p: 16, c: 14, f: 18 },
+  { name: "gazpacho 1 taza", cal: 90, p: 2, c: 14, f: 3 },
+  { name: "tabulé (tabbouleh) 1 taza", cal: 180, p: 4, c: 26, f: 7 },
+  { name: "moussaka 1 porción", cal: 380, p: 18, c: 22, f: 24 },
+  { name: "goulash de res 1 plato", cal: 420, p: 28, c: 30, f: 20 },
+  { name: "borscht 1 plato", cal: 150, p: 5, c: 22, f: 5 },
+  { name: "ramen instantáneo preparado 1 taza", cal: 380, p: 8, c: 52, f: 14 },
+  // === COMIDA RÁPIDA Y CASUAL AMPLIADA (sin marcas) ===
+  { name: "pizza margarita 1 rebanada", cal: 260, p: 11, c: 32, f: 9 },
+  { name: "pizza vegetariana 1 rebanada", cal: 250, p: 10, c: 32, f: 9 },
+  { name: "pizza mexicana con chorizo y jalapeño 1 rebanada", cal: 330, p: 14, c: 32, f: 16 },
+  { name: "pizza delgada estilo italiano 1 rebanada", cal: 210, p: 9, c: 24, f: 9 },
+  { name: "hamburguesa con tocino y queso 1 pieza", cal: 620, p: 32, c: 40, f: 36 },
+  { name: "hamburguesa vegetariana 1 pieza", cal: 380, p: 18, c: 40, f: 14 },
+  { name: "sándwich club triple 1 pieza", cal: 520, p: 28, c: 42, f: 26 },
+  { name: "sándwich de atún 1 pieza", cal: 380, p: 22, c: 34, f: 16 },
+  { name: "sándwich de pavo 1 pieza", cal: 320, p: 20, c: 34, f: 10 },
+  { name: "submarino mixto 15cm 1 pieza", cal: 420, p: 22, c: 48, f: 14 },
+  { name: "wrap de pollo con vegetales 1 pieza", cal: 380, p: 24, c: 38, f: 14 },
+  { name: "wrap vegetariano 1 pieza", cal: 320, p: 10, c: 42, f: 12 },
+  { name: "fajitas de res con tortillas 1 plato", cal: 520, p: 32, c: 40, f: 24 },
+  { name: "fajitas de pollo con tortillas 1 plato", cal: 480, p: 32, c: 38, f: 18 },
+  { name: "fajitas de camarón con tortillas 1 plato", cal: 460, p: 30, c: 38, f: 16 },
+  { name: "papas gajo (wedges) 1 orden", cal: 380, p: 5, c: 48, f: 18 },
+  { name: "ensalada de nopales 1 plato", cal: 120, p: 6, c: 14, f: 5 },
+  { name: "ensalada griega 1 plato", cal: 320, p: 10, c: 16, f: 24 },
+  { name: "ensalada de espinaca con fresa y nuez 1 plato", cal: 280, p: 6, c: 22, f: 18 },
+  { name: "ensalada de quinoa con verduras 1 plato", cal: 340, p: 10, c: 48, f: 11 },
+  { name: "ensalada waldorf 1 plato", cal: 320, p: 4, c: 34, f: 19 },
+  { name: "ensalada de garbanzo 1 plato", cal: 300, p: 13, c: 40, f: 9 },
+  { name: "ensalada de pasta fría 1 plato", cal: 380, p: 10, c: 52, f: 14 },
+  // === QUESADILLAS Y GUISADOS CASEROS AMPLIADOS ===
+  { name: "quesadilla de champiñones 1 pieza", cal: 260, p: 10, c: 26, f: 13 },
+  { name: "quesadilla de flor de calabaza 1 pieza", cal: 240, p: 9, c: 24, f: 12 },
+  { name: "quesadilla de huitlacoche 1 pieza", cal: 250, p: 10, c: 25, f: 13 },
+  { name: "quesadilla de rajas con queso 1 pieza", cal: 270, p: 10, c: 26, f: 14 },
+  { name: "quesadilla de chicharrón prensado 1 pieza", cal: 300, p: 11, c: 25, f: 17 },
+  { name: "quesadilla de papa con queso 1 pieza", cal: 260, p: 9, c: 34, f: 10 },
+  { name: "quesadilla frita sin queso 1 pieza", cal: 150, p: 3, c: 18, f: 7 },
+  { name: "pollo guisado en salsa de tomate 100g", cal: 190, p: 22, c: 6, f: 8 },
+  { name: "pollo rostizado con piel 1 pierna", cal: 250, p: 22, c: 0, f: 17 },
+  { name: "pollo rostizado sin piel 1 pierna", cal: 170, p: 24, c: 0, f: 7 },
+  { name: "pollo rostizado pechuga con piel 1 pieza", cal: 300, p: 38, c: 0, f: 16 },
+  { name: "pollo a la naranja 1 plato", cal: 380, p: 28, c: 34, f: 14 },
+  { name: "res guisada con papas 1 plato", cal: 380, p: 26, c: 26, f: 18 },
+  { name: "res en salsa de chile ancho 1 plato", cal: 350, p: 28, c: 18, f: 18 },
+  { name: "picadillo de res 1 taza", cal: 320, p: 22, c: 18, f: 18 },
+  { name: "carne deshebrada en salsa 100g", cal: 200, p: 22, c: 6, f: 9 },
+  { name: "cerdo en salsa verde 100g", cal: 230, p: 22, c: 6, f: 13 },
+  { name: "cerdo en salsa de chile pasilla 100g", cal: 250, p: 22, c: 8, f: 15 },
+  { name: "pescado empanizado 1 filete", cal: 280, p: 24, c: 20, f: 12 },
+  { name: "camarones a la diabla 1 plato", cal: 280, p: 28, c: 10, f: 13 },
+  { name: "camarones al mojo de ajo 1 plato", cal: 320, p: 28, c: 8, f: 19 },
+  // === COMIDA REGIONAL MEXICANA POCO COMÚN (v5.49) ===
+  { name: "mixiote de pollo 1 pieza", cal: 320, p: 26, c: 8, f: 20 },
+  { name: "mixiote de res 1 pieza", cal: 380, p: 28, c: 8, f: 26 },
+  { name: "mixiote de borrego 1 pieza", cal: 400, p: 28, c: 8, f: 28 },
+  { name: "tesmole de pollo 1 plato", cal: 320, p: 24, c: 20, f: 16 },
+  { name: "pipián verde con pollo 1 plato", cal: 400, p: 28, c: 16, f: 24 },
+  { name: "pipián rojo con pollo 1 plato", cal: 400, p: 28, c: 18, f: 24 },
+  { name: "zacahuil (tamal huasteco) 1 rebanada", cal: 380, p: 14, c: 48, f: 14 },
+  { name: "chanfaina 1 plato", cal: 280, p: 22, c: 14, f: 16 },
+  { name: "relleno negro yucateco 1 plato", cal: 350, p: 26, c: 16, f: 20 },
+  { name: "papadzules 3 piezas", cal: 420, p: 14, c: 40, f: 24 },
+  { name: "sikil pak con totopos 1 porción", cal: 280, p: 9, c: 22, f: 18 },
+  { name: "poc chuc 1 plato", cal: 380, p: 32, c: 8, f: 24 },
+  { name: "cabrito al pastor 100g", cal: 280, p: 26, c: 0, f: 19 },
+  { name: "chilorio de cerdo 100g", cal: 320, p: 24, c: 6, f: 22 },
+  { name: "cecina enchilada 100g", cal: 260, p: 26, c: 4, f: 16 },
+  { name: "gaznates poblanos 1 pieza", cal: 160, p: 2, c: 22, f: 7 },
+  { name: "chongos zamoranos 1 porción", cal: 220, p: 6, c: 38, f: 5 },
+  { name: "jericalla 1 porción", cal: 240, p: 6, c: 30, f: 10 },
+  { name: "pozole verde con pollo 1 plato", cal: 420, p: 26, c: 46, f: 14 },
+  { name: "pozole blanco con guarnición 1 plato", cal: 400, p: 24, c: 46, f: 13 },
+  { name: "consomé de birria 1 taza", cal: 120, p: 12, c: 4, f: 6 },
+  { name: "birria de chivo en su jugo 1 plato", cal: 380, p: 32, c: 6, f: 24 },
+  { name: "chapulines tostados 30g", cal: 100, p: 18, c: 4, f: 2 },
+  { name: "escamoles 100g", cal: 170, p: 18, c: 2, f: 10 },
+  { name: "gusanos de maguey fritos 100g", cal: 240, p: 22, c: 4, f: 16 },
+  { name: "chicatanas tostadas 30g", cal: 120, p: 14, c: 4, f: 6 },
+  { name: "jumiles 30g", cal: 90, p: 14, c: 2, f: 3 },
+  { name: "acociles fritos 100g", cal: 140, p: 22, c: 2, f: 5 },
+  { name: "garnachas veracruzanas 3 piezas", cal: 320, p: 8, c: 40, f: 14 },
+  { name: "empanadas de camote 1 pieza", cal: 220, p: 3, c: 32, f: 9 },
+  { name: "clayuda con tasajo 1 pieza", cal: 620, p: 28, c: 62, f: 28 },
+  { name: "huarache de nopal 1 pieza", cal: 280, p: 14, c: 24, f: 14 },
+  // === OPCIONES KETO / BAJAS EN CARBOHIDRATOS ===
+  { name: "harina de almendra 1/4 taza", cal: 160, p: 6, c: 6, f: 14 },
+  { name: "harina de coco 2 cucharadas", cal: 60, p: 2, c: 8, f: 2 },
+  { name: "pan keto casero 1 rebanada", cal: 90, p: 4, c: 3, f: 7 },
+  { name: "tortilla de coliflor 1 pieza", cal: 40, p: 3, c: 5, f: 1 },
+  { name: "tortilla de nopal 1 pieza", cal: 25, p: 2, c: 3, f: 1 },
+  { name: "fideos de calabacita (zoodles) 1 taza", cal: 30, p: 2, c: 6, f: 0 },
+  { name: "eritritol 1 cucharadita", cal: 0, p: 0, c: 0, f: 0 },
+  { name: "pan de nube (cloud bread) 1 pieza", cal: 35, p: 3, c: 1, f: 2 },
+  { name: "mug cake keto 1 pieza", cal: 220, p: 8, c: 6, f: 18 },
+  { name: "grasa de tocino para cocinar 1 cucharada", cal: 115, p: 0, c: 0, f: 13 },
+  { name: "caldo de hueso (bone broth) 1 taza", cal: 40, p: 9, c: 0, f: 1 },
+  // === OPCIONES VEGANAS / VEGETARIANAS ===
+  { name: "leche de avena sin azúcar 1 vaso 240ml", cal: 90, p: 2, c: 14, f: 3 },
+  { name: "leche de coco para bebida 1 vaso 240ml", cal: 80, p: 1, c: 7, f: 5 },
+  { name: "leche de arroz 1 vaso 240ml", cal: 113, p: 0, c: 22, f: 2 },
+  { name: "yogur de coco natural 1 taza", cal: 180, p: 2, c: 8, f: 16 },
+  { name: "yogur de almendra natural 1 taza", cal: 90, p: 2, c: 8, f: 5 },
+  { name: "tempeh 100g", cal: 190, p: 20, c: 9, f: 11 },
+  { name: "seitan 100g", cal: 370, p: 75, c: 14, f: 2 },
+  { name: "hamburguesa de origen vegetal 1 pieza", cal: 250, p: 20, c: 14, f: 13 },
+  { name: "chorizo vegano 100g", cal: 220, p: 18, c: 10, f: 12 },
+  { name: "tocino vegano 2 tiras", cal: 60, p: 4, c: 3, f: 4 },
+  { name: "queso vegano rebanada 1 pieza", cal: 70, p: 1, c: 4, f: 5 },
+  { name: "mayonesa vegana 1 cucharada", cal: 90, p: 0, c: 1, f: 10 },
+  { name: "crema vegana para cocinar 2 cucharadas", cal: 50, p: 0, c: 2, f: 4 },
+  { name: "proteína de guisante en polvo 1 scoop 30g", cal: 110, p: 24, c: 2, f: 1 },
+  { name: "proteína de arroz en polvo 1 scoop 30g", cal: 115, p: 22, c: 3, f: 1 },
+  // === SIN GLUTEN ===
+  { name: "pan sin gluten 1 rebanada", cal: 90, p: 2, c: 17, f: 2 },
+  { name: "pasta de arroz cocida 1 taza", cal: 200, p: 4, c: 44, f: 1 },
+  { name: "pasta de lenteja cocida 1 taza", cal: 230, p: 18, c: 40, f: 1 },
+  { name: "galleta sin gluten 3 piezas", cal: 140, p: 2, c: 22, f: 5 },
+  { name: "avena certificada sin gluten cruda 1/2 taza", cal: 150, p: 5, c: 27, f: 3 },
+  { name: "harina de arroz 1/4 taza", cal: 145, p: 2, c: 32, f: 1 },
+  { name: "cereal de arroz inflado 1 taza", cal: 90, p: 1, c: 21, f: 0 }
 ];
 
 // Unidad de medida de un alimento (derivada del propio nombre: pieza, plato, taza...)
@@ -979,33 +1126,35 @@ function foodUnit(food) {
     return 'porción';
 }
 
-// Sugerencias tipo autocompletado (Registrar + Asistente de comida)
-function findFoodSuggestions(query, max = 8) {
+// Sugerencias tipo autocompletado (Registrar + Asistente de comida).
+// Muestra TODAS las coincidencias posibles, ordenadas de la A a la Z
+// (el recuadro que las contiene ya tiene scroll propio y tamaño fijo,
+// así que no hace falta recortar la lista a un puñado de opciones).
+function findFoodSuggestions(query) {
     const norm = (s) => (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/_/g, ' ').replace(/\s+/g, ' ').trim();
     const q = norm(query);
     if (!q || q.length < 2) return [];
     const custom = (typeof loadCustomFoods === 'function') ? loadCustomFoods() : [];
     const all = [...FOOD_DATABASE, ...custom];
     const qWords = q.split(' ').filter(Boolean);
-    const scored = [];
+    const matches = [];
     for (const f of all) {
         const n = norm(f.name);
-        let s = 0;
-        if (n === q) s = 1000;
-        else if (n.startsWith(q)) s = 500;
-        else if (n.includes(q)) s = 250;
-        else {
+        let isMatch = false;
+        if (n === q || n.startsWith(q) || n.includes(q)) {
+            isMatch = true;
+        } else {
             const nWords = n.split(' ');
             let hits = 0;
             for (const w of qWords) {
                 if (nWords.some(x => x.startsWith(w) || (x.length >= 3 && w.startsWith(x)))) hits++;
             }
-            if (hits > 0 && hits === qWords.length) s = 100 + hits;
+            if (hits > 0 && hits === qWords.length) isMatch = true;
         }
-        if (s > 0) scored.push([s, f]);
+        if (isMatch) matches.push(f);
     }
-    scored.sort((a, b) => b[0] - a[0] || a[1].name.length - b[1].name.length);
-    return scored.slice(0, max).map(x => x[1]);
+    matches.sort((a, b) => a.name.localeCompare(b.name, 'es'));
+    return matches;
 }
 
 /**
