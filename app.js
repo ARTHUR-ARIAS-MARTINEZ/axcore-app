@@ -175,10 +175,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 row.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); select(f); });
                 box.appendChild(row);
             });
+            // Colocación: debajo del campo si hay lugar; si no (campo abajo de la
+            // pantalla o teclado abierto), ARRIBA del campo. Además se limita el
+            // alto al espacio libre real para que la lista nunca quede cortada
+            // fuera de la pantalla: siempre se puede desplazar completa.
             const r = inp.getBoundingClientRect();
+            const vh = window.innerHeight || document.documentElement.clientHeight;
+            const GAP = 4, MARGEN = 8, ALTO_MAX = 240;
+            const libreAbajo = vh - r.bottom - GAP - MARGEN;
+            const libreArriba = r.top - GAP - MARGEN;
             box.style.left = r.left + 'px';
-            box.style.top = (r.bottom + 4) + 'px';
             box.style.width = r.width + 'px';
+            if (libreAbajo >= 120 || libreAbajo >= libreArriba) {
+                box.style.top = (r.bottom + GAP) + 'px';
+                box.style.bottom = 'auto';
+                box.style.maxHeight = Math.max(96, Math.min(ALTO_MAX, libreAbajo)) + 'px';
+            } else {
+                box.style.top = 'auto';
+                box.style.bottom = (vh - r.top + GAP) + 'px';
+                box.style.maxHeight = Math.max(96, Math.min(ALTO_MAX, libreArriba)) + 'px';
+            }
             document.body.appendChild(box);
             // Cierra al tocar fuera (input o caja) o al hacer scroll de la PÁGINA (no de la
             // caja). Reemplaza el 'blur', que cerraba la lista al desplazarla con el dedo.

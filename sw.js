@@ -1,12 +1,12 @@
-const CACHE_NAME = 'axcore-v5.53-mas-variedad-alimentos';
+const CACHE_NAME = 'axcore-v5.54-buscador-alimentos-fix';
 const urlsToCache = [
   './',
-  './index.html?v=20260720a',
-  './index.css?v=20260720a',
-  './premium.css?v=20260720a',
-  './profile-persist.js?v=20260720a',
-  './app.js?v=20260720a',
-  './knowledge.js?v=20260720a',
+  './index.html?v=20260720b',
+  './index.css?v=20260720b',
+  './premium.css?v=20260720b',
+  './profile-persist.js?v=20260720b',
+  './app.js?v=20260720b',
+  './knowledge.js?v=20260720b',
   './logo.png',
   './logo_coach.png',
   './manifest_vip.json',
