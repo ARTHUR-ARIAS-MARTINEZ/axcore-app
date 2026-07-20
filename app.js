@@ -156,7 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
             close();
             const q = inp.value.trim();
             if (q.length < 2 || /^\d+$/.test(q)) { setUnitLbl(null); return; }
-            const sugs = (typeof findFoodSuggestions === 'function') ? findFoodSuggestions(q, 8) : [];
+            const sugs = (typeof findFoodSuggestions === 'function') ? findFoodSuggestions(q) : [];
             if (!sugs.length) return;
             box = document.createElement('div');
             box.className = 'ax-suggest';

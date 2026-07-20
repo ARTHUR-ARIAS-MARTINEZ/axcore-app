@@ -1,12 +1,12 @@
-const CACHE_NAME = 'axcore-v5.52-color-picker-cursor-swipe-block';
+const CACHE_NAME = 'axcore-v5.53-mas-variedad-alimentos';
 const urlsToCache = [
   './',
-  './index.html?v=20260712c',
-  './index.css?v=20260712c',
-  './premium.css?v=20260712c',
-  './profile-persist.js?v=20260712c',
-  './app.js?v=20260712c',
-  './knowledge.js?v=20260712c',
+  './index.html?v=20260720a',
+  './index.css?v=20260720a',
+  './premium.css?v=20260720a',
+  './profile-persist.js?v=20260720a',
+  './app.js?v=20260720a',
+  './knowledge.js?v=20260720a',
   './logo.png',
   './logo_coach.png',
   './manifest_vip.json',
