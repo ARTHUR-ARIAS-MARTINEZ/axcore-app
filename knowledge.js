@@ -969,7 +969,7 @@ const FOOD_DATABASE = [
   { name: "curry de pollo con arroz 1 plato", cal: 450, p: 28, c: 45, f: 18 },
   { name: "curry verde tailandés con pollo 1 plato", cal: 420, p: 24, c: 20, f: 28 },
   { name: "curry rojo con verduras 1 plato", cal: 340, p: 8, c: 30, f: 22 },
-  { name: "falafel 4 piezas", cal: 220, p: 8, c: 24, f: 11 },
+  { name: "falafel (croquetas de garbanzo) 4 piezas", cal: 220, p: 8, c: 24, f: 11 },
   { name: "pan pita integral 1 pieza", cal: 165, p: 6, c: 33, f: 2 },
   { name: "gyro (döner) de cordero 1 pieza", cal: 430, p: 24, c: 34, f: 22 },
   { name: "gyro (döner) de pollo 1 pieza", cal: 380, p: 26, c: 34, f: 15 },
@@ -978,24 +978,24 @@ const FOOD_DATABASE = [
   { name: "empanada frita de carne 1 pieza", cal: 290, p: 8, c: 26, f: 17 },
   { name: "paella de mariscos 1 plato", cal: 480, p: 28, c: 58, f: 14 },
   { name: "risotto de champiñones 1 plato", cal: 420, p: 10, c: 60, f: 14 },
-  { name: "gnocchi con salsa de tomate 1 plato", cal: 380, p: 10, c: 68, f: 8 },
+  { name: "gnocchi (ñoquis) con salsa de tomate 1 plato", cal: 380, p: 10, c: 68, f: 8 },
   { name: "tiramisú 1 rebanada", cal: 350, p: 6, c: 34, f: 21 },
   { name: "croissant sencillo 1 pieza", cal: 230, p: 5, c: 26, f: 12 },
   { name: "croissant de jamón y queso 1 pieza", cal: 320, p: 13, c: 28, f: 18 },
-  { name: "dim sum al vapor 4 piezas", cal: 220, p: 10, c: 26, f: 8 },
-  { name: "chow mein de pollo 1 plato", cal: 420, p: 22, c: 50, f: 14 },
+  { name: "dim sum (empanaditas al vapor) 4 piezas", cal: 220, p: 10, c: 26, f: 8 },
+  { name: "chow mein (tallarines salteados) de pollo 1 plato", cal: 420, p: 22, c: 50, f: 14 },
   { name: "arroz frito con verduras 1 plato", cal: 380, p: 8, c: 62, f: 10 },
-  { name: "pho de res 1 plato", cal: 420, p: 26, c: 50, f: 10 },
+  { name: "pho (sopa vietnamita) de res 1 plato", cal: 420, p: 26, c: 50, f: 10 },
   { name: "bibimbap con res 1 plato", cal: 520, p: 26, c: 62, f: 16 },
-  { name: "kimchi 1/2 taza", cal: 25, p: 2, c: 5, f: 0 },
+  { name: "kimchi (col fermentada) 1/2 taza", cal: 25, p: 2, c: 5, f: 0 },
   { name: "tikka masala de pollo con arroz 1 plato", cal: 520, p: 32, c: 50, f: 22 },
-  { name: "biryani de pollo 1 plato", cal: 480, p: 26, c: 60, f: 14 },
-  { name: "shakshuka 1 plato", cal: 280, p: 16, c: 14, f: 18 },
+  { name: "biryani (arroz especiado) de pollo 1 plato", cal: 480, p: 26, c: 60, f: 14 },
+  { name: "shakshuka (huevos en salsa de tomate) 1 plato", cal: 280, p: 16, c: 14, f: 18 },
   { name: "gazpacho 1 taza", cal: 90, p: 2, c: 14, f: 3 },
   { name: "tabulé (tabbouleh) 1 taza", cal: 180, p: 4, c: 26, f: 7 },
-  { name: "moussaka 1 porción", cal: 380, p: 18, c: 22, f: 24 },
-  { name: "goulash de res 1 plato", cal: 420, p: 28, c: 30, f: 20 },
-  { name: "borscht 1 plato", cal: 150, p: 5, c: 22, f: 5 },
+  { name: "moussaka (musaca) 1 porción", cal: 380, p: 18, c: 22, f: 24 },
+  { name: "goulash (gulash) de res 1 plato", cal: 420, p: 28, c: 30, f: 20 },
+  { name: "borscht (sopa de betabel) 1 plato", cal: 150, p: 5, c: 22, f: 5 },
   { name: "ramen instantáneo preparado 1 taza", cal: 380, p: 8, c: 52, f: 14 },
   // === COMIDA RÁPIDA Y CASUAL AMPLIADA (sin marcas) ===
   { name: "pizza margarita 1 rebanada", cal: 260, p: 11, c: 32, f: 9 },
@@ -1085,7 +1085,7 @@ const FOOD_DATABASE = [
   { name: "fideos de calabacita (zoodles) 1 taza", cal: 30, p: 2, c: 6, f: 0 },
   { name: "eritritol 1 cucharadita", cal: 0, p: 0, c: 0, f: 0 },
   { name: "pan de nube (cloud bread) 1 pieza", cal: 35, p: 3, c: 1, f: 2 },
-  { name: "mug cake keto 1 pieza", cal: 220, p: 8, c: 6, f: 18 },
+  { name: "mug cake keto (pastelito en taza) 1 pieza", cal: 220, p: 8, c: 6, f: 18 },
   { name: "grasa de tocino para cocinar 1 cucharada", cal: 115, p: 0, c: 0, f: 13 },
   { name: "caldo de hueso (bone broth) 1 taza", cal: 40, p: 9, c: 0, f: 1 },
   // === OPCIONES VEGANAS / VEGETARIANAS ===
@@ -1094,8 +1094,8 @@ const FOOD_DATABASE = [
   { name: "leche de arroz 1 vaso 240ml", cal: 113, p: 0, c: 22, f: 2 },
   { name: "yogur de coco natural 1 taza", cal: 180, p: 2, c: 8, f: 16 },
   { name: "yogur de almendra natural 1 taza", cal: 90, p: 2, c: 8, f: 5 },
-  { name: "tempeh 100g", cal: 190, p: 20, c: 9, f: 11 },
-  { name: "seitan 100g", cal: 370, p: 75, c: 14, f: 2 },
+  { name: "tempeh (soya fermentada) 100g", cal: 190, p: 20, c: 9, f: 11 },
+  { name: "seitan (gluten de trigo) 100g", cal: 370, p: 75, c: 14, f: 2 },
   { name: "hamburguesa de origen vegetal 1 pieza", cal: 250, p: 20, c: 14, f: 13 },
   { name: "chorizo vegano 100g", cal: 220, p: 18, c: 10, f: 12 },
   { name: "tocino vegano 2 tiras", cal: 60, p: 4, c: 3, f: 4 },
@@ -1172,22 +1172,78 @@ function findFood(query) {
     const customFoods = (typeof loadCustomFoods === 'function') ? loadCustomFoods() : [];
     const allFoods = [...FOOD_DATABASE, ...customFoods];
 
-    // 1) Coincidencia directa por subcadena (la más específica gana).
-    let best = null, bestLen = 0;
+    // Comprueba que el texto buscado aparezca como palabra COMPLETA, no a
+    // media palabra: así "res" ya no coincide con "fresa" ni "pan" con
+    // "empanada" (antes devolvía calorías de un platillo equivocado).
+    const hasWord = (haystack, needle) => {
+        if (!needle) return false;
+        let from = 0;
+        for (;;) {
+            const i = haystack.indexOf(needle, from);
+            if (i < 0) return false;
+            const before = i === 0 ? '' : haystack[i - 1];
+            const after = haystack[i + needle.length] || '';
+            if (!/[a-z0-9]/.test(before) && !/[a-z0-9]/.test(after)) return true;
+            from = i + 1;
+        }
+    };
+
+    // Las fichas más viejas de la base ("cerveza", "avena", "huevo") no dicen
+    // la porción: su valor es por 100 g y al sumarlo tal cual sale muy mal
+    // (una cerveza serían 43 kcal en vez de ~150). Se prefiere siempre una
+    // ficha que sí declare cuánto es ("1 botella 355ml", "1 taza", "100g").
+    const hasPortion = (n) => /\d/.test(n) || /\b(median[oa]|grande|chic[oa]|pequeñ|enter[oa])\b/.test(n);
+    let best = null;
+
+    // 1) Coincidencia exacta con el nombre completo, si declara su porción.
+    for (const food of allFoods) {
+        if (norm(food.name) === q && hasPortion(norm(food.name))) return food;
+    }
+
+    // 2) El usuario escribió una frase que CONTIENE el nombre de un alimento
+    //    ("me comí 2 tacos de pastor"): gana el nombre más largo, que es el
+    //    más específico. Si ese ganador no declara porción, más abajo se
+    //    revisa si existe una ficha equivalente que sí la declare.
+    let bestLen = 0;
     for (const food of allFoods) {
         const n = norm(food.name);
-        if (q.includes(n) || n.includes(q)) {
-            if (n.length > bestLen) { bestLen = n.length; best = food; }
-        }
+        if (n.length < q.length && hasWord(q, n) && n.length > bestLen) { bestLen = n.length; best = food; }
     }
+    if (best && hasPortion(norm(best.name))) return best;
+    const fraseSinPorcion = best;
+    best = null;
+
+    // 3) El usuario escribió algo corto que forma parte del nombre de varios
+    //    alimentos ("pizza", "ensalada"): gana el nombre MÁS CORTO, que es el
+    //    más parecido a lo que pidió, dando preferencia a los que empiezan
+    //    igual. Antes ganaba el más largo y salía el platillo más rebuscado.
+    //    Manda que empiece igual que lo escrito, luego que declare su porción
+    //    y por último el nombre más corto. Nunca se elige sola una versión
+    //    "light/zero/sin azúcar" si el usuario no la pidió: registraría de
+    //    menos (un "refresco" saldría en 0 kcal) y arruinaría la cuenta.
+    const isLight = /\b(light|zero|diet|dietetic[oa]|sin azucar)\b/;
+    const askedLight = isLight.test(q);
+    let bestScore = -Infinity;
+    for (const food of allFoods) {
+        const n = norm(food.name);
+        if (!hasWord(n, q)) continue;
+        const score = (n.startsWith(q) ? 4000000 : 0)
+                    + (hasPortion(n) ? 2000000 : 0)
+                    + ((!askedLight && isLight.test(n)) ? -1000000 : 0)
+                    - n.length;
+        if (score > bestScore) { bestScore = score; best = food; }
+    }
+    // Entre la ficha de la frase (paso 2) y esta, gana la que declare porción.
+    if (best && hasPortion(norm(best.name))) return best;
+    if (fraseSinPorcion) return fraseSinPorcion;
     if (best) return best;
 
-    // 2) Fallback por palabras clave: tolera "taco de adobada" -> "tacos",
+    // 4) Fallback por palabras clave: tolera "taco de adobada" -> "tacos",
     //    "milanesa empanizada" -> "milanesa ...", ignora "de/con/en/al" etc.
     const stop = new Set(['de', 'con', 'la', 'el', 'un', 'una', 'al', 'a', 'y', 'en', 'sin', 'los', 'las', 'del', 'por', 'para']);
     const qWords = q.split(' ').filter(w => w.length >= 3 && !stop.has(w));
     if (qWords.length === 0) return null;
-    let bestScore = 0;
+    let bestKeyScore = 0;
     for (const food of allFoods) {
         const nWords = norm(food.name).split(' ');
         let score = 0;
@@ -1198,9 +1254,9 @@ function findFood(query) {
                 }
             }
         }
-        if (score > bestScore) { bestScore = score; best = food; }
+        if (score > bestKeyScore) { bestKeyScore = score; best = food; }
     }
-    return bestScore > 0 ? best : null;
+    return bestKeyScore > 0 ? best : null;
 }
 
 // Cargar alimentos personalizados que el usuario fue agregando
