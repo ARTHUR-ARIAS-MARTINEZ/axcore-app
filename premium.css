@@ -4017,3 +4017,26 @@ body.premium-mode #page-evolution .history-table-container tbody td:first-child 
 body.premium-mode #page-evolution .evolution-panel .measurement-form {
   position: relative;
 }
+
+/* ═══════════════ MEDALLAS POR IMAGEN (assets/insignias) — v5.55 ═══════════════ */
+/* La imagen ES la medalla (marco+glifo+nivel). El número va SOBREPUESTO en el centro-bajo. */
+.axmed { position: relative; display: block; width: 100%; height: 100%; }
+.axmed-img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.axmed-num {
+  position: absolute; left: 50%; top: 60%; transform: translate(-50%, -50%);
+  font-family: 'Oswald', sans-serif; font-weight: 700; color: #fff;
+  font-size: 13px; letter-spacing: -0.3px; line-height: 1; white-space: nowrap;
+  text-shadow: 0 1px 2px rgba(0,0,0,.95), 0 0 5px rgba(0,0,0,.85); pointer-events: none;
+}
+.axmed-lock .axmed-img { filter: grayscale(1) brightness(.5); }
+.axmed-lock .axmed-num { opacity: .35; }
+/* Quitar el fondo/borde del contenedor cuando lleva medalla-imagen (evita el cuadro tras el círculo) */
+body.premium-mode .pd-badge-icon.has-med {
+  background: none !important; border: none !important; box-shadow: none !important; padding: 0 !important;
+}
+.pd-badge-icon.has-med .axmed-num { font-size: 14px; }
+body.premium-mode #achievements-panel .ach-icon.has-med {
+  width: 54px; height: 54px; margin: 0 auto 5px; padding: 0; font-size: 0; background: none !important;
+}
+.pm-bemoji.has-med { width: 60px; height: 60px; margin: 2px auto 6px; }
+.pm-bemoji.has-med .axmed-num { font-size: 16px; }
