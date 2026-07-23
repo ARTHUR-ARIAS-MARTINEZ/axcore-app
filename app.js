@@ -1591,9 +1591,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (scroll) {
             // Tier: usa b.tier o b.t (definiciones) o calcula por nombre. Default 1 (bronce).
             const getTier = (b) => +(b.tier || b.t || 1);
-            scroll.innerHTML = unlockedB.map(b =>
-                `<div class="pd-badge"><div class="pd-badge-icon unlocked t${getTier(b)}">${b.emoji || b.icon || '🏅'}</div><div class="pd-badge-name">${(b.name || b.title || '').toUpperCase()}</div></div>`
-            ).join('') + Array.from({length: lockedCount}).map(() =>
+            scroll.innerHTML = unlockedB.map(b => {
+                const med = (typeof axMedalHTML === 'function') ? axMedalHTML(b, true) : '';
+                const icon = med
+                    ? `<div class="pd-badge-icon has-med">${med}</div>`
+                    : `<div class="pd-badge-icon unlocked t${getTier(b)}">${b.emoji || b.icon || '🏅'}</div>`;
+                return `<div class="pd-badge">${icon}<div class="pd-badge-name">${(b.name || b.title || '').toUpperCase()}</div></div>`;
+            }).join('') + Array.from({length: lockedCount}).map(() =>
                 `<div class="pd-badge locked"><div class="pd-badge-icon locked">🔒</div><div class="pd-badge-name">???</div></div>`
             ).join('');
         }
@@ -5079,14 +5083,54 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => t.remove(), 5200);
     }
 
+    // ═══════════════ MEDALLAS POR IMAGEN (assets/insignias) ═══════════════
+    // Cada insignia usa la imagen de su categoría+nivel (assets/insignias/<cat>_<nivel>.webp)
+    // con el número sobrepuesto. Si no hay imagen (inicio/especial/medidas-leyenda) cae al
+    // emoji de siempre. NO cambia ninguna lógica de desbloqueo ni ids.
+    const AX_TIERNAME = { 1: 'bronce', 2: 'plata', 3: 'oro', 4: 'platino', 5: 'leyenda' };
+    const AX_MEDAL_SET = new Set([
+        'racha_bronce','racha_plata','racha_oro','racha_platino','racha_leyenda',
+        'peso_bronce','peso_plata','peso_oro','peso_platino','peso_leyenda',
+        'medidas_bronce','medidas_plata','medidas_oro','medidas_platino',
+        'ejercicio_bronce','ejercicio_plata','ejercicio_oro','ejercicio_platino','ejercicio_leyenda',
+        'comida_bronce','comida_plata','comida_oro','comida_platino','comida_leyenda',
+        'deficit_bronce','deficit_plata','deficit_oro','deficit_platino','deficit_leyenda',
+        'constancia_bronce','constancia_plata','constancia_oro','constancia_platino','constancia_leyenda'
+    ]);
+    function axMedalImg(def) {
+        const t = +(def.t || def.tier || 1);
+        const key = (def.cat || '') + '_' + (AX_TIERNAME[t] || 'bronce');
+        return AX_MEDAL_SET.has(key) ? ('assets/insignias/' + key + '.webp') : null;
+    }
+    function axMedalNum(def) {
+        const m = String(def.title || def.name || '').match(/-?\d[\d.,]*/);
+        if (!m) return '';
+        const raw = m[0].replace(/,/g, ''), n = parseFloat(raw);
+        if (!isNaN(n) && Math.abs(n) >= 1000) { const k = n / 1000; return (Number.isInteger(k) ? k : +k.toFixed(1)) + 'K'; }
+        return raw;
+    }
+    // Devuelve el HTML de la medalla-imagen, o '' si no hay imagen (para caer al emoji).
+    function axMedalHTML(def, unlocked) {
+        const img = axMedalImg(def);
+        if (!img) return '';
+        const num = axMedalNum(def);
+        return '<span class="axmed' + (unlocked ? '' : ' axmed-lock') + '">'
+            + '<img class="axmed-img" src="' + img + '" alt="" loading="lazy">'
+            + (num ? '<span class="axmed-num">' + num + '</span>' : '')
+            + '</span>';
+    }
+    window.axMedalHTML = axMedalHTML;
+
     function renderAchievementsPanel() {
         const panel = document.getElementById('achievements-panel');
         if (!panel) return;
         const earned = new Set(userData.achievements || []);
         panel.innerHTML = ACHIEVEMENTS_DEF.map(a => {
             const got = earned.has(a.id);
+            const med = axMedalHTML(a, got);
+            const iconHTML = med ? `<div class="ach-icon has-med">${med}</div>` : `<div class="ach-icon">${a.icon}</div>`;
             return `<div class="ach-card ${got ? 'ach-card--got' : 'ach-card--locked'}">
-                <div class="ach-icon">${a.icon}</div>
+                ${iconHTML}
                 <div class="ach-title">${a.title}</div>
                 <div class="ach-desc">${a.desc}</div>
             </div>`;

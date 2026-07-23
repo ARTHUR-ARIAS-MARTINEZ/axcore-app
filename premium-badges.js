@@ -75,20 +75,25 @@
         if (!wrap) return;
         const list = activeCat === 'todos' ? getBadges() : getBadges().filter(b => b.c === activeCat);
         wrap.innerHTML = list.map(b => {
-            if (isUnlocked(b.id)) {
+            const unlocked = isUnlocked(b.id);
+            const med = (typeof window.axMedalHTML === 'function')
+                ? window.axMedalHTML({ cat: b.c, t: b.t, title: b.n, icon: b.e }, unlocked) : '';
+            if (unlocked) {
+                const iconEl = med ? `<div class="pm-bemoji has-med">${med}</div>` : `<div class="pm-bemoji">${b.e}</div>`;
                 return `
                     <div class="pm-bcard unlocked t${b.t}" title="${b.n} · ${b.d}">
                         <div class="pm-btier">${TIER_NAMES[b.t]}</div>
-                        <div class="pm-bemoji">${b.e}</div>
+                        ${iconEl}
                         <div class="pm-bname">${b.n}</div>
                         <div class="pm-bdesc">${b.d}</div>
                     </div>`;
             }
             // Bloqueada: se muestra la META (no oculta) para motivar a alcanzarla.
+            const iconElL = med ? `<div class="pm-bemoji has-med">${med}</div>` : `<div class="pm-bemoji">🔒</div>`;
             return `
                 <div class="pm-bcard locked t${b.t}" title="🔒 ${b.d}">
                     <div class="pm-btier">${TIER_NAMES[b.t]}</div>
-                    <div class="pm-bemoji">🔒</div>
+                    ${iconElL}
                     <div class="pm-block-overlay">🔒</div>
                     <div class="pm-bname">${b.n}</div>
                     <div class="pm-bdesc">${b.d}</div>
