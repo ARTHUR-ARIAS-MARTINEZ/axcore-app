@@ -5110,12 +5110,17 @@ document.addEventListener('DOMContentLoaded', () => {
         return raw;
     }
     // Devuelve el HTML de la medalla-imagen, o '' si no hay imagen (para caer al emoji).
+    // RESPALDO: si la imagen no carga (caché a medio bajar / offline), se muestra el emoji
+    // de siempre (onerror) para que NINGUNA insignia ganada quede en blanco.
     function axMedalHTML(def, unlocked) {
         const img = axMedalImg(def);
         if (!img) return '';
         const num = axMedalNum(def);
+        const emoji = def.icon || def.e || '🏅';
         return '<span class="axmed' + (unlocked ? '' : ' axmed-lock') + '">'
-            + '<img class="axmed-img" src="' + img + '" alt="" loading="lazy">'
+            + '<img class="axmed-img" src="' + img + '" alt="" loading="lazy"'
+            + ' onerror="this.style.display=\'none\';this.parentNode.classList.add(\'axmed-failed\');">'
+            + '<span class="axmed-fb">' + emoji + '</span>'
             + (num ? '<span class="axmed-num">' + num + '</span>' : '')
             + '</span>';
     }
