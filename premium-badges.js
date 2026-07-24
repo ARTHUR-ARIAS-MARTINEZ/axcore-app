@@ -10,9 +10,10 @@
     const TIER_NAMES = {1:'BRONCE',2:'PLATA',3:'ORO',4:'PLATINO',5:'LEYENDA'};
     const CAT_NAMES = {
         todos:'TODAS', inicio:'INICIO', racha:'RACHA', peso:'PESO', medidas:'MEDIDAS',
-        ejercicio:'EJERCICIO', comida:'COMIDA', deficit:'DÉFICIT', constancia:'CONSTANCIA', especial:'ESPECIAL'
+        ejercicio:'EJERCICIO', comida:'COMIDA', deficit:'DÉFICIT', constancia:'CONSTANCIA',
+        comunidad:'COMUNIDAD', especial:'ESPECIAL'
     };
-    const CAT_ORDER = ['todos','inicio','racha','peso','medidas','ejercicio','comida','deficit','constancia','especial'];
+    const CAT_ORDER = ['todos','inicio','racha','peso','medidas','ejercicio','comida','deficit','constancia','comunidad','especial'];
 
     let activeCat = 'todos';
 
@@ -25,7 +26,8 @@
             n:  a.title || 'INSIGNIA',
             d:  a.desc  || '',
             t:  a.t     || 2,
-            c:  a.cat   || 'especial'
+            c:  a.cat   || 'especial',
+            num: a.num
         }));
     }
 
@@ -44,7 +46,7 @@
         modal.className = 'pm-badges-modal';
         modal.innerHTML = `
             <div class="pm-badges-hdr">
-                <div class="pm-badges-title">🏅 LAS 100 INSIGNIAS</div>
+                <div class="pm-badges-title">🏅 TODAS LAS INSIGNIAS</div>
                 <button class="pm-badges-close" onclick="window.pmCloseBadges()">✕</button>
             </div>
             <div class="pm-badges-prog">Desbloqueadas: <strong id="pmBadgesNum">0</strong> de <span id="pmBadgesTotal">0</span></div>
@@ -77,7 +79,7 @@
         wrap.innerHTML = list.map(b => {
             const unlocked = isUnlocked(b.id);
             const med = (typeof window.axMedalHTML === 'function')
-                ? window.axMedalHTML({ id: b.id, cat: b.c, t: b.t, title: b.n, icon: b.e }, unlocked) : '';
+                ? window.axMedalHTML({ id: b.id, cat: b.c, t: b.t, title: b.n, icon: b.e, num: b.num }, unlocked) : '';
             if (unlocked) {
                 const iconEl = med ? `<div class="pm-bemoji has-med">${med}</div>` : `<div class="pm-bemoji">${b.e}</div>`;
                 return `
@@ -130,7 +132,7 @@
         if (ap && !ap.querySelector('.pm-ver-todas-btn')) {
             const btn = document.createElement('div');
             btn.style.cssText = 'grid-column:1/-1;text-align:center;margin-top:14px;';
-            btn.innerHTML = '<button class="pm-ver-todas-btn" onclick="window.pmOpenBadges()">🏅 VER LAS 100 INSIGNIAS →</button>';
+            btn.innerHTML = '<button class="pm-ver-todas-btn" onclick="window.pmOpenBadges()">🏅 VER TODAS LAS INSIGNIAS →</button>';
             ap.appendChild(btn);
         }
     }
