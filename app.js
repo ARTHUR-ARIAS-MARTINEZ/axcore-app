@@ -3287,6 +3287,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // 301 a la app en GitHub Pages sin mostrar el nombre del dueño ni github.io
         // en el mensaje. Si algún día cambia el hosting, basta apuntar el alias.
         const APP_URL = 'https://tinyurl.com/axcoremx';
+        axCountShare();   // suma a las insignias de COMUNIDAD
         if (navigator.share) {
             navigator.share({
                 title: 'AX-CORE By ARTHUR',
@@ -4389,12 +4390,8 @@ document.addEventListener('DOMContentLoaded', () => {
             link.click();
             document.body.removeChild(link);
 
-            // Marcar que compartió/creó una tarjeta (insignia COMPARTIDOR).
-            if (!userData.sharedCard) {
-                userData.sharedCard = true;
-                saveData();
-                if (typeof checkAchievements === 'function') checkAchievements();
-            }
+            // Marcar que compartió/creó una tarjeta (COMPARTIDOR + insignias de COMUNIDAD).
+            axCountShare();
 
             if (typeof pmShowToast === 'function') {
                 pmShowToast('📥 ¡Tarjeta guardada en descargas!', 'green');
@@ -4412,12 +4409,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 const file = new File([blob], 'AX-CORE_Logros.png', { type: 'image/png' });
 
-                // Marcar que compartió una tarjeta (insignia COMPARTIDOR).
-                if (!userData.sharedCard) {
-                    userData.sharedCard = true;
-                    saveData();
-                    if (typeof checkAchievements === 'function') checkAchievements();
-                }
+                // Marcar que compartió una tarjeta (COMPARTIDOR + insignias de COMUNIDAD).
+                axCountShare();
 
                 if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
                     try {
@@ -4865,21 +4858,25 @@ document.addEventListener('DOMContentLoaded', () => {
         { id:'streak_180', icon:'👑', title:'RACHA 180', desc:'Medio año sin fallar.',       t:5, cat:'racha', check:()=>streakDays()>=180 },
         { id:'streak_270', icon:'👑', title:'RACHA 270', desc:'Nueve meses.',                t:5, cat:'racha', check:()=>streakDays()>=270 },
         { id:'streak_365', icon:'👑', title:'RACHA 365', desc:'UN AÑO. Leyenda viva.',       t:5, cat:'racha', check:()=>streakDays()>=365 },
-        // ─── PESO (14) — kilos perdidos desde tu inicio ───
-        { id:'lose_05',   icon:'🔻', title:'-0.5 KG',  desc:'Primera bajada.',              t:1, cat:'peso', check:()=>kilosLost()>=0.5 },
-        { id:'lose_1kg',  icon:'🔻', title:'-1 KG',    desc:'Tu primer kilo.',              t:1, cat:'peso', check:()=>kilosLost()>=1 },
-        { id:'lose_2',    icon:'🔻', title:'-2 KG',    desc:'Dos kilos menos.',             t:1, cat:'peso', check:()=>kilosLost()>=2 },
-        { id:'lose_3',    icon:'🏅', title:'-3 KG',    desc:'Tres kilos.',                  t:2, cat:'peso', check:()=>kilosLost()>=3 },
-        { id:'lose_4',    icon:'🏅', title:'-4 KG',    desc:'Cuatro kilos.',                t:2, cat:'peso', check:()=>kilosLost()>=4 },
-        { id:'lose_5kg',  icon:'🥉', title:'-5 KG',    desc:'Cinco kilos. Bronce.',         t:2, cat:'peso', check:()=>kilosLost()>=5 },
-        { id:'lose_7',    icon:'🥈', title:'-7 KG',    desc:'Siete kilos. Plata.',          t:3, cat:'peso', check:()=>kilosLost()>=7 },
-        { id:'lose_10kg', icon:'🥇', title:'-10 KG',   desc:'Diez kilos. Oro.',             t:3, cat:'peso', check:()=>kilosLost()>=10 },
-        { id:'lose_12',   icon:'🥇', title:'-12 KG',   desc:'Doce kilos.',                  t:3, cat:'peso', check:()=>kilosLost()>=12 },
-        { id:'lose_15',   icon:'💫', title:'-15 KG',   desc:'Quince kilos.',                t:4, cat:'peso', check:()=>kilosLost()>=15 },
-        { id:'lose_18',   icon:'💫', title:'-18 KG',   desc:'Dieciocho kilos.',             t:4, cat:'peso', check:()=>kilosLost()>=18 },
-        { id:'lose_20',   icon:'🦅', title:'-20 KG',   desc:'Veinte kilos.',                t:4, cat:'peso', check:()=>kilosLost()>=20 },
-        { id:'lose_25',   icon:'🦅', title:'-25 KG',   desc:'Veinticinco kilos.',           t:5, cat:'peso', check:()=>kilosLost()>=25 },
-        { id:'lose_30',   icon:'🔱', title:'-30 KG',   desc:'Treinta kilos. Increíble.',    t:5, cat:'peso', check:()=>kilosLost()>=30 },
+        // ─── PESO (14) — % DE TU META (rebalance por esfuerzo) ───
+        // Los IDs se CONSERVAN a propósito para NO borrar insignias ya ganadas por los
+        // atletas. Lo que cambia es la vara: ahora se mide contra la meta de CADA persona,
+        // así quien quiere bajar 6 kg y quien quiere bajar 60 kg pueden llegar los dos
+        // hasta LEYENDA con su propio esfuerzo.
+        { id:'lose_05',   icon:'🔻', title:'AVANCE 5%',   desc:'5% de tu meta de peso.',    t:1, cat:'peso', num:5,   check:()=>goalPct()>=5 },
+        { id:'lose_1kg',  icon:'🔻', title:'AVANCE 10%',  desc:'10% de tu meta.',           t:1, cat:'peso', num:10,  check:()=>goalPct()>=10 },
+        { id:'lose_2',    icon:'🔻', title:'AVANCE 15%',  desc:'15% de tu meta.',           t:1, cat:'peso', num:15,  check:()=>goalPct()>=15 },
+        { id:'lose_3',    icon:'🏅', title:'AVANCE 20%',  desc:'20% de tu meta.',           t:2, cat:'peso', num:20,  check:()=>goalPct()>=20 },
+        { id:'lose_4',    icon:'🏅', title:'AVANCE 30%',  desc:'30% de tu meta.',           t:2, cat:'peso', num:30,  check:()=>goalPct()>=30 },
+        { id:'lose_5kg',  icon:'🥉', title:'AVANCE 40%',  desc:'40% de tu meta.',           t:2, cat:'peso', num:40,  check:()=>goalPct()>=40 },
+        { id:'lose_7',    icon:'🥈', title:'MITAD DEL CAMINO', desc:'50% de tu meta.',      t:3, cat:'peso', num:50,  check:()=>goalPct()>=50 },
+        { id:'lose_10kg', icon:'🥇', title:'AVANCE 60%',  desc:'60% de tu meta.',           t:3, cat:'peso', num:60,  check:()=>goalPct()>=60 },
+        { id:'lose_12',   icon:'🥇', title:'AVANCE 70%',  desc:'70% de tu meta.',           t:3, cat:'peso', num:70,  check:()=>goalPct()>=70 },
+        { id:'lose_15',   icon:'💫', title:'AVANCE 80%',  desc:'80% de tu meta.',           t:4, cat:'peso', num:80,  check:()=>goalPct()>=80 },
+        { id:'lose_18',   icon:'💫', title:'AVANCE 90%',  desc:'90% de tu meta.',           t:4, cat:'peso', num:90,  check:()=>goalPct()>=90 },
+        { id:'lose_20',   icon:'🦅', title:'META 100%',   desc:'¡Llegaste a tu peso meta!', t:4, cat:'peso', num:100, check:()=>goalPct()>=100 },
+        { id:'lose_25',   icon:'🦅', title:'META FIRME',  desc:'Meta lograda y sostenida (30 días activos).', t:5, cat:'peso', check:()=>goalPct()>=100 && distinctDaysLogged()>=30 },
+        { id:'lose_30',   icon:'🔱', title:'SUPERMETA',   desc:'Superaste tu meta un 10% más.', t:5, cat:'peso', check:()=>goalPct()>=110 },
         // ─── MEDIDAS (12) — cintura reducida y # de mediciones ───
         { id:'waist_1',   icon:'📏', title:'CINTURA -1',  desc:'1 cm menos de cintura.',    t:1, cat:'medidas', check:()=>waistLost()>=1 },
         { id:'waist_2',   icon:'📏', title:'CINTURA -2',  desc:'2 cm menos.',               t:1, cat:'medidas', check:()=>waistLost()>=2 },
@@ -4940,6 +4937,17 @@ document.addEventListener('DOMContentLoaded', () => {
         { id:'days_60',  icon:'📅', title:'60 DÍAS ACTIVO',  desc:'60 días distintos.',                 t:3, cat:'constancia', check:()=>distinctDaysLogged()>=60 },
         { id:'days_100', icon:'📅', title:'100 DÍAS ACTIVO', desc:'100 días distintos.',                t:4, cat:'constancia', check:()=>distinctDaysLogged()>=100 },
         { id:'days_200', icon:'📅', title:'200 DÍAS ACTIVO', desc:'200 días distintos.',                t:5, cat:'constancia', check:()=>distinctDaysLogged()>=200 },
+        // ─── COMUNIDAD (9) — veces que compartes AX-CORE (app o tarjeta de logros) ───
+        // Difunden la app y traen al atleta de vuelta a abrirla para presumir su avance.
+        { id:'share_1',   icon:'📣', title:'DIFUSOR',      desc:'Compartiste AX-CORE por 1ª vez.', t:1, cat:'comunidad', num:1,   check:()=>(+userData.shareCount||0)>=1 || !!userData.sharedCard },
+        { id:'share_3',   icon:'📣', title:'VOZ ACTIVA',   desc:'Compartiste 3 veces.',            t:1, cat:'comunidad', num:3,   check:()=>(+userData.shareCount||0)>=3 },
+        { id:'share_5',   icon:'📣', title:'ALTAVOZ',      desc:'Compartiste 5 veces.',            t:2, cat:'comunidad', num:5,   check:()=>(+userData.shareCount||0)>=5 },
+        { id:'share_10',  icon:'📣', title:'PROMOTOR',     desc:'Compartiste 10 veces.',           t:2, cat:'comunidad', num:10,  check:()=>(+userData.shareCount||0)>=10 },
+        { id:'share_20',  icon:'📣', title:'INFLUENCIA',   desc:'Compartiste 20 veces.',           t:3, cat:'comunidad', num:20,  check:()=>(+userData.shareCount||0)>=20 },
+        { id:'share_35',  icon:'📣', title:'ONDA VIRAL',   desc:'Compartiste 35 veces.',           t:3, cat:'comunidad', num:35,  check:()=>(+userData.shareCount||0)>=35 },
+        { id:'share_50',  icon:'📣', title:'REFERENTE',    desc:'Compartiste 50 veces.',           t:4, cat:'comunidad', num:50,  check:()=>(+userData.shareCount||0)>=50 },
+        { id:'share_75',  icon:'📣', title:'FENÓMENO',     desc:'Compartiste 75 veces.',           t:4, cat:'comunidad', num:75,  check:()=>(+userData.shareCount||0)>=75 },
+        { id:'share_100', icon:'👑', title:'EMBAJADOR AX', desc:'Compartiste 100 veces. Leyenda.', t:5, cat:'comunidad', num:100, check:()=>(+userData.shareCount||0)>=100 },
         // ─── ESPECIALES (3) ───
         { id:'goal_halfway', icon:'🎯', title:'MEDIO CAMINO', desc:'Llegaste a la mitad de tu meta de peso.', t:3, cat:'especial', check:()=>{ const h=H(); const start=(h[0]&&+h[0].weight)||+userData.weight||0; const tw=+userData.target_weight||0; return tw>0 && start>tw && kilosLost()>=(start-tw)/2; } },
         { id:'goal_reached', icon:'🔱', title:'META ALCANZADA', desc:'Llegaste a tu peso objetivo.',           t:5, cat:'especial', check:()=>userData.weight>0 && userData.target_weight>0 && userData.weight<=userData.target_weight },
@@ -5025,6 +5033,21 @@ document.addEventListener('DOMContentLoaded', () => {
         return Math.max(0, start - cur);
     }
 
+    // % de avance hacia TU meta de peso (0–200). Es la base del rebalance por esfuerzo:
+    // se compara lo bajado contra el objetivo propio (peso inicial → peso meta), de modo
+    // que cualquier atleta, con la meta que sea, puede escalar hasta LEYENDA.
+    // Devuelve 0 si aún no hay meta válida configurada (no rompe nada, solo no avanza).
+    function goalPct() {
+        const h = userData.history || [];
+        const start = (h[0] && +h[0].weight) || +userData.weight || 0;
+        if (start <= 0) return 0;
+        let target = +userData.target_weight || 0;
+        // Si el atleta AÚN no configuró su meta, se asume una razonable (10% del peso
+        // inicial) para que sus insignias de peso no se queden congeladas.
+        if (!(target > 0 && start > target)) target = start * 0.9;
+        return Math.max(0, Math.min(200, (kilosLost() / (start - target)) * 100));
+    }
+
     // Centímetros de cintura reducidos desde el primer registro con cintura.
     function waistLost() {
         const h = userData.history || [];
@@ -5095,7 +5118,8 @@ document.addEventListener('DOMContentLoaded', () => {
         'ejercicio_bronce','ejercicio_plata','ejercicio_oro','ejercicio_platino','ejercicio_leyenda',
         'comida_bronce','comida_plata','comida_oro','comida_platino','comida_leyenda',
         'deficit_bronce','deficit_plata','deficit_oro','deficit_platino','deficit_leyenda',
-        'constancia_bronce','constancia_plata','constancia_oro','constancia_platino','constancia_leyenda'
+        'constancia_bronce','constancia_plata','constancia_oro','constancia_platino','constancia_leyenda',
+        'comunidad_bronce','comunidad_plata','comunidad_oro','comunidad_platino','comunidad_leyenda'
     ]);
     // Insignias sin imagen propia (INICIO, ESPECIAL, medidas-leyenda): se les asigna la
     // medalla existente más afín a su tema, para que TODAS se vean con el diseño nuevo
@@ -5124,6 +5148,8 @@ document.addEventListener('DOMContentLoaded', () => {
         return AX_MEDAL_SET.has(key) ? ('assets/insignias/' + key + '.webp?v=3') : null;
     }
     function axMedalNum(def) {
+        // Si la insignia trae su propio número (num), ese manda (ej. COMUNIDAD, PESO %).
+        if (def.num !== undefined && def.num !== null && def.num !== '') return String(def.num);
         const m = String(def.title || def.name || '').match(/-?\d[\d.,]*/);
         if (!m) return '';
         const raw = m[0].replace(/,/g, ''), n = parseFloat(raw);
@@ -5146,6 +5172,18 @@ document.addEventListener('DOMContentLoaded', () => {
             + '</span>';
     }
     window.axMedalHTML = axMedalHTML;
+
+    // Cuenta cada vez que el atleta comparte (la app o una tarjeta de logros).
+    // Alimenta las insignias de COMUNIDAD. Es aditivo: no altera nada existente.
+    function axCountShare() {
+        try {
+            userData.shareCount = (+userData.shareCount || 0) + 1;
+            if (!userData.sharedCard) userData.sharedCard = true;
+            saveData();
+            if (typeof checkAchievements === 'function') checkAchievements();
+        } catch (e) { console.warn('[axCountShare]', e); }
+    }
+    window.axCountShare = axCountShare;
 
     function renderAchievementsPanel() {
         const panel = document.getElementById('achievements-panel');
