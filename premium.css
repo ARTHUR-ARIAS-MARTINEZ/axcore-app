@@ -1423,9 +1423,12 @@ body.premium-mode #studio-accent-btns button,
 body.premium-mode #studio-font-btns button,
 body.premium-mode #studio-phrase-btns button,
 body.premium-mode #studio-hero-metric-btns button {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.12);
-  color: rgba(255,255,255,0.65);
+  /* Superficie/borde/texto del TEMA (antes blanco fijo: en tema BLANCO las tarjetas y
+     sus bordes desaparecían sobre el fondo claro). El JS _makeStyleBtns sigue pudiendo
+     sobreescribir con estilos en línea (activo/inactivo) porque van sin !important. */
+  background: var(--pm-s2, rgba(255,255,255,0.05));
+  border: 1px solid var(--pm-border, rgba(255,255,255,0.12));
+  color: var(--pm-dim2, rgba(255,255,255,0.65));
   font-family: 'Oswald', sans-serif !important;
   letter-spacing: 1px !important;
   transition: all .2s !important;
@@ -3790,7 +3793,9 @@ body.premium-mode #page-studio .sx-ach-lbl span[style*="accent-main"] {
 
 /* ---- CANVAS más dominante + marco luminoso ---- */
 body.premium-mode #page-studio #studio-preview-canvas {
-  max-height: min(36vh, 330px) !important;
+  /* Un poco más baja (antes 36vh): al quedar la tarjeta FIJA arriba, esto deja
+     buen espacio para el scroll de controles por debajo sin que se sienta apretado. */
+  max-height: min(30vh, 300px) !important;
   border-radius: 20px !important;
 }
 body.premium-mode #page-studio .sx-canvas-glow {

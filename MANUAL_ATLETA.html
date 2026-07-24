@@ -3,170 +3,127 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AX-CORE · Guía del Atleta</title>
+<title>AX-CORE · Guía rápida del Atleta</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#0a0e14;--s1:#0d1826;--s2:#111f30;--acc:#00c97a;--cyan:#00e5ff;--txt:#e8edf5;--dim:#7f93a8;--bd:rgba(0,201,122,.22)}
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:var(--bg);color:var(--txt);font-family:'Inter',sans-serif;line-height:1.65;font-size:15.5px}
-.wrap{max-width:760px;margin:0 auto;padding:28px 18px 80px}
-header{text-align:center;padding:34px 0 26px}
-.logo{font-family:'Oswald',sans-serif;font-size:2.2rem;letter-spacing:6px;font-weight:700;background:linear-gradient(90deg,var(--acc),var(--cyan));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-.tag{color:var(--dim);font-size:.8rem;letter-spacing:3px;text-transform:uppercase;margin-top:6px}
-.ver{display:inline-block;margin-top:12px;font-size:.68rem;color:var(--acc);border:1px solid var(--bd);border-radius:99px;padding:4px 14px;letter-spacing:1px}
-nav.idx{background:var(--s1);border:1px solid var(--bd);border-radius:16px;padding:18px 22px;margin-bottom:26px}
-nav.idx b{font-family:'Oswald',sans-serif;letter-spacing:2px;color:var(--acc);font-size:.8rem}
-nav.idx a{display:block;color:var(--txt);text-decoration:none;font-size:.88rem;padding:5px 0;border-bottom:1px dashed rgba(255,255,255,.06)}
-nav.idx a:last-child{border-bottom:none}
-nav.idx a span{color:var(--acc);font-family:'Oswald',sans-serif;margin-right:10px}
-section{background:var(--s1);border:1px solid rgba(255,255,255,.07);border-left:4px solid var(--acc);border-radius:16px;padding:22px 24px;margin-bottom:18px}
-h2{font-family:'Oswald',sans-serif;font-size:1.15rem;letter-spacing:2px;color:var(--acc);margin-bottom:12px}
-h3{font-family:'Oswald',sans-serif;font-size:.92rem;letter-spacing:1.5px;color:var(--cyan);margin:16px 0 6px}
+body{background:var(--bg);color:var(--txt);font-family:'Inter',sans-serif;line-height:1.6;font-size:15.5px}
+.wrap{max-width:720px;margin:0 auto;padding:24px 18px 70px}
+header{text-align:center;padding:30px 0 20px}
+.logo{font-family:'Oswald',sans-serif;font-size:2.1rem;letter-spacing:6px;font-weight:700;background:linear-gradient(90deg,var(--acc),var(--cyan));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.tag{color:var(--dim);font-size:.78rem;letter-spacing:3px;text-transform:uppercase;margin-top:6px}
+.ver{display:inline-block;margin-top:12px;font-size:.66rem;color:var(--acc);border:1px solid var(--bd);border-radius:99px;padding:4px 14px;letter-spacing:1px}
+.intro{background:var(--s1);border:1px solid var(--bd);border-radius:14px;padding:14px 18px;margin-bottom:22px;font-size:.9rem;color:var(--dim)}
+.intro b{color:var(--txt)}
+nav.idx{display:grid;grid-template-columns:1fr 1fr;gap:6px 18px;background:var(--s1);border:1px solid var(--bd);border-radius:14px;padding:16px 20px;margin-bottom:24px}
+nav.idx a{color:var(--txt);text-decoration:none;font-size:.85rem;padding:3px 0}
+nav.idx a span{color:var(--acc);font-family:'Oswald',sans-serif;margin-right:8px}
+section{background:var(--s1);border:1px solid rgba(255,255,255,.07);border-left:4px solid var(--acc);border-radius:14px;padding:18px 22px;margin-bottom:14px}
+section.star{border-left-color:var(--cyan);background:linear-gradient(135deg,rgba(0,229,255,.05),var(--s1))}
+h2{font-family:'Oswald',sans-serif;font-size:1.08rem;letter-spacing:1.5px;color:var(--acc);margin-bottom:10px}
+section.star h2{color:var(--cyan)}
 p,li{color:var(--txt);font-size:.9rem}
-ul,ol{padding-left:20px;margin:6px 0}
-li{margin-bottom:6px}
-.tip{background:rgba(0,201,122,.07);border:1px solid var(--bd);border-radius:12px;padding:12px 16px;margin:12px 0;font-size:.85rem}
+ul{padding-left:18px;margin:4px 0}
+li{margin-bottom:5px}
+b{color:#fff}
+.tip{background:rgba(0,201,122,.07);border:1px solid var(--bd);border-radius:10px;padding:9px 14px;margin:10px 0 0;font-size:.82rem;color:var(--dim)}
 .tip b{color:var(--acc)}
-kbd{background:var(--s2);border:1px solid rgba(255,255,255,.15);border-radius:6px;padding:1px 8px;font-size:.8rem;font-family:'Oswald',sans-serif;letter-spacing:1px;color:var(--acc)}
-footer{text-align:center;color:var(--dim);font-size:.72rem;margin-top:36px;letter-spacing:1px}
+kbd{background:var(--s2);border:1px solid rgba(255,255,255,.15);border-radius:5px;padding:1px 7px;font-size:.8rem;font-family:'Oswald',sans-serif;letter-spacing:.5px;color:var(--acc);white-space:nowrap}
+footer{text-align:center;color:var(--dim);font-size:.72rem;margin-top:30px;letter-spacing:1px}
 </style>
 </head>
 <body>
 <div class="wrap">
 <header>
   <div class="logo">AX-CORE</div>
-  <div class="tag">Guía del Atleta</div>
-  <div class="ver">ACTUALIZADA · v5.24+</div>
+  <div class="tag">Guía rápida del Atleta</div>
+  <div class="ver">ACTUALIZADA · v5.65</div>
 </header>
 
+<div class="intro">Todo se actualiza <b>solo</b> cuando registras. Regla de oro: <b>registra algo cada día</b> —aunque sea el peso— y las insignias, la racha y tus proyecciones crecen solas.</div>
+
 <nav class="idx">
-  <b>ÍNDICE</b>
-  <a href="#s1"><span>01</span>Entrar a la app</a>
+  <a href="#s1"><span>01</span>Entrar</a>
   <a href="#s2"><span>02</span>Tablero</a>
-  <a href="#s3"><span>03</span>Dieta: registrar lo que comes</a>
-  <a href="#s4"><span>04</span>Dieta: Mi Plan y Reglas</a>
-  <a href="#s5"><span>05</span>Workouts</a>
-  <a href="#s6"><span>06</span>Evolución y medidas</a>
-  <a href="#s7"><span>07</span>Calculadora</a>
-  <a href="#s8"><span>08</span>Estudio e insignias</a>
-  <a href="#s9"><span>09</span>Ajustes y temas</a>
-  <a href="#s10"><span>10</span>Trucos rápidos</a>
+  <a href="#s3"><span>03</span>Dieta</a>
+  <a href="#s4"><span>04</span>Workouts</a>
+  <a href="#s5"><span>05</span>Evolución</a>
+  <a href="#s6"><span>06</span>Calculadora</a>
+  <a href="#s7"><span>07</span>Estudio e Insignias</a>
+  <a href="#s8"><span>08</span>Ajustes</a>
+  <a href="#s9"><span>09</span>Tu cuenta</a>
 </nav>
 
 <section id="s1">
-  <h2>01 · ENTRAR A LA APP</h2>
-  <ol>
-    <li>Tu coach te entrega un <b>código de atleta</b> (ej. <kbd>AXV-XXXX</kbd>).</li>
-    <li>Abre la app, toca <b>"¿No tienes cuenta? Regístrate aquí"</b>, escribe tu usuario, tu <b>correo electrónico</b>, una contraseña y el código.</li>
-    <li>Acepta el Aviso de Privacidad y listo: tu cuenta queda respaldada en la nube.</li>
-  </ol>
-  <div class="tip"><b>🔑 Tu correo es tu llave:</b> aunque cambies de código, de usuario o de celular, con tu correo recuperas TODO tu progreso. Escríbelo bien.</div>
-  <div class="tip"><b>📲 Instálala como app:</b> en el navegador toca "Agregar a pantalla de inicio". Funciona incluso sin internet.</div>
+  <h2>01 · ENTRAR</h2>
+  <ul>
+    <li>Tu coach te da un <b>código</b> (<kbd>AXV-XXXX</kbd>). Toca <b>"Regístrate aquí"</b> y pon usuario, <b>correo</b> y contraseña.</li>
+    <li>Instálala como app: <b>"Agregar a pantalla de inicio"</b>. Funciona sin internet.</li>
+  </ul>
+  <div class="tip"><b>🔑 Tu correo es tu llave:</b> con él recuperas TODO tu progreso aunque cambies de celular, usuario o código.</div>
 </section>
 
 <section id="s2">
   <h2>02 · TABLERO</h2>
-  <p>Es tu resumen del día: peso actual, calorías de hoy, déficit acumulado, racha y gráficas de peso y cintura. Se actualiza solo cada vez que registras algo en cualquier sección.</p>
+  <p>Tu resumen del día: <b>peso, calorías, déficit, racha</b> y gráficas. No se toca nada aquí: se llena solo con lo que registras en las demás secciones.</p>
 </section>
 
 <section id="s3">
-  <h2>03 · DIETA — REGISTRA LO QUE COMES</h2>
-  <p>Pestaña <kbd>REGISTRAR</kbd> dentro de Dieta. Aquí <b>NO tienes que saber calorías</b>: la app las sabe por ti.</p>
-  <ol>
-    <li>Empieza a escribir el alimento (ej. "taco…"). <b>Se despliega un menú de sugerencias</b> con las kcal de cada uno — como en Google.</li>
-    <li>Elige el alimento. La etiqueta de cantidad te dirá la unidad: <b>piezas, platos, tazas, vasos…</b></li>
-    <li>Pon cuántas con los botones <kbd>−</kbd> <kbd>+</kbd> y toca <kbd>+ AGREGAR A MI DÍA</kbd>.</li>
-  </ol>
-  <p>La app suma sola las <b>calorías, proteína, carbohidratos y grasa</b>, y los ves arriba en los totales del día. Cada registro aparece en tu historial de hoy con sus macros; con <kbd>✕</kbd> lo borras y los números se revierten.</p>
-  <div class="tip"><b>🇲🇽 Base mexicana:</b> más de 700 alimentos — tacos de todo tipo, pozole, sushi, caldos, frutas, aguas, garnachas, cortes, proteína en polvo… Si algo no está, la app te pregunta una vez sus kcal y se lo aprende.</div>
+  <h2>03 · DIETA</h2>
+  <ul>
+    <li><b>Registrar:</b> escribe el alimento → elige de las <b>sugerencias</b> → pon la cantidad → <kbd>+ AGREGAR</kbd>. La app suma <b>calorías y macros sola</b> —no necesitas saber calorías.</li>
+    <li><b>Mi Plan:</b> tus 8 comidas del día. ¿Te dieron la dieta en texto? Pégala y toca <kbd>⚡ DISTRIBUIR</kbd>: la acomoda sola y fija tu <b>límite diario</b>.</li>
+  </ul>
 </section>
 
 <section id="s4">
-  <h2>04 · DIETA — MI PLAN Y REGLAS</h2>
-  <h3>MI PLAN (tus 8 comidas)</h3>
-  <p>Desayuno · Media mañana · Comida · Media tarde · Pre-entreno · Post-entreno · Cena · Snack. Toca una para <b>abrir su ventana</b> y ver qué te toca; con el lápiz <kbd>✎</kbd> la editas.</p>
-  <h3>PEGAR TU DIETA COMPLETA</h3>
-  <p>Si tu nutriólogo o coach te dio la dieta en texto, pégala completa en <b>"Ingreso de dieta completa"</b> y toca <kbd>⚡ DISTRIBUIR</kbd>: la app reparte cada comida en su lugar, <b>aunque tenga errores de dedo</b> ("desalluno", "colasion"…), detecta las calorías totales y las fija como tu límite diario.</p>
-  <h3>REGLAS</h3>
-  <p>Los mandamientos de tu plan (agua, ayuno, prohibidos…). Se llenan <b>solas</b> si tu dieta pegada trae una sección de "Recomendaciones". Mientras no tengas reglas propias verás 5 <i>ejemplos sombreados</i>. Con <kbd>✏️ EDITAR REGLAS</kbd> las ajustas a mano.</p>
+  <h2>04 · WORKOUTS</h2>
+  <p>Elige ejercicio (filtros por músculo), ajusta minutos o series y toca <kbd>✓</kbd>. Las <b>calorías quemadas suben a tu déficit</b>. El cronómetro sigue corriendo aunque cambies de sección.</p>
 </section>
 
 <section id="s5">
-  <h2>05 · WORKOUTS</h2>
-  <ul>
-    <li><b>Cronómetro de alto rendimiento:</b> sigue corriendo aunque cambies de sección (verás un mini-reloj arriba).</li>
-    <li><b>Catálogo de ejercicios</b> con filtros (Cardio, HIIT, Pierna, Glúteo, Pecho, Hombro). Ajusta minutos o series y toca <kbd>✓</kbd> para registrarlo.</li>
-    <li>Las calorías quemadas se suman a tu día y a tu déficit. En "Ejercicios de hoy" puedes deshacer con <kbd>✕</kbd>.</li>
-  </ul>
+  <h2>05 · EVOLUCIÓN</h2>
+  <p>Registra <b>peso y medidas</b> (cintura, brazo, pierna, pecho…). Cada una tiene un <kbd>?</kbd> que te enseña <b>dónde y cómo medir</b>. Filtra tu historial por semana o mes.</p>
 </section>
 
 <section id="s6">
-  <h2>06 · EVOLUCIÓN Y MEDIDAS</h2>
+  <h2>06 · CALCULADORA</h2>
   <ul>
-    <li><b>Perfil antropométrico:</b> altura, peso inicial, cintura inicial y meta de peso.</li>
-    <li><b>Historial de medidas:</b> peso, cintura, bíceps, pierna, pecho, cadera, pantorrilla, glúteo, cuello, antebrazo y espalda.</li>
-    <li>Cada medida tiene un <kbd>?</kbd> que te explica <b>exactamente dónde y cómo medir</b> con la cinta.</li>
-    <li>Filtra tu historial por <b>Todo / Esta semana / Este mes</b>.</li>
+    <li><b>TE QUEDAN:</b> las calorías que te sobran hoy. Tócalo para <b>fijar tu límite</b> (o se fija solo al pegar tu dieta).</li>
+    <li><b>Asistente:</b> escribe un antojo y te dice <b>qué ejercicio y cuánto tiempo</b> lo quema.</li>
+    <li><b>Proyección:</b> con tus pesajes calcula <b>cuántos días faltan</b> para tu meta, con ciencia real (sin fechas infladas).</li>
   </ul>
-  <div class="tip"><b>📏 Consejo:</b> pésate y mídete siempre en las mismas condiciones (en ayunas, sin ropa pesada) y registra al menos 1–2 veces por semana: la Calculadora usa estos datos para proyectar tu meta.</div>
 </section>
 
-<section id="s7">
-  <h2>07 · CALCULADORA</h2>
-  <h3>HOY INGERISTE</h3>
-  <p>Seis cuadros con tu día: calorías, proteína, carbos, grasa, quemadas y <b>TE QUEDAN</b>. Este último usa tu límite diario — <b>tócalo para fijarlo o cambiarlo</b> (también se fija solo al pegar tu dieta).</p>
-  <h3>ASISTENTE DE COMIDA</h3>
-  <p>¿Antojo? Escribe el alimento (con sugerencias), pon la cantidad y te dice: calorías, macros y <b>qué ejercicio hacer y por cuánto tiempo para quemarlo</b>.</p>
-  <h3>PROYECCIÓN A TU META</h3>
-  <p>Con tus pesajes reales calcula cuántos días te faltan, la fecha estimada, tus gramos perdidos por día y tu ritmo semanal. Usa ciencia real (1 kg de grasa ≈ 7,700 kcal; máximo saludable 1% de tu peso por semana) — sin fechas infladas.</p>
+<section id="s7" class="star">
+  <h2>07 · ESTUDIO E INSIGNIAS ★</h2>
+  <ul>
+    <li><b>Insignias:</b> más de <b>100 medallas</b> que se ganan <b>solas por tu esfuerzo</b>: racha, peso perdido (según TU meta), comidas, entrenamientos, medidas, déficit, constancia y por <b>compartir</b>. Míralas tocando <b>🎖 INSIGNIAS</b> arriba.</li>
+    <li><b>Tu tarjeta para redes:</b> elige <b>foto o plantilla</b>, color, tipografía y frase. La imagen queda <b>fija arriba</b> mientras ajustas lo demás abajo.</li>
+    <li>Puedes <b>lucir 1 insignia</b> en la esquina superior, y la tarjeta lleva un <b>QR</b> para que quien la vea <b>descargue la app</b>.</li>
+    <li>Toca <kbd>DESCARGAR</kbd> o <kbd>COMPARTIR</kbd>. <b>Compartir también desbloquea insignias.</b></li>
+  </ul>
+  <div class="tip"><b>💡 Sácale el máximo:</b> registra todos los días. Entre más constante, más insignias y mejor se ve tu tarjeta.</div>
 </section>
 
 <section id="s8">
-  <h2>08 · ESTUDIO E INSIGNIAS</h2>
-  <ul>
-    <li><b>Insignias:</b> decenas de logros por constancia, medidas, peso perdido, entrenamientos y más. Se desbloquean solas.</li>
-    <li><b>Generador de tarjetas:</b> crea una tarjeta con tus números (peso, cintura, déficit…) con plantillas y colores, y compártela en redes o con tu coach.</li>
-  </ul>
+  <h2>08 · AJUSTES</h2>
+  <p><b>10 temas de color</b> (de BLANCO a NEGRO). Cambia tu <b>foto y nombre</b>, tu <b>contraseña</b>, <b>comparte la app</b> o <b>reinicia tus datos</b> (siempre con confirmación).</p>
 </section>
 
 <section id="s9">
-  <h2>09 · AJUSTES Y TEMAS</h2>
+  <h2>09 · TU CUENTA</h2>
   <ul>
-    <li><b>Estilo visual:</b> 10 temas ordenados del más claro al más oscuro — de <b>BLANCO</b> a <b>NEGRO</b>, pasando por lila, dorado, rosa, café, verde, azul, rojo y violeta.</li>
-    <li><b>Foto y nombre:</b> toca tu foto o tu nombre para cambiarlos.</li>
-    <li><b>Contraseña:</b> en "Cambiar contraseña".</li>
-    <li><b>Compartir app</b> y <b>reiniciar datos</b> (siempre con confirmación, no hay sustos).</li>
+    <li><b>Otro celular:</b> entra con tu <b>usuario o correo</b> + contraseña y se jala todo tu progreso.</li>
+    <li><b>¿Olvidaste la contraseña?</b> Pon tu <b>código + usuario/correo</b> y defines una nueva.</li>
+    <li><b>Si dejas de pagar y regresas:</b> tu info NO se borra. Con el <b>mismo correo</b> recuperas tu avance.</li>
   </ul>
+  <div class="tip"><b>↔ Truco:</b> desliza con el pulgar para cambiar de sección. ¿No ves lo nuevo? Cierra la app por completo y ábrela con internet.</div>
 </section>
 
-<section id="s-cuenta">
-  <h2>10 · TU CUENTA, CONTRASEÑA Y TUS DATOS</h2>
-  <h3>Entrar en otro celular</h3>
-  <p>Escribe tu <b>usuario o tu correo</b> + tu contraseña en cualquier dispositivo con internet y se jala <b>todo</b> tu progreso (peso, medidas, dieta, racha, insignias). No necesitas volver a registrarte.</p>
-  <h3>¿Olvidaste tu usuario o contraseña?</h3>
-  <ul>
-    <li>En la pantalla de acceso toca <b>"¿Olvidaste tu usuario o contraseña?"</b>.</li>
-    <li><b>Usuario:</b> te muestra las cuentas guardadas en ese dispositivo.</li>
-    <li><b>Contraseña:</b> pon tu <b>código de atleta</b> + tu <b>usuario o correo</b> y defines una nueva. (Guarda bien tu código: es tu llave de recuperación.)</li>
-  </ul>
-  <h3>Si dejas de pagar y regresas</h3>
-  <p>Si dejas de asistir y tu coach cierra tu acceso, <b>tu información NO se borra</b>: queda guardada en la nube. Cuando regreses —aunque el coach te dé un <b>código nuevo</b> y elijas otro <b>usuario</b>— al registrarte con el <b>mismo correo</b> recuperas todo tu avance anterior.</p>
-  <div class="tip"><b>🔒 Privacidad en celulares compartidos:</b> al <b>cerrar sesión</b> en una cuenta de nube, tus datos locales se borran de ese dispositivo (siguen a salvo en la nube). Otra persona que entre con su usuario ve solo lo suyo.</div>
-  <div class="tip"><b>♻️ Reiniciar:</b> solo TÚ puedes borrar tu progreso, desde Ajustes. Nadie más lo hace por ti.</div>
-</section>
-
-<section id="s10">
-  <h2>11 · TRUCOS RÁPIDOS</h2>
-  <ul>
-    <li><b>Desliza con el pulgar</b> ← → para cambiar de sección.</li>
-    <li><b>¿No ves lo nuevo?</b> Cierra la app por completo (quítala de recientes) y ábrela con internet: se actualiza sola.</li>
-    <li>El registro de comida y las medidas funcionan <b>sin internet</b>; se respaldan al reconectar.</li>
-    <li>Registra <b>todos los días</b> aunque sea solo el peso: la racha y las proyecciones viven de tu constancia.</li>
-  </ul>
-</section>
-
-<footer>AX-CORE · POWERING YOUR BIOLOGY</footer>
+<footer>AX-CORE · DISCIPLINA. CONSTANCIA. EVOLUCIÓN.</footer>
 </div>
 </body>
 </html>

@@ -2352,6 +2352,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     el.classList.contains('sx-tabbar') ||
                     el.classList.contains('sx-font-pills') ||    // fila TIPOGRAFÍA (12 fuentes)
                     el.classList.contains('sx-phrase-row') ||    // fila FRASES (12 frases)
+                    el.classList.contains('sx-badge-row') ||     // fila INSIGNIA de la tarjeta
                     el.classList.contains('pm-workout-filters') ||
                     el.classList.contains('pd-badges-scroll')) {   // carrusel de insignias del tablero
                     return true;
@@ -3394,6 +3395,7 @@ document.addEventListener('DOMContentLoaded', () => {
         accentColor: '#22c55e',    // FIJO por defecto (= primer color de COLOR PRINCIPAL,
                                     // VERDE). Solo cambia desde ahí — la plantilla NO lo toca.
         phraseId: 1,               // PASO 6 — frase activa (título+subtítulo de la tarjeta)
+        badgeId: null,             // insignia lucida arriba-derecha (null = ninguna). Máx 1.
         hudStyle: 'tech-corners',  // (legacy)
         fontStyle: 'bold-impact',  // bold-impact | tech-mono | elegant-sans
         overlayFilter: 'clear',    // clear | glitch | grain | vignette (fijo: PASO 6 quitó su UI)
@@ -3405,7 +3407,32 @@ document.addEventListener('DOMContentLoaded', () => {
     const STUDIO_BG_IMAGES = {};
     let isStudioPreloading = false;
     let STUDIO_LOGO_IMG = null;
-    let STUDIO_QR_IMG = null;   // QR del enlace de la app (QR_APP_ATLETA.png) para la tarjeta
+    // QR del enlace de descarga de la app para la tarjeta.
+    // OJO: antes apuntaba a 'QR_APP_ATLETA.png', que .gitignore excluye con la regla
+    // `QR_*.png` — nunca llegó al repo, daba 404 en el sitio publicado y en la tarjeta
+    // solo quedaba el recuadro blanco. Ahora vive en assets/ (sí versionado).
+    const STUDIO_QR_SRC = 'assets/qr-axcore.png?v=1';
+    let STUDIO_QR_IMG = null;
+
+    // Medallas elegidas para la esquina superior derecha de la tarjeta (id → Image).
+    const STUDIO_MEDAL_IMGS = {};
+    const _studioMedalPending = {};
+    // La tarjeta luce UNA sola insignia (decisión del dueño: 2-3 saturaban la esquina).
+    // El selector es de una-a-la-vez; este tope queda como salvaguarda si algún día se amplía.
+    const AX_MAX_CARD_BADGES = 1;
+
+    // Carga (una sola vez) la imagen de una insignia para poder dibujarla en el canvas.
+    function loadStudioMedal(id) {
+        if (!id || STUDIO_MEDAL_IMGS[id] || _studioMedalPending[id]) return;
+        const def = ACHIEVEMENTS_DEF.find(a => a.id === id);
+        const src = def ? axMedalImg(def) : null;
+        if (!src) return;
+        _studioMedalPending[id] = true;
+        const im = new Image(); im.crossOrigin = 'anonymous';
+        im.onload  = () => { STUDIO_MEDAL_IMGS[id] = im; _studioMedalPending[id] = false; _studioTryRedraw(); };
+        im.onerror = () => { _studioMedalPending[id] = false; };
+        im.src = src;
+    }
 
     let _studioLoadPromise = null;
 
@@ -3429,7 +3456,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const q = new Image(); q.crossOrigin = 'anonymous';
                     q.onload = () => { STUDIO_QR_IMG = q; _studioTryRedraw(); r(); };
                     q.onerror = () => { r(); };
-                    q.src = 'QR_APP_ATLETA.png';
+                    q.src = STUDIO_QR_SRC;
                 }),
                 new Promise((r) => {
                     if (activeTplId === 'custom') { r(); return; }
@@ -3617,6 +3644,42 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.fillText('AX-CORE', headTx, logoTop + logoS*0.48);
         ctx.fillStyle = ac(0.92); ctx.font = sans(Math.round(CW*0.023), '800');
         ctx.fillText('BY ARTHUR', headTx, logoTop + logoS*0.82);
+
+        // ── Insignia lucida (esquina superior derecha) — UNA sola, opcional ──
+        // Espejo del logo: misma zona alta, alineada al margen derecho del contenido.
+        // Sombra suave para separarla de la foto sin recuadros (queda limpia, no saturada).
+        if (studioState.badgeId) {
+            const bdef = ACHIEVEMENTS_DEF.find(a => a.id === studioState.badgeId);
+            if (bdef) {
+                const bimg = STUDIO_MEDAL_IMGS[studioState.badgeId];
+                if (!bimg) loadStudioMedal(studioState.badgeId);  // async → redibuja al cargar
+                const bS = Math.round(CW * 0.175);
+                const bX = padX + contW - bS;
+                const bY = Math.round(H * 0.05);
+                if (bimg && bimg.complete && bimg.naturalWidth) {
+                    ctx.save();
+                    ctx.shadowColor = 'rgba(0,0,0,0.55)';
+                    ctx.shadowBlur = Math.round(CW * 0.03);
+                    ctx.shadowOffsetY = Math.max(1, Math.round(CW * 0.004));
+                    ctx.drawImage(bimg, bX, bY, bS, bS);
+                    ctx.restore();
+                    // Número sobrepuesto (mismo lugar que en el panel: ~66% de la altura)
+                    const bnum = axMedalNum(bdef);
+                    if (bnum) {
+                        const TIERCOL = { 1:'#f7cf9b', 2:'#eef2f8', 3:'#ffe08a', 4:'#c6f6ff', 5:'#d6ffd9' };
+                        const tier = Math.min(5, Math.max(1, +(bdef.t || bdef.tier || 1)));
+                        ctx.save();
+                        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                        ctx.font = `700 ${Math.round(bS * 0.21)}px 'Oswald','Segoe UI',sans-serif`;
+                        ctx.fillStyle = TIERCOL[tier] || '#ffffff';
+                        ctx.shadowColor = 'rgba(0,0,0,0.95)'; ctx.shadowBlur = Math.round(CW * 0.012);
+                        ctx.fillText(bnum, bX + bS/2, bY + bS * 0.66);
+                        ctx.restore();
+                    }
+                }
+                ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';  // restaurar para lo que sigue
+            }
+        }
 
         // ── Título (PASO 6: líneas dinámicas según la FRASE elegida, 2-3 líneas) ──
         const phrase = STUDIO_PHRASES.find(p => p.id === studioState.phraseId) || STUDIO_PHRASES[0];
@@ -3884,6 +3947,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="studio-templates" id="studio-tpl-list"></div>
                     </section>
 
+                    <!-- 1b. INSIGNIA (opcional — se luce arriba-derecha en la tarjeta) -->
+                    <section class="sx-section">
+                        <div class="sx-sn-h">🎖 INSIGNIA <span class="sx-sn-opt">— opcional · esquina superior</span></div>
+                        <div class="sx-badge-row" id="studio-badge-row"></div>
+                    </section>
+
                     <!-- 2. COLOR PRINCIPAL (acento — ya existe: studioState.accentColor) -->
                     <section class="sx-section">
                         <div class="sx-sn-h">COLOR PRINCIPAL</div>
@@ -3915,6 +3984,53 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Pintar medallas
         if (typeof renderAchievementsPanel === 'function') renderAchievementsPanel();
+
+        // --- INSIGNIA de la tarjeta: fila con las medallas YA desbloqueadas + "NINGUNA" ---
+        // Selección única: tocar una reemplaza a la anterior; "NINGUNA" la quita. Al elegir,
+        // solo se redibuja el canvas (no se reconstruye el DOM → no se pierde el scroll).
+        const badgeRow = document.getElementById('studio-badge-row');
+        if (badgeRow) {
+            const _earned = new Set(userData.achievements || []);
+            const _earnedDefs = ACHIEVEMENTS_DEF.filter(a => _earned.has(a.id));
+            // Si la insignia guardada ya no está desbloqueada (reinicio de datos), se limpia.
+            if (studioState.badgeId && !_earned.has(studioState.badgeId)) studioState.badgeId = null;
+
+            const _pickBadge = (id, chip) => {
+                studioState.badgeId = id;
+                badgeRow.querySelectorAll('.sx-badge-chip').forEach(c => c.classList.remove('sx-on'));
+                chip.classList.add('sx-on');
+                if (id) loadStudioMedal(id);
+                const pc = document.getElementById('studio-preview-canvas');
+                if (pc) renderStudioCard(pc, studioState.tpl, studioState.fmt, studioState.metrics, true);
+            };
+            const _mkChip = (id, inner, extraCls) => {
+                const chip = document.createElement('button');
+                chip.className = 'sx-badge-chip' + (extraCls ? ' ' + extraCls : '')
+                    + (studioState.badgeId === id ? ' sx-on' : '');
+                chip.innerHTML = inner;
+                chip.onclick = () => _pickBadge(id, chip);
+                badgeRow.appendChild(chip);
+            };
+
+            // Opción "NINGUNA" (siempre primera; por defecto activa)
+            _mkChip(null, '<span class="sx-badge-x">∅</span><span class="sx-badge-lbl">NINGUNA</span>', 'sx-badge-none');
+
+            if (_earnedDefs.length === 0) {
+                const hint = document.createElement('div');
+                hint.className = 'sx-badge-empty';
+                hint.textContent = 'Desbloquea insignias para lucirlas en tu tarjeta.';
+                badgeRow.appendChild(hint);
+            } else {
+                _earnedDefs.forEach(def => {
+                    const med = (typeof axMedalHTML === 'function') ? axMedalHTML(def, true) : '';
+                    const inner = med
+                        ? `<span class="sx-badge-med">${med}</span>`
+                        : `<span class="sx-badge-emoji">${def.icon || '🏅'}</span>`;
+                    _mkChip(def.id, inner, '');
+                    loadStudioMedal(def.id); // precarga para que aparezca al instante en el canvas
+                });
+            }
+        }
 
         // --- Render template thumbnails ---
         const tplList = document.getElementById('studio-tpl-list');

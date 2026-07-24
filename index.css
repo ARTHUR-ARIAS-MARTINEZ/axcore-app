@@ -1328,7 +1328,7 @@ body {
     }
 
     /* STUDIO mobile fixes */
-    #page-studio { overflow-x: hidden; }
+    #page-studio { overflow-x: clip; }  /* clip, no hidden: ver nota en la regla base (tarjeta sticky) */
     .studio-templates { gap: 8px; padding: 8px 2px; }
     .studio-metrics { grid-template-columns: 1fr 1fr; gap: 5px; }
     .studio-format-btns { gap: 5px; }
@@ -2046,7 +2046,10 @@ body {
     /* Mobile: .content-area tiene padding: 1rem; padding-bottom: 6rem */
     margin: -1rem -1rem -6rem -1rem !important;
     background: #080c14;
-    overflow-x: hidden;
+    /* clip (no hidden): recorta el desborde horizontal SIN volverse contenedor de
+       scroll — así el escenario de la tarjeta puede quedar 'sticky' (imagen fija)
+       tomando como referencia .content-area, no #page-studio. */
+    overflow-x: clip;
 }
 @media (min-width: 601px) {
     /* Desktop: .content-area tiene padding: 2rem */
@@ -2712,7 +2715,7 @@ body {
     line-height: 1.1;
     font-weight: 800;
     letter-spacing: 0.1px;
-    color: var(--pm-text, #eaf2ff);
+    color: var(--pm-white, #eaf2ff);
     text-align: center;
 }
 #page-studio .sx-phrase-sub {
@@ -2774,7 +2777,7 @@ body {
     border-radius: 12px;
     background: var(--pm-s2, rgba(255,255,255,0.04));
     border: 1.5px solid var(--pm-border, rgba(255,255,255,0.1));
-    color: var(--pm-text, #eaf2ff);
+    color: var(--pm-white, #eaf2ff);
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
     transition: border-color 0.18s ease, background 0.18s ease, transform 0.15s ease;
@@ -2784,7 +2787,11 @@ body {
 #page-studio .sx-font-card .sx-font-aa {
     font-size: 1.4rem;
     line-height: 1;
-    color: inherit;
+    /* Color PROPIO del tema (no 'inherit'): la regla premium de #studio-font-btns button
+       fijaba el texto en blanco 0.65 y la "Aa" lo heredaba → invisible en tema BLANCO.
+       Esta regla (1 id + 2 clases) gana a esa (1 id + 1 clase + 2 elementos). La activa
+       (.sx-on .sx-font-aa) sigue mandando en acento por más especificidad. */
+    color: var(--pm-white, #eaf2ff);
 }
 /* Activa: borde + tinte de acento */
 #page-studio .sx-font-card.sx-on {
@@ -3471,8 +3478,20 @@ body.premium-mode #btn-studio-share.sx-share-btn {
     align-items: center;
     justify-content: center;
     gap: 16px;
-    padding: 16px 16px 20px;
-    background: radial-gradient(ellipse 80% 55% at 40% 28%, rgba(var(--pm-green-rgb, 0,201,122), 0.07) 0%, transparent 70%);
+    padding: 14px 16px 16px;
+    /* IMAGEN FIJA: el escenario (tarjeta + acciones VISTA/DESCARGAR/COMPARTIR) queda
+       pinado arriba mientras PLANTILLAS/INSIGNIA/COLOR/TIPOGRAFÍA/FRASES/FORMATOS
+       hacen scroll por debajo — así nunca se pierde de vista lo que se está creando.
+       Fondo OPACO del tema (--pm-bg) por encima del glow, para que el contenido pase
+       por detrás sin transparentarse. */
+    position: sticky;
+    top: 0;
+    z-index: 6;
+    background:
+        radial-gradient(ellipse 80% 55% at 40% 28%, rgba(var(--pm-green-rgb, 0,201,122), 0.07) 0%, transparent 70%),
+        var(--pm-bg, #080c14);
+    box-shadow: 0 10px 22px -8px rgba(0,0,0,0.4);
+    border-bottom: 1px solid var(--pm-border, rgba(255,255,255,0.07));
 }
 #page-studio .sx-stage .sx-canvas-frame { flex: 0 1 auto; width: auto; min-width: 0; }
 #page-studio .sx-actions {
@@ -3546,6 +3565,52 @@ body.premium-mode #btn-studio-share.sx-share-btn {
     margin: 12px 0 7px;
 }
 #page-studio .sx-sub-lbl:first-of-type { margin-top: 0; }
+
+/* Aclaración "— opcional · esquina superior" dentro del título de sección INSIGNIA.
+   Va en minúsculas y tenue (el título de sección es MAYÚSCULAS por defecto). */
+#page-studio .sx-sn-opt {
+    font-size: 0.56rem; font-weight: 600; letter-spacing: 0.4px;
+    color: var(--pm-dim2, #5a7a99); text-transform: none;
+}
+
+/* ── INSIGNIA de la tarjeta: fila horizontal scrollable de medallas del atleta ── */
+#page-studio .sx-badge-row {
+    display: flex; flex-wrap: nowrap; align-items: center; gap: 10px;
+    overflow-x: auto; scrollbar-width: none;
+    padding-bottom: 2px; -webkit-overflow-scrolling: touch;
+    touch-action: pan-x; overscroll-behavior-x: contain;   /* el swipe se queda en la fila */
+}
+#page-studio .sx-badge-row::-webkit-scrollbar { display: none; }
+#page-studio .sx-badge-chip {
+    flex: 0 0 auto;
+    width: 60px; height: 60px; padding: 4px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+    border-radius: 14px; cursor: pointer;
+    background: var(--pm-s2, rgba(255,255,255,0.04));
+    border: 1.5px solid var(--pm-border, rgba(255,255,255,0.1));
+    -webkit-tap-highlight-color: transparent;
+    transition: border-color .18s ease, background .18s ease, transform .15s ease;
+}
+#page-studio .sx-badge-chip:active { transform: scale(0.95); }
+#page-studio .sx-badge-chip.sx-on {
+    border-color: var(--accent-main) !important;
+    background: color-mix(in srgb, var(--accent-main) 15%, transparent);
+    box-shadow: 0 0 0 1px var(--accent-main), 0 0 12px rgba(var(--accent-rgb),0.28);
+}
+#page-studio .sx-badge-med { width: 48px; height: 48px; display: block; }
+#page-studio .sx-badge-emoji { font-size: 30px; line-height: 1; }
+#page-studio .sx-badge-none .sx-badge-x {
+    font-size: 22px; line-height: 1; color: var(--pm-dim2, #5a7a99);
+}
+#page-studio .sx-badge-lbl {
+    font-size: 7px; font-weight: 800; letter-spacing: 0.5px;
+    color: var(--pm-dim2, #5a7a99); text-transform: uppercase;
+}
+#page-studio .sx-badge-none.sx-on .sx-badge-x,
+#page-studio .sx-badge-none.sx-on .sx-badge-lbl { color: var(--accent-main); }
+#page-studio .sx-badge-empty {
+    font-size: 0.74rem; color: var(--pm-dim2, #5a7a99); padding: 6px 2px; line-height: 1.4;
+}
 
 /* Controles planos dentro del scroll (la tarjeta es .sx-section; se anula la
    "tarjeta tintada" premium de estos grupos para no anidar dos tarjetas). */
