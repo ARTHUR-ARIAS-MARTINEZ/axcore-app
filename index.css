@@ -3485,13 +3485,24 @@ body.premium-mode #btn-studio-share.sx-share-btn {
        Fondo OPACO del tema (--pm-bg) por encima del glow, para que el contenido pase
        por detrás sin transparentarse. */
     position: sticky;
-    top: 0;
+    /* Se ancla JUSTO debajo de la top-bar sticky de la app (66px) — NO en 0, o su parte
+       de arriba quedaría escondida bajo esa barra. Con esto la tarjeta arranca ya en su
+       sitio y NO sube ni un pixel al hacer scroll. La variable la fija el JS midiendo la
+       barra real (fallback 66px). */
+    top: var(--sx-topbar-h, 66px);
     z-index: 6;
     background:
         radial-gradient(ellipse 80% 55% at 40% 28%, rgba(var(--pm-green-rgb, 0,201,122), 0.07) 0%, transparent 70%),
         var(--pm-bg, #080c14);
-    box-shadow: 0 10px 22px -8px rgba(0,0,0,0.4);
+    box-shadow: 0 6px 14px -6px rgba(0,0,0,0.35);
     border-bottom: 1px solid var(--pm-border, rgba(255,255,255,0.07));
+    /* Capa propia de composición: el scroll de abajo pasa por GPU sin re-pintar la
+       tarjeta en cada frame (antes se trababa). translateZ fuerza la capa también en
+       WebViews viejos de Android; will-change es la pista moderna. */
+    will-change: transform;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    backface-visibility: hidden;
 }
 #page-studio .sx-stage .sx-canvas-frame { flex: 0 1 auto; width: auto; min-width: 0; }
 #page-studio .sx-actions {

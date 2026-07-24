@@ -3878,36 +3878,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const earnedCount = [...earned].filter(id => ACHIEVEMENTS_DEF.find(a => a.id === id)).length;
         el.innerHTML = `
 
-            <!-- ═══ INSIGNIAS (acordeón colapsable) ═══ -->
-            <div class="sx-ach-bar">
-                <button class="sx-ach-toggle" onclick="this.closest('.sx-ach-bar').classList.toggle('sx-ach-open')">
-                    <span class="sx-ach-lbl">🎖 INSIGNIAS &nbsp;·&nbsp; <span style="color:var(--accent-main)">${earnedCount}</span><span style="color:rgba(255,255,255,0.35)">/${ACHIEVEMENTS_DEF.length}</span> desbloqueadas</span>
-                    <span class="sx-ach-chevron">›</span>
-                </button>
-                <div class="sx-ach-body">
-                    <div id="achievements-panel" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(78px,1fr)); gap:7px; padding:12px 14px 16px;"></div>
-                </div>
-            </div>
-
-            <!-- ═══ STUDIO CORE — SCROLL VERTICAL (rediseño v5.48) ═══ -->
+            <!-- ═══ STUDIO CORE — la TARJETA queda FIJA arriba; el resto scrollea por debajo ═══ -->
             <div class="sx-core sx-scrollmode">
 
-                <!-- TÍTULO DE SECCIÓN -->
-                <div class="sx-hdr">
-                    <div class="sx-hdr-left">
-                        <span class="sx-hdr-ico">🏆</span>
-                        <div>
-                            <div class="sx-hdr-title">ESTUDIO <em>DE LOGROS</em></div>
-                            <div class="sx-hdr-sub">AX-CORE BY ARTHUR</div>
-                        </div>
-                    </div>
-                    <div class="sx-hdr-badge">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                        PRO
-                    </div>
-                </div>
-
-                <!-- TARJETA (canvas) + ACCIONES LATERALES (VISTA / DESCARGAR / COMPARTIR) -->
+                <!-- TARJETA (canvas) + ACCIONES — FIJA (sticky). Va PRIMERA en el flujo para que
+                     NO se mueva ni un pixel al hacer scroll (no hay nada encima de ella). -->
                 <div class="sx-stage">
                     <div class="sx-canvas-frame">
                         <div class="sx-canvas-glow"></div>
@@ -3926,6 +3901,32 @@ document.addEventListener('DOMContentLoaded', () => {
                             <span class="sx-act-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></span>
                             <span class="sx-act-lbl">COMPARTIR</span>
                         </button>
+                    </div>
+                </div>
+
+                <!-- TÍTULO + INSIGNIAS — scrollean POR DEBAJO de la tarjeta fija -->
+                <div class="sx-hdr">
+                    <div class="sx-hdr-left">
+                        <span class="sx-hdr-ico">🏆</span>
+                        <div>
+                            <div class="sx-hdr-title">ESTUDIO <em>DE LOGROS</em></div>
+                            <div class="sx-hdr-sub">AX-CORE BY ARTHUR</div>
+                        </div>
+                    </div>
+                    <div class="sx-hdr-badge">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                        PRO
+                    </div>
+                </div>
+
+                <!-- INSIGNIAS (acordeón — ver TODAS tus medallas) -->
+                <div class="sx-ach-bar">
+                    <button class="sx-ach-toggle" onclick="this.closest('.sx-ach-bar').classList.toggle('sx-ach-open')">
+                        <span class="sx-ach-lbl">🎖 INSIGNIAS &nbsp;·&nbsp; <span style="color:var(--accent-main)">${earnedCount}</span><span style="color:rgba(255,255,255,0.35)">/${ACHIEVEMENTS_DEF.length}</span> desbloqueadas</span>
+                        <span class="sx-ach-chevron">›</span>
+                    </button>
+                    <div class="sx-ach-body">
+                        <div id="achievements-panel" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(78px,1fr)); gap:7px; padding:12px 14px 16px;"></div>
                     </div>
                 </div>
 
@@ -3981,6 +3982,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
             </div><!-- /.sx-core -->
         `;
+
+        // La tarjeta FIJA se ancla justo debajo de la top-bar sticky de la app. Medimos su
+        // alto real (por si cambia con el tema/tamaño) y lo exponemos como variable CSS para
+        // que la tarjeta no arranque escondida bajo la barra ni se mueva al hacer scroll.
+        const _tb = document.querySelector('.top-bar');
+        el.style.setProperty('--sx-topbar-h', (((_tb && _tb.getBoundingClientRect().height) || 66)) + 'px');
 
         // Pintar medallas
         if (typeof renderAchievementsPanel === 'function') renderAchievementsPanel();

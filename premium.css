@@ -1954,8 +1954,9 @@ body.premium-mode .top-bar {
   box-sizing: border-box !important;
   background: var(--pm-s1) !important; /* usa superficie del tema (no azul fijo) */
   border-bottom: 1px solid rgba(var(--pm-green-rgb), 0.15) !important;
-  backdrop-filter: blur(16px) !important;
-  -webkit-backdrop-filter: blur(16px) !important;
+  /* SIN backdrop-filter: --pm-s1 es OPACO, así que el blur no se veía pero re-componía
+     cada frame el contenido que scrollea por debajo → trababa el scroll del Estudio.
+     (Mismo patrón que ya se quitó de .sx-sheet/.sx-hdr en v5.31.) */
   position: sticky !important;
   top: 0 !important;
   width: 100% !important;
