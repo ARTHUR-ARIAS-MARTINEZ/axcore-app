@@ -77,7 +77,7 @@
         wrap.innerHTML = list.map(b => {
             const unlocked = isUnlocked(b.id);
             const med = (typeof window.axMedalHTML === 'function')
-                ? window.axMedalHTML({ cat: b.c, t: b.t, title: b.n, icon: b.e }, unlocked) : '';
+                ? window.axMedalHTML({ id: b.id, cat: b.c, t: b.t, title: b.n, icon: b.e }, unlocked) : '';
             if (unlocked) {
                 const iconEl = med ? `<div class="pm-bemoji has-med">${med}</div>` : `<div class="pm-bemoji">${b.e}</div>`;
                 return `

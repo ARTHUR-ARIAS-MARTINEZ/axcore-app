@@ -4045,3 +4045,8 @@ body.premium-mode #achievements-panel .ach-icon.has-med {
 .axmed-fb { display: none; position: absolute; inset: 0; align-items: center; justify-content: center; font-size: 26px; line-height: 1; }
 .axmed-failed .axmed-fb { display: flex; }
 .axmed-failed .axmed-num { display: none; }
+
+/* v5.57: BLOQUEADAS con medalla — metal apagado LIMPIO (quita el desenfoque que las volvía manchas blancas) */
+.pm-bcard.locked .pm-bemoji.has-med { filter: none !important; color: inherit !important; }
+body.premium-mode #achievements-panel .ach-card--locked .ach-icon.has-med { opacity: .5 !important; filter: none !important; }
+.axmed-lock .axmed-img { filter: grayscale(1) brightness(.45); opacity: .55; }

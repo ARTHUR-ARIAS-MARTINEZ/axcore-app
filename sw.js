@@ -1,4 +1,4 @@
-const CACHE_NAME = 'axcore-v5.57-medalla-fallback';
+const CACHE_NAME = 'axcore-v5.58-medallas-recortadas';
 const urlsToCache = [
   './',
   './index.html?v=20260722c',
@@ -20,14 +20,14 @@ const urlsToCache = [
 const optionalCache = [
   './premium-badges.js?v=20260722c',
   './premium-extras.js?v=20260722c',
-  './assets/insignias/racha_bronce.webp','./assets/insignias/racha_plata.webp','./assets/insignias/racha_oro.webp','./assets/insignias/racha_platino.webp','./assets/insignias/racha_leyenda.webp',
-  './assets/insignias/peso_bronce.webp','./assets/insignias/peso_plata.webp','./assets/insignias/peso_oro.webp','./assets/insignias/peso_platino.webp','./assets/insignias/peso_leyenda.webp',
-  './assets/insignias/medidas_bronce.webp','./assets/insignias/medidas_plata.webp','./assets/insignias/medidas_oro.webp','./assets/insignias/medidas_platino.webp',
-  './assets/insignias/ejercicio_bronce.webp','./assets/insignias/ejercicio_plata.webp','./assets/insignias/ejercicio_oro.webp','./assets/insignias/ejercicio_platino.webp','./assets/insignias/ejercicio_leyenda.webp',
-  './assets/insignias/comida_bronce.webp','./assets/insignias/comida_plata.webp','./assets/insignias/comida_oro.webp','./assets/insignias/comida_platino.webp','./assets/insignias/comida_leyenda.webp',
-  './assets/insignias/deficit_bronce.webp','./assets/insignias/deficit_plata.webp','./assets/insignias/deficit_oro.webp','./assets/insignias/deficit_platino.webp','./assets/insignias/deficit_leyenda.webp',
-  './assets/insignias/constancia_bronce.webp','./assets/insignias/constancia_plata.webp','./assets/insignias/constancia_oro.webp','./assets/insignias/constancia_platino.webp','./assets/insignias/constancia_leyenda.webp',
-  './assets/insignias/comunidad_bronce.webp','./assets/insignias/comunidad_plata.webp','./assets/insignias/comunidad_oro.webp','./assets/insignias/comunidad_platino.webp','./assets/insignias/comunidad_leyenda.webp'
+  './assets/insignias/racha_bronce.webp?v=3','./assets/insignias/racha_plata.webp?v=3','./assets/insignias/racha_oro.webp?v=3','./assets/insignias/racha_platino.webp?v=3','./assets/insignias/racha_leyenda.webp?v=3',
+  './assets/insignias/peso_bronce.webp?v=3','./assets/insignias/peso_plata.webp?v=3','./assets/insignias/peso_oro.webp?v=3','./assets/insignias/peso_platino.webp?v=3','./assets/insignias/peso_leyenda.webp?v=3',
+  './assets/insignias/medidas_bronce.webp?v=3','./assets/insignias/medidas_plata.webp?v=3','./assets/insignias/medidas_oro.webp?v=3','./assets/insignias/medidas_platino.webp?v=3',
+  './assets/insignias/ejercicio_bronce.webp?v=3','./assets/insignias/ejercicio_plata.webp?v=3','./assets/insignias/ejercicio_oro.webp?v=3','./assets/insignias/ejercicio_platino.webp?v=3','./assets/insignias/ejercicio_leyenda.webp?v=3',
+  './assets/insignias/comida_bronce.webp?v=3','./assets/insignias/comida_plata.webp?v=3','./assets/insignias/comida_oro.webp?v=3','./assets/insignias/comida_platino.webp?v=3','./assets/insignias/comida_leyenda.webp?v=3',
+  './assets/insignias/deficit_bronce.webp?v=3','./assets/insignias/deficit_plata.webp?v=3','./assets/insignias/deficit_oro.webp?v=3','./assets/insignias/deficit_platino.webp?v=3','./assets/insignias/deficit_leyenda.webp?v=3',
+  './assets/insignias/constancia_bronce.webp?v=3','./assets/insignias/constancia_plata.webp?v=3','./assets/insignias/constancia_oro.webp?v=3','./assets/insignias/constancia_platino.webp?v=3','./assets/insignias/constancia_leyenda.webp?v=3',
+  './assets/insignias/comunidad_bronce.webp?v=3','./assets/insignias/comunidad_plata.webp?v=3','./assets/insignias/comunidad_oro.webp?v=3','./assets/insignias/comunidad_platino.webp?v=3','./assets/insignias/comunidad_leyenda.webp?v=3'
 ];
 
 self.addEventListener('install', event => {

@@ -5097,10 +5097,31 @@ document.addEventListener('DOMContentLoaded', () => {
         'deficit_bronce','deficit_plata','deficit_oro','deficit_platino','deficit_leyenda',
         'constancia_bronce','constancia_plata','constancia_oro','constancia_platino','constancia_leyenda'
     ]);
+    // Insignias sin imagen propia (INICIO, ESPECIAL, medidas-leyenda): se les asigna la
+    // medalla existente más afín a su tema, para que TODAS se vean con el diseño nuevo
+    // y ninguna quede con emoji suelto.
+    const AX_MEDAL_OVERRIDE = {
+        first_login:   'constancia_bronce',
+        first_weigh:   'peso_bronce',
+        first_food:    'comida_bronce',
+        first_workout: 'ejercicio_bronce',
+        first_waist:   'medidas_bronce',
+        profile_photo: 'comunidad_bronce',
+        theme_change:  'comunidad_bronce',
+        diet_set:      'comida_bronce',
+        used_calc:     'deficit_bronce',
+        first_share:   'comunidad_bronce',
+        goal_halfway:  'peso_oro',
+        goal_reached:  'peso_leyenda',
+        legend:        'racha_leyenda',
+        waist_15:      'peso_leyenda'
+    };
     function axMedalImg(def) {
+        const ov = def.id && AX_MEDAL_OVERRIDE[def.id];
+        if (ov) return 'assets/insignias/' + ov + '.webp?v=3';
         const t = +(def.t || def.tier || 1);
         const key = (def.cat || '') + '_' + (AX_TIERNAME[t] || 'bronce');
-        return AX_MEDAL_SET.has(key) ? ('assets/insignias/' + key + '.webp') : null;
+        return AX_MEDAL_SET.has(key) ? ('assets/insignias/' + key + '.webp?v=3') : null;
     }
     function axMedalNum(def) {
         const m = String(def.title || def.name || '').match(/-?\d[\d.,]*/);
