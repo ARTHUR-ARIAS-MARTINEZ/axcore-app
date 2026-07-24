@@ -4050,3 +4050,12 @@ body.premium-mode #achievements-panel .ach-icon.has-med {
 .pm-bcard.locked .pm-bemoji.has-med { filter: none !important; color: inherit !important; }
 body.premium-mode #achievements-panel .ach-card--locked .ach-icon.has-med { opacity: .5 !important; filter: none !important; }
 .axmed-lock .axmed-img { filter: grayscale(1) brightness(.45); opacity: .55; }
+
+/* v5.61: el NÚMERO toma el tono del metal de su nivel (armoniza con la medalla y
+   mantiene contraste gracias a la sombra oscura sobre el disco). */
+.axmed-t1 .axmed-num { color: #f7cf9b; }  /* cobre  */
+.axmed-t2 .axmed-num { color: #eef2f8; }  /* plata  */
+.axmed-t3 .axmed-num { color: #ffe08a; }  /* oro    */
+.axmed-t4 .axmed-num { color: #c6f6ff; }  /* azul   */
+.axmed-t5 .axmed-num { color: #d6ffd9; }  /* verde  */
+.axmed-num { text-shadow: 0 1px 2px rgba(0,0,0,.95), 0 0 6px rgba(0,0,0,.9); }

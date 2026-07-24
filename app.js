@@ -4829,16 +4829,16 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     const ACHIEVEMENTS_DEF = [
         // ─── INICIO (10) ───
-        { id:'first_login',   icon:'🎯', title:'PRIMER ACCESO',    desc:'Entraste a AX-CORE.',                 t:1, cat:'inicio', check:()=>!!userData.username },
-        { id:'first_weigh',   icon:'⚖️', title:'PESO EN MARCHA',    desc:'Registraste tu peso 3 veces.',        t:1, cat:'inicio', check:()=>H().length>=3 },
-        { id:'first_food',    icon:'🍽️', title:'DIETA EN MARCHA',   desc:'Registraste 5 comidas.',              t:1, cat:'inicio', check:()=>FL()>=5 },
-        { id:'first_workout', icon:'🏃', title:'ENTRENO EN MARCHA', desc:'Registraste 3 ejercicios.',           t:1, cat:'inicio', check:()=>WK()>=3 },
-        { id:'first_waist',   icon:'📏', title:'MEDIDAS EN MARCHA', desc:'Mediste tu cintura 2 veces.',         t:1, cat:'inicio', check:()=>H().filter(h=>+h.waist>0).length>=2 },
-        { id:'profile_photo', icon:'📸', title:'CON ROSTRO',       desc:'Pusiste foto de perfil.',              t:1, cat:'inicio', check:()=>!!(userData.avatarPhoto||userData.avatar) },
-        { id:'theme_change',  icon:'🎨', title:'ESTILO PROPIO',    desc:'Cambiaste el color de la app.',        t:1, cat:'inicio', check:()=>!!userData.theme && userData.theme!=='neon' },
-        { id:'diet_set',      icon:'🥗', title:'PLAN LISTO',       desc:'Configuraste tu dieta.',               t:1, cat:'inicio', check:()=>dietConfigured() },
-        { id:'used_calc',     icon:'🧮', title:'CALCULADOR',       desc:'Usaste la calculadora.',               t:1, cat:'inicio', check:()=>!!userData.usedCalc },
-        { id:'first_share',   icon:'🌟', title:'COMPARTIDOR',      desc:'Creaste tu 1ª tarjeta de logros.',     t:1, cat:'inicio', check:()=>!!userData.sharedCard },
+        { id:'first_login',   icon:'🎯', title:'PRIMER ACCESO',    desc:'Entraste a AX-CORE.',                 t:1, cat:'inicio', num:'1',  check:()=>!!userData.username },
+        { id:'first_weigh',   icon:'⚖️', title:'PESO EN MARCHA',    desc:'Registraste tu peso 3 veces.',        t:1, cat:'inicio', num:3,    check:()=>H().length>=3 },
+        { id:'first_food',    icon:'🍽️', title:'DIETA EN MARCHA',   desc:'Registraste 5 comidas.',              t:1, cat:'inicio', num:5,    check:()=>FL()>=5 },
+        { id:'first_workout', icon:'🏃', title:'ENTRENO EN MARCHA', desc:'Registraste 3 ejercicios.',           t:1, cat:'inicio', num:3,    check:()=>WK()>=3 },
+        { id:'first_waist',   icon:'📏', title:'MEDIDAS EN MARCHA', desc:'Mediste tu cintura 2 veces.',         t:1, cat:'inicio', num:2,    check:()=>H().filter(h=>+h.waist>0).length>=2 },
+        { id:'profile_photo', icon:'📸', title:'CON ROSTRO',       desc:'Pusiste foto de perfil.',              t:1, cat:'inicio', num:'✓', check:()=>!!(userData.avatarPhoto||userData.avatar) },
+        { id:'theme_change',  icon:'🎨', title:'ESTILO PROPIO',    desc:'Cambiaste el color de la app.',        t:1, cat:'inicio', num:'✓', check:()=>!!userData.theme && userData.theme!=='neon' },
+        { id:'diet_set',      icon:'🥗', title:'PLAN LISTO',       desc:'Configuraste tu dieta.',               t:1, cat:'inicio', num:'✓', check:()=>dietConfigured() },
+        { id:'used_calc',     icon:'🧮', title:'CALCULADOR',       desc:'Usaste la calculadora.',               t:1, cat:'inicio', num:'✓', check:()=>!!userData.usedCalc },
+        { id:'first_share',   icon:'🌟', title:'COMPARTIDOR',      desc:'Creaste tu 1ª tarjeta de logros.',     t:1, cat:'inicio', num:'1',  check:()=>!!userData.sharedCard },
         // ─── RACHA (18) — días CONSECUTIVOS registrando peso ───
         { id:'streak_2',   icon:'🔥', title:'RACHA 3',   desc:'3 días seguidos.',            t:1, cat:'racha', check:()=>streakDays()>=3 },
         { id:'streak_3',   icon:'🔥', title:'RACHA 5',   desc:'5 días seguidos.',            t:1, cat:'racha', check:()=>streakDays()>=5 },
@@ -4875,8 +4875,8 @@ document.addEventListener('DOMContentLoaded', () => {
         { id:'lose_15',   icon:'💫', title:'AVANCE 80%',  desc:'80% de tu meta.',           t:4, cat:'peso', num:80,  check:()=>goalPct()>=80 },
         { id:'lose_18',   icon:'💫', title:'AVANCE 90%',  desc:'90% de tu meta.',           t:4, cat:'peso', num:90,  check:()=>goalPct()>=90 },
         { id:'lose_20',   icon:'🦅', title:'META 100%',   desc:'¡Llegaste a tu peso meta!', t:4, cat:'peso', num:100, check:()=>goalPct()>=100 },
-        { id:'lose_25',   icon:'🦅', title:'META FIRME',  desc:'Meta lograda y sostenida (30 días activos).', t:5, cat:'peso', check:()=>goalPct()>=100 && distinctDaysLogged()>=30 },
-        { id:'lose_30',   icon:'🔱', title:'SUPERMETA',   desc:'Superaste tu meta un 10% más.', t:5, cat:'peso', check:()=>goalPct()>=110 },
+        { id:'lose_25',   icon:'🦅', title:'META FIRME',  desc:'Meta lograda y sostenida (30 días activos).', t:5, cat:'peso', num:'30d', check:()=>goalPct()>=100 && distinctDaysLogged()>=30 },
+        { id:'lose_30',   icon:'🔱', title:'SUPERMETA',   desc:'Superaste tu meta un 10% más.', t:5, cat:'peso', num:110, check:()=>goalPct()>=110 },
         // ─── MEDIDAS (12) — cintura reducida y # de mediciones ───
         { id:'waist_1',   icon:'📏', title:'CINTURA -2',  desc:'2 cm menos de cintura.',    t:1, cat:'medidas', check:()=>waistLost()>=2 },
         { id:'waist_2',   icon:'📏', title:'CINTURA -3',  desc:'3 cm menos.',               t:1, cat:'medidas', check:()=>waistLost()>=3 },
@@ -4889,7 +4889,7 @@ document.addEventListener('DOMContentLoaded', () => {
         { id:'meas_10',   icon:'📐', title:'20 MEDICIONES', desc:'20 mediciones.',          t:2, cat:'medidas', check:()=>H().length>=20 },
         { id:'meas_25',   icon:'📐', title:'40 MEDICIONES', desc:'40 mediciones.',          t:3, cat:'medidas', check:()=>H().length>=40 },
         { id:'meas_50',   icon:'📐', title:'75 MEDICIONES', desc:'75 mediciones.',          t:4, cat:'medidas', check:()=>H().length>=75 },
-        { id:'meas_full', icon:'🧍', title:'CUERPO COMPLETO', desc:'Registraste todas tus medidas en un día.', t:3, cat:'medidas', check:()=>H().some(h=>+h.bicep>0&&+h.leg>0&&+h.chest>0&&+h.hip>0&&+h.calf>0&&+h.glute>0&&+h.neck>0&&+h.forearm>0&&+h.back>0) },
+        { id:'meas_full', icon:'🧍', title:'CUERPO COMPLETO', desc:'Registraste todas tus medidas en un día.', t:3, cat:'medidas', num:'✓', check:()=>H().some(h=>+h.bicep>0&&+h.leg>0&&+h.chest>0&&+h.hip>0&&+h.calf>0&&+h.glute>0&&+h.neck>0&&+h.forearm>0&&+h.back>0) },
         // ─── EJERCICIO (16) — calorías quemadas acumuladas y # de ejercicios ───
         { id:'burn_100',    icon:'🔥', title:'500 KCAL',    desc:'Quemaste 500 kcal.',       t:1, cat:'ejercicio', check:()=>BURN()>=500 },
         { id:'burn_500',    icon:'🔥', title:'1,500 KCAL',  desc:'Quemaste 1,500 kcal.',     t:1, cat:'ejercicio', check:()=>BURN()>=1500 },
@@ -4949,9 +4949,9 @@ document.addEventListener('DOMContentLoaded', () => {
         { id:'share_75',  icon:'📣', title:'FENÓMENO',     desc:'Compartiste 80 veces.',           t:4, cat:'comunidad', num:80,  check:()=>(+userData.shareCount||0)>=80 },
         { id:'share_100', icon:'👑', title:'EMBAJADOR AX', desc:'Compartiste 100 veces. Leyenda.', t:5, cat:'comunidad', num:100, check:()=>(+userData.shareCount||0)>=100 },
         // ─── ESPECIALES (3) ───
-        { id:'goal_halfway', icon:'🎯', title:'MEDIO CAMINO', desc:'Llegaste a la mitad de tu meta de peso.', t:3, cat:'especial', check:()=>{ const h=H(); const start=(h[0]&&+h[0].weight)||+userData.weight||0; const tw=+userData.target_weight||0; return tw>0 && start>tw && kilosLost()>=(start-tw)/2; } },
-        { id:'goal_reached', icon:'🔱', title:'META ALCANZADA', desc:'Llegaste a tu peso objetivo.',           t:5, cat:'especial', check:()=>userData.weight>0 && userData.target_weight>0 && userData.weight<=userData.target_weight },
-        { id:'legend',       icon:'👑', title:'LEYENDA AX',     desc:'Desbloqueaste 75 insignias.',            t:5, cat:'especial', check:()=>(userData.achievements||[]).length>=75 }
+        { id:'goal_halfway', icon:'🎯', title:'MEDIO CAMINO', desc:'Llegaste a la mitad de tu meta de peso.', t:3, cat:'especial', num:50, check:()=>{ const h=H(); const start=(h[0]&&+h[0].weight)||+userData.weight||0; const tw=+userData.target_weight||0; return tw>0 && start>tw && kilosLost()>=(start-tw)/2; } },
+        { id:'goal_reached', icon:'🔱', title:'META ALCANZADA', desc:'Llegaste a tu peso objetivo.',           t:5, cat:'especial', num:100, check:()=>userData.weight>0 && userData.target_weight>0 && userData.weight<=userData.target_weight },
+        { id:'legend',       icon:'👑', title:'LEYENDA AX',     desc:'Desbloqueaste 75 insignias.',            t:5, cat:'especial', num:75, check:()=>(userData.achievements||[]).length>=75 }
     ];
 
     // ── Fechas: lee CUALQUIER formato guardado sin confundir día con mes ──
@@ -5164,7 +5164,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!img) return '';
         const num = axMedalNum(def);
         const emoji = def.icon || def.e || '🏅';
-        return '<span class="axmed' + (unlocked ? '' : ' axmed-lock') + '">'
+        const tier = Math.min(5, Math.max(1, +(def.t || def.tier || 1)));
+        return '<span class="axmed axmed-t' + tier + (unlocked ? '' : ' axmed-lock') + '">'
             + '<img class="axmed-img" src="' + img + '" alt="" loading="lazy"'
             + ' onerror="this.style.display=\'none\';this.parentNode.classList.add(\'axmed-failed\');">'
             + '<span class="axmed-fb">' + emoji + '</span>'
