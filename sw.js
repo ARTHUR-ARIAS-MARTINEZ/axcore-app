@@ -1,12 +1,12 @@
-const CACHE_NAME = 'axcore-v5.59-rebalance-esfuerzo';
+const CACHE_NAME = 'axcore-v5.60-dificultad-media';
 const urlsToCache = [
   './',
-  './index.html?v=20260724',
-  './index.css?v=20260724',
-  './premium.css?v=20260724',
-  './profile-persist.js?v=20260724',
-  './app.js?v=20260724',
-  './knowledge.js?v=20260724',
+  './index.html?v=20260724b',
+  './index.css?v=20260724b',
+  './premium.css?v=20260724b',
+  './profile-persist.js?v=20260724b',
+  './app.js?v=20260724b',
+  './knowledge.js?v=20260724b',
   './logo.png',
   './logo_coach.png',
   './manifest_vip.json',
@@ -18,8 +18,8 @@ const urlsToCache = [
 // No críticos (scripts de badges + 39 imágenes de insignias): precache NO atómico.
 // Si algo aquí fallara (imagen faltante, etc.) NO rompe la instalación del Service Worker.
 const optionalCache = [
-  './premium-badges.js?v=20260724',
-  './premium-extras.js?v=20260724',
+  './premium-badges.js?v=20260724b',
+  './premium-extras.js?v=20260724b',
   './assets/insignias/racha_bronce.webp?v=3','./assets/insignias/racha_plata.webp?v=3','./assets/insignias/racha_oro.webp?v=3','./assets/insignias/racha_platino.webp?v=3','./assets/insignias/racha_leyenda.webp?v=3',
   './assets/insignias/peso_bronce.webp?v=3','./assets/insignias/peso_plata.webp?v=3','./assets/insignias/peso_oro.webp?v=3','./assets/insignias/peso_platino.webp?v=3','./assets/insignias/peso_leyenda.webp?v=3',
   './assets/insignias/medidas_bronce.webp?v=3','./assets/insignias/medidas_plata.webp?v=3','./assets/insignias/medidas_oro.webp?v=3','./assets/insignias/medidas_platino.webp?v=3',
@@ -27,7 +27,8 @@ const optionalCache = [
   './assets/insignias/comida_bronce.webp?v=3','./assets/insignias/comida_plata.webp?v=3','./assets/insignias/comida_oro.webp?v=3','./assets/insignias/comida_platino.webp?v=3','./assets/insignias/comida_leyenda.webp?v=3',
   './assets/insignias/deficit_bronce.webp?v=3','./assets/insignias/deficit_plata.webp?v=3','./assets/insignias/deficit_oro.webp?v=3','./assets/insignias/deficit_platino.webp?v=3','./assets/insignias/deficit_leyenda.webp?v=3',
   './assets/insignias/constancia_bronce.webp?v=3','./assets/insignias/constancia_plata.webp?v=3','./assets/insignias/constancia_oro.webp?v=3','./assets/insignias/constancia_platino.webp?v=3','./assets/insignias/constancia_leyenda.webp?v=3',
-  './assets/insignias/comunidad_bronce.webp?v=3','./assets/insignias/comunidad_plata.webp?v=3','./assets/insignias/comunidad_oro.webp?v=3','./assets/insignias/comunidad_platino.webp?v=3','./assets/insignias/comunidad_leyenda.webp?v=3'
+  './assets/insignias/comunidad_bronce.webp?v=3','./assets/insignias/comunidad_plata.webp?v=3','./assets/insignias/comunidad_oro.webp?v=3','./assets/insignias/comunidad_platino.webp?v=3','./assets/insignias/comunidad_leyenda.webp?v=3',
+  './assets/insignias/especial_legend.webp?v=3','./assets/insignias/inicio.webp?v=3'
 ];
 
 self.addEventListener('install', event => {
