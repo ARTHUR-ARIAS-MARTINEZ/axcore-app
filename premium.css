@@ -4025,7 +4025,7 @@ body.premium-mode #page-evolution .evolution-panel .measurement-form {
 .axmed-num {
   position: absolute; left: 50%; top: 60%; transform: translate(-50%, -50%);
   font-family: 'Oswald', sans-serif; font-weight: 700; color: #fff;
-  font-size: 13px; letter-spacing: -0.3px; line-height: 1; white-space: nowrap;
+  font-size: 11.4px; letter-spacing: -0.3px; line-height: 1; white-space: nowrap;
   text-shadow: 0 1px 2px rgba(0,0,0,.95), 0 0 5px rgba(0,0,0,.85); pointer-events: none;
 }
 .axmed-lock .axmed-img { filter: grayscale(1) brightness(.5); }
@@ -4034,12 +4034,12 @@ body.premium-mode #page-evolution .evolution-panel .measurement-form {
 body.premium-mode .pd-badge-icon.has-med {
   background: none !important; border: none !important; box-shadow: none !important; padding: 0 !important;
 }
-.pd-badge-icon.has-med .axmed-num { font-size: 14px; }
+.pd-badge-icon.has-med .axmed-num { font-size: 12.3px; }
 body.premium-mode #achievements-panel .ach-icon.has-med {
   width: 54px; height: 54px; margin: 0 auto 5px; padding: 0; font-size: 0; background: none !important;
 }
 .pm-bemoji.has-med { width: 60px; height: 60px; margin: 2px auto 6px; }
-.pm-bemoji.has-med .axmed-num { font-size: 16px; }
+.pm-bemoji.has-med .axmed-num { font-size: 14.1px; }
 
 /* Respaldo v5.57: si la imagen de la medalla NO carga, se muestra el emoji (nunca en blanco) */
 .axmed-fb { display: none; position: absolute; inset: 0; align-items: center; justify-content: center; font-size: 26px; line-height: 1; }
