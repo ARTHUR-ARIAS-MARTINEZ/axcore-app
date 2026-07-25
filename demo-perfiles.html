@@ -64,8 +64,14 @@
     <p class="sub">Carga un atleta con meses de historial en este dispositivo, para enseñar la app llena en una visita de venta.</p>
   </header>
 
-  <div class="warn">
-    <strong>Úsalo solo en tu teléfono de ventas.</strong> Al cargar un perfil se reemplaza el usuario activo de esta app en este dispositivo. Si aquí traes tus datos reales, no lo uses.
+  <div class="warn" id="aviso-cuenta">
+    <strong>Tu cuenta está guardada.</strong> Cargar un perfil de demostración no borra tus datos: solo cambia cuál está activo. Cuando termines, el botón de abajo te regresa a la tuya.
+  </div>
+
+  <div class="p" id="volver-caja" style="display:none">
+    <h2>Volver a lo tuyo</h2>
+    <p class="desc">Tu cuenta guardada en este teléfono es <em id="mi-cuenta">—</em>. Tus datos siguen intactos; solo hay que reactivarla.</p>
+    <button onclick="volver()">REGRESAR A MI CUENTA</button>
   </div>
 
   <div class="p">
@@ -307,7 +313,58 @@ function aviso(txt){
   setTimeout(function(){ el.classList.remove('show'); }, 2600);
 }
 
+// ── Tu cuenta ────────────────────────────────────────────────────────
+// Antes del primer sembrado guardamos cuál era el usuario real de este
+// teléfono, para poder devolverlo después. Se guarda UNA sola vez: si ya
+// hay respaldo, no lo pisamos con el nombre de un perfil demo.
+var LLAVE_MIA = 'axcore_cuenta_real';
+
+function esDemo(nombre){
+  for (var k in PERFILES) if (PERFILES[k].username === nombre) return true;
+  return false;
+}
+
+function respaldarCuenta(){
+  if (localStorage.getItem(LLAVE_MIA)) return;
+  var actual = localStorage.getItem('arthur_current_user');
+  if (actual && !esDemo(actual)) localStorage.setItem(LLAVE_MIA, actual);
+}
+
+function pintarCuenta(){
+  var mia = localStorage.getItem(LLAVE_MIA);
+  var actual = localStorage.getItem('arthur_current_user');
+  var caja = document.getElementById('volver-caja');
+  // Solo tiene sentido ofrecer el regreso si hay respaldo y ahorita está un demo.
+  if (mia && actual && esDemo(actual)){
+    document.getElementById('mi-cuenta').textContent = mia;
+    caja.style.display = '';
+  } else {
+    caja.style.display = 'none';
+  }
+  var aviso = document.getElementById('aviso-cuenta');
+  if (!mia && actual && !esDemo(actual)){
+    aviso.innerHTML = '<strong>Tu cuenta activa es «' + actual + '».</strong> ' +
+      'Al cargar un perfil de demostración la guardamos aparte y te la devolvemos con un botón. Tus datos no se borran.';
+  } else if (!mia && !actual){
+    aviso.innerHTML = '<strong>Este teléfono no tiene ninguna cuenta activa.</strong> ' +
+      'Puedes cargar los perfiles de demostración sin riesgo.';
+  }
+}
+
+function volver(){
+  var mia = localStorage.getItem(LLAVE_MIA);
+  if (!mia){ aviso('No hay ninguna cuenta tuya guardada aquí'); return; }
+  localStorage.setItem('arthur_current_user', mia);
+  try {
+    localStorage.setItem('axcore_profile_v1', JSON.stringify({ name: mia, photo: '' }));
+  } catch(e){}
+  sessionStorage.setItem('axcore_active_page', 'dashboard');
+  aviso('Listo — abriendo la app como ' + mia);
+  setTimeout(function(){ location.href = 'index.html'; }, 900);
+}
+
 function cargar(id){
+  respaldarCuenta();
   var d = construir(id);
   localStorage.setItem('arthur_data_' + d.username, JSON.stringify(d));
   localStorage.setItem('arthur_current_user', d.username);
@@ -328,12 +385,19 @@ function limpiar(){
     var k = 'arthur_data_' + PERFILES[id].username;
     if (localStorage.getItem(k)){ localStorage.removeItem(k); n++; }
   }
+  // Si el activo era un demo, devolver la cuenta real (o dejarlo sin nadie).
   var actual = localStorage.getItem('arthur_current_user');
-  for (var id2 in PERFILES){
-    if (PERFILES[id2].username === actual) localStorage.removeItem('arthur_current_user');
+  if (actual && esDemo(actual)){
+    var mia = localStorage.getItem(LLAVE_MIA);
+    if (mia) localStorage.setItem('arthur_current_user', mia);
+    else localStorage.removeItem('arthur_current_user');
   }
+  localStorage.removeItem(LLAVE_MIA);
+  pintarCuenta();
   aviso(n ? ('Borrados ' + n + ' perfiles demo') : 'No había perfiles demo aquí');
 }
+
+pintarCuenta();
 </script>
 </body>
 </html>
