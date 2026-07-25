@@ -2687,7 +2687,7 @@ body {
     padding-bottom: 2px;
     -webkit-overflow-scrolling: touch;
     /* FIX: el swipe horizontal se quede en la fila y no dispare el cambio de pestaña. */
-    touch-action: pan-x;
+    touch-action: pan-x pan-y;
     overscroll-behavior-x: contain;
 }
 #page-studio .sx-phrase-row::-webkit-scrollbar { display: none; }
@@ -2762,7 +2762,7 @@ body {
     padding-bottom: 2px;
     -webkit-overflow-scrolling: touch;
     /* FIX: el swipe horizontal se quede en la fila y no dispare el cambio de pestaña. */
-    touch-action: pan-x;
+    touch-action: pan-x pan-y;
     overscroll-behavior-x: contain;
 }
 #page-studio #studio-font-btns.sx-font-pills::-webkit-scrollbar { display: none; }
@@ -3475,8 +3475,7 @@ body.premium-mode #btn-studio-share.sx-share-btn {
 /* ═══ ZONA FIJA (pinada): tarjeta + título "ESTUDIO DE LOGROS" + barra de INSIGNIAS.
    Todo el bloque queda pinado JUSTO debajo de la top-bar sticky de la app (66px) y SOLO
    los controles (PLANTILLAS/INSIGNIA/COLOR/TIPOGRAFÍA/FRASES/FORMATOS) hacen scroll por
-   debajo. Fondo OPACO del tema para que el contenido pase por detrás sin transparentarse,
-   y capa propia de composición (translateZ/will-change) para que el scroll no se trabe. ═══ */
+   debajo. Fondo OPACO del tema para que el contenido pase por detrás sin transparentarse. ═══ */
 #page-studio .sx-scrollmode .sx-pinned {
     position: sticky;
     top: var(--sx-topbar-h, 66px);   /* alto real de la top-bar, medido por JS (fallback 66) */
@@ -3486,10 +3485,10 @@ body.premium-mode #btn-studio-share.sx-share-btn {
         var(--pm-bg, #080c14);
     box-shadow: 0 8px 16px -8px rgba(0,0,0,0.4);
     border-bottom: 1px solid var(--pm-border, rgba(255,255,255,0.07));
-    will-change: transform;
-    transform: translateZ(0);
-    -webkit-transform: translateZ(0);
-    backface-visibility: hidden;
+    /* SIN will-change/translateZ/contain: el 'position:sticky' ya se compone nativamente
+       en Chromium/WebView, y en un bloque grande (con canvas) esos hints causaban tironeo.
+       El verdadero "trabado" era 'touch-action:pan-x' en las filas (bloqueaba el scroll
+       vertical) — corregido a 'pan-x pan-y'. */
 }
 
 /* ---- STAGE: tarjeta (canvas) + columna de acciones VISTA/DESCARGAR/COMPARTIR ----
@@ -3586,7 +3585,7 @@ body.premium-mode #btn-studio-share.sx-share-btn {
     display: flex; flex-wrap: nowrap; align-items: center; gap: 10px;
     overflow-x: auto; scrollbar-width: none;
     padding-bottom: 2px; -webkit-overflow-scrolling: touch;
-    touch-action: pan-x; overscroll-behavior-x: contain;   /* el swipe se queda en la fila */
+    touch-action: pan-x pan-y; overscroll-behavior-x: contain;   /* el swipe se queda en la fila */
 }
 #page-studio .sx-badge-row::-webkit-scrollbar { display: none; }
 #page-studio .sx-badge-chip {
