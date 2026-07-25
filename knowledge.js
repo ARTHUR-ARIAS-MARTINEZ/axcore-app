@@ -184,12 +184,23 @@ const NUTRITION_ADVANCES = [
  * ================================================================
  */
 
-// Planes de negocio
+// Planes de negocio.
+// maxUsers = TOTAL de códigos que puede generar el coach (atletas + los de regalo
+// para los propios coaches). El gimnasio revende el acceso a $60/atleta: su utilidad
+// mensual es (atletas × 60) − price.
+//   BÁSICO 35 atletas + 1 coach = 36 → 35×60 = $2,100 − $1,500 = $600 de utilidad
+//   PRO    70 atletas + 2 coach = 72 → 70×60 = $4,200 − $2,500 = $1,700 de utilidad
+//   ÉLITE 140 atletas + 3 coach = 143 → 140×60 = $8,400 − $3,000 = $5,400 de utilidad
+// Las claves (basico/estandar/premium) NO se cambian: hay gimnasios ya guardados con
+// ellas en MongoDB. Solo cambian el nombre visible, el precio y el cupo.
 const AX_PLANS = {
-    basico:   { name: "BÁSICO",   price: 1500, maxUsers: 50,  color: "#00ff88" },
-    estandar: { name: "ESTÁNDAR", price: 2000, maxUsers: 100, color: "#00d4ff" },
-    premium:  { name: "PREMIUM",  price: 3000, maxUsers: 200, color: "#ffd700" }
+    basico:   { name: "BÁSICO", price: 1500, maxUsers: 36,  athletes: 35,  coaches: 1, color: "#00ff88" },
+    estandar: { name: "PRO",    price: 2500, maxUsers: 72,  athletes: 70,  coaches: 2, color: "#00d4ff" },
+    premium:  { name: "ÉLITE",  price: 3000, maxUsers: 143, athletes: 140, coaches: 3, color: "#ffd700" }
 };
+
+// Lo que el gimnasio le cobra de más a cada atleta por el acceso a la app.
+const AX_PRECIO_ATLETA = 60;
 
 /**
  * GYM_CODES se carga DINÁMICAMENTE desde localStorage (admin genera los códigos).

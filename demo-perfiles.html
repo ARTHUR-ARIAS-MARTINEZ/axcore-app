@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>AX-CORE — Perfiles de demostración</title>
+<style>
+  :root{
+    --bg:#0b0f14; --card:#141b23; --line:#243040;
+    --txt:#e7edf4; --dim:#94a3b4; --green:#00ff88; --gold:#ffd166; --red:#ff5d73;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--txt); min-height:100vh;
+    font-family:"Segoe UI",system-ui,-apple-system,Roboto,sans-serif;
+    padding:24px 16px 60px;
+  }
+  .wrap{max-width:560px; margin:0 auto; display:flex; flex-direction:column; gap:20px}
+  header{text-align:center; display:flex; flex-direction:column; gap:6px; padding-bottom:14px; border-bottom:1px solid var(--line)}
+  h1{margin:0; font-size:20px; letter-spacing:2px; color:var(--green)}
+  .sub{color:var(--dim); font-size:13px; line-height:1.5}
+  .warn{
+    background:rgba(255,93,115,.1); border:1px solid rgba(255,93,115,.35);
+    border-radius:10px; padding:12px 14px; font-size:13px; color:#ffc9d1; line-height:1.5;
+  }
+  .p{
+    background:var(--card); border:1px solid var(--line); border-radius:14px;
+    padding:16px; display:flex; flex-direction:column; gap:10px;
+  }
+  .p h2{margin:0; font-size:17px; display:flex; align-items:center; gap:9px}
+  .tag{font-size:10px; letter-spacing:1.4px; text-transform:uppercase; padding:3px 9px; border-radius:99px; font-weight:700}
+  .t-a{background:rgba(0,255,136,.14); color:var(--green)}
+  .t-b{background:rgba(255,209,102,.14); color:var(--gold)}
+  .t-c{background:rgba(120,180,255,.14); color:#8ab6ff}
+  .stats{display:grid; grid-template-columns:repeat(4,1fr); gap:8px}
+  .s{background:rgba(255,255,255,.03); border-radius:9px; padding:8px 6px; text-align:center}
+  .s b{display:block; font-size:15px; font-variant-numeric:tabular-nums}
+  .s span{font-size:9.5px; color:var(--dim); letter-spacing:.6px; text-transform:uppercase}
+  .desc{font-size:13px; color:var(--dim); line-height:1.55; margin:0}
+  .desc em{color:var(--txt); font-style:normal; font-weight:600}
+  button{
+    font-family:inherit; font-size:13px; font-weight:700; letter-spacing:1px;
+    padding:12px; border-radius:10px; border:1px solid var(--green);
+    background:rgba(0,255,136,.12); color:var(--green); cursor:pointer; width:100%;
+  }
+  button:hover{background:rgba(0,255,136,.2)}
+  button:active{transform:scale(.98)}
+  .danger{border-color:var(--red); background:rgba(255,93,115,.1); color:var(--red)}
+  .ok{
+    position:fixed; left:50%; bottom:24px; transform:translateX(-50%);
+    background:var(--green); color:#05210f; font-weight:800; font-size:13px;
+    padding:12px 22px; border-radius:99px; opacity:0; transition:opacity .25s; pointer-events:none;
+    max-width:90vw; text-align:center;
+  }
+  .ok.show{opacity:1}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>PERFILES DE DEMOSTRACIÓN</h1>
+    <p class="sub">Carga un atleta con meses de historial en este dispositivo, para enseñar la app llena en una visita de venta.</p>
+  </header>
+
+  <div class="warn">
+    <strong>Úsalo solo en tu teléfono de ventas.</strong> Al cargar un perfil se reemplaza el usuario activo de esta app en este dispositivo. Si aquí traes tus datos reales, no lo uses.
+  </div>
+
+  <div class="p">
+    <h2>Rocío Mendoza <span class="tag t-a">La que sí funcionó</span></h2>
+    <div class="stats">
+      <div class="s"><b>-7.4</b><span>kg</span></div>
+      <div class="s"><b>96</b><span>días</span></div>
+      <div class="s"><b>34</b><span>racha</span></div>
+      <div class="s"><b>-9</b><span>cm cintura</span></div>
+    </div>
+    <p class="desc">Tu caso estrella. Tres meses de constancia, 24 insignias, la proyección le dice que llega a su meta en <em>5 semanas</em>. Es la que enseñas primero.</p>
+    <button onclick="cargar('rocio')">CARGAR ESTE PERFIL</button>
+  </div>
+
+  <div class="p">
+    <h2>Miguel Ángel Torres <span class="tag t-b">El que va empezando</span></h2>
+    <div class="stats">
+      <div class="s"><b>-2.1</b><span>kg</span></div>
+      <div class="s"><b>26</b><span>días</span></div>
+      <div class="s"><b>11</b><span>racha</span></div>
+      <div class="s"><b>-3</b><span>cm cintura</span></div>
+    </div>
+    <p class="desc">Un mes dentro. Sirve para enseñar que <em>desde el primer mes ya se ve movimiento</em> — justo el mes en que la gente se da de baja.</p>
+    <button onclick="cargar('miguel')">CARGAR ESTE PERFIL</button>
+  </div>
+
+  <div class="p">
+    <h2>Karina Ríos <span class="tag t-c">La del nutriólogo</span></h2>
+    <div class="stats">
+      <div class="s"><b>-4.6</b><span>kg</span></div>
+      <div class="s"><b>58</b><span>días</span></div>
+      <div class="s"><b>19</b><span>racha</span></div>
+      <div class="s"><b>-6</b><span>cm cintura</span></div>
+    </div>
+    <p class="desc">Trae la dieta del nutriólogo ya pegada y repartida en las 8 comidas, con límite de <em>1,650 kcal</em> y sus reglas. Es la que enseñas si el gimnasio tiene nutrióloga.</p>
+    <button onclick="cargar('karina')">CARGAR ESTE PERFIL</button>
+  </div>
+
+  <div class="p">
+    <h2>Limpieza</h2>
+    <p class="desc">Borra los tres perfiles de demostración de este dispositivo. No toca ninguna otra cuenta.</p>
+    <button class="danger" onclick="limpiar()">BORRAR LOS PERFILES DEMO</button>
+  </div>
+
+</div>
+<div class="ok" id="ok"></div>
+
+<script>
+// ── Utilidades de fecha ──────────────────────────────────────────────
+function diasAtras(n){ var d = new Date(); d.setDate(d.getDate() - n); return d; }
+function claveDia(d){
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function fechaMx(d){ return d.toLocaleDateString('es-MX'); }
+
+// Días activos: los últimos `racha` seguidos + días sueltos hacia atrás hasta `total`.
+function generarDiasActivos(total, racha){
+  var dias = [], i;
+  for (i = 0; i < racha; i++) dias.push(claveDia(diasAtras(i)));
+  var restantes = total - racha, salto = racha;
+  while (restantes > 0 && salto < 400){
+    salto += (restantes % 3 === 0) ? 2 : 1;
+    dias.push(claveDia(diasAtras(salto)));
+    restantes--;
+  }
+  return dias.sort();
+}
+
+// Historial de medidas: pesajes que bajan de `pesoIni` a `pesoFin` a lo largo de `dias`.
+function generarHistorial(pesoIni, pesoFin, cintIni, cintFin, dias, tomas, extra){
+  var h = [], i, t, peso, cint, d;
+  for (i = tomas - 1; i >= 0; i--){
+    t = i / (tomas - 1);                       // 1 = la más vieja, 0 = hoy
+    d = diasAtras(Math.round(t * dias));
+    peso = +(pesoFin + (pesoIni - pesoFin) * t).toFixed(1);
+    cint = Math.round(cintFin + (cintIni - cintFin) * t);
+    var rec = { date: fechaMx(d), weight: peso, waist: cint };
+    for (var k in extra) rec[k] = extra[k];
+    h.push(rec);
+  }
+  return h;
+}
+
+// ── Los tres perfiles ────────────────────────────────────────────────
+var PERFILES = {
+
+  rocio: {
+    username: 'Rocío Mendoza',
+    height: 162, weight: 68.3, target_weight: 63,
+    waist: 79, bicep: 27, leg: 55, chest: 91, hip: 98, calf: 35, glute: 100, neck: 32, forearm: 23, back: 96,
+    dailyCalLimit: 1500,
+    caloriesConsumedToday: 1180, caloriesBurnedToday: 420,
+    totalNetDeficit: 57200, totalCaloriesBurned: 38400, totalWorkouts: 71, totalFoodLogs: 412,
+    theme: 'neon', usedCalc: true, sharedCard: true,
+    diasTotal: 96, racha: 34,
+    historial: [75.7, 68.3, 88, 79, 92, 22],
+    achievements: [
+      'first_login','first_weight','first_waist','first_food','first_workout','first_meas',
+      'streak_2','streak_3','streak_5','streak_7','streak_10','streak_14','streak_21','streak_30',
+      'lose_05','lose_1kg','lose_2','lose_3','lose_4','lose_5kg','lose_7',
+      'waist_1','waist_2','waist_3','waist_5','waist_7',
+      'meas_5','meas_10','meas_25',
+      'burn_100','burn_500','burn_1000','burn_2500','burn_5000','burn_10000','burn_25000',
+      'workouts_5','workouts_10','workouts_25','workouts_50'
+    ],
+    comidas: [
+      ['07:20','Huevo × 3 piezas',465,39,3,33],
+      ['07:20','Avena × 1 taza',150,5,27,3],
+      ['11:00','Manzana × 1 pieza',95,0,25,0],
+      ['14:30','Pollo pechuga × 200 g',330,62,0,7],
+      ['14:30','Arroz blanco × 1 plato',205,4,45,0],
+      ['14:30','Ensalada verde × 1 plato',35,2,7,0]
+    ],
+    ejercicios: [
+      ['06:40','Caminadora','35 min',280],
+      ['07:15','Sentadilla','4 series',140]
+    ]
+  },
+
+  miguel: {
+    username: 'Miguel Torres',
+    height: 176, weight: 94.2, target_weight: 85,
+    waist: 104, bicep: 34, leg: 62, chest: 108, hip: 106, calf: 39, glute: 104, neck: 41, forearm: 29, back: 112,
+    dailyCalLimit: 2100,
+    caloriesConsumedToday: 1740, caloriesBurnedToday: 310,
+    totalNetDeficit: 14800, totalCaloriesBurned: 9600, totalWorkouts: 18, totalFoodLogs: 88,
+    theme: 'azul', usedCalc: true, sharedCard: false,
+    diasTotal: 26, racha: 11,
+    historial: [96.3, 94.2, 107, 104, 24, 8],
+    achievements: [
+      'first_login','first_weight','first_waist','first_food','first_workout','first_meas',
+      'streak_2','streak_3','streak_5','streak_7','streak_10',
+      'lose_05','lose_1kg','lose_2',
+      'waist_1','waist_2','waist_3',
+      'meas_5',
+      'burn_100','burn_500','burn_1000','burn_2500','burn_5000',
+      'workouts_5','workouts_10'
+    ],
+    comidas: [
+      ['08:10','Tacos de adobada × 3 piezas',675,36,45,39],
+      ['13:40','Agua de horchata × 1 vaso',150,1,33,2],
+      ['16:00','Proteína en polvo × 1 scoop',120,24,3,1]
+    ],
+    ejercicios: [
+      ['19:10','Prensa de pierna','4 series',160],
+      ['19:45','Bicicleta fija','20 min',150]
+    ]
+  },
+
+  karina: {
+    username: 'Karina Ríos',
+    height: 158, weight: 71.4, target_weight: 65,
+    waist: 84, bicep: 26, leg: 54, chest: 89, hip: 101, calf: 34, glute: 103, neck: 31, forearm: 22, back: 94,
+    dailyCalLimit: 1650,
+    caloriesConsumedToday: 1425, caloriesBurnedToday: 260,
+    totalNetDeficit: 33100, totalCaloriesBurned: 19200, totalWorkouts: 41, totalFoodLogs: 236,
+    theme: 'violeta', usedCalc: true, sharedCard: true,
+    diasTotal: 58, racha: 19,
+    historial: [76.0, 71.4, 90, 84, 56, 15],
+    achievements: [
+      'first_login','first_weight','first_waist','first_food','first_workout','first_meas',
+      'streak_2','streak_3','streak_5','streak_7','streak_10','streak_14',
+      'lose_05','lose_1kg','lose_2','lose_3','lose_4',
+      'waist_1','waist_2','waist_3','waist_5',
+      'meas_5','meas_10',
+      'burn_100','burn_500','burn_1000','burn_2500','burn_5000','burn_10000',
+      'workouts_5','workouts_10','workouts_25'
+    ],
+    comidas: [
+      ['07:00','Claras de huevo × 4 piezas',68,15,1,0],
+      ['07:00','Pan integral × 2 piezas',140,6,26,2],
+      ['10:30','Yogurt natural × 1 taza',110,10,12,3],
+      ['14:00','Pescado × 180 g',240,38,0,9],
+      ['14:00','Nopales × 1 plato',30,2,5,0],
+      ['18:30','Almendras × 20 piezas',140,5,5,12]
+    ],
+    ejercicios: [
+      ['17:30','Elíptica','30 min',190],
+      ['18:05','Abdominales','3 series',70]
+    ],
+    // La dieta que le pasó su nutrióloga, ya repartida.
+    dieta: {
+      breakfast: '4 claras de huevo + 2 rebanadas de pan integral + café sin azúcar',
+      lunch: '180 g de pescado a la plancha + nopales asados + 1/2 taza de arroz',
+      dinner: '1 taza de yogurt natural + 20 almendras',
+      snacks: '1 manzana a media mañana · 1 té verde a media tarde'
+    },
+    reglas: 'Tomar 2.5 L de agua al día\nNada de refresco ni jugo industrial\nÚltima comida antes de las 20:00\nCaminar 30 min los días que no vengas al gym'
+  }
+};
+
+// ── Sembrado ─────────────────────────────────────────────────────────
+function construir(id){
+  var p = PERFILES[id];
+  var h = p.historial; // [pesoIni, pesoFin, cintIni, cintFin, dias, tomas]
+
+  var d = {
+    username: p.username,
+    passHash: null,
+    gymCode: 'AXV-DEMO',
+    privacyAccepted: true,
+    avatar: '',
+    height: p.height, weight: p.weight, target_weight: p.target_weight,
+    waist: p.waist, bicep: p.bicep, leg: p.leg, chest: p.chest, hip: p.hip,
+    calf: p.calf, glute: p.glute, neck: p.neck, forearm: p.forearm, back: p.back,
+    dailyCalLimit: p.dailyCalLimit,
+    caloriesConsumedToday: p.caloriesConsumedToday,
+    caloriesBurnedToday: p.caloriesBurnedToday,
+    totalNetDeficit: p.totalNetDeficit,
+    totalCaloriesBurned: p.totalCaloriesBurned,
+    totalWorkouts: p.totalWorkouts,
+    totalFoodLogs: p.totalFoodLogs,
+    usedCalc: p.usedCalc,
+    sharedCard: p.sharedCard,
+    theme: p.theme,
+    achievements: p.achievements.slice(),
+    activeDays: generarDiasActivos(p.diasTotal, p.racha),
+    history: generarHistorial(h[0], h[1], h[2], h[3], h[4], h[5], {
+      bicep: p.bicep, leg: p.leg, chest: p.chest, hip: p.hip,
+      calf: p.calf, glute: p.glute, neck: p.neck, forearm: p.forearm, back: p.back
+    }),
+    foodLogToday: p.comidas.map(function(c){
+      return { time:c[0], desc:c[1], cal:c[2], p:c[3], c:c[4], f:c[5] };
+    }),
+    workoutLogToday: p.ejercicios.map(function(e){
+      return { time:e[0], name:e[1], detail:e[2], cal:e[3] };
+    }),
+    recommendedDiet: p.dieta || { breakfast:'', lunch:'', dinner:'', snacks:'' },
+    customDietRules: p.reglas || null,
+    lastUpdateDate: new Date().toDateString()
+  };
+  return d;
+}
+
+function aviso(txt){
+  var el = document.getElementById('ok');
+  el.textContent = txt;
+  el.classList.add('show');
+  setTimeout(function(){ el.classList.remove('show'); }, 2600);
+}
+
+function cargar(id){
+  var d = construir(id);
+  localStorage.setItem('arthur_data_' + d.username, JSON.stringify(d));
+  localStorage.setItem('arthur_current_user', d.username);
+  // Nombre y foto del encabezado viven aparte (profile-persist.js)
+  try {
+    localStorage.setItem('axcore_profile_v1', JSON.stringify({ name: d.username, photo: '' }));
+  } catch(e){}
+  // Que no salte el tour de bienvenida encima de la demostración
+  localStorage.removeItem('axcore_first_run');
+  sessionStorage.setItem('axcore_active_page', 'dashboard');
+  aviso('Listo — abriendo la app como ' + d.username);
+  setTimeout(function(){ location.href = 'index.html'; }, 900);
+}
+
+function limpiar(){
+  var n = 0;
+  for (var id in PERFILES){
+    var k = 'arthur_data_' + PERFILES[id].username;
+    if (localStorage.getItem(k)){ localStorage.removeItem(k); n++; }
+  }
+  var actual = localStorage.getItem('arthur_current_user');
+  for (var id2 in PERFILES){
+    if (PERFILES[id2].username === actual) localStorage.removeItem('arthur_current_user');
+  }
+  aviso(n ? ('Borrados ' + n + ' perfiles demo') : 'No había perfiles demo aquí');
+}
+</script>
+</body>
+</html>

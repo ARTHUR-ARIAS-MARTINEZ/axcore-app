@@ -16,13 +16,22 @@ app.set('trust proxy', 1);
 // MONGO_URI   — connection string de MongoDB Atlas
 // JWT_SECRET  — secreto para firmar tokens de atletas
 // ALLOWED_ORIGINS — dominios permitidos (coma separados)
-// MAX_ATHLETES_PER_GYM — tope global (default 50)
+// MAX_ATHLETES_PER_GYM — tope de respaldo si un gimnasio no trae plan (default 36 = BÁSICO)
 // STRIPE_SECRET — opcional, para pagos
 // ============================================================
 const ADMIN_TOKEN = process.env.ADMIN_TOKEN || '';
 const MONGO_URI   = process.env.MONGO_URI   || '';
 const JWT_SECRET  = process.env.JWT_SECRET  || crypto.randomBytes(48).toString('hex');
-const MAX_ATHLETES_PER_GYM = parseInt(process.env.MAX_ATHLETES_PER_GYM || '50', 10);
+
+// Cupo y renta por plan. maxUsers = TOTAL de códigos (atletas + los de regalo del coach).
+// El gimnasio revende el acceso a $60/atleta; su utilidad es (athletes × 60) − rent.
+// Las claves se conservan porque hay gimnasios ya guardados con ellas en MongoDB.
+const PLAN_LIMITS = {
+    basico:   { maxUsers: 36,  athletes: 35,  coaches: 1, rent: 1500 },
+    estandar: { maxUsers: 72,  athletes: 70,  coaches: 2, rent: 2500 }, // PRO
+    premium:  { maxUsers: 143, athletes: 140, coaches: 3, rent: 3000 }  // ÉLITE
+};
+const MAX_ATHLETES_PER_GYM = parseInt(process.env.MAX_ATHLETES_PER_GYM || '36', 10);
 const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS ||
     'https://arthur-arias-martinez.github.io,http://localhost:3000,http://localhost:5500,http://127.0.0.1:5500'
 ).split(',').map(s => s.trim()).filter(Boolean);
@@ -264,8 +273,13 @@ app.post('/api/admin/gyms', requireAdminAuth, async (req, res) => {
         data.gymCode = String(data.gymCode).toUpperCase();
         data.password = await hashPassword(data.password || String(Math.floor(1000 + Math.random() * 9000)));
         data.active = true;
-        // El plan default no puede exceder MAX_ATHLETES_PER_GYM salvo override admin explícito
-        if (typeof data.maxUsers !== 'number' || data.maxUsers < 1) data.maxUsers = MAX_ATHLETES_PER_GYM;
+        // El cupo sale del PLAN contratado. El admin puede mandar un maxUsers explícito
+        // para ampliar un gimnasio fuera de plan; si no lo manda, manda el plan.
+        if (typeof data.maxUsers !== 'number' || data.maxUsers < 1) {
+            const p = PLAN_LIMITS[data.plan] || PLAN_LIMITS.basico;
+            data.maxUsers = p.maxUsers;
+            if (typeof data.rent !== 'number') data.rent = p.rent;
+        }
         const gym = await Gym.findOneAndUpdate(
             { gymCode: data.gymCode },
             data,
@@ -811,8 +825,8 @@ app.post('/api/poc/setup', requireAdminAuth, async (req, res) => {
             manager: 'Manager Test',
             coach: 'Coach Test',
             plan: 'basico',
-            maxUsers: 50,
-            rent: 1500,
+            maxUsers: PLAN_LIMITS.basico.maxUsers,
+            rent: PLAN_LIMITS.basico.rent,
             active: true,
             blockId: 'POC',
             password: 'COACHPASS123',
