@@ -15,9 +15,9 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0a0e14">
     <link rel="apple-touch-icon" href="logo.png">
-    <link rel="stylesheet" href="index.css?v=20260724h">
+    <link rel="stylesheet" href="index.css?v=20260724i">
     <!-- Premium UI overrides (inerte si <body> NO tiene .premium-mode) -->
-    <link rel="stylesheet" href="premium.css?v=20260724h">
+    <link rel="stylesheet" href="premium.css?v=20260724i">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <!-- Fuentes: Inter para cuerpos de texto, Oswald (Heavy Gym) para titulares -->
@@ -1004,14 +1004,14 @@
 
     <!-- Gráficas (Al final para no bloquear inicio rápido) -->
     <script src="https://cdn.jsdelivr.net/npm/apexcharts" defer></script>
-    <script src="profile-persist.js?v=20260724h"></script>
-    <script src="knowledge.js?v=20260724h"></script>
-    <script src="app.js?v=20260724h"></script>
+    <script src="profile-persist.js?v=20260724i"></script>
+    <script src="knowledge.js?v=20260724i"></script>
+    <script src="app.js?v=20260724i"></script>
     <!-- Premium UI: catálogo de insignias + FAB + onboarding -->
-    <script src="premium-badges.js?v=20260724h"></script>
-    <script src="premium-extras.js?v=20260724h"></script>
+    <script src="premium-badges.js?v=20260724i"></script>
+    <script src="premium-extras.js?v=20260724i"></script>
     <!-- Botón "atrás" del teléfono: retrocede dentro de la app en vez de cerrarla -->
-    <script src="axcore-back.js?v=20260724h"></script>
+    <script src="axcore-back.js?v=20260724i"></script>
 
     <!-- REGISTRO GLOBAL — funciona aunque app.js falle -->
     <script>
@@ -1089,7 +1089,7 @@
         // Registro del Service Worker de PWA unificado con detección de actualizaciones y auto-refresco
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=20260724h').then(reg => {
+                navigator.serviceWorker.register('sw.js?v=20260724i').then(reg => {
                     console.log('[AX-CORE] Service Worker registrado con éxito:', reg.scope);
 
                     // MEJORA (v5.56): revisar si hay versión nueva CADA VEZ que la app vuelve

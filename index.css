@@ -3472,37 +3472,34 @@ body.premium-mode #btn-studio-share.sx-share-btn {
     #page-studio .sx-scrollmode .sx-stage { max-width: 880px; margin-left: auto; margin-right: auto; width: 100%; }
 }
 
-/* ---- STAGE: tarjeta (canvas) + columna de acciones VISTA/DESCARGAR/COMPARTIR ---- */
+/* ═══ ZONA FIJA (pinada): tarjeta + título "ESTUDIO DE LOGROS" + barra de INSIGNIAS.
+   Todo el bloque queda pinado JUSTO debajo de la top-bar sticky de la app (66px) y SOLO
+   los controles (PLANTILLAS/INSIGNIA/COLOR/TIPOGRAFÍA/FRASES/FORMATOS) hacen scroll por
+   debajo. Fondo OPACO del tema para que el contenido pase por detrás sin transparentarse,
+   y capa propia de composición (translateZ/will-change) para que el scroll no se trabe. ═══ */
+#page-studio .sx-scrollmode .sx-pinned {
+    position: sticky;
+    top: var(--sx-topbar-h, 66px);   /* alto real de la top-bar, medido por JS (fallback 66) */
+    z-index: 6;
+    background:
+        radial-gradient(ellipse 80% 42% at 40% 16%, rgba(var(--pm-green-rgb, 0,201,122), 0.07) 0%, transparent 70%),
+        var(--pm-bg, #080c14);
+    box-shadow: 0 8px 16px -8px rgba(0,0,0,0.4);
+    border-bottom: 1px solid var(--pm-border, rgba(255,255,255,0.07));
+    will-change: transform;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    backface-visibility: hidden;
+}
+
+/* ---- STAGE: tarjeta (canvas) + columna de acciones VISTA/DESCARGAR/COMPARTIR ----
+   Ya NO es sticky por sí sola: vive dentro de .sx-pinned (que es quien se fija). ---- */
 #page-studio .sx-stage {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 16px;
-    padding: 14px 16px 16px;
-    /* IMAGEN FIJA: el escenario (tarjeta + acciones VISTA/DESCARGAR/COMPARTIR) queda
-       pinado arriba mientras PLANTILLAS/INSIGNIA/COLOR/TIPOGRAFÍA/FRASES/FORMATOS
-       hacen scroll por debajo — así nunca se pierde de vista lo que se está creando.
-       Fondo OPACO del tema (--pm-bg) por encima del glow, para que el contenido pase
-       por detrás sin transparentarse. */
-    position: sticky;
-    /* Se ancla JUSTO debajo de la top-bar sticky de la app (66px) — NO en 0, o su parte
-       de arriba quedaría escondida bajo esa barra. Con esto la tarjeta arranca ya en su
-       sitio y NO sube ni un pixel al hacer scroll. La variable la fija el JS midiendo la
-       barra real (fallback 66px). */
-    top: var(--sx-topbar-h, 66px);
-    z-index: 6;
-    background:
-        radial-gradient(ellipse 80% 55% at 40% 28%, rgba(var(--pm-green-rgb, 0,201,122), 0.07) 0%, transparent 70%),
-        var(--pm-bg, #080c14);
-    box-shadow: 0 6px 14px -6px rgba(0,0,0,0.35);
-    border-bottom: 1px solid var(--pm-border, rgba(255,255,255,0.07));
-    /* Capa propia de composición: el scroll de abajo pasa por GPU sin re-pintar la
-       tarjeta en cada frame (antes se trababa). translateZ fuerza la capa también en
-       WebViews viejos de Android; will-change es la pista moderna. */
-    will-change: transform;
-    transform: translateZ(0);
-    -webkit-transform: translateZ(0);
-    backface-visibility: hidden;
+    padding: 14px 16px 12px;
 }
 #page-studio .sx-stage .sx-canvas-frame { flex: 0 1 auto; width: auto; min-width: 0; }
 #page-studio .sx-actions {

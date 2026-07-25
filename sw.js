@@ -1,4 +1,4 @@
-const CACHE_NAME = 'axcore-v5.66-estudio-tarjeta-fija';
+const CACHE_NAME = 'axcore-v5.67-estudio-zona-fija';
 const urlsToCache = [
   './',
   './index.html?v=20260724h',

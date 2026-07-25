@@ -2426,18 +2426,19 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!tracking || fired) return;
             const dx = e.touches[0].clientX - sX;
             const dy = Math.abs(e.touches[0].clientY - sY);
-            // DISPARO EN PLENO GESTO: en cuanto el arrastre es claramente horizontal
-            // (50px y más horizontal que vertical) se navega YA, sin esperar a soltar
-            // el dedo, sin exigir velocidad ni límite de tiempo. Esto elimina la
-            // sensación de "necesita fuerza/presión" — un arrastre suave basta.
-            if (Math.abs(dx) >= 50 && Math.abs(dx) > dy) {
+            const adx = Math.abs(dx);
+            // Si el gesto se inclina a VERTICAL, es scroll: soltamos el tracking de inmediato
+            // para NO robar el gesto ni disparar cambio de sección por el arco natural del
+            // pulgar (esto era lo que "trababa" el scroll, sobre todo del lado izquierdo).
+            if (dy > 8 && dy >= adx) { tracking = false; return; }
+            // DISPARO horizontal SOLO si es CLARAMENTE horizontal (50px y bastante más
+            // horizontal que vertical) — un arrastre suave basta, pero un scroll con arco no.
+            if (adx >= 50 && adx > dy * 1.6) {
                 fired = true;
                 tracking = false;
                 goToPage(dx);
                 return;
             }
-            // Cancelar solo si es MUY claramente un scroll vertical.
-            if (dy > 60 && dy > Math.abs(dx) * 2) tracking = false;
         }, { passive: true });
 
         document.addEventListener('touchend', (e) => {
@@ -2446,12 +2447,11 @@ document.addEventListener('DOMContentLoaded', () => {
             // Respaldo para FLICKS cortos (el dedo se levantó antes de los 50px del
             // disparo en movimiento). Sin límite de tiempo: también cuenta un arrastre
             // corto y deliberado.
-            const eX = e.changedTouches[0].clientX;
-            const eY = e.changedTouches[0].clientY;
-            const dx = eX - sX;
-            const dy = Math.abs(eY - sY);
-            if (Math.abs(dx) < 24) return;        // mínimo horizontal
-            if (Math.abs(dx) < dy * 0.9) return;  // debe ser mayormente horizontal
+            const dx = e.changedTouches[0].clientX - sX;
+            const dy = Math.abs(e.changedTouches[0].clientY - sY);
+            const adx = Math.abs(dx);
+            // Flick corto: solo cuenta si fue CLARAMENTE horizontal (>30px y más que vertical).
+            if (adx < 30 || adx <= dy) return;
             goToPage(dx);
         }, { passive: true });
     })();
@@ -3881,8 +3881,11 @@ document.addEventListener('DOMContentLoaded', () => {
             <!-- ═══ STUDIO CORE — la TARJETA queda FIJA arriba; el resto scrollea por debajo ═══ -->
             <div class="sx-core sx-scrollmode">
 
-                <!-- TARJETA (canvas) + ACCIONES — FIJA (sticky). Va PRIMERA en el flujo para que
-                     NO se mueva ni un pixel al hacer scroll (no hay nada encima de ella). -->
+                <!-- ═══ ZONA FIJA (pinada): tarjeta + título + barra de INSIGNIAS. Todo esto
+                     queda arriba fijo (sticky) y SOLO los controles de abajo hacen scroll. ═══ -->
+                <div class="sx-pinned">
+
+                <!-- TARJETA (canvas) + ACCIONES (VISTA / DESCARGAR / COMPARTIR) -->
                 <div class="sx-stage">
                     <div class="sx-canvas-frame">
                         <div class="sx-canvas-glow"></div>
@@ -3929,6 +3932,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div id="achievements-panel" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(78px,1fr)); gap:7px; padding:12px 14px 16px;"></div>
                     </div>
                 </div>
+
+                </div><!-- /.sx-pinned (fin de la zona fija) -->
 
                 <!-- PESTAÑAS OCULTAS — se conservan .studio-pro-tab y [data-stab] para NO tocar el wiring/restorer -->
                 <div class="studio-pro-tabs sx-tabbar" style="display:none" aria-hidden="true">
