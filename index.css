@@ -231,6 +231,211 @@
     --accent-secondary-rgb: 255, 244, 214;
 }
 
+/* ══════════════════════════════════════════════════════════════════════
+   COLECCIONES 2026 — 5 familias de color × 3 tonos (15 temas nuevos)
+   ──────────────────────────────────────────────────────────────────────
+   Criterios (psicología del color + apps fitness de gama alta):
+   · Fondo NO negro puro: neutro profundo TEÑIDO con la familia (se ve
+     elegante, no "cueva" ni conspiranoico).
+   · Dos acentos ANÁLOGOS (mismo sector del círculo cromático, 20°-50°
+     de separación) para que todo degradado se vea natural, nunca chillón.
+   · Croma controlado: nada de saturación 100% sobre negro (eso es lo que
+     "grita"). Luminosidad alta para contraste de lectura.
+   · Cada tema trae su --pm-s1-rgb para barras/menús translúcidos del
+     mismo tono del tema (antes eran azul marino fijo en todos).
+   NO se borró ningún tema anterior: esto es puramente aditivo.
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* ─────────── COLECCIÓN ORO · lujo cálido (tierra, oro, ámbar) ─────────── */
+[data-theme="oro-champan"] {
+    --bg-dark: #12100c;
+    --accent-main: #d9b26a;
+    --accent-secondary: #f2e2c0;
+    --accent-alert: #ff6b5c;
+    --glass: rgba(217, 178, 106, 0.07);
+    --glass-border: rgba(217, 178, 106, 0.26);
+    --neon-glow: 0 0 14px rgba(217, 178, 106, 0.32), 0 0 30px rgba(242, 226, 192, 0.12);
+    --text-dim: #9e9077;
+    --accent-rgb: 217, 178, 106;
+    --accent-secondary-rgb: 242, 226, 192;
+}
+[data-theme="oro-cobre"] {
+    --bg-dark: #140f0b;
+    --accent-main: #c97c4e;
+    --accent-secondary: #f0b98a;
+    --accent-alert: #ff5e6c;
+    --glass: rgba(201, 124, 78, 0.07);
+    --glass-border: rgba(201, 124, 78, 0.26);
+    --neon-glow: 0 0 14px rgba(201, 124, 78, 0.32), 0 0 30px rgba(240, 185, 138, 0.14);
+    --text-dim: #a08872;
+    --accent-rgb: 201, 124, 78;
+    --accent-secondary-rgb: 240, 185, 138;
+}
+[data-theme="oro-ambar"] {
+    --bg-dark: #14110a;
+    --accent-main: #f0b429;
+    --accent-secondary: #ffe08a;
+    --accent-alert: #ff5a5a;
+    --glass: rgba(240, 180, 41, 0.07);
+    --glass-border: rgba(240, 180, 41, 0.26);
+    --neon-glow: 0 0 14px rgba(240, 180, 41, 0.32), 0 0 30px rgba(255, 224, 138, 0.14);
+    --text-dim: #a69264;
+    --accent-rgb: 240, 180, 41;
+    --accent-secondary-rgb: 255, 224, 138;
+}
+
+/* ─────────── COLECCIÓN FUEGO · energía (brasa, coral, terracota) ─────────── */
+[data-theme="fuego-brasa"] {
+    --bg-dark: #140a08;
+    --accent-main: #ff5a45;
+    --accent-secondary: #ffa24d;
+    --accent-alert: #ffc93c;
+    --glass: rgba(255, 90, 69, 0.07);
+    --glass-border: rgba(255, 90, 69, 0.26);
+    --neon-glow: 0 0 14px rgba(255, 90, 69, 0.32), 0 0 30px rgba(255, 162, 77, 0.14);
+    --text-dim: #b08579;
+    --accent-rgb: 255, 90, 69;
+    --accent-secondary-rgb: 255, 162, 77;
+}
+[data-theme="fuego-coral"] {
+    --bg-dark: #150d0e;
+    --accent-main: #ff6f61;
+    --accent-secondary: #ffb199;
+    --accent-alert: #ffd166;
+    --glass: rgba(255, 111, 97, 0.07);
+    --glass-border: rgba(255, 111, 97, 0.26);
+    --neon-glow: 0 0 14px rgba(255, 111, 97, 0.30), 0 0 30px rgba(255, 177, 153, 0.14);
+    --text-dim: #b08d89;
+    --accent-rgb: 255, 111, 97;
+    --accent-secondary-rgb: 255, 177, 153;
+}
+[data-theme="fuego-terracota"] {
+    --bg-dark: #130d0a;
+    --accent-main: #c1553a;
+    --accent-secondary: #e39b72;
+    --accent-alert: #e8b04b;
+    --glass: rgba(193, 85, 58, 0.07);
+    --glass-border: rgba(193, 85, 58, 0.26);
+    --neon-glow: 0 0 14px rgba(193, 85, 58, 0.32), 0 0 30px rgba(227, 155, 114, 0.14);
+    --text-dim: #a48a7c;
+    --accent-rgb: 193, 85, 58;
+    --accent-secondary-rgb: 227, 155, 114;
+}
+
+/* ─────────── COLECCIÓN ACERO · monocromo (negro, gris, blanco) ─────────── */
+[data-theme="acero-obsidiana"] {
+    --bg-dark: #08090b;
+    --accent-main: #e9ecf0;
+    --accent-secondary: #9aa4b0;
+    --accent-alert: #ff5c6e;
+    --glass: rgba(233, 236, 240, 0.05);
+    --glass-border: rgba(233, 236, 240, 0.16);
+    --neon-glow: 0 0 14px rgba(233, 236, 240, 0.16), 0 0 30px rgba(154, 164, 176, 0.10);
+    --text-dim: #7a828c;
+    --accent-rgb: 233, 236, 240;
+    --accent-secondary-rgb: 154, 164, 176;
+}
+[data-theme="acero-grafito"] {
+    --bg-dark: #101317;
+    --accent-main: #c3cbd6;
+    --accent-secondary: #8290a0;
+    --accent-alert: #ff6b7a;
+    --glass: rgba(195, 203, 214, 0.05);
+    --glass-border: rgba(195, 203, 214, 0.18);
+    --neon-glow: 0 0 14px rgba(195, 203, 214, 0.18), 0 0 30px rgba(130, 144, 160, 0.12);
+    --text-dim: #808a96;
+    --accent-rgb: 195, 203, 214;
+    --accent-secondary-rgb: 130, 144, 160;
+}
+[data-theme="acero-titanio"] {
+    --bg-dark: #0e1114;
+    --accent-main: #d5dee8;
+    --accent-secondary: #7e93a8;
+    --accent-alert: #ff6060;
+    --glass: rgba(213, 222, 232, 0.05);
+    --glass-border: rgba(213, 222, 232, 0.18);
+    --neon-glow: 0 0 14px rgba(213, 222, 232, 0.18), 0 0 30px rgba(126, 147, 168, 0.14);
+    --text-dim: #7e8894;
+    --accent-rgb: 213, 222, 232;
+    --accent-secondary-rgb: 126, 147, 168;
+}
+
+/* ─────────── COLECCIÓN AURORA · frescura (jade, océano, cobalto) ─────────── */
+[data-theme="aurora-jade"] {
+    --bg-dark: #071310;
+    --accent-main: #17c98c;
+    --accent-secondary: #4fe3c6;
+    --accent-alert: #ff5c7a;
+    --glass: rgba(23, 201, 140, 0.07);
+    --glass-border: rgba(23, 201, 140, 0.26);
+    --neon-glow: 0 0 14px rgba(23, 201, 140, 0.32), 0 0 30px rgba(79, 227, 198, 0.14);
+    --text-dim: #7ba396;
+    --accent-rgb: 23, 201, 140;
+    --accent-secondary-rgb: 79, 227, 198;
+}
+[data-theme="aurora-oceano"] {
+    --bg-dark: #061320;
+    --accent-main: #14a5c9;
+    --accent-secondary: #45e0d0;
+    --accent-alert: #ff6384;
+    --glass: rgba(20, 165, 201, 0.07);
+    --glass-border: rgba(20, 165, 201, 0.26);
+    --neon-glow: 0 0 14px rgba(20, 165, 201, 0.32), 0 0 30px rgba(69, 224, 208, 0.14);
+    --text-dim: #7c9bb0;
+    --accent-rgb: 20, 165, 201;
+    --accent-secondary-rgb: 69, 224, 208;
+}
+[data-theme="aurora-cobalto"] {
+    --bg-dark: #05101e;
+    --accent-main: #3b7bf0;
+    --accent-secondary: #56c8f5;
+    --accent-alert: #ff5e7d;
+    --glass: rgba(59, 123, 240, 0.07);
+    --glass-border: rgba(59, 123, 240, 0.26);
+    --neon-glow: 0 0 14px rgba(59, 123, 240, 0.32), 0 0 30px rgba(86, 200, 245, 0.14);
+    --text-dim: #8199b8;
+    --accent-rgb: 59, 123, 240;
+    --accent-secondary-rgb: 86, 200, 245;
+}
+
+/* ─────────── COLECCIÓN ORQUÍDEA · lila, rosa y magenta ─────────── */
+[data-theme="orq-lila"] {
+    --bg-dark: #100b18;
+    --accent-main: #a87bf0;
+    --accent-secondary: #ddb0ff;
+    --accent-alert: #ff6b9a;
+    --glass: rgba(168, 123, 240, 0.07);
+    --glass-border: rgba(168, 123, 240, 0.26);
+    --neon-glow: 0 0 14px rgba(168, 123, 240, 0.32), 0 0 30px rgba(221, 176, 255, 0.14);
+    --text-dim: #9a8ab0;
+    --accent-rgb: 168, 123, 240;
+    --accent-secondary-rgb: 221, 176, 255;
+}
+[data-theme="orq-rosa"] {
+    --bg-dark: #150c13;
+    --accent-main: #f2749e;
+    --accent-secondary: #ffb8ce;
+    --accent-alert: #ffae5c;
+    --glass: rgba(242, 116, 158, 0.07);
+    --glass-border: rgba(242, 116, 158, 0.26);
+    --neon-glow: 0 0 14px rgba(242, 116, 158, 0.30), 0 0 30px rgba(255, 184, 206, 0.14);
+    --text-dim: #b08b9c;
+    --accent-rgb: 242, 116, 158;
+    --accent-secondary-rgb: 255, 184, 206;
+}
+[data-theme="orq-magenta"] {
+    --bg-dark: #120814;
+    --accent-main: #e0459b;
+    --accent-secondary: #ff8fd0;
+    --accent-alert: #ffb03a;
+    --glass: rgba(224, 69, 155, 0.07);
+    --glass-border: rgba(224, 69, 155, 0.26);
+    --neon-glow: 0 0 14px rgba(224, 69, 155, 0.32), 0 0 30px rgba(255, 143, 208, 0.14);
+    --text-dim: #a87c9c;
+    --accent-rgb: 224, 69, 155;
+    --accent-secondary-rgb: 255, 143, 208;
+}
+
 * {
     margin: 0;
     padding: 0;

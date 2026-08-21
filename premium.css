@@ -475,6 +475,250 @@ body.premium-mode[data-theme="dorado"] {
   background: #14120a !important;
 }
 
+/* ═══════════════════════════════════════════════════════════════════════
+   COLECCIONES 2026 — superficies y degradados de los 15 temas nuevos
+   ───────────────────────────────────────────────────────────────────────
+   Cada tema define 3 superficies escalonadas (s1 tarjeta hundida, s2
+   tarjeta normal, s3 tarjeta elevada) TEÑIDAS con su familia de color,
+   más --pm-s1-rgb para las barras translúcidas (menú inferior y lateral),
+   que antes eran azul marino fijo en TODOS los temas y rompían la armonía.
+   Aditivo: no se tocó ningún tema anterior.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── ORO · lujo cálido ── */
+body.premium-mode[data-theme="oro-champan"] {
+  --pm-green-rgb: 217,178,106;
+  --pm-cyan-rgb:  242,226,192;
+  --pm-title-2: #f6ecd8;
+  --pm-s1: #191510; --pm-s2: #211c15; --pm-s3: #2b241b; --pm-dim: #4a3f2e;
+  --pm-s1-rgb: 25,21,16;
+  --pm-border: rgba(217,178,106,0.15);
+}
+body.premium-mode[data-theme="oro-cobre"] {
+  --pm-green-rgb: 201,124,78;
+  --pm-cyan-rgb:  240,185,138;
+  --pm-title-2: #fbdcc0;
+  --pm-s1: #1c150f; --pm-s2: #241b14; --pm-s3: #30241a; --pm-dim: #533b29;
+  --pm-s1-rgb: 28,21,15;
+  --pm-border: rgba(201,124,78,0.16);
+}
+body.premium-mode[data-theme="oro-ambar"] {
+  --pm-green-rgb: 240,180,41;
+  --pm-cyan-rgb:  255,224,138;
+  --pm-title-2: #fff0c4;
+  --pm-s1: #1b1710; --pm-s2: #241e14; --pm-s3: #2f281a; --pm-dim: #55461f;
+  --pm-s1-rgb: 27,23,16;
+  --pm-border: rgba(240,180,41,0.15);
+}
+
+/* ── FUEGO · energía ── */
+body.premium-mode[data-theme="fuego-brasa"] {
+  --pm-green-rgb: 255,90,69;
+  --pm-cyan-rgb:  255,162,77;
+  --pm-title-2: #ffd9c4;
+  --pm-s1: #1d100c; --pm-s2: #261611; --pm-s3: #331d17; --pm-dim: #57291f;
+  --pm-s1-rgb: 29,16,12;
+  --pm-border: rgba(255,90,69,0.15);
+}
+body.premium-mode[data-theme="fuego-coral"] {
+  --pm-green-rgb: 255,111,97;
+  --pm-cyan-rgb:  255,177,153;
+  --pm-title-2: #ffddd2;
+  --pm-s1: #1e1314; --pm-s2: #271a1a; --pm-s3: #332222; --pm-dim: #5a3230;
+  --pm-s1-rgb: 30,19,20;
+  --pm-border: rgba(255,111,97,0.15);
+}
+body.premium-mode[data-theme="fuego-terracota"] {
+  --pm-green-rgb: 193,85,58;
+  --pm-cyan-rgb:  227,155,114;
+  --pm-title-2: #f6d9c4;
+  --pm-s1: #1b1310; --pm-s2: #241a15; --pm-s3: #2f231c; --pm-dim: #55362a;
+  --pm-s1-rgb: 27,19,16;
+  --pm-border: rgba(193,85,58,0.17);
+}
+
+/* ── ACERO · monocromo ── */
+body.premium-mode[data-theme="acero-obsidiana"] {
+  --pm-green-rgb: 233,236,240;
+  --pm-cyan-rgb:  154,164,176;
+  --pm-title-2: #aeb6c0;
+  --pm-s1: #101216; --pm-s2: #16191e; --pm-s3: #1e2228; --pm-dim: #2c3138;
+  --pm-s1-rgb: 16,18,22;
+  --pm-border: rgba(233,236,240,0.08);
+}
+body.premium-mode[data-theme="acero-grafito"] {
+  --pm-green-rgb: 195,203,214;
+  --pm-cyan-rgb:  130,144,160;
+  --pm-title-2: #9ba6b4;
+  --pm-s1: #171b21; --pm-s2: #1e232a; --pm-s3: #272d36; --pm-dim: #3a424d;
+  --pm-s1-rgb: 23,27,33;
+  --pm-border: rgba(195,203,214,0.10);
+}
+body.premium-mode[data-theme="acero-titanio"] {
+  --pm-green-rgb: 213,222,232;
+  --pm-cyan-rgb:  126,147,168;
+  --pm-title-2: #a9bacb;
+  --pm-s1: #161a20; --pm-s2: #1d222a; --pm-s3: #262d36; --pm-dim: #38414d;
+  --pm-s1-rgb: 22,26,32;
+  --pm-border: rgba(213,222,232,0.10);
+}
+
+/* ── AURORA · frescura ── */
+body.premium-mode[data-theme="aurora-jade"] {
+  --pm-green-rgb: 23,201,140;
+  --pm-cyan-rgb:  79,227,198;
+  --pm-title-2: #c8ffec;
+  --pm-s1: #0c1b17; --pm-s2: #10231e; --pm-s3: #163029; --pm-dim: #23473c;
+  --pm-s1-rgb: 12,27,23;
+  --pm-border: rgba(23,201,140,0.16);
+}
+body.premium-mode[data-theme="aurora-oceano"] {
+  --pm-green-rgb: 20,165,201;
+  --pm-cyan-rgb:  69,224,208;
+  --pm-title-2: #c6f2ff;
+  --pm-s1: #0b1b2a; --pm-s2: #0f2335; --pm-s3: #163046; --pm-dim: #23455f;
+  --pm-s1-rgb: 11,27,42;
+  --pm-border: rgba(20,165,201,0.16);
+}
+body.premium-mode[data-theme="aurora-cobalto"] {
+  --pm-green-rgb: 59,123,240;
+  --pm-cyan-rgb:  86,200,245;
+  --pm-title-2: #d2e6ff;
+  --pm-s1: #0a192b; --pm-s2: #0e2136; --pm-s3: #142c46; --pm-dim: #1f3e63;
+  --pm-s1-rgb: 10,25,43;
+  --pm-border: rgba(59,123,240,0.16);
+}
+
+/* ── ORQUÍDEA · lila, rosa y magenta ── */
+body.premium-mode[data-theme="orq-lila"] {
+  --pm-green-rgb: 168,123,240;
+  --pm-cyan-rgb:  221,176,255;
+  --pm-title-2: #ebdcff;
+  --pm-s1: #171021; --pm-s2: #1e162b; --pm-s3: #281d38; --pm-dim: #3d2e56;
+  --pm-s1-rgb: 23,16,33;
+  --pm-border: rgba(168,123,240,0.16);
+}
+body.premium-mode[data-theme="orq-rosa"] {
+  --pm-green-rgb: 242,116,158;
+  --pm-cyan-rgb:  255,184,206;
+  --pm-title-2: #ffdce8;
+  --pm-s1: #1d111b; --pm-s2: #261722; --pm-s3: #321f2d; --pm-dim: #58314a;
+  --pm-s1-rgb: 29,17,27;
+  --pm-border: rgba(242,116,158,0.16);
+}
+body.premium-mode[data-theme="orq-magenta"] {
+  --pm-green-rgb: 224,69,155;
+  --pm-cyan-rgb:  255,143,208;
+  --pm-title-2: #ffd6ee;
+  --pm-s1: #1a0d1c; --pm-s2: #221226; --pm-s3: #2d1932; --pm-dim: #4e2450;
+  --pm-s1-rgb: 26,13,28;
+  --pm-border: rgba(224,69,155,0.16);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   CAPA DE ARMONÍA — aplica SOLO a los 15 temas nuevos (prefijos oro- /
+   fuego- / acero- / aurora- / orq-). Ningún tema anterior la recibe.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* 1) FONDO CON LUZ: dos halos suaves del propio tema (arriba y abajo).
+      Quita el efecto "pared negra plana" sin aclarar la app. */
+body.premium-mode[data-theme^="oro-"],
+body.premium-mode[data-theme^="fuego-"],
+body.premium-mode[data-theme^="acero-"],
+body.premium-mode[data-theme^="aurora-"],
+body.premium-mode[data-theme^="orq-"] {
+  background-image:
+    radial-gradient(120% 62% at 50% -14%, rgba(var(--pm-green-rgb), 0.13), rgba(0,0,0,0) 60%),
+    radial-gradient(100% 58% at 106% 108%, rgba(var(--pm-cyan-rgb), 0.08), rgba(0,0,0,0) 58%) !important;
+  background-repeat: no-repeat !important;
+  background-position: center top, right bottom !important;
+}
+
+/* 2) TARJETAS CON PROFUNDIDAD: degradado propio + filo de luz superior.
+      (Antes eran un color plano; así se ven talladas, no pegadas.) */
+body.premium-mode[data-theme^="oro-"] .glass-card,
+body.premium-mode[data-theme^="fuego-"] .glass-card,
+body.premium-mode[data-theme^="acero-"] .glass-card,
+body.premium-mode[data-theme^="aurora-"] .glass-card,
+body.premium-mode[data-theme^="orq-"] .glass-card {
+  background: linear-gradient(158deg, var(--pm-s3) 0%, var(--pm-s2) 46%, var(--pm-s1) 100%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.045),
+    0 0 34px rgba(var(--pm-green-rgb), 0.045),
+    0 14px 34px rgba(0,0,0,0.32) !important;
+}
+
+/* 3) TARJETAS DE DATO: mismo degradado, un punto más brillante. */
+body.premium-mode[data-theme^="oro-"] .stat-card,
+body.premium-mode[data-theme^="fuego-"] .stat-card,
+body.premium-mode[data-theme^="acero-"] .stat-card,
+body.premium-mode[data-theme^="aurora-"] .stat-card,
+body.premium-mode[data-theme^="orq-"] .stat-card {
+  background: linear-gradient(150deg, var(--pm-s3), var(--pm-s1)) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.05) !important;
+}
+
+/* 4) MENÚ INFERIOR Y LATERAL DEL COLOR DEL TEMA (antes: azul marino fijo
+      en todos los temas — era lo que más rompía la armonía). */
+body.premium-mode[data-theme^="oro-"] .pm-bottom-nav-inner,
+body.premium-mode[data-theme^="fuego-"] .pm-bottom-nav-inner,
+body.premium-mode[data-theme^="acero-"] .pm-bottom-nav-inner,
+body.premium-mode[data-theme^="aurora-"] .pm-bottom-nav-inner,
+body.premium-mode[data-theme^="orq-"] .pm-bottom-nav-inner {
+  background: linear-gradient(180deg,
+      rgba(var(--pm-s1-rgb), 0.90) 0%,
+      rgba(var(--pm-s1-rgb), 0.97) 100%) !important;
+  border: 1px solid rgba(var(--pm-green-rgb), 0.14) !important;
+  box-shadow: 0 10px 34px rgba(0,0,0,0.42), inset 0 1px 0 rgba(255,255,255,0.05) !important;
+}
+body.premium-mode[data-theme^="oro-"] .side-nav,
+body.premium-mode[data-theme^="fuego-"] .side-nav,
+body.premium-mode[data-theme^="acero-"] .side-nav,
+body.premium-mode[data-theme^="aurora-"] .side-nav,
+body.premium-mode[data-theme^="orq-"] .side-nav {
+  background: linear-gradient(180deg,
+      rgba(var(--pm-s1-rgb), 0.96) 0%,
+      rgba(var(--pm-s1-rgb), 0.90) 100%) !important;
+  border-color: rgba(var(--pm-green-rgb), 0.12) !important;
+}
+
+/* 5) BOTÓN PRINCIPAL: degradado en diagonal con un tercer paso de luz,
+      para que no se vea como una plasta de un solo color. */
+body.premium-mode[data-theme^="oro-"] .btn-premium,
+body.premium-mode[data-theme^="fuego-"] .btn-premium,
+body.premium-mode[data-theme^="acero-"] .btn-premium,
+body.premium-mode[data-theme^="aurora-"] .btn-premium,
+body.premium-mode[data-theme^="orq-"] .btn-premium {
+  background: linear-gradient(126deg,
+      var(--pm-green) 0%,
+      var(--pm-green) 34%,
+      var(--pm-cyan) 100%) !important;
+  box-shadow: 0 6px 22px rgba(var(--pm-green-rgb), 0.28),
+              inset 0 1px 0 rgba(255,255,255,0.22) !important;
+}
+
+/* 6) BARRA DE PROGRESO: degradado acento → acento claro, con filo de luz
+      y un halo tenue del propio tema (se lee el avance de un vistazo). */
+body.premium-mode[data-theme^="oro-"] .progress-fill,
+body.premium-mode[data-theme^="fuego-"] .progress-fill,
+body.premium-mode[data-theme^="acero-"] .progress-fill,
+body.premium-mode[data-theme^="aurora-"] .progress-fill,
+body.premium-mode[data-theme^="orq-"] .progress-fill {
+  background: linear-gradient(90deg, var(--pm-green) 0%, var(--pm-cyan) 100%) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.25),
+              0 0 12px rgba(var(--pm-green-rgb), 0.30) !important;
+}
+
+/* 7) CANALETA DE LA BARRA: hundida y del tono del tema, no gris genérico. */
+body.premium-mode[data-theme^="oro-"] .progress-bar-container,
+body.premium-mode[data-theme^="fuego-"] .progress-bar-container,
+body.premium-mode[data-theme^="acero-"] .progress-bar-container,
+body.premium-mode[data-theme^="aurora-"] .progress-bar-container,
+body.premium-mode[data-theme^="orq-"] .progress-bar-container {
+  background: rgba(var(--pm-green-rgb), 0.10) !important;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.45) !important;
+}
+
 /* TARJETAS — glass premium */
 body.premium-mode .glass-card {
   background: var(--pm-s2) !important;
@@ -4066,3 +4310,76 @@ body.premium-mode #achievements-panel .ach-card--locked .ach-icon.has-med { opac
 .axmed-t4 .axmed-num { color: #c6f6ff; }  /* azul   */
 .axmed-t5 .axmed-num { color: #d6ffd9; }  /* verde  */
 .axmed-num { text-shadow: 0 1px 2px rgba(0,0,0,.95), 0 0 6px rgba(0,0,0,.9); }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   SELECTOR DE COLECCIONES (Ajustes › Estilo visual) — 5 familias × 3 tonos
+   ═══════════════════════════════════════════════════════════════════════ */
+.axc-wrap { display: none; }
+body.premium-mode .axc-wrap { display: block; margin: 18px 0 8px; }
+
+body.premium-mode .axc-head { margin: 0 5px 12px; }
+body.premium-mode .axc-head-title {
+  font-family: 'Oswald', sans-serif;
+  font-size: 11px; letter-spacing: 2.5px; font-weight: 600;
+  color: var(--pm-dim2);
+  display: flex; align-items: center; gap: 8px;
+}
+body.premium-mode .axc-new {
+  font-size: 8px; letter-spacing: 1.4px; font-weight: 700;
+  padding: 2px 7px; border-radius: 99px;
+  color: var(--pm-accent-ink, #000);
+  background: linear-gradient(126deg, var(--pm-green), var(--pm-cyan));
+}
+body.premium-mode .axc-head-sub {
+  font-size: 10px; line-height: 1.45; color: var(--pm-dim2);
+  opacity: .75; margin-top: 5px;
+}
+
+body.premium-mode .axc-col {
+  position: relative;
+  background: linear-gradient(158deg, var(--pm-s2), var(--pm-s1));
+  border: 1px solid var(--pm-border);
+  border-radius: 18px;
+  padding: 14px 12px 12px;
+  margin-bottom: 10px;
+  overflow: hidden;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), 0 8px 22px rgba(0,0,0,0.22);
+}
+body.premium-mode .axc-col-bar {
+  position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  border-radius: 18px 18px 0 0;
+}
+body.premium-mode .axc-col-name {
+  font-family: 'Oswald', sans-serif;
+  font-size: 13px; letter-spacing: 2.5px; font-weight: 700;
+  color: var(--pm-white);
+}
+body.premium-mode .axc-col-desc {
+  font-size: 10px; line-height: 1.45; color: var(--pm-dim2);
+  margin: 3px 0 11px;
+}
+body.premium-mode .axc-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px;
+}
+body.premium-mode .axc-grid .t-swatch {
+  background: rgba(255,255,255,0.035) !important;
+  border: 1px solid var(--pm-border) !important;
+  border-radius: 14px !important;
+  padding: 11px 4px 8px !important;
+}
+body.premium-mode .axc-grid .t-dot {
+  width: 30px !important; height: 30px !important;
+  border: 1px solid rgba(255,255,255,0.16);
+  box-shadow: 0 3px 10px rgba(0,0,0,0.42), inset 0 1px 0 rgba(255,255,255,0.22);
+}
+body.premium-mode .axc-grid .t-name {
+  font-size: 8px !important; letter-spacing: 1px;
+}
+/* En tema claro (BLANCO) las fichas necesitan fondo y filos visibles. */
+body.premium-mode[data-theme="blanco"] .axc-grid .t-swatch {
+  background: #ffffff !important;
+  border-color: rgba(0,0,0,0.14) !important;
+}
+body.premium-mode[data-theme="blanco"] .axc-col {
+  background: linear-gradient(158deg, #ffffff, #f2f3f5) !important;
+}

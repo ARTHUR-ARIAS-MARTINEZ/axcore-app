@@ -649,6 +649,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (userData.theme === 'amarillo') { userData.theme = 'dorado'; try { saveData(); } catch(e){} }
         const activeTheme = userData.theme || 'neon';
         document.body.setAttribute('data-theme', activeTheme);
+        if (typeof window.axSyncThemeColor === 'function') window.axSyncThemeColor();
         // Marcar theme-btn (legacy) y t-swatch (premium) con estado activo
         document.querySelectorAll('.theme-buttons .theme-btn, .t-swatch').forEach(b => {
             b.classList.toggle('active', b.dataset.theme === activeTheme);
@@ -1768,11 +1769,29 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => t.remove(), 2200);
     }
 
+    // Pinta la barra de estado del celular (arriba, donde va la hora y la
+    // señal) del mismo color de fondo del tema activo. Sin esto se quedaba
+    // siempre en el azul oscuro original y se veía un "escalón" de color.
+    window.axSyncThemeColor = function() {
+        try {
+            const bg = (getComputedStyle(document.body).getPropertyValue('--bg-dark') || '').trim();
+            if (!bg) return;
+            let meta = document.querySelector('meta[name="theme-color"]');
+            if (!meta) {
+                meta = document.createElement('meta');
+                meta.setAttribute('name', 'theme-color');
+                document.head.appendChild(meta);
+            }
+            meta.setAttribute('content', bg);
+        } catch (e) { /* sin barra que pintar */ }
+    };
+
     window.pmSetTheme = function(themeName) {
         try {
             userData.theme = themeName;
             if (typeof checkAchievements === 'function') checkAchievements();
             document.body.setAttribute('data-theme', themeName);
+            window.axSyncThemeColor();
             // Marcar el swatch activo
             document.querySelectorAll('.t-swatch').forEach(btn => {
                 if (btn.dataset.theme === themeName) btn.classList.add('active');
@@ -1799,7 +1818,23 @@ document.addEventListener('DOMContentLoaded', () => {
                     cafe: 'CAFÉ',
                     rojo: 'ROJO',
                     dorado: 'DORADO',
-                    neon: 'NEON'
+                    neon: 'NEON',
+                    // ── COLECCIONES 2026 (5 familias × 3 tonos) ──
+                    'oro-champan': 'ORO · CHAMPÁN',
+                    'oro-cobre': 'ORO · COBRE',
+                    'oro-ambar': 'ORO · ÁMBAR',
+                    'fuego-brasa': 'FUEGO · BRASA',
+                    'fuego-coral': 'FUEGO · CORAL',
+                    'fuego-terracota': 'FUEGO · TERRACOTA',
+                    'acero-obsidiana': 'ACERO · OBSIDIANA',
+                    'acero-grafito': 'ACERO · GRAFITO',
+                    'acero-titanio': 'ACERO · TITANIO',
+                    'aurora-jade': 'AURORA · JADE',
+                    'aurora-oceano': 'AURORA · OCÉANO',
+                    'aurora-cobalto': 'AURORA · COBALTO',
+                    'orq-lila': 'ORQUÍDEA · LILA',
+                    'orq-rosa': 'ORQUÍDEA · ROSA',
+                    'orq-magenta': 'ORQUÍDEA · MAGENTA'
                 };
                 toastFn('✦ Tema: ' + (nombres[themeName] || themeName.toUpperCase()), 'green');
             }
