@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'axcore-v5.76-cupos-y-fichas';
+﻿const CACHE_NAME = 'axcore-v5.77-admin-seguro';
 const urlsToCache = [
   './',
   './index.html?v=20260822e',

@@ -104,17 +104,29 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 });
                 
-                // Cleanup: Gimnasios que no tienen un bloque válido en esta consola
+                // ⚠️ 2026-08-22 — AQUÍ HABÍA UNA BOMBA.
+                // Este trozo borraba de la NUBE todo gimnasio cuyo bloque no
+                // estuviera en ESTE navegador. Como los bloques viven en el
+                // localStorage de cada equipo, abrir la consola en un celular
+                // nuevo (sin bloques) marcaba TODOS los gimnasios como huérfanos
+                // y los borraba de la base de datos. Clientes que pagan, fuera.
+                // Regla nueva: la consola JAMÁS borra sola. Los gimnasios sin
+                // bloque se marcan y se muestran para que Arthur decida.
                 const validBlockIds = new Set(adminData.blocks.map(b => b.id));
-                const orphanedGyms = adminData.gyms.filter(g => !validBlockIds.has(g.blockId));
-                
-                if (orphanedGyms.length > 0) {
-                    // Borrar de la nube
-                    for (const g of orphanedGyms) {
-                        try { await fetch(`${API_URL}/api/admin/gyms/${g.gymCode}`, { method: 'DELETE', headers: adminHeaders() }); } catch(e){}
+                adminData.gyms.forEach(g => {
+                    g.sinBloque = !validBlockIds.has(g.blockId);
+                });
+                const huerfanos = adminData.gyms.filter(g => g.sinBloque).length;
+                const avisoOrf = document.getElementById('aviso-huerfanos');
+                if (avisoOrf) {
+                    if (huerfanos > 0) {
+                        avisoOrf.style.display = 'block';
+                        avisoOrf.innerHTML = '⚠️ Hay <b>' + huerfanos + '</b> gimnasio(s) sin bloque asignado en esta consola. ' +
+                            'No se borró nada. Si es la primera vez que abres la consola en este equipo, ' +
+                            'restaura tu configuración con el botón <b>Restaurar</b> de arriba.';
+                    } else {
+                        avisoOrf.style.display = 'none';
                     }
-                    // Borrar de memoria y guardar
-                    adminData.gyms = adminData.gyms.filter(g => validBlockIds.has(g.blockId));
                 }
                 saveAdminData();
             }
@@ -126,6 +138,33 @@ document.addEventListener('DOMContentLoaded', () => {
     function saveAdminData() {
         localStorage.setItem('arthur_admin_blocks_data', JSON.stringify(adminData));
     }
+
+    // Los BLOQUES viven solo en el navegador donde se crearon: no viajan solos
+    // de la computadora al celular. Con esto se copian a mano.
+    window.axRespaldarConsola = async function () {
+        const texto = JSON.stringify(adminData);
+        try {
+            await navigator.clipboard.writeText(texto);
+            alert('Configuración copiada.\n\n' + adminData.blocks.length + ' bloque(s) y ' +
+                  adminData.gyms.length + ' gimnasio(s).\n\nPégala en el otro equipo con el botón Restaurar.');
+        } catch (e) {
+            prompt('Copia todo este texto y pégalo en el otro equipo:', texto);
+        }
+    };
+
+    window.axRestaurarConsola = function () {
+        const texto = prompt('Pega aquí la configuración que copiaste del otro equipo:');
+        if (!texto) return;
+        let datos;
+        try { datos = JSON.parse(texto); } catch (e) { return alert('Ese texto no sirve. Cópialo completo.'); }
+        if (!datos || !Array.isArray(datos.blocks)) return alert('Ese texto no trae bloques.');
+        if (!confirm('Vas a reemplazar la configuración de ESTE equipo por:\n\n' +
+                     datos.blocks.length + ' bloque(s)\n' +
+                     (datos.gyms || []).length + ' gimnasio(s)\n\n¿Le seguimos?')) return;
+        adminData = { blocks: datos.blocks || [], gyms: datos.gyms || [] };
+        saveAdminData();
+        location.reload();
+    };
 
     // --- NAVEGACIÓN TABS ---
     document.querySelectorAll('.nav-btn').forEach(btn => {
