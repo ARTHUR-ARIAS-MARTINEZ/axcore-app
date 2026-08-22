@@ -4693,3 +4693,98 @@ body.premium-mode #page-settings .t-swatch.ax-fus.active::after { content: none;
   border: 1px solid rgba(var(--pm-green-rgb), .30);
   color: var(--accent-main);
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   DIETA › MI PLAN — mosaico de 8 cuadros, dos por renglón.
+   Antes eran ocho renglones largos que se comían la pantalla completa.
+   Ahora: DESAYUNO y MEDIA MAÑANA arriba, COMIDA y MEDIA TARDE abajo,
+   PRE y POST entreno, y CENA con SNACK. El icono manda, el nombre
+   acompaña, y el borde se enciende cuando esa comida ya tiene plan.
+   ═══════════════════════════════════════════════════════════════════════ */
+body.premium-mode .pm-d-meals {
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: 10px !important;
+  margin-bottom: 16px !important;
+}
+body.premium-mode .pm-d-meals .pm-d-meal {
+  min-height: 104px !important;
+  margin: 0 !important;
+  padding: 15px 10px 13px !important;
+  border-radius: 19px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 9px !important;
+  text-align: center !important;
+  background: linear-gradient(158deg, var(--pm-s3) 0%, var(--pm-s2) 48%, var(--pm-s1) 100%) !important;
+  border: 1px solid var(--pm-border) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.05), 0 8px 20px rgba(0,0,0,.22) !important;
+  transition: transform .14s cubic-bezier(.34,1.56,.64,1), border-color .22s, box-shadow .22s !important;
+}
+body.premium-mode .pm-d-meals .pm-d-meal:active { transform: scale(.97) !important; }
+
+/* el icono, dentro de un disco del color del tema */
+body.premium-mode .pm-d-meal-ico {
+  width: 40px; height: 40px; flex: none;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 19px; line-height: 1;
+  border-radius: 50%;
+  background: rgba(var(--pm-green-rgb), .10);
+  border: 1px solid rgba(var(--pm-green-rgb), .22);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.10);
+  transition: all .22s;
+}
+body.premium-mode .pm-d-meals .pm-d-meal-name-c {
+  font-family: 'Oswald', sans-serif !important;
+  font-size: .66rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 1.7px !important;
+  line-height: 1.2 !important;
+  color: var(--pm-dim2, #7f93a8) !important;
+  text-transform: uppercase;
+  transition: color .22s;
+}
+/* el lápiz, discreto en la esquina */
+body.premium-mode .pm-d-meals .pm-d-meal-edit {
+  position: absolute !important;
+  top: 8px !important; right: 9px !important;
+  transform: none !important;
+  font-size: .78rem !important;
+  color: var(--pm-dim2, #7f93a8) !important;
+  opacity: .5; background: transparent; border: none; cursor: pointer;
+  padding: 3px; line-height: 1;
+}
+body.premium-mode .pm-d-meals .pm-d-meal-edit:active { opacity: 1; }
+
+/* con plan cargado: se enciende */
+body.premium-mode .pm-d-meals .pm-d-meal.has-content {
+  border-color: rgba(var(--pm-green-rgb), .36) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06),
+              0 0 18px rgba(var(--pm-green-rgb), .10),
+              0 8px 20px rgba(0,0,0,.24) !important;
+}
+body.premium-mode .pm-d-meals .pm-d-meal.has-content .pm-d-meal-ico {
+  background: rgba(var(--pm-green-rgb), .18);
+  border-color: rgba(var(--pm-green-rgb), .42);
+  box-shadow: 0 0 14px rgba(var(--pm-green-rgb), .22), inset 0 1px 0 rgba(255,255,255,.16);
+}
+body.premium-mode .pm-d-meals .pm-d-meal.has-content .pm-d-meal-name-c {
+  color: var(--accent-main) !important;
+}
+/* puntito de "ya tiene plan" */
+body.premium-mode .pm-d-meals .pm-d-meal.has-content::after {
+  content: ''; position: absolute; top: 11px; left: 11px;
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--accent-main);
+  box-shadow: 0 0 8px var(--accent-main);
+}
+body.premium-mode .pm-d-plan-hint {
+  font-style: normal !important;
+  font-family: 'Oswald', sans-serif;
+  font-size: .58rem !important;
+  letter-spacing: 1.4px; text-transform: uppercase;
+  opacity: .7;
+}

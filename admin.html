@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>MAESTRO AX-CORE | Control de Bloques</title>
     <!-- PWA Support -->
-    <link rel="manifest" href="manifest_admin.json?v=20260822f">
+    <link rel="manifest" href="manifest_admin.json?v=20260822g">
     <meta name="theme-color" content="#0a0b0d">
     <link rel="icon" href="assets/icons/admin-192.png" type="image/png">
     <link rel="apple-touch-icon" href="assets/icons/admin-192.png">
@@ -13,12 +13,14 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="AX Admin">
-    <link rel="stylesheet" href="admin.css?v=20260822f">
+    <link rel="stylesheet" href="index.css?v=20260822g">
+    <link rel="stylesheet" href="premium.css?v=20260822g">
+    <link rel="stylesheet" href="admin.css?v=20260822g">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
 </head>
-<body data-theme="admin">
+<body class="premium-mode" data-theme="fusion-acero">
     
     <!-- Pantalla de Seguridad -->
     <div id="admin-login" class="admin-overlay">
@@ -47,8 +49,6 @@
         <header class="admin-header">
             <div class="logo">AX-CORE <span class="tag">ADMIN M36</span></div>
             <div class="user-info">Administrador de Red: <span id="admin-user">Arthur</span></div>
-            <button onclick="axRespaldarConsola()" title="Copiar la configuración de esta consola">RESPALDAR</button>
-            <button onclick="axRestaurarConsola()" title="Pegar la configuración de otro equipo">RESTAURAR</button>
             <button id="btn-logout-admin">CERRAR CONSOLA</button>
         </header>
 
@@ -63,6 +63,53 @@
 
             <section class="admin-content">
                 <!-- Tab Bloques -->
+                <div class="glass-card ax-acc" id="admin-temas" style="margin-bottom:16px;">
+                    <button class="ax-acc-head" type="button" onclick="document.getElementById('admin-temas').classList.toggle('ax-acc-open')">
+                        <span class="ax-acc-lbl">Estilo visual</span>
+                        <span class="ax-acc-now" id="admin-tema-actual">ACERO</span>
+                        <span class="ax-acc-chev">&rsaquo;</span>
+                    </button>
+                    <div class="ax-acc-body">
+                        <div class="theme-grid" style="display:flex;flex-direction:column;gap:9px;">
+                        <div class="t-swatch ax-fus" data-theme="fusion-acero" onclick="axSetAdminTheme('fusion-acero')" style="--c1:#8e99a6;--c2:#d7e0ea;--c3:#f4f7fa;--c1rgb:215,224,234">
+                            <span class="ax-fus-txt">
+                                <span class="ax-fus-word">AX-CORE <b>ACERO</b></span>
+                                <span class="ax-fus-note">acero &middot; titanio &middot; humo</span>
+                            </span>
+                            <span class="ax-fus-check"></span>
+                        </div>
+                        <div class="t-swatch ax-fus" data-theme="fusion-aurora" onclick="axSetAdminTheme('fusion-aurora')" style="--c1:#17c98c;--c2:#15b4c6;--c3:#4fa0ff;--c1rgb:21,180,198">
+                            <span class="ax-fus-txt">
+                                <span class="ax-fus-word">AX-CORE <b>AURORA</b></span>
+                                <span class="ax-fus-note">jade &middot; turquesa &middot; cobalto</span>
+                            </span>
+                            <span class="ax-fus-check"></span>
+                        </div>
+                        <div class="t-swatch ax-fus" data-theme="fusion-oro" onclick="axSetAdminTheme('fusion-oro')" style="--c1:#c97d45;--c2:#e8b04a;--c3:#f7e7c6;--c1rgb:232,176,74">
+                            <span class="ax-fus-txt">
+                                <span class="ax-fus-word">AX-CORE <b>ORO</b></span>
+                                <span class="ax-fus-note">cobre &middot; oro &middot; champ&aacute;n</span>
+                            </span>
+                            <span class="ax-fus-check"></span>
+                        </div>
+                        <div class="t-swatch ax-fus" data-theme="fusion-fuego" onclick="axSetAdminTheme('fusion-fuego')" style="--c1:#c8502f;--c2:#ff5a45;--c3:#ffb08f;--c1rgb:255,90,69">
+                            <span class="ax-fus-txt">
+                                <span class="ax-fus-word">AX-CORE <b>FUEGO</b></span>
+                                <span class="ax-fus-note">terracota &middot; brasa &middot; coral</span>
+                            </span>
+                            <span class="ax-fus-check"></span>
+                        </div>
+                        <div class="t-swatch ax-fus" data-theme="fusion-orq" onclick="axSetAdminTheme('fusion-orq')" style="--c1:#a87bf0;--c2:#dc55a8;--c3:#ffb0ce;--c1rgb:220,85,168">
+                            <span class="ax-fus-txt">
+                                <span class="ax-fus-word">AX-CORE <b>ORQU&Iacute;DEA</b></span>
+                                <span class="ax-fus-note">lila &middot; orqu&iacute;dea &middot; rosa</span>
+                            </span>
+                            <span class="ax-fus-check"></span>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div id="aviso-huerfanos" style="display:none; margin-bottom:16px; padding:14px 16px; border-radius:14px; background:rgba(255,170,0,.10); border:1px solid rgba(255,170,0,.35); color:#ffcf70; font-size:.85rem; line-height:1.5;"></div>
 
                 <div id="tab-blocks" class="admin-pane active">
@@ -241,10 +288,10 @@
     </div>
 
     <script src="knowledge.js"></script>
-    <script src="admin.js?v=20260822f"></script>
+    <script src="admin.js?v=20260822g"></script>
     <script>
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js?v=20260822f').catch(() => {});
+            navigator.serviceWorker.register('sw.js?v=20260822g').catch(() => {});
         }
     // --- INSTALACIÓN EN EL CELULAR ---
     // Regla: la caja se muestra SIEMPRE, salvo que esta misma app ya este

@@ -147,6 +147,19 @@ const Code  = mongoose.model('Code', codeSchema);
 const User  = mongoose.model('User', userSchema);
 const Vault = mongoose.model('Vault', vaultSchema);
 
+// Bloques (zonas comerciales de Arthur). Antes vivian SOLO en el localStorage
+// de la consola: no viajaban de la computadora al celular y, peor, la consola
+// borraba gimnasios cuando no los encontraba. Ahora viven aqui, junto a los
+// gimnasios, y se ven igual desde donde se abra la consola.
+const blockSchema = new mongoose.Schema({
+    id:      { type: String, required: true, unique: true, index: true },
+    name:    { type: String, required: true },
+    zone:    { type: String, default: '' },
+    created: { type: String, default: '' },
+    createdAt: { type: Date, default: Date.now }
+});
+const Block = mongoose.model('Block', blockSchema);
+
 // ============================================================
 // HELPERS DE SEGURIDAD
 // ============================================================
@@ -286,6 +299,34 @@ app.post('/api/admin/gyms', requireAdminAuth, async (req, res) => {
             { upsert: true, new: true }
         );
         res.json({ success: true, gym: stripPassword(gym) });
+    } catch (e) { res.status(500).json({ success: false, message: e.message }); }
+});
+
+// ── BLOQUES ──────────────────────────────────────────────────────────────
+app.get('/api/admin/blocks', requireAdminAuth, async (req, res) => {
+    try {
+        const blocks = await Block.find({}).sort({ createdAt: 1 }).lean();
+        res.json({ success: true, blocks });
+    } catch (e) { res.status(500).json({ success: false, message: e.message }); }
+});
+
+app.post('/api/admin/blocks', requireAdminAuth, async (req, res) => {
+    try {
+        const d = req.body || {};
+        if (!d.id || !d.name) return res.status(400).json({ success: false, message: 'id y name requeridos.' });
+        const block = await Block.findOneAndUpdate(
+            { id: String(d.id) },
+            { id: String(d.id), name: d.name, zone: d.zone || '', created: d.created || '' },
+            { upsert: true, new: true }
+        );
+        res.json({ success: true, block });
+    } catch (e) { res.status(500).json({ success: false, message: e.message }); }
+});
+
+app.delete('/api/admin/blocks/:id', requireAdminAuth, async (req, res) => {
+    try {
+        await Block.deleteOne({ id: req.params.id });
+        res.json({ success: true });
     } catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 

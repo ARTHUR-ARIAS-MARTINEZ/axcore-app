@@ -75,96 +75,62 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- PERSISTENCIA ---
     async function loadAdminData() {
+        // El localStorage se queda SOLO como copia por si no hay internet.
+        // La verdad de los bloques y de los gimnasios esta en el servidor.
         const saved = localStorage.getItem('arthur_admin_blocks_data');
         if (saved) {
-            adminData = JSON.parse(saved);
+            try { adminData = JSON.parse(saved); } catch (e) {}
         }
 
-        // Sincronizar gimnasios desde el servidor en la nube
         try {
-            const res = await fetch(`${API_URL}/api/admin/gyms`, { headers: adminHeaders() });
-            if (res.status === 401) {
+            const [rb, rg] = await Promise.all([
+                fetch(`${API_URL}/api/admin/blocks`, { headers: adminHeaders() }),
+                fetch(`${API_URL}/api/admin/gyms`,   { headers: adminHeaders() })
+            ]);
+
+            if (rb.status === 401 || rg.status === 401) {
                 sessionStorage.removeItem('admin_token');
                 alert('Sesión expirada. Vuelve a entrar.');
                 location.reload();
                 return;
             }
-            const data = await res.json();
-            if(data.success && data.gyms) {
-                // Fusionar datos del servidor con datos locales (para mantener blockId)
-                data.gyms.forEach(serverGym => {
-                    const localGym = adminData.gyms.find(g => g.gymCode === serverGym.gymCode);
-                    if (localGym) {
-                        // Actualizar datos del servidor pero conservar blockId local
-                        localGym.currentUsers = serverGym.currentUsers;
-                        localGym.active = serverGym.active;
-                    } else {
-                        // Gym nuevo del servidor que no teníamos localmente
-                        adminData.gyms.push(serverGym);
-                    }
-                });
-                
-                // ⚠️ 2026-08-22 — AQUÍ HABÍA UNA BOMBA.
-                // Este trozo borraba de la NUBE todo gimnasio cuyo bloque no
-                // estuviera en ESTE navegador. Como los bloques viven en el
-                // localStorage de cada equipo, abrir la consola en un celular
-                // nuevo (sin bloques) marcaba TODOS los gimnasios como huérfanos
-                // y los borraba de la base de datos. Clientes que pagan, fuera.
-                // Regla nueva: la consola JAMÁS borra sola. Los gimnasios sin
-                // bloque se marcan y se muestran para que Arthur decida.
-                const validBlockIds = new Set(adminData.blocks.map(b => b.id));
-                adminData.gyms.forEach(g => {
-                    g.sinBloque = !validBlockIds.has(g.blockId);
-                });
-                const huerfanos = adminData.gyms.filter(g => g.sinBloque).length;
-                const avisoOrf = document.getElementById('aviso-huerfanos');
-                if (avisoOrf) {
-                    if (huerfanos > 0) {
-                        avisoOrf.style.display = 'block';
-                        avisoOrf.innerHTML = '⚠️ Hay <b>' + huerfanos + '</b> gimnasio(s) sin bloque asignado en esta consola. ' +
-                            'No se borró nada. Si es la primera vez que abres la consola en este equipo, ' +
-                            'restaura tu configuración con el botón <b>Restaurar</b> de arriba.';
-                    } else {
-                        avisoOrf.style.display = 'none';
-                    }
-                }
-                saveAdminData();
+
+            const db = await rb.json();
+            if (db.success && Array.isArray(db.blocks)) {
+                adminData.blocks = db.blocks.map(b => ({
+                    id: b.id, name: b.name, zone: b.zone || '', created: b.created || ''
+                }));
             }
-        } catch(e) {
-            console.error("Modo offline: Cargando gyms locales", e);
+
+            const dg = await rg.json();
+            if (dg.success && dg.gyms) {
+                // El servidor manda; el blockId tambien viene de ahi.
+                adminData.gyms = dg.gyms;
+            }
+
+            // La consola NUNCA borra sola. Si un gimnasio quedo sin bloque, se avisa.
+            const validBlockIds = new Set(adminData.blocks.map(b => b.id));
+            adminData.gyms.forEach(g => { g.sinBloque = !validBlockIds.has(g.blockId); });
+            const huerfanos = adminData.gyms.filter(g => g.sinBloque).length;
+            const avisoOrf = document.getElementById('aviso-huerfanos');
+            if (avisoOrf) {
+                if (huerfanos > 0) {
+                    avisoOrf.style.display = 'block';
+                    avisoOrf.innerHTML = '⚠️ Hay <b>' + huerfanos + '</b> gimnasio(s) sin bloque asignado. ' +
+                        'No se borró nada: entra a Asignación de Gimnasios y ponles el bloque que les toca.';
+                } else {
+                    avisoOrf.style.display = 'none';
+                }
+            }
+            saveAdminData();
+        } catch (e) {
+            console.error('Sin conexión: mostrando la última copia guardada.', e);
         }
     }
 
     function saveAdminData() {
         localStorage.setItem('arthur_admin_blocks_data', JSON.stringify(adminData));
     }
-
-    // Los BLOQUES viven solo en el navegador donde se crearon: no viajan solos
-    // de la computadora al celular. Con esto se copian a mano.
-    window.axRespaldarConsola = async function () {
-        const texto = JSON.stringify(adminData);
-        try {
-            await navigator.clipboard.writeText(texto);
-            alert('Configuración copiada.\n\n' + adminData.blocks.length + ' bloque(s) y ' +
-                  adminData.gyms.length + ' gimnasio(s).\n\nPégala en el otro equipo con el botón Restaurar.');
-        } catch (e) {
-            prompt('Copia todo este texto y pégalo en el otro equipo:', texto);
-        }
-    };
-
-    window.axRestaurarConsola = function () {
-        const texto = prompt('Pega aquí la configuración que copiaste del otro equipo:');
-        if (!texto) return;
-        let datos;
-        try { datos = JSON.parse(texto); } catch (e) { return alert('Ese texto no sirve. Cópialo completo.'); }
-        if (!datos || !Array.isArray(datos.blocks)) return alert('Ese texto no trae bloques.');
-        if (!confirm('Vas a reemplazar la configuración de ESTE equipo por:\n\n' +
-                     datos.blocks.length + ' bloque(s)\n' +
-                     (datos.gyms || []).length + ' gimnasio(s)\n\n¿Le seguimos?')) return;
-        adminData = { blocks: datos.blocks || [], gyms: datos.gyms || [] };
-        saveAdminData();
-        location.reload();
-    };
 
     // --- NAVEGACIÓN TABS ---
     document.querySelectorAll('.nav-btn').forEach(btn => {
@@ -198,10 +164,9 @@ document.addEventListener('DOMContentLoaded', () => {
         openModal('modal-block');
     };
 
-    document.getElementById('btn-save-block').onclick = () => {
+    document.getElementById('btn-save-block').onclick = async () => {
         const name = document.getElementById('block-name').value.trim();
         const key = document.getElementById('block-key').value.trim();
-
         if (!name) return alert("Escribe el nombre del bloque.");
 
         const newBlock = {
@@ -211,32 +176,31 @@ document.addEventListener('DOMContentLoaded', () => {
             created: new Date().toLocaleDateString()
         };
 
+        const btn = document.getElementById('btn-save-block');
+        const txt = btn.textContent;
+        btn.textContent = 'GUARDANDO...'; btn.disabled = true;
+        try {
+            const res = await fetch(`${API_URL}/api/admin/blocks`, {
+                method: 'POST',
+                headers: adminHeaders({ 'Content-Type': 'application/json' }),
+                body: JSON.stringify(newBlock)
+            });
+            const data = await res.json();
+            if (!data.success) throw new Error(data.message || 'El servidor no lo aceptó.');
+        } catch (e) {
+            btn.textContent = txt; btn.disabled = false;
+            return alert('No se pudo guardar en el servidor.\n\n' + e.message +
+                         '\n\nRevisa tu internet y vuelve a intentar. No se creó nada a medias.');
+        }
+        btn.textContent = txt; btn.disabled = false;
+
         adminData.blocks.push(newBlock);
         saveAdminData();
         closeModal('modal-block');
         renderBlocks();
         updateGymBlockSelect();
-        alert(`✅ Bloque "${name}" creado correctamente.\nAhora ve a "Asignación de Gimnasios" para agregar gimnasios a este bloque.`);
+        alert(`✅ Bloque "${name}" creado y guardado en el servidor.\nYa lo vas a ver desde cualquier equipo.`);
     };
-
-    function renderBlocks() {
-        blocksList.innerHTML = adminData.blocks.map(b => {
-            const gymsInBlock = adminData.gyms.filter(g => g.blockId === b.id).length;
-            return `
-                <div class="block-card">
-                    <h4>${b.name.toUpperCase()}</h4>
-                    <div class="api-preview">ZONA: ${b.zone || b.apiKey || '—'}</div>
-                    <div class="gym-count">Gimnasios: ${gymsInBlock} / 20</div>
-                    <div class="block-actions">
-                        <button class="btn-cancel" style="font-size:0.6rem;" onclick="deleteBlock('${b.id}')">ELIMINAR</button>
-                    </div>
-                </div>
-            `;
-        }).join('');
-        if (adminData.blocks.length === 0) {
-            blocksList.innerHTML = `<p style="grid-column: 1/-1; text-align:center; padding:3rem; color:var(--text-dim);">No hay bloques configurados. Crea el primero para empezar.</p>`;
-        }
-    }
 
     window.deleteBlock = async (id) => {
         if (confirm("¿Seguro que quieres eliminar este bloque? Los gimnasios asociados también SERÁN ELIMINADOS DE LA NUBE permanentemente.")) {
@@ -249,6 +213,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             // Remover de la memoria local
+            try { await fetch(`${API_URL}/api/admin/blocks/${id}`, { method: 'DELETE', headers: adminHeaders() }); } catch(e){}
             adminData.blocks = adminData.blocks.filter(b => b.id !== id);
             adminData.gyms = adminData.gyms.filter(g => g.blockId !== id);
             

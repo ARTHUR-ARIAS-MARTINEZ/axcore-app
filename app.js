@@ -2784,16 +2784,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 <!-- ─── TAB MI PLAN ─── -->
                 <div class="pm-d-panel ${pmDietTab === 'plan' ? 'on' : ''}" id="pmDt-plan">
                     <div class="pm-d-plan-hint">Toca una comida para abrirla · el lápiz ✎ para editarla</div>
+                    <div class="pm-d-meals">
                     ${MEAL_SLOTS.map(m => {
                         const has = (diet[m.key] || '').trim();
                         return `
-                    <div class="pm-d-meal ${has ? 'has-content' : ''}" data-meal="${m.key}">
-                        <div class="pm-d-meal-center">
-                            <span class="pm-d-meal-name-c">${m.icon} ${m.name}</span>
+                        <div class="pm-d-meal ${has ? 'has-content' : ''}" data-meal="${m.key}">
+                            <span class="pm-d-meal-ico">${m.icon}</span>
+                            <span class="pm-d-meal-name-c">${m.name}</span>
                             <button class="pm-d-meal-edit" data-edit="${m.key}" title="Editar" aria-label="Editar">✎</button>
-                        </div>
-                    </div>`;
+                        </div>`;
                     }).join('')}
+                    </div>
 
                     <!-- INGRESO AUTOMÁTICO DE DIETA -->
                     <div class="pm-diet-import-card">
