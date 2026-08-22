@@ -19,6 +19,7 @@ const urlsToCache = [
   './assets/icons/admin-192.png',
   './assets/icons/admin-512.png',
   './coach.html',
+  './guia.html?v=20260822g',
   './aviso_privacidad.html',
   './terminos.html'
 ];

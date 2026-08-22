@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>AX-CORE · Cómo se usa</title>
+<meta name="theme-color" content="#06141b">
+<link rel="icon" href="assets/icons/app-192.png" type="image/png">
+<link rel="stylesheet" href="index.css?v=20260822g">
+<link rel="stylesheet" href="premium.css?v=20260822g">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  html, body { height: 100%; margin: 0; overflow: hidden; }
+  body { font-family: 'Inter', sans-serif; }
+
+  .gx { height: 100dvh; display: flex; flex-direction: column; }
+
+  /* ── barra de arriba ── */
+  .gx-top {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; padding: 14px 16px 10px; flex: none;
+  }
+  .gx-brand {
+    font-family: 'Oswald', sans-serif; font-weight: 700;
+    font-size: .9rem; letter-spacing: 3px;
+    background: linear-gradient(120deg,
+        var(--accent-tri, var(--accent-main)), var(--accent-main) 52%, var(--accent-secondary));
+    -webkit-background-clip: text; background-clip: text;
+    color: transparent; -webkit-text-fill-color: transparent;
+  }
+  .gx-close {
+    cursor: pointer; text-decoration: none;
+    background: transparent; border: 1px solid var(--pm-border);
+    color: var(--pm-dim2, #7f93a8); border-radius: 99px; padding: .4rem .9rem;
+    font-family: 'Oswald', sans-serif; font-size: .6rem;
+    letter-spacing: 1.5px; text-transform: uppercase;
+  }
+
+  /* ── el carrete ── */
+  .gx-track {
+    flex: 1; display: flex; overflow-x: auto; overflow-y: hidden;
+    scroll-snap-type: x mandatory; scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .gx-track::-webkit-scrollbar { display: none; }
+
+  .gx-slide {
+    flex: 0 0 100%; scroll-snap-align: center;
+    display: flex; flex-direction: column;
+    padding: 0 16px 6px; min-width: 0;
+  }
+
+  .gx-shot {
+    flex: 1; min-height: 0; position: relative;
+    border-radius: 24px; overflow: hidden;
+    background: linear-gradient(158deg, var(--pm-s3), var(--pm-s2) 46%, var(--pm-s1));
+    border: 1px solid var(--pm-border);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.05), 0 16px 38px rgba(0,0,0,.32);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .gx-shot img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .gx-ph {
+    text-align: center; padding: 24px;
+    font-family: 'Oswald', sans-serif; letter-spacing: 2px;
+    color: var(--pm-dim2, #7f93a8); font-size: .68rem; line-height: 1.9;
+  }
+  .gx-ph b {
+    display: block; font-size: 2.4rem; line-height: 1; margin-bottom: 12px;
+    background: linear-gradient(120deg,
+        var(--accent-tri, var(--accent-main)), var(--accent-main) 52%, var(--accent-secondary));
+    -webkit-background-clip: text; background-clip: text;
+    color: transparent; -webkit-text-fill-color: transparent;
+  }
+
+  .gx-txt { flex: none; padding: 16px 4px 4px; }
+  .gx-step {
+    font-family: 'Oswald', sans-serif; font-size: .58rem;
+    letter-spacing: 2.6px; text-transform: uppercase;
+    color: var(--accent-main); margin-bottom: 7px;
+  }
+  .gx-title {
+    font-family: 'Oswald', sans-serif; font-weight: 700;
+    font-size: 1.35rem; letter-spacing: 1.4px; line-height: 1.1;
+    color: var(--pm-white, #fff); margin: 0 0 8px;
+  }
+  .gx-line {
+    font-size: .86rem; line-height: 1.5;
+    color: var(--pm-dim2, #7f93a8); margin: 0; max-width: 46ch;
+  }
+
+  /* ── pie: puntos y botón ── */
+  .gx-foot { flex: none; padding: 12px 16px calc(14px + env(safe-area-inset-bottom)); }
+  .gx-dots { display: flex; justify-content: center; gap: 7px; margin-bottom: 13px; }
+  .gx-dot {
+    width: 7px; height: 7px; border-radius: 99px; flex: none;
+    background: var(--pm-dim2, #7f93a8); opacity: .34;
+    transition: all .3s cubic-bezier(.34,1.56,.64,1); cursor: pointer;
+  }
+  .gx-dot.on { opacity: 1; width: 22px; background: var(--accent-main); }
+  .gx-next {
+    width: 100%; cursor: pointer; border: none; border-radius: 99px;
+    padding: .95rem; color: #0a0a0a;
+    font-family: 'Oswald', sans-serif; font-weight: 700;
+    font-size: .78rem; letter-spacing: 2px; text-transform: uppercase;
+    background: linear-gradient(122deg,
+        var(--accent-tri, var(--accent-main)) 0%, var(--accent-main) 30%, var(--accent-secondary) 100%);
+    box-shadow: 0 6px 22px rgba(var(--pm-green-rgb), .3), inset 0 1px 0 rgba(255,255,255,.24);
+  }
+  .gx-next:active { transform: scale(.98); }
+
+  @media (min-width: 760px) {
+    .gx-slide { padding: 0 22px 6px; }
+    .gx-track { max-width: 520px; margin: 0 auto; width: 100%; }
+    .gx-foot { max-width: 520px; margin: 0 auto; width: 100%; }
+  }
+</style>
+</head>
+<body class="premium-mode" data-theme="fusion-aurora">
+
+<div class="gx">
+  <div class="gx-top">
+    <span class="gx-brand">AX-CORE</span>
+    <a class="gx-close" href="index.html">Salir</a>
+  </div>
+
+  <div class="gx-track" id="gxTrack"></div>
+
+  <div class="gx-foot">
+    <div class="gx-dots" id="gxDots"></div>
+    <button class="gx-next" id="gxNext">SIGUIENTE</button>
+  </div>
+</div>
+
+<script>
+// Cada paso: número de imagen, título y la línea que lo explica.
+// La imagen vive en assets/guia/NN.png. Si todavía no está, sale el hueco
+// con su número para que se sepa cuál falta.
+var PASOS = [
+  { img: '01', step: 'Paso 1', title: 'Entra con tu pase',
+    line: 'Tu coach te da un pase de una sola vez. Lo escribes, pones tu nombre y ya quedaste dentro. No se comparte: queda amarrado a ti.' },
+  { img: '02', step: 'Paso 2', title: 'Tu tablero',
+    line: 'Lo primero que ves: tu peso de hoy, cuántas calorías llevas y tu racha. Todo de un vistazo, sin buscarle.' },
+  { img: '03', step: 'Paso 3', title: 'Registra tu peso',
+    line: 'Te pesas, lo anotas y la app hace el resto. Es el número que manda: de ahí sale todo lo demás.' },
+  { img: '04', step: 'Paso 4', title: 'Tu plan de comidas',
+    line: 'Ocho cuadros, uno por comida. El que ya tiene plan se enciende. Tocas uno y ves qué te toca comer.' },
+  { img: '05', step: 'Paso 5', title: 'Registra lo que comes',
+    line: 'Escribes el alimento y la cantidad. La app le pone las calorías sola y te dice cuánto te queda del día.' },
+  { img: '06', step: 'Paso 6', title: 'Tu entrenamiento',
+    line: 'La rutina que te tocó, ejercicio por ejercicio. Vas marcando lo que ya hiciste.' },
+  { img: '07', step: 'Paso 7', title: 'Mira cómo vas',
+    line: 'Tu peso y tu cintura semana con semana, en gráfica. Aquí se ve el avance que en el espejo tarda en notarse.' },
+  { img: '08', step: 'Paso 8', title: 'Presume tu avance',
+    line: 'El Estudio te arma una tarjeta con tus números para mandarla por WhatsApp o subirla. Tú eliges el estilo.' },
+  { img: '09', step: 'Paso 9', title: 'Tus insignias',
+    line: 'Cada racha, cada kilo y cada centímetro te dan una medalla. Bronce, plata, oro, platino y leyenda.' },
+  { img: '10', step: 'Paso 10', title: 'Ponla a tu gusto',
+    line: 'En Ajustes escoges el color de toda la app: Aurora, Acero, Oro, Fuego u Orquídea. Y desde ahí la instalas en tu pantalla de inicio.' }
+];
+
+var track = document.getElementById('gxTrack');
+var dots  = document.getElementById('gxDots');
+var next  = document.getElementById('gxNext');
+
+track.innerHTML = PASOS.map(function (p, i) {
+  return '<div class="gx-slide">' +
+    '<div class="gx-shot">' +
+      '<img src="assets/guia/' + p.img + '.png" alt="' + p.title + '" ' +
+      'onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'block\'">' +
+      '<div class="gx-ph" style="display:none"><b>' + p.img + '</b>Aqu&iacute; va la imagen ' + p.img + '<br>assets/guia/' + p.img + '.png</div>' +
+    '</div>' +
+    '<div class="gx-txt">' +
+      '<div class="gx-step">' + p.step + ' de ' + PASOS.length + '</div>' +
+      '<h1 class="gx-title">' + p.title + '</h1>' +
+      '<p class="gx-line">' + p.line + '</p>' +
+    '</div>' +
+  '</div>';
+}).join('');
+
+dots.innerHTML = PASOS.map(function (p, i) {
+  return '<span class="gx-dot' + (i === 0 ? ' on' : '') + '" data-i="' + i + '"></span>';
+}).join('');
+
+function actual() {
+  return Math.round(track.scrollLeft / track.clientWidth);
+}
+function pinta() {
+  var i = actual();
+  dots.querySelectorAll('.gx-dot').forEach(function (d, k) {
+    d.classList.toggle('on', k === i);
+  });
+  next.textContent = (i >= PASOS.length - 1) ? 'EMPEZAR' : 'SIGUIENTE';
+}
+function ir(i) {
+  track.scrollTo({ left: i * track.clientWidth, behavior: 'smooth' });
+}
+
+track.addEventListener('scroll', function () {
+  clearTimeout(track._t);
+  track._t = setTimeout(pinta, 60);
+});
+next.addEventListener('click', function () {
+  var i = actual();
+  if (i >= PASOS.length - 1) { location.href = 'index.html'; return; }
+  ir(i + 1);
+});
+dots.addEventListener('click', function (e) {
+  var d = e.target.closest('.gx-dot');
+  if (d) ir(+d.dataset.i);
+});
+document.addEventListener('keydown', function (e) {
+  if (e.key === 'ArrowRight') ir(Math.min(actual() + 1, PASOS.length - 1));
+  if (e.key === 'ArrowLeft')  ir(Math.max(actual() - 1, 0));
+});
+
+// La guía se abre con el mismo color que el atleta eligió en la app.
+// La clave del usuario cambia según quién entró, así que se busca el tema
+// en lo que haya guardado la app, sin depender del nombre de la clave.
+(function () {
+  try {
+    var tema = null;
+    for (var i = 0; i < localStorage.length && !tema; i++) {
+      var v = localStorage.getItem(localStorage.key(i));
+      if (!v || v.indexOf('"theme"') === -1) continue;
+      try {
+        var o = JSON.parse(v);
+        if (o && typeof o.theme === 'string' && o.theme.indexOf('fusion-') === 0) tema = o.theme;
+      } catch (e) {}
+    }
+    if (tema) document.body.setAttribute('data-theme', tema);
+    var bg = (getComputedStyle(document.body).getPropertyValue('--bg-dark') || '').trim();
+    var m = document.querySelector('meta[name="theme-color"]');
+    if (bg && m) m.setAttribute('content', bg);
+  } catch (e) {}
+})();
+</script>
+</body>
+</html>
