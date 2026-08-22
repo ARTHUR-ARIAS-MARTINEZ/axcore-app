@@ -645,8 +645,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function applySettings() {
-        // Migración: el tema "amarillo" se eliminó (se parecía a dorado) → usar dorado.
-        if (userData.theme === 'amarillo') { userData.theme = 'dorado'; try { saveData(); } catch(e){} }
+        // Migración 2026-08-22: los 10 temas viejos se retiraron. Al atleta que
+        // tenía uno de ellos se le pasa a la fusión más cercana de su familia,
+        // para que nadie despierte sin color ni pierda el estilo que eligió.
+        var TEMAS_RETIRADOS = {
+            amarillo: 'fusion-oro', dorado: 'fusion-oro', cafe: 'fusion-oro',
+            rojo: 'fusion-fuego',
+            black: 'fusion-acero', blanco: 'fusion-acero',
+            cyberpunk: 'fusion-aurora', azul: 'fusion-aurora',
+            pink: 'fusion-orq', pastel: 'fusion-orq', violeta: 'fusion-orq'
+        };
+        if (TEMAS_RETIRADOS[userData.theme]) {
+            userData.theme = TEMAS_RETIRADOS[userData.theme];
+            try { saveData(); } catch(e){}
+        }
         const activeTheme = userData.theme || 'neon';
         document.body.setAttribute('data-theme', activeTheme);
         if (typeof window.axSyncThemeColor === 'function') window.axSyncThemeColor();
@@ -1808,17 +1820,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const toastFn = typeof pmShowToast === 'function' ? pmShowToast : null;
             if (toastFn) {
                 const nombres = {
-                    blanco: 'BLANCO',
-                    cyberpunk: 'VERDE',
-                    black: 'NEGRO',
-                    pink: 'ROSA',
-                    pastel: 'LILA',
-                    azul: 'AZUL',
-                    violeta: 'VIOLETA',
-                    cafe: 'CAFÉ',
-                    rojo: 'ROJO',
-                    dorado: 'DORADO',
                     neon: 'NEON',
+                    // ── LAS 5 FUSIONES (Estilo visual) ──
+                    'fusion-oro': 'ORO',
+                    'fusion-fuego': 'FUEGO',
+                    'fusion-acero': 'ACERO',
+                    'fusion-aurora': 'AURORA',
+                    'fusion-orq': 'ORQUÍDEA',
                     // ── COLECCIONES 2026 (5 familias × 3 tonos) ──
                     'oro-champan': 'ORO · CHAMPÁN',
                     'oro-cobre': 'ORO · COBRE',

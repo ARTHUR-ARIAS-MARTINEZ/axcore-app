@@ -15,9 +15,9 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0a0e14">
     <link rel="apple-touch-icon" href="logo.png">
-    <link rel="stylesheet" href="index.css?v=20260820a">
+    <link rel="stylesheet" href="index.css?v=20260822a">
     <!-- Premium UI overrides (inerte si <body> NO tiene .premium-mode) -->
-    <link rel="stylesheet" href="premium.css?v=20260820a">
+    <link rel="stylesheet" href="premium.css?v=20260822a">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <!-- Fuentes: Inter para cuerpos de texto, Oswald (Heavy Gym) para titulares -->
@@ -881,59 +881,44 @@
                     </div>
                 </div>
 
-                <!-- ═══ THEMES ═══ -->
+                <!-- ═══ THEMES — las 5 fusiones, una por familia ═══ -->
                 <div class="premium-only" style="margin-bottom:12px;">
                     <div class="pm-section-title" style="margin-left:5px; margin-bottom:8px; font-family:var(--font-accent); font-size:10px; letter-spacing:2px; color:var(--text-dim);">ESTILO VISUAL</div>
-                    <div class="theme-grid" id="theme-grid" style="display:grid; grid-template-columns: repeat(3, 1fr); gap:7px;">
-                        <!-- BLANCO (más claro) -->
-                        <div class="t-swatch" data-theme="blanco" onclick="pmSetTheme('blanco')" style="order:1">
-                            <div class="t-dot" style="background:linear-gradient(135deg,#ffffff,#aab2bd); border:2px solid rgba(0,0,0,.25); width:26px; height:26px; border-radius:50%; margin:0 auto 6px;"></div>
-                            <div class="t-name">BLANCO</div>
+                    <div class="theme-grid ax-fus-list" id="theme-grid">
+                        <div class="t-swatch ax-fus" data-theme="fusion-aurora" onclick="pmSetTheme('fusion-aurora')">
+                            <span class="ax-fus-chip" style="background:linear-gradient(100deg,#17c98c 0%,#15b4c6 52%,#4fa0ff 100%)"></span>
+                            <span class="ax-fus-txt">
+                                <span class="ax-fus-name">AURORA</span>
+                                <span class="ax-fus-note">jade &middot; turquesa &middot; cobalto</span>
+                            </span>
                         </div>
-                        <!-- VERDE -->
-                        <div class="t-swatch" data-theme="cyberpunk" onclick="pmSetTheme('cyberpunk')" style="order:6">
-                            <div class="t-dot" style="background:linear-gradient(135deg,#00e6a8,#00785a); border:2px solid rgba(0,212,170,.3); width:26px; height:26px; border-radius:50%; margin:0 auto 6px;"></div>
-                            <div class="t-name">VERDE</div>
+                        <div class="t-swatch ax-fus" data-theme="fusion-acero" onclick="pmSetTheme('fusion-acero')">
+                            <span class="ax-fus-chip" style="background:linear-gradient(100deg,#5e6975 0%,#d7e0ea 52%,#f4f7fa 100%)"></span>
+                            <span class="ax-fus-txt">
+                                <span class="ax-fus-name">ACERO</span>
+                                <span class="ax-fus-note">acero &middot; titanio &middot; humo</span>
+                            </span>
                         </div>
-                        <!-- NEGRO -->
-                        <div class="t-swatch" data-theme="black" onclick="pmSetTheme('black')" style="order:10">
-                            <div class="t-dot" style="background:linear-gradient(135deg,#3a3a3a,#000000); border:2px solid rgba(255,255,255,.2); width:26px; height:26px; border-radius:50%; margin:0 auto 6px;"></div>
-                            <div class="t-name">NEGRO</div>
+                        <div class="t-swatch ax-fus" data-theme="fusion-oro" onclick="pmSetTheme('fusion-oro')">
+                            <span class="ax-fus-chip" style="background:linear-gradient(100deg,#b5673c 0%,#e8b04a 52%,#f7e7c6 100%)"></span>
+                            <span class="ax-fus-txt">
+                                <span class="ax-fus-name">ORO</span>
+                                <span class="ax-fus-note">cobre &middot; oro &middot; champ&aacute;n</span>
+                            </span>
                         </div>
-                        <!-- ROSA -->
-                        <div class="t-swatch" data-theme="pink" onclick="pmSetTheme('pink')" style="order:4">
-                            <div class="t-dot" style="background:linear-gradient(135deg,#f72585,#8a1150); border:2px solid rgba(247,37,133,.3); width:26px; height:26px; border-radius:50%; margin:0 auto 6px;"></div>
-                            <div class="t-name">ROSA</div>
+                        <div class="t-swatch ax-fus" data-theme="fusion-fuego" onclick="pmSetTheme('fusion-fuego')">
+                            <span class="ax-fus-chip" style="background:linear-gradient(100deg,#a8402a 0%,#ff5a45 52%,#ffb08f 100%)"></span>
+                            <span class="ax-fus-txt">
+                                <span class="ax-fus-name">FUEGO</span>
+                                <span class="ax-fus-note">terracota &middot; brasa &middot; coral</span>
+                            </span>
                         </div>
-                        <!-- LILA -->
-                        <div class="t-swatch" data-theme="pastel" onclick="pmSetTheme('pastel')" style="order:2">
-                            <div class="t-dot" style="background:linear-gradient(135deg,#c77dff,#6a3aa8); border:2px solid rgba(199,125,255,.3); width:26px; height:26px; border-radius:50%; margin:0 auto 6px;"></div>
-                            <div class="t-name">LILA</div>
-                        </div>
-                        <!-- AZUL -->
-                        <div class="t-swatch" data-theme="azul" onclick="pmSetTheme('azul')" style="order:7">
-                            <div class="t-dot" style="background:linear-gradient(135deg,#2979ff,#0a2e73); border:2px solid rgba(41,121,255,.3); width:26px; height:26px; border-radius:50%; margin:0 auto 6px;"></div>
-                            <div class="t-name">AZUL</div>
-                        </div>
-                        <!-- VIOLETA -->
-                        <div class="t-swatch" data-theme="violeta" onclick="pmSetTheme('violeta')" style="order:9">
-                            <div class="t-dot" style="background:linear-gradient(135deg,#8b3aef,#4a1680); border:2px solid rgba(201,58,255,.3); width:26px; height:26px; border-radius:50%; margin:0 auto 6px;"></div>
-                            <div class="t-name">VIOLETA</div>
-                        </div>
-                        <!-- CAFÉ -->
-                        <div class="t-swatch" data-theme="cafe" onclick="pmSetTheme('cafe')" style="order:5">
-                            <div class="t-dot" style="background:linear-gradient(135deg,#c68a52,#5c3a1a); border:2px solid rgba(168,107,67,.3); width:26px; height:26px; border-radius:50%; margin:0 auto 6px;"></div>
-                            <div class="t-name">CAFÉ</div>
-                        </div>
-                        <!-- ROJO -->
-                        <div class="t-swatch" data-theme="rojo" onclick="pmSetTheme('rojo')" style="order:8">
-                            <div class="t-dot" style="background:linear-gradient(135deg,#ff2d3d,#7a0a12); border:2px solid rgba(255,23,68,.3); width:26px; height:26px; border-radius:50%; margin:0 auto 6px;"></div>
-                            <div class="t-name">ROJO</div>
-                        </div>
-                        <!-- DORADO -->
-                        <div class="t-swatch" data-theme="dorado" onclick="pmSetTheme('dorado')" style="order:3">
-                            <div class="t-dot" style="background:linear-gradient(135deg,#e8c04c,#8a6a1f); border:2px solid rgba(232,192,76,.3); width:26px; height:26px; border-radius:50%; margin:0 auto 6px;"></div>
-                            <div class="t-name">DORADO</div>
+                        <div class="t-swatch ax-fus" data-theme="fusion-orq" onclick="pmSetTheme('fusion-orq')">
+                            <span class="ax-fus-chip" style="background:linear-gradient(100deg,#a87bf0 0%,#dc55a8 52%,#ffb0ce 100%)"></span>
+                            <span class="ax-fus-txt">
+                                <span class="ax-fus-name">ORQU&Iacute;DEA</span>
+                                <span class="ax-fus-note">lila &middot; orqu&iacute;dea &middot; rosa</span>
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -1117,14 +1102,14 @@
 
     <!-- Gráficas (Al final para no bloquear inicio rápido) -->
     <script src="https://cdn.jsdelivr.net/npm/apexcharts" defer></script>
-    <script src="profile-persist.js?v=20260820a"></script>
-    <script src="knowledge.js?v=20260820a"></script>
-    <script src="app.js?v=20260820a"></script>
+    <script src="profile-persist.js?v=20260822a"></script>
+    <script src="knowledge.js?v=20260822a"></script>
+    <script src="app.js?v=20260822a"></script>
     <!-- Premium UI: catálogo de insignias + FAB + onboarding -->
-    <script src="premium-badges.js?v=20260820a"></script>
-    <script src="premium-extras.js?v=20260820a"></script>
+    <script src="premium-badges.js?v=20260822a"></script>
+    <script src="premium-extras.js?v=20260822a"></script>
     <!-- Botón "atrás" del teléfono: retrocede dentro de la app en vez de cerrarla -->
-    <script src="axcore-back.js?v=20260820a"></script>
+    <script src="axcore-back.js?v=20260822a"></script>
 
     <!-- REGISTRO GLOBAL — funciona aunque app.js falle -->
     <script>
@@ -1202,7 +1187,7 @@
         // Registro del Service Worker de PWA unificado con detección de actualizaciones y auto-refresco
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=20260820a').then(reg => {
+                navigator.serviceWorker.register('sw.js?v=20260822a').then(reg => {
                     console.log('[AX-CORE] Service Worker registrado con éxito:', reg.scope);
 
                     // MEJORA (v5.56): revisar si hay versión nueva CADA VEZ que la app vuelve

@@ -10,8 +10,8 @@
     <link rel="icon" href="logo_coach.png" type="image/png">
     <!-- Fuentes -->
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="index.css?v=20260616b">
-    <link rel="stylesheet" href="premium.css?v=20260616b">
+    <link rel="stylesheet" href="index.css?v=20260822a">
+    <link rel="stylesheet" href="premium.css?v=20260822a">
     <style>
         /* ============================
            COACH TERMINAL VIP
@@ -392,7 +392,7 @@
         }
     </style>
 </head>
-<body class="premium-mode" data-theme="cyberpunk">
+<body class="premium-mode" data-theme="fusion-aurora">
 
 <div class="coach-container pb-transition" id="main-container">
     <div class="header-brand" style="position:relative;">
@@ -443,26 +443,26 @@
             <div style="font-family: 'Orbitron', sans-serif; font-size: 0.72rem; letter-spacing: 2px; color: var(--accent-main); margin-bottom: 12px; text-transform: uppercase; text-align: center; font-weight: bold;">
                 ESTILO VISUAL DEL TERMINAL
             </div>
-            <div class="theme-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
-                <!-- CYBERPUNK -->
-                <div class="t-swatch" data-theme="cyberpunk" onclick="setCoachTheme('cyberpunk')" style="cursor: pointer; text-align: center; background: rgba(255,255,255,0.02); padding: 8px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); transition: all 0.3s;">
-                    <div style="background: linear-gradient(135deg, #00d4aa, #00ff66); border: 2px solid rgba(0,212,170,0.3); width: 20px; height: 20px; border-radius: 50%; margin: 0 auto 6px;"></div>
-                    <div style="font-size: 0.58rem; font-family: 'Orbitron', sans-serif; letter-spacing: 1px; color: #fff; font-weight: bold;">VERDE</div>
+            <div class="theme-grid" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px;">
+                <div class="t-swatch" data-theme="fusion-aurora" onclick="setCoachTheme('fusion-aurora')" style="cursor: pointer; text-align: center; background: rgba(255,255,255,0.02); padding: 8px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); transition: all 0.3s;">
+                    <div style="background: linear-gradient(120deg, #17c98c 0%, #15b4c6 52%, #4fa0ff 100%); border: 1px solid rgba(255,255,255,0.18); width: 22px; height: 22px; border-radius: 50%; margin: 0 auto 6px;"></div>
+                    <div style="font-size: 0.52rem; font-family: 'Orbitron', sans-serif; letter-spacing: 1px; color: #fff; font-weight: bold;">AURORA</div>
                 </div>
-                <!-- ULTRA DARK -->
-                <div class="t-swatch" data-theme="black" onclick="setCoachTheme('black')" style="cursor: pointer; text-align: center; background: rgba(255,255,255,0.02); padding: 8px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); transition: all 0.3s;">
-                    <div style="background: linear-gradient(135deg, #ffffff, #1a1a1a); border: 2px solid rgba(255,255,255,0.2); width: 20px; height: 20px; border-radius: 50%; margin: 0 auto 6px;"></div>
-                    <div style="font-size: 0.58rem; font-family: 'Orbitron', sans-serif; letter-spacing: 1px; color: #fff; font-weight: bold;">NEGRO</div>
+                <div class="t-swatch" data-theme="fusion-acero" onclick="setCoachTheme('fusion-acero')" style="cursor: pointer; text-align: center; background: rgba(255,255,255,0.02); padding: 8px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); transition: all 0.3s;">
+                    <div style="background: linear-gradient(120deg, #5e6975 0%, #d7e0ea 52%, #f4f7fa 100%); border: 1px solid rgba(255,255,255,0.18); width: 22px; height: 22px; border-radius: 50%; margin: 0 auto 6px;"></div>
+                    <div style="font-size: 0.52rem; font-family: 'Orbitron', sans-serif; letter-spacing: 1px; color: #fff; font-weight: bold;">ACERO</div>
                 </div>
-                <!-- FEMENINO -->
-                <div class="t-swatch" data-theme="pink" onclick="setCoachTheme('pink')" style="cursor: pointer; text-align: center; background: rgba(255,255,255,0.02); padding: 8px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); transition: all 0.3s;">
-                    <div style="background: linear-gradient(135deg, #f72585, #ff9de2); border: 2px solid rgba(247,37,133,0.3); width: 20px; height: 20px; border-radius: 50%; margin: 0 auto 6px;"></div>
-                    <div style="font-size: 0.58rem; font-family: 'Orbitron', sans-serif; letter-spacing: 1px; color: #fff; font-weight: bold;">ROSA</div>
+                <div class="t-swatch" data-theme="fusion-oro" onclick="setCoachTheme('fusion-oro')" style="cursor: pointer; text-align: center; background: rgba(255,255,255,0.02); padding: 8px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); transition: all 0.3s;">
+                    <div style="background: linear-gradient(120deg, #b5673c 0%, #e8b04a 52%, #f7e7c6 100%); border: 1px solid rgba(255,255,255,0.18); width: 22px; height: 22px; border-radius: 50%; margin: 0 auto 6px;"></div>
+                    <div style="font-size: 0.52rem; font-family: 'Orbitron', sans-serif; letter-spacing: 1px; color: #fff; font-weight: bold;">ORO</div>
                 </div>
-                <!-- LGBT -->
-                <div class="t-swatch" data-theme="pastel" onclick="setCoachTheme('pastel')" style="cursor: pointer; text-align: center; background: rgba(255,255,255,0.02); padding: 8px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); transition: all 0.3s;">
-                    <div style="background: linear-gradient(135deg, #ff9ee2, #b5e2ff); border: 2px solid rgba(255,158,226,0.3); width: 20px; height: 20px; border-radius: 50%; margin: 0 auto 6px;"></div>
-                    <div style="font-size: 0.58rem; font-family: 'Orbitron', sans-serif; letter-spacing: 1px; color: #fff; font-weight: bold;">LILA</div>
+                <div class="t-swatch" data-theme="fusion-fuego" onclick="setCoachTheme('fusion-fuego')" style="cursor: pointer; text-align: center; background: rgba(255,255,255,0.02); padding: 8px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); transition: all 0.3s;">
+                    <div style="background: linear-gradient(120deg, #a8402a 0%, #ff5a45 52%, #ffb08f 100%); border: 1px solid rgba(255,255,255,0.18); width: 22px; height: 22px; border-radius: 50%; margin: 0 auto 6px;"></div>
+                    <div style="font-size: 0.52rem; font-family: 'Orbitron', sans-serif; letter-spacing: 1px; color: #fff; font-weight: bold;">FUEGO</div>
+                </div>
+                <div class="t-swatch" data-theme="fusion-orq" onclick="setCoachTheme('fusion-orq')" style="cursor: pointer; text-align: center; background: rgba(255,255,255,0.02); padding: 8px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); transition: all 0.3s;">
+                    <div style="background: linear-gradient(120deg, #a87bf0 0%, #dc55a8 52%, #ffb0ce 100%); border: 1px solid rgba(255,255,255,0.18); width: 22px; height: 22px; border-radius: 50%; margin: 0 auto 6px;"></div>
+                    <div style="font-size: 0.52rem; font-family: 'Orbitron', sans-serif; letter-spacing: 1px; color: #fff; font-weight: bold;">ORQU&Iacute;DEA</div>
                 </div>
             </div>
         </div>
@@ -490,7 +490,15 @@
         localStorage.setItem('coach_theme', themeName);
     };
     // Inicializar con el tema guardado o Cyberpunk por defecto
-    setCoachTheme(localStorage.getItem('coach_theme') || 'cyberpunk');
+    // Los temas viejos se retiraron: al coach que tenía uno se le pasa a su fusión.
+    var COACH_RETIRADOS = {
+        cyberpunk: 'fusion-aurora', azul: 'fusion-aurora',
+        black: 'fusion-acero', blanco: 'fusion-acero',
+        pink: 'fusion-orq', pastel: 'fusion-orq', violeta: 'fusion-orq',
+        cafe: 'fusion-oro', dorado: 'fusion-oro', rojo: 'fusion-fuego'
+    };
+    var _ct = localStorage.getItem('coach_theme') || 'fusion-aurora';
+    setCoachTheme(COACH_RETIRADOS[_ct] || _ct);
 
     const loginSection = document.getElementById('login-section');
     const dashboard = document.getElementById('dashboard');

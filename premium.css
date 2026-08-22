@@ -93,32 +93,11 @@ body.premium-mode[data-theme="rainbow"] {  /* RAINBOW PRIDE */
   --pm-s1: #11101a; --pm-s2: #181625; --pm-s3: #201e30; --pm-dim: #442a5a;
 }
 /* ── MASCULINO 1: ULTRA DARK BLACK ── */
-body.premium-mode[data-theme="black"] {
-  --pm-green-rgb: 240,240,240;
-  --pm-cyan-rgb:  160,160,160;
-  --pm-title-2: #8f97a1;
-  --pm-s1: #060606; --pm-s2: #0e0e0e; --pm-s3: #161616; --pm-dim: #2a2a2a;
-  --pm-border: rgba(255,255,255,0.07);
-  background: #000000 !important;
-}
 /* ── BLANCO: modo claro, inverso exacto del NEGRO ── */
-body.premium-mode[data-theme="blanco"] {
-  --pm-green-rgb: 20,24,29;
-  --pm-cyan-rgb:  90,101,114;
-  --pm-title-2: #3d4650;
-  --pm-s1: #ffffff; --pm-s2: #f2f3f5; --pm-s3: #e8eaee; --pm-dim: #c6ccd4;
-  --pm-dim2: #5a6572;
-  --pm-white: #14181d;
-  /* Bordes más marcados que en oscuro: sobre blanco un alfa 0.10 casi no se ve.
-     Estos hacen visibles TODOS los contornos que usan var(--pm-border/2). */
-  --pm-border: rgba(0,0,0,0.16);
-  --pm-border2: rgba(0,0,0,0.24);
-  /* El acento vale casi-negro → la tinta que contrasta encima es BLANCA. */
-  --pm-accent-ink: #ffffff;
-  --text-primary: #14181d;
-  --text-dim: #5a6572;
-  background: #f2f3f5 !important;
-}
+/* NOTA 2026-08-22: el tema BLANCO se quito del selector. Las reglas de
+   modo claro que siguen quedaron aparcadas a proposito: ya no aplican a
+   nadie (ningun elemento lleva data-theme="blanco") y son la base lista
+   para cuando se quiera un tema claro de verdad. */
 /* ═══════════════════════════════════════════════════════════
    TEMA BLANCO — modo claro armónico (SOLO [data-theme="blanco"])
    Página clara · tarjetas blancas · texto grafito · botones
@@ -365,14 +344,6 @@ body.premium-mode[data-theme="blanco"] #page-evolution .history-table-container 
 }
 
 /* ── MASCULINO 2: CYBERPUNK ── */
-body.premium-mode[data-theme="cyberpunk"] {
-  --pm-green-rgb: 0,212,170;
-  --pm-cyan-rgb:  0,255,102;
-  --pm-title-2: #bffff0;
-  --pm-s1: #06091a; --pm-s2: #0a1028; --pm-s3: #111834; --pm-dim: #1a2a4a;
-  --pm-border: rgba(0,212,170,0.12);
-  background: #050a1f !important;
-}
 /* ── MASCULINO 3: MILITAR ── */
 body.premium-mode[data-theme="military"] {
   --pm-green-rgb: 132,155,76;
@@ -382,13 +353,6 @@ body.premium-mode[data-theme="military"] {
 }
 
 /* ── FEMENINO 1: HOT PINK ÉLITE — fucsia profundo ── */
-body.premium-mode[data-theme="pink"] {
-  --pm-green-rgb: 247,37,133;
-  --pm-cyan-rgb:  255,157,226;
-  --pm-title-2: #ffd4ee;
-  --pm-s1: #200a1c; --pm-s2: #2a1028; --pm-s3: #361436; --pm-dim: #6a1850;
-  background: #130816 !important;
-}
 /* ── FEMENINO 2: VIOLETA ÉLITE — morado eléctrico ── */
 body.premium-mode[data-theme="salmon"] {
   --pm-green-rgb: 155,93,229;
@@ -397,14 +361,6 @@ body.premium-mode[data-theme="salmon"] {
   background: #07040f !important;
 }
 /* ── FEMENINO 3: LGBT PASTEL — lila y rosa pastel ── */
-body.premium-mode[data-theme="pastel"] {
-  --pm-green-rgb: 255,158,226;
-  --pm-cyan-rgb:  181,226,255;
-  --pm-title-2: #eef4ff;
-  --pm-s1: #130f1d; --pm-s2: #191426; --pm-s3: #221c32; --pm-dim: #352a4e;
-  background: #0f0b18 !important;
-}
-
 /* ── LGBTQ+ 1: PRIDE FIRE — arcoíris cálido, naranja-dorado ── */
 body.premium-mode[data-theme="pride"] {
   --pm-green-rgb: 255,107,0;
@@ -429,50 +385,99 @@ body.premium-mode[data-theme="neon-bi"] {
 
 /* ══ NUEVOS TEMAS DE COLOR — mismo estilo, degradado propio por tema ══ */
 /* ── AZUL ── (más contraste: azul eléctrico → aqua brillante) */
-body.premium-mode[data-theme="azul"] {
-  --pm-green-rgb: 31,107,255;
-  --pm-cyan-rgb:  64,223,255;
-  --pm-title-2: #cfe6ff;
-  --pm-s1: #071120; --pm-s2: #0c1a30; --pm-s3: #12243e; --pm-dim: #2a4a78;
-  --pm-border: rgba(64,223,255,0.16);
-  background: #04101f !important;
-}
 /* ── VIOLETA ── (reemplaza AMARILLO: violeta eléctrico → magenta) */
-body.premium-mode[data-theme="violeta"] {
-  --pm-green-rgb: 124,58,237;
-  --pm-cyan-rgb:  201,58,255;
-  --pm-title-2: #e9d9ff;
-  --pm-s1: #120a20; --pm-s2: #19102c; --pm-s3: #221638; --pm-dim: #3c2660;
-  --pm-border: rgba(201,58,255,0.16);
-  background: #0d0618 !important;
-}
 /* ── NARANJA ── */
 /* ── CAFÉ ── (reemplaza TURQUESA: café/mocha → crema) */
-body.premium-mode[data-theme="cafe"] {
-  --pm-green-rgb: 168,107,67;
-  --pm-cyan-rgb:  217,180,143;
-  --pm-title-2: #f0dcc4;
-  --pm-s1: #17100a; --pm-s2: #211710; --pm-s3: #2c2016; --pm-dim: #4e3826;
-  --pm-border: rgba(168,107,67,0.16);
-  background: #140d08 !important;
-}
 /* ── ROJO ── (menos monótono: crimson → ember, gradiente "fuego") */
-body.premium-mode[data-theme="rojo"] {
-  --pm-green-rgb: 255,45,74;
-  --pm-cyan-rgb:  255,122,60;
-  --pm-title-2: #ffd7cb;
-  --pm-s1: #180a0b; --pm-s2: #221010; --pm-s3: #2c1815; --pm-dim: #4a2420;
-  --pm-border: rgba(255,122,60,0.16);
-  background: #150407 !important;
-}
 /* ── DORADO ── */
-body.premium-mode[data-theme="dorado"] {
-  --pm-green-rgb: 232,192,76;
-  --pm-cyan-rgb:  255,244,214;
-  --pm-title-2: #fff4d6;
-  --pm-s1: #14120a; --pm-s2: #1c1810; --pm-s3: #262016; --pm-dim: #4a4020;
-  --pm-border: rgba(232,192,76,0.16);
-  background: #14120a !important;
+/* ═══════════════════════════════════════════════════════════════════════
+   FUSIONES — superficies y degradado de TRES paradas
+   ═══════════════════════════════════════════════════════════════════════ */
+body.premium-mode[data-theme="fusion-oro"] {
+  --pm-green-rgb: 232,176,74;
+  --pm-cyan-rgb:  247,231,198;
+  --pm-tri:       #b5673c;
+  --pm-tri-rgb:   181,103,60;
+  --pm-title-2: #f9eeda;
+  --pm-s1: #1b1610; --pm-s2: #241d15; --pm-s3: #30271b; --pm-dim: #4e3e27;
+  --pm-s1-rgb: 27,22,16;
+  --pm-border: rgba(232,176,74, 0.16);
+}
+body.premium-mode[data-theme="fusion-fuego"] {
+  --pm-green-rgb: 255,90,69;
+  --pm-cyan-rgb:  255,176,143;
+  --pm-tri:       #a8402a;
+  --pm-tri-rgb:   168,64,42;
+  --pm-title-2: #ffdccb;
+  --pm-s1: #1e100c; --pm-s2: #281611; --pm-s3: #351e17; --pm-dim: #58281d;
+  --pm-s1-rgb: 30,16,12;
+  --pm-border: rgba(255,90,69, 0.16);
+}
+body.premium-mode[data-theme="fusion-acero"] {
+  --pm-green-rgb: 215,224,234;
+  --pm-cyan-rgb:  244,247,250;
+  --pm-tri:       #5e6975;
+  --pm-tri-rgb:   94,105,117;
+  --pm-title-2: #b2bcc9;
+  --pm-s1: #12151a; --pm-s2: #191d23; --pm-s3: #222831; --pm-dim: #2e343d;
+  --pm-s1-rgb: 18,21,26;
+  --pm-border: rgba(215,224,234, 0.16);
+}
+body.premium-mode[data-theme="fusion-aurora"] {
+  --pm-green-rgb: 21,180,198;
+  --pm-cyan-rgb:  79,160,255;
+  --pm-tri:       #17c98c;
+  --pm-tri-rgb:   23,201,140;
+  --pm-title-2: #c9f2f5;
+  --pm-s1: #0b1d26; --pm-s2: #0f2531; --pm-s3: #15313f; --pm-dim: #1e4557;
+  --pm-s1-rgb: 11,29,38;
+  --pm-border: rgba(21,180,198, 0.16);
+}
+body.premium-mode[data-theme="fusion-orq"] {
+  --pm-green-rgb: 220,85,168;
+  --pm-cyan-rgb:  255,176,206;
+  --pm-tri:       #a87bf0;
+  --pm-tri-rgb:   168,123,240;
+  --pm-title-2: #ffdcf0;
+  --pm-s1: #1b0f23; --pm-s2: #23152c; --pm-s3: #2e1c39; --pm-dim: #452a55;
+  --pm-s1-rgb: 27,15,35;
+  --pm-border: rgba(220,85,168, 0.16);
+}
+
+/* Las fusiones heredan toda la capa de armonia de las colecciones y
+   ademas suben a degradado de tres colores en fondo, boton y progreso. */
+
+/* Fondo: tres halos, uno por cada tono de la familia. */
+body.premium-mode[data-theme^="fusion-"] {
+  background-image:
+    radial-gradient(110% 58% at 16% -12%, rgba(var(--pm-tri-rgb), 0.15), rgba(0,0,0,0) 58%),
+    radial-gradient(120% 60% at 76% -10%, rgba(var(--pm-green-rgb), 0.12), rgba(0,0,0,0) 60%),
+    radial-gradient(105% 62% at 104% 106%, rgba(var(--pm-cyan-rgb), 0.09), rgba(0,0,0,0) 60%) !important;
+  background-repeat: no-repeat !important;
+}
+
+/* Tarjetas: el filo toma el tono profundo de la familia. */
+body.premium-mode[data-theme^="fusion-"] .glass-card {
+  border-color: rgba(var(--pm-tri-rgb), 0.26) !important;
+}
+
+/* Boton principal: los tres tonos. El tono profundo se queda en la punta
+   izquierda para que el texto (centrado) caiga sobre la parte brillante. */
+body.premium-mode[data-theme^="fusion-"] .btn-premium {
+  background: linear-gradient(122deg,
+      var(--pm-tri) 0%,
+      var(--pm-green) 30%,
+      var(--pm-cyan) 100%) !important;
+  box-shadow: 0 6px 22px rgba(var(--pm-green-rgb), 0.30),
+              inset 0 1px 0 rgba(255,255,255,0.24) !important;
+}
+
+/* Barra de progreso: los tres tonos de izquierda a derecha. */
+body.premium-mode[data-theme^="fusion-"] .progress-fill {
+  background: linear-gradient(90deg,
+      var(--pm-tri) 0%,
+      var(--pm-green) 55%,
+      var(--pm-cyan) 100%) !important;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -622,6 +627,7 @@ body.premium-mode[data-theme="orq-magenta"] {
 
 /* 1) FONDO CON LUZ: dos halos suaves del propio tema (arriba y abajo).
       Quita el efecto "pared negra plana" sin aclarar la app. */
+body.premium-mode[data-theme^="fusion-"],
 body.premium-mode[data-theme^="oro-"],
 body.premium-mode[data-theme^="fuego-"],
 body.premium-mode[data-theme^="acero-"],
@@ -636,6 +642,7 @@ body.premium-mode[data-theme^="orq-"] {
 
 /* 2) TARJETAS CON PROFUNDIDAD: degradado propio + filo de luz superior.
       (Antes eran un color plano; así se ven talladas, no pegadas.) */
+body.premium-mode[data-theme^="fusion-"],
 body.premium-mode[data-theme^="oro-"] .glass-card,
 body.premium-mode[data-theme^="fuego-"] .glass-card,
 body.premium-mode[data-theme^="acero-"] .glass-card,
@@ -649,6 +656,7 @@ body.premium-mode[data-theme^="orq-"] .glass-card {
 }
 
 /* 3) TARJETAS DE DATO: mismo degradado, un punto más brillante. */
+body.premium-mode[data-theme^="fusion-"],
 body.premium-mode[data-theme^="oro-"] .stat-card,
 body.premium-mode[data-theme^="fuego-"] .stat-card,
 body.premium-mode[data-theme^="acero-"] .stat-card,
@@ -660,6 +668,7 @@ body.premium-mode[data-theme^="orq-"] .stat-card {
 
 /* 4) MENÚ INFERIOR Y LATERAL DEL COLOR DEL TEMA (antes: azul marino fijo
       en todos los temas — era lo que más rompía la armonía). */
+body.premium-mode[data-theme^="fusion-"],
 body.premium-mode[data-theme^="oro-"] .pm-bottom-nav-inner,
 body.premium-mode[data-theme^="fuego-"] .pm-bottom-nav-inner,
 body.premium-mode[data-theme^="acero-"] .pm-bottom-nav-inner,
@@ -671,6 +680,7 @@ body.premium-mode[data-theme^="orq-"] .pm-bottom-nav-inner {
   border: 1px solid rgba(var(--pm-green-rgb), 0.14) !important;
   box-shadow: 0 10px 34px rgba(0,0,0,0.42), inset 0 1px 0 rgba(255,255,255,0.05) !important;
 }
+body.premium-mode[data-theme^="fusion-"],
 body.premium-mode[data-theme^="oro-"] .side-nav,
 body.premium-mode[data-theme^="fuego-"] .side-nav,
 body.premium-mode[data-theme^="acero-"] .side-nav,
@@ -684,6 +694,7 @@ body.premium-mode[data-theme^="orq-"] .side-nav {
 
 /* 5) BOTÓN PRINCIPAL: degradado en diagonal con un tercer paso de luz,
       para que no se vea como una plasta de un solo color. */
+body.premium-mode[data-theme^="fusion-"],
 body.premium-mode[data-theme^="oro-"] .btn-premium,
 body.premium-mode[data-theme^="fuego-"] .btn-premium,
 body.premium-mode[data-theme^="acero-"] .btn-premium,
@@ -699,6 +710,7 @@ body.premium-mode[data-theme^="orq-"] .btn-premium {
 
 /* 6) BARRA DE PROGRESO: degradado acento → acento claro, con filo de luz
       y un halo tenue del propio tema (se lee el avance de un vistazo). */
+body.premium-mode[data-theme^="fusion-"],
 body.premium-mode[data-theme^="oro-"] .progress-fill,
 body.premium-mode[data-theme^="fuego-"] .progress-fill,
 body.premium-mode[data-theme^="acero-"] .progress-fill,
@@ -710,6 +722,7 @@ body.premium-mode[data-theme^="orq-"] .progress-fill {
 }
 
 /* 7) CANALETA DE LA BARRA: hundida y del tono del tema, no gris genérico. */
+body.premium-mode[data-theme^="fusion-"],
 body.premium-mode[data-theme^="oro-"] .progress-bar-container,
 body.premium-mode[data-theme^="fuego-"] .progress-bar-container,
 body.premium-mode[data-theme^="acero-"] .progress-bar-container,
@@ -4382,4 +4395,38 @@ body.premium-mode[data-theme="blanco"] .axc-grid .t-swatch {
 }
 body.premium-mode[data-theme="blanco"] .axc-col {
   background: linear-gradient(158deg, #ffffff, #f2f3f5) !important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   ESTILO VISUAL — las 5 fusiones, en fila, con su degradado a la vista
+   Se ven como muestras de pintura: la franja de color manda, el nombre
+   acompaña. Es la forma honesta de enseñar un tema de tres colores.
+   ═══════════════════════════════════════════════════════════════════════ */
+body.premium-mode #page-settings #theme-grid.ax-fus-list {
+  display: flex !important;
+  flex-direction: column;
+  gap: 8px !important;
+}
+body.premium-mode #page-settings .t-swatch.ax-fus {
+  display: flex; align-items: center; gap: 12px;
+  text-align: left;
+  padding: 11px 12px !important;
+  border-radius: 16px !important;
+}
+body.premium-mode .ax-fus-chip {
+  width: 62px; height: 34px; border-radius: 11px; flex: none;
+  border: 1px solid rgba(255,255,255,0.16);
+  box-shadow: 0 3px 10px rgba(0,0,0,0.42), inset 0 1px 0 rgba(255,255,255,0.22);
+}
+body.premium-mode .ax-fus-txt { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+body.premium-mode .ax-fus-name {
+  font-family: 'Oswald', sans-serif; font-size: 13px; font-weight: 600;
+  letter-spacing: 2px; color: var(--pm-white); line-height: 1.1;
+}
+body.premium-mode .ax-fus-note {
+  font-size: 9px; letter-spacing: .5px; color: var(--pm-dim2); line-height: 1.2;
+}
+body.premium-mode #page-settings .t-swatch.ax-fus.active .ax-fus-name {
+  color: var(--accent-main) !important;
 }
