@@ -627,7 +627,6 @@ body.premium-mode[data-theme="orq-magenta"] {
 
 /* 1) FONDO CON LUZ: dos halos suaves del propio tema (arriba y abajo).
       Quita el efecto "pared negra plana" sin aclarar la app. */
-body.premium-mode[data-theme^="fusion-"],
 body.premium-mode[data-theme^="oro-"],
 body.premium-mode[data-theme^="fuego-"],
 body.premium-mode[data-theme^="acero-"],
@@ -642,7 +641,7 @@ body.premium-mode[data-theme^="orq-"] {
 
 /* 2) TARJETAS CON PROFUNDIDAD: degradado propio + filo de luz superior.
       (Antes eran un color plano; así se ven talladas, no pegadas.) */
-body.premium-mode[data-theme^="fusion-"],
+body.premium-mode[data-theme^="fusion-"] .glass-card,
 body.premium-mode[data-theme^="oro-"] .glass-card,
 body.premium-mode[data-theme^="fuego-"] .glass-card,
 body.premium-mode[data-theme^="acero-"] .glass-card,
@@ -656,7 +655,7 @@ body.premium-mode[data-theme^="orq-"] .glass-card {
 }
 
 /* 3) TARJETAS DE DATO: mismo degradado, un punto más brillante. */
-body.premium-mode[data-theme^="fusion-"],
+body.premium-mode[data-theme^="fusion-"] .stat-card,
 body.premium-mode[data-theme^="oro-"] .stat-card,
 body.premium-mode[data-theme^="fuego-"] .stat-card,
 body.premium-mode[data-theme^="acero-"] .stat-card,
@@ -668,7 +667,7 @@ body.premium-mode[data-theme^="orq-"] .stat-card {
 
 /* 4) MENÚ INFERIOR Y LATERAL DEL COLOR DEL TEMA (antes: azul marino fijo
       en todos los temas — era lo que más rompía la armonía). */
-body.premium-mode[data-theme^="fusion-"],
+body.premium-mode[data-theme^="fusion-"] .pm-bottom-nav-inner,
 body.premium-mode[data-theme^="oro-"] .pm-bottom-nav-inner,
 body.premium-mode[data-theme^="fuego-"] .pm-bottom-nav-inner,
 body.premium-mode[data-theme^="acero-"] .pm-bottom-nav-inner,
@@ -680,7 +679,7 @@ body.premium-mode[data-theme^="orq-"] .pm-bottom-nav-inner {
   border: 1px solid rgba(var(--pm-green-rgb), 0.14) !important;
   box-shadow: 0 10px 34px rgba(0,0,0,0.42), inset 0 1px 0 rgba(255,255,255,0.05) !important;
 }
-body.premium-mode[data-theme^="fusion-"],
+body.premium-mode[data-theme^="fusion-"] .side-nav,
 body.premium-mode[data-theme^="oro-"] .side-nav,
 body.premium-mode[data-theme^="fuego-"] .side-nav,
 body.premium-mode[data-theme^="acero-"] .side-nav,
@@ -694,7 +693,7 @@ body.premium-mode[data-theme^="orq-"] .side-nav {
 
 /* 5) BOTÓN PRINCIPAL: degradado en diagonal con un tercer paso de luz,
       para que no se vea como una plasta de un solo color. */
-body.premium-mode[data-theme^="fusion-"],
+body.premium-mode[data-theme^="fusion-"] .btn-premium,
 body.premium-mode[data-theme^="oro-"] .btn-premium,
 body.premium-mode[data-theme^="fuego-"] .btn-premium,
 body.premium-mode[data-theme^="acero-"] .btn-premium,
@@ -710,7 +709,7 @@ body.premium-mode[data-theme^="orq-"] .btn-premium {
 
 /* 6) BARRA DE PROGRESO: degradado acento → acento claro, con filo de luz
       y un halo tenue del propio tema (se lee el avance de un vistazo). */
-body.premium-mode[data-theme^="fusion-"],
+body.premium-mode[data-theme^="fusion-"] .progress-fill,
 body.premium-mode[data-theme^="oro-"] .progress-fill,
 body.premium-mode[data-theme^="fuego-"] .progress-fill,
 body.premium-mode[data-theme^="acero-"] .progress-fill,
@@ -722,7 +721,7 @@ body.premium-mode[data-theme^="orq-"] .progress-fill {
 }
 
 /* 7) CANALETA DE LA BARRA: hundida y del tono del tema, no gris genérico. */
-body.premium-mode[data-theme^="fusion-"],
+body.premium-mode[data-theme^="fusion-"] .progress-bar-container,
 body.premium-mode[data-theme^="oro-"] .progress-bar-container,
 body.premium-mode[data-theme^="fuego-"] .progress-bar-container,
 body.premium-mode[data-theme^="acero-"] .progress-bar-container,

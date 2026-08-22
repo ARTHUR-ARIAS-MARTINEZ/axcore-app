@@ -9,386 +9,280 @@
     <meta name="theme-color" content="#0a0e14">
     <link rel="icon" href="logo_coach.png" type="image/png">
     <!-- Fuentes -->
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="index.css?v=20260822a">
-    <link rel="stylesheet" href="premium.css?v=20260822a">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="index.css?v=20260822b">
+    <link rel="stylesheet" href="premium.css?v=20260822b">
     <style>
-        /* ============================
-           COACH TERMINAL VIP
-           ============================ */
+        /* ════════════════════════════════════════════════════════════════
+           PANEL DEL COACH — mismo lenguaje visual que la app del atleta.
+           Casi todo lo pesado (tarjetas, botones, fichas de tema, fondo con
+           halos) ya viene de premium.css porque el <body> lleva .premium-mode
+           y su data-theme. Aqui solo va lo propio del panel.
+           ════════════════════════════════════════════════════════════════ */
         * { box-sizing: border-box; }
 
-        html {
-            overflow-y: auto !important;
-            height: auto !important;
-        }
+        html { overflow-y: auto !important; height: auto !important; }
         body {
-            background: var(--bg-dark, #0a0e14) !important;
+            /* SIN background propio: deja que el tema pinte su color y sus
+               halos (antes un background fijo aqui los borraba). */
             overflow-x: hidden !important;
             overflow-y: auto !important;
             height: auto !important;
             min-height: 100vh;
             position: static !important;
-            transition: background 0.3s ease;
-        }
-        body::before {
-            content: '';
-            position: fixed; inset: 0; z-index: -1;
-            background:
-                radial-gradient(ellipse 60% 50% at 15% 10%, rgba(var(--pm-green-rgb, 0,255,136), 0.07), transparent),
-                radial-gradient(ellipse 50% 40% at 85% 85%, rgba(var(--pm-cyan-rgb, 0,212,255), 0.05), transparent),
-                radial-gradient(ellipse 40% 30% at 50% 50%, rgba(var(--pm-green-rgb, 0,255,136), 0.03), transparent);
-            animation: bgPulse 12s ease-in-out infinite alternate;
-        }
-        @keyframes bgPulse {
-            0% { opacity: 0.7; }
-            100% { opacity: 1; }
-        }
-
-        .gradient-text {
-            background: linear-gradient(135deg, var(--accent-main, #00ff88) 0%, var(--accent-secondary, #00d4ff) 40%, var(--accent-main, #00ff88) 100%);
-            background-size: 200% auto;
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: neonShimmer 4s ease-in-out infinite;
-        }
-        @keyframes neonShimmer {
-            0%, 100% { background-position: 0% center; }
-            50% { background-position: 200% center; }
+            font-family: 'Inter', sans-serif;
         }
 
         .coach-container {
             max-width: 960px;
             margin: 0 auto;
-            padding: 24px 16px 80px;
+            padding: 26px 16px 80px;
             display: flex;
             flex-direction: column;
-            justify-content: flex-start;
             min-height: 100vh;
         }
-        /* Login centrado verticalmente dentro del contenedor */
         #login-wrapper {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            flex: 1;
-            min-height: calc(100vh - 200px);
+            display: flex; flex-direction: column; justify-content: center;
+            flex: 1; min-height: calc(100vh - 220px);
         }
-        .dashboard-container {
-            align-items: flex-start;
-            justify-content: flex-start;
-            width: 100%;
-        }
+        .dashboard-container { align-items: flex-start; width: 100%; }
 
-        .header-brand {
-            text-align: center; 
-            margin-bottom: 2.5rem;
-            position: relative;
-        }
+        /* ── MARCA ── igual que el encabezado de la app: chico, limpio ── */
+        .header-brand { text-align: center; margin-bottom: 2rem; position: relative; }
         .header-brand h1 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 3.8rem;
-            letter-spacing: 4px;
+            font-family: 'Oswald', sans-serif;
+            font-weight: 700;
+            font-size: clamp(2rem, 9vw, 2.9rem);
+            letter-spacing: 5px;
             line-height: 1;
-            text-shadow: 0 0 40px rgba(var(--pm-green-rgb, 0,255,136), 0.4);
+            margin: 0;
         }
         .header-brand p {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 0.95rem;
-            color: rgba(255,255,255,0.5);
-            letter-spacing: 6px;
-            margin-top: 8px;
+            font-family: 'Oswald', sans-serif;
+            font-size: 0.62rem;
+            color: var(--pm-dim2, #7f93a8);
+            letter-spacing: 4px;
+            margin-top: 9px;
             text-transform: uppercase;
         }
         .header-brand::after {
             content: '';
-            display: block;
-            width: 120px; height: 2px;
-            background: linear-gradient(90deg, transparent, var(--accent-main, #00ff88), transparent);
-            margin: 18px auto 0;
+            display: block; width: 84px; height: 2px; border-radius: 2px;
+            background: linear-gradient(90deg,
+                var(--accent-tri, var(--accent-main)),
+                var(--accent-main),
+                var(--accent-secondary));
+            margin: 15px auto 0;
         }
-
-        /* LOGIN */
-        #login-section {
-            max-width: 480px;
-            margin: 0 auto;
-            width: 100%;
-            background: rgba(12,16,24,0.85);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border, rgba(0,255,136,0.2));
-            border-radius: 20px;
-            padding: 2.5rem 2rem;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.6), var(--neon-glow);
-            position: relative;
-            overflow: hidden;
-        }
-        #login-section::before {
-            content: '';
-            position: absolute; top: 0; left: 0; right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--accent-main, #00ff88), var(--accent-secondary, #00d4ff), transparent);
-        }
-        #login-section h2 {
-            text-align: center;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.2rem;
-            margin-bottom: 2rem;
-            letter-spacing: 3px;
+        #btn-install-coach {
+            position: absolute; right: 10px; top: 6px;
+            font-size: 1.3rem; text-decoration: none; cursor: pointer;
             color: var(--accent-main);
         }
 
-        /* DASHBOARD */
-        .dashboard-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-            background: rgba(10,14,20,0.85);
-            backdrop-filter: blur(20px);
-            padding: 1.5rem 2rem;
-            border-radius: 12px;
-            border: 1px solid var(--glass-border, rgba(0,255,136,0.15));
-            flex-wrap: wrap;
-            gap: 16px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-            position: relative;
+        /* ── ACCESO ── la tarjeta usa .glass-card de premium.css ── */
+        #login-section {
+            max-width: 460px; margin: 0 auto; width: 100%;
+            padding: 2.2rem 1.7rem !important;
+            position: relative; overflow: hidden;
         }
-        .dashboard-header::before {
+        #login-section::before {
             content: '';
-            position: absolute; bottom: 0; left: 20px; right: 20px;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(var(--pm-green-rgb, 0,255,136), 0.3), transparent);
+            position: absolute; top: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(90deg,
+                var(--accent-tri, var(--accent-main)),
+                var(--accent-main) 52%,
+                var(--accent-secondary));
+        }
+        #login-section h2 {
+            text-align: center;
+            font-family: 'Oswald', sans-serif;
+            font-size: 0.95rem; font-weight: 600;
+            margin: 0 0 1.6rem; letter-spacing: 3px;
+            color: var(--accent-main);
+        }
+
+        /* ── CABECERA DEL TABLERO ── tarjeta, no barra de nave espacial ── */
+        .dashboard-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 18px; padding: 1.1rem 1.2rem;
+            background: linear-gradient(158deg, var(--pm-s3, #172840), var(--pm-s1, #0d1826));
+            border: 1px solid var(--pm-border, rgba(255,255,255,.08));
+            border-radius: 22px;
+            flex-wrap: wrap; gap: 14px;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.05), 0 12px 30px rgba(0,0,0,.26);
         }
         .dashboard-header h2 {
-            font-family: 'Orbitron', sans-serif;
-            color: #fff;
-            margin: 0;
-            font-size: 1.1rem;
-            letter-spacing: 2px;
+            font-family: 'Oswald', sans-serif; font-weight: 600;
+            color: var(--pm-white, #fff);
+            margin: 0; font-size: 1rem; letter-spacing: 2px;
         }
         .dashboard-header p {
-            margin: 4px 0 0 0;
-            color: rgba(var(--pm-green-rgb, 0,255,136), 0.6);
-            font-size: 0.75rem;
-            letter-spacing: 2px;
-            font-family: 'Orbitron', sans-serif;
+            margin: 4px 0 0; font-size: 0.62rem; letter-spacing: 2px;
+            font-family: 'Oswald', sans-serif; color: var(--pm-dim2, #7f93a8);
         }
 
         .stats-badge {
-            background: rgba(var(--pm-green-rgb, 0,255,136), 0.08);
-            color: var(--accent-main, #00ff88);
-            padding: 0.6rem 1.2rem;
-            border-radius: 30px;
-            font-weight: 700;
-            font-size: 0.85rem;
-            border: 1px solid rgba(var(--pm-green-rgb, 0,255,136), 0.25);
-            box-shadow: 0 0 15px rgba(var(--pm-green-rgb, 0,255,136), 0.1);
-            letter-spacing: 0.5px;
-            transition: all 0.3s;
-            font-family: 'Orbitron', sans-serif;
+            background: rgba(var(--pm-green-rgb), 0.10);
+            color: var(--accent-main);
+            padding: 0.45rem 0.9rem;
+            border-radius: 99px;
+            font-family: 'Oswald', sans-serif; font-weight: 600;
+            font-size: 0.7rem; letter-spacing: 1px;
+            border: 1px solid rgba(var(--pm-green-rgb), 0.28);
+            transition: all .3s;
         }
         .stats-badge.alert {
-            background: rgba(255,50,70,0.08);
+            background: rgba(255,50,70,0.10);
             color: var(--accent-alert, #ff4757);
-            border-color: rgba(255,50,70,0.3);
-            box-shadow: 0 0 18px rgba(255,50,70,0.15);
-            animation: alertPulse 2s ease-in-out infinite;
-        }
-        @keyframes alertPulse {
-            0%, 100% { box-shadow: 0 0 18px rgba(255,50,70,0.15); }
-            50% { box-shadow: 0 0 28px rgba(255,50,70,0.3); }
+            border-color: rgba(255,50,70,0.32);
         }
 
+        /* ── ATLETAS ── mismas tarjetas que la app ── */
         .client-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
-            gap: 18px;
-            padding-right: 4px;
+            grid-template-columns: repeat(auto-fill, minmax(min(100%, 290px), 1fr));
+            gap: 14px;
         }
-
         .client-card {
-            background: var(--glass, rgba(14,14,24,0.75)) !important;
-            backdrop-filter: blur(16px);
-            border: 1px solid var(--glass-border, rgba(255,255,255,0.06)) !important;
-            border-left: 4px solid var(--accent-main, #00ff88) !important;
-            border-radius: 14px;
-            padding: 1rem 1.2rem;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            background: linear-gradient(158deg, var(--pm-s3, #172840) 0%, var(--pm-s2, #111f30) 46%, var(--pm-s1, #0d1826) 100%);
+            border: 1px solid var(--pm-border, rgba(255,255,255,.08));
+            border-left: 3px solid var(--accent-main);
+            border-radius: 18px;
+            padding: 1rem 1.1rem;
+            display: flex; flex-direction: column; justify-content: space-between;
+            transition: transform .2s cubic-bezier(.34,1.56,.64,1), box-shadow .25s;
             position: relative;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.045), 0 10px 26px rgba(0,0,0,.26);
         }
         .client-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 16px 48px rgba(0,0,0,0.5), 0 0 20px rgba(var(--pm-green-rgb, 0,255,136), 0.08);
-            border-color: rgba(var(--pm-green-rgb, 0,255,136), 0.15);
+            transform: translateY(-4px);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.06),
+                        0 16px 40px rgba(0,0,0,.36),
+                        0 0 22px rgba(var(--pm-green-rgb), 0.10);
         }
-        .client-card.paused {
-            border-left-color: var(--accent-alert, #ff4757) !important;
-            opacity: 0.65;
-        }
-        .client-card.paused:hover {
-            box-shadow: 0 16px 48px rgba(0,0,0,0.5), 0 0 20px rgba(var(--pm-green-rgb, 0,255,136), 0.1);
-            border-color: rgba(var(--pm-green-rgb, 0,255,136), 0.15);
-        }
-
+        .client-card.paused { border-left-color: var(--accent-alert, #ff4757); opacity: .62; }
         .client-card h3 {
-            margin: 0 0 6px 0;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 0.95rem;
-            color: #fff;
-            padding-right: 24px;
-            letter-spacing: 1px;
+            margin: 0 0 6px; font-family: 'Oswald', sans-serif; font-weight: 600;
+            font-size: 0.95rem; color: var(--pm-white, #fff);
+            padding-right: 26px; letter-spacing: 1px;
         }
-        .client-card p {
-            margin: 0 0 4px 0;
-            color: rgba(255,255,255,0.5);
-            font-size: 0.78rem;
-        }
+        .client-card p { margin: 0 0 4px; color: var(--pm-dim2, #7f93a8); font-size: 0.75rem; }
 
         .btn-delete-x {
-            position: absolute; right: 16px; top: 16px;
+            position: absolute; right: 12px; top: 12px;
             background: rgba(255,71,87,0.08);
-            border: 1px solid rgba(255,71,87,0.15);
-            color: rgba(255,71,87,0.5);
-            font-size: 0.85rem;
-            font-weight: 800;
-            cursor: pointer;
-            transition: all 0.3s;
-            width: 28px; height: 28px;
-            border-radius: 8px;
+            border: 1px solid rgba(255,71,87,0.18);
+            color: rgba(255,71,87,0.55);
+            font-size: 0.8rem; font-weight: 800; cursor: pointer;
+            width: 26px; height: 26px; border-radius: 9px;
             display: flex; align-items: center; justify-content: center;
+            transition: all .25s;
         }
         .btn-delete-x:hover {
-            transform: scale(1.15);
-            color: var(--accent-alert, #ff4757);
-            background: rgba(255,71,87,0.15);
-            box-shadow: 0 0 12px rgba(255,71,87,0.3);
+            transform: scale(1.12); color: var(--accent-alert, #ff4757);
+            background: rgba(255,71,87,0.16);
         }
 
         .code-box {
-            font-family: 'Orbitron', monospace, 'Courier New';
-            background: rgba(var(--pm-green-rgb, 0,255,136), 0.08);
-            padding: 4px 10px;
-            border-radius: 8px;
-            color: var(--accent-main, #00ff88);
-            letter-spacing: 3px;
-            font-size: 0.9rem;
-            font-weight: 700;
-            border: 1px solid rgba(var(--pm-green-rgb, 0,255,136), 0.2);
+            font-family: 'Oswald', sans-serif;
+            background: rgba(var(--pm-green-rgb), 0.10);
+            padding: 3px 9px; border-radius: 8px;
+            color: var(--accent-main);
+            letter-spacing: 3px; font-size: 0.85rem; font-weight: 600;
+            border: 1px solid rgba(var(--pm-green-rgb), 0.22);
         }
 
-        /* TOAST */
+        /* ── AVISO ── mismo degradado de tres tonos del boton de la app ── */
         .toast {
-            position: fixed; top: 24px; left: 50%; transform: translateX(-50%);
-            background: linear-gradient(135deg, var(--accent-main, #00ff88), var(--accent-secondary, #00cc6a));
-            color: #000; padding: 16px 32px;
-            font-size: 0.95rem; font-weight: 800;
-            border-radius: 14px; z-index: 2000;
-            box-shadow: 0 8px 32px rgba(var(--pm-green-rgb, 0,255,136), 0.4), 0 0 60px rgba(var(--pm-green-rgb, 0,255,136), 0.2);
-            opacity: 0;
-            transition: opacity 0.5s ease-in-out, transform 0.5s;
-            pointer-events: none;
-            letter-spacing: 0.5px;
+            position: fixed; top: 22px; left: 50%; transform: translateX(-50%);
+            background: linear-gradient(122deg,
+                var(--accent-tri, var(--accent-main)) 0%,
+                var(--accent-main) 30%,
+                var(--accent-secondary) 100%);
+            color: #0a0a0a;
+            padding: 14px 28px; border-radius: 99px; z-index: 2000;
+            font-family: 'Oswald', sans-serif; font-weight: 700;
+            font-size: 0.82rem; letter-spacing: 1.4px;
+            box-shadow: 0 10px 34px rgba(var(--pm-green-rgb), 0.34);
+            opacity: 0; pointer-events: none;
+            transition: opacity .45s ease-in-out, transform .45s;
         }
         .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-        /* BUTTONS */
-        .btn-premium {
-            background: linear-gradient(135deg, var(--accent-main, #00ff88), var(--accent-secondary, #00cc6a));
-            color: #000;
-            font-weight: 800;
-            border: none;
-            border-radius: 14px;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 0.75rem;
-            padding: 0.9rem 1.6rem;
-        }
-        .btn-premium:hover {
-            box-shadow: 0 6px 24px rgba(var(--pm-green-rgb, 0,255,136), 0.4);
-            transform: translateY(-2px);
-            filter: brightness(1.1);
-        }
-        .btn-premium:active { transform: scale(0.97); }
-
+        /* ── BOTONES ── .btn-premium ya viene de premium.css (pildora + degradado) ── */
         .btn-cancel {
             background: transparent;
             border: 1px solid var(--accent-alert, #ff4757);
-            border-radius: 12px;
-            cursor: pointer;
-            font-weight: 700;
-            font-family: 'Inter', sans-serif;
-            transition: all 0.3s;
-            font-size: 0.78rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            border-radius: 99px; cursor: pointer;
+            font-family: 'Oswald', sans-serif; font-weight: 600;
+            transition: all .25s; font-size: 0.72rem;
+            text-transform: uppercase; letter-spacing: 1px;
             color: var(--accent-alert, #ff4757);
+            padding: 0.5rem 1rem;
         }
-        .btn-cancel:hover {
-            transform: translateY(-1px);
-            background: rgba(255,71,87,0.08);
-        }
+        .btn-cancel:hover { background: rgba(255,71,87,0.10); }
 
-        /* INPUT */
+        /* ── CAMPOS ── */
         .input-group { margin-bottom: 0; }
         .input-group label {
-            display: block;
-            font-size: 0.82rem;
-            font-weight: 700;
-            margin-bottom: 8px;
+            display: block; font-family: 'Oswald', sans-serif;
+            font-size: 0.66rem; font-weight: 600; letter-spacing: 2px;
+            text-transform: uppercase; margin-bottom: 9px;
+            color: var(--pm-dim2, #7f93a8);
         }
         .input-group input[type="text"],
         .input-group input[type="password"] {
-            width: 100%;
-            padding: 14px 16px;
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 12px;
-            color: #fff;
-            font-size: 1rem;
-            font-family: 'Inter', sans-serif;
-            transition: all 0.3s;
-            outline: none;
+            width: 100%; padding: 14px 16px;
+            background: rgba(0,0,0,0.22);
+            border: 1px solid var(--pm-border, rgba(255,255,255,.12));
+            border-radius: 14px;
+            color: var(--pm-white, #fff);
+            font-size: 1rem; font-family: 'Inter', sans-serif;
+            transition: all .25s; outline: none;
         }
         .input-group input:focus {
-            border-color: var(--accent-main, rgba(0,255,136,0.5));
-            box-shadow: 0 0 16px rgba(var(--pm-green-rgb, 0,255,136), 0.15);
-            outline: none;
+            border-color: var(--accent-main);
+            box-shadow: 0 0 0 3px rgba(var(--pm-green-rgb), 0.14);
         }
+        .input-group input::placeholder { color: var(--pm-dim2, #7f93a8); opacity: .6; }
 
-        #dashboard { display: none; margin-top: -3vh; }
+        #dashboard { display: none; }
 
-        /* Swatches de Temas */
-        .t-swatch {
-            transition: all 0.3s;
+        /* ── ESTILO VISUAL: las mismas muestras de pintura que la app ── */
+        .coach-theme-card { padding: 1.1rem 1rem !important; margin-bottom: 18px; }
+        .coach-theme-title {
+            font-family: 'Oswald', sans-serif; font-size: 0.62rem;
+            letter-spacing: 2.5px; text-transform: uppercase;
+            color: var(--pm-dim2, #7f93a8); margin-bottom: 11px;
         }
-        .t-swatch:hover {
-            transform: translateY(-2px);
-            background: rgba(255,255,255,0.05) !important;
-            border-color: rgba(var(--pm-green-rgb, 0,255,136), 0.2) !important;
+        .coach-theme-list { display: flex; flex-direction: column; gap: 8px; }
+        .coach-theme-list .t-swatch {
+            display: flex; align-items: center; gap: 12px;
+            text-align: left; cursor: pointer;
+            background: rgba(255,255,255,0.035);
+            border: 1px solid var(--pm-border, rgba(255,255,255,.08));
+            border-radius: 16px; padding: 10px 12px;
+            transition: border-color .2s, box-shadow .2s, transform .1s;
+            position: relative;
         }
-        .t-swatch.active {
-            background: rgba(var(--pm-green-rgb, 0,255,136), 0.1) !important;
-            border-color: var(--accent-main, #00ff88) !important;
-            box-shadow: 0 0 15px rgba(var(--pm-green-rgb, 0,255,136), 0.25);
+        .coach-theme-list .t-swatch:active { transform: scale(.985); }
+        .coach-theme-list .t-swatch.active {
+            border-color: var(--accent-main);
+            box-shadow: 0 0 0 1px var(--accent-main), 0 0 16px rgba(var(--pm-green-rgb), 0.30);
+            background: rgba(var(--pm-green-rgb), 0.07);
         }
+        .coach-theme-list .t-swatch.active::after {
+            content: '\2713'; position: absolute; top: 8px; right: 11px;
+            font-size: 11px; font-weight: 900; color: var(--accent-main); line-height: 1;
+        }
+        .coach-theme-list .t-swatch.active .ax-fus-name { color: var(--accent-main); }
 
-        /* Responsive */
         @media (max-width: 600px) {
-            .header-brand h1 { font-size: 2.2rem; }
-            .dashboard-header { padding: 0.8rem; gap: 8px; }
-            .dashboard-header h2 { font-size: 1rem !important; }
+            .dashboard-header { padding: 0.9rem; gap: 10px; }
             .client-grid { grid-template-columns: 1fr; }
-            .stats-badge { font-size: 0.6rem; padding: 0.3rem 0.6rem; }
-            .client-card { padding: 0.9rem; }
-            .stats-badge { font-size: 0.7rem; padding: 0.4rem 0.8rem; }
         }
     </style>
 </head>
@@ -396,22 +290,22 @@
 
 <div class="coach-container pb-transition" id="main-container">
     <div class="header-brand" style="position:relative;">
-        <h1 style="background: linear-gradient(135deg, var(--accent-main, #00ff88), var(--accent-secondary, #00d4ff), var(--accent-main, #00ff88)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; text-shadow: none;"><span>AX-CORE</span></h1>
-        <p style="font-family: 'Orbitron', sans-serif; font-size: 0.85rem; color:rgba(255,255,255,0.6); letter-spacing: 4px; margin-top:5px; text-transform:uppercase;">COACH TERMINAL VIP</p>
+        <h1 style="background: linear-gradient(120deg, var(--accent-tri, var(--accent-main)), var(--accent-main) 52%, var(--accent-secondary)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; text-shadow: none;"><span>AX-CORE</span></h1>
+        <p style="font-family: 'Oswald', sans-serif; font-size: 0.85rem; color:rgba(255,255,255,0.6); letter-spacing: 4px; margin-top:5px; text-transform:uppercase;">PANEL DEL COACH</p>
         <a id="btn-install-coach" href="#" style="position:absolute; right:16px; top:16px; font-size:1.5rem; color:var(--accent-main, #00ff88); text-decoration:none; cursor:pointer;" title="Instalar App">⬇</a>
     </div>
 
     <!-- Login -->
     <div id="login-wrapper">
     <div id="login-section" class="glass-card" style="max-width: 500px; margin: 0 auto; width: 100%;">
-        <h2 style="text-align: center; color: var(--accent-main); font-family: 'Orbitron', sans-serif; margin-bottom: 1.5rem; font-size:1rem; letter-spacing:3px;">ACCESO COACH</h2>
+        <h2 style="text-align: center; color: var(--accent-main); font-family: 'Oswald', sans-serif; margin-bottom: 1.5rem; font-size:1rem; letter-spacing:3px;">ACCESO COACH</h2>
         <div class="input-group">
-            <label style="color:var(--accent-main); font-size: 0.7rem; font-weight:bold; font-family:'Orbitron',sans-serif; letter-spacing:1px;">CÓDIGO DE FRANQUICIA</label>
+            <label style="color:var(--accent-main); font-size: 0.7rem; font-weight:bold; font-family:'Oswald',sans-serif; letter-spacing:1px;">CÓDIGO DE FRANQUICIA</label>
             <input type="text" id="gym-id" autocomplete="off" placeholder="Ej. AXB-1234" style="font-size: 1rem; text-align: center; letter-spacing: 2px; text-transform: uppercase;">
             <div style="font-size:0.62rem; color:#555; margin-top:5px;">Proporcionado por AX-CORE corporativo.</div>
         </div>
         <div class="input-group" style="margin-top:1.5rem;">
-            <label style="color:var(--accent-secondary); font-size: 0.7rem; font-weight:bold; font-family:'Orbitron',sans-serif; letter-spacing:1px;">CONTRASEÑA</label>
+            <label style="color:var(--accent-secondary); font-size: 0.7rem; font-weight:bold; font-family:'Oswald',sans-serif; letter-spacing:1px;">CONTRASEÑA</label>
             <input type="password" id="gym-pass" autocomplete="new-password" placeholder="Contraseña asignada" style="font-size: 1rem; text-align: center; letter-spacing: 2px;">
         </div>
         <button class="btn-premium" id="btn-login" style="width: 100%; margin-top: 1.5rem; padding: 1.2rem; font-size: 0.8rem;">INICIAR SESIÓN</button>
@@ -423,8 +317,8 @@
         
         <div class="dashboard-header" style="flex-wrap: wrap; gap:8px;">
             <div>
-                <h2 style="font-family: 'Orbitron', sans-serif; color:#fff; margin:0; font-size:0.95rem; letter-spacing:2px;" id="gym-name-display">GIMNASIO...</h2>
-                <p style="margin:3px 0 0 0; color:var(--accent-secondary, #00ff88); opacity:0.75; font-size:0.65rem; font-family:'Orbitron',sans-serif; letter-spacing:2px;" id="gym-code-display">ID: ---</p>
+                <h2 style="font-family: 'Oswald', sans-serif; color:#fff; margin:0; font-size:0.95rem; letter-spacing:2px;" id="gym-name-display">GIMNASIO...</h2>
+                <p style="margin:3px 0 0 0; color:var(--accent-secondary, #00ff88); opacity:0.75; font-size:0.65rem; font-family:'Oswald',sans-serif; letter-spacing:2px;" id="gym-code-display">ID: ---</p>
             </div>
             <div style="display:flex; flex-direction:column; gap:6px; align-items:flex-end;">
                 <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
@@ -432,37 +326,50 @@
                     <button class="btn-premium" style="margin:0; font-size:0.7rem; padding:0.5rem 0.9rem;" id="btn-new-code">+ PASE NUEVO</button>
                 </div>
                 <div style="display:flex; gap:6px;">
-                    <button class="btn-premium" style="padding:0.4rem 0.8rem; font-size:0.65rem; background: rgba(0,255,200,0.12); border-color: rgba(0,255,200,0.35); color: #00ffcc;" onclick="window.open('MANUAL_COACH.html', '_blank')">📖 GUÍA COACH</button>
+                    <button class="btn-premium" style="padding:0.4rem 0.8rem; font-size:0.65rem; background: rgba(var(--pm-green-rgb),0.12) !important; border: 1px solid rgba(var(--pm-green-rgb),0.32) !important; color: var(--accent-main) !important; box-shadow: none !important;" onclick="window.open('MANUAL_COACH.html', '_blank')">📖 GUÍA COACH</button>
                     <button class="btn-cancel" style="padding:0.4rem 0.8rem; font-size:0.65rem;" onclick="logout()">CERRAR SESIÓN</button>
                 </div>
             </div>
         </div>
 
         <!-- Selector de Temas Coach -->
-        <div class="glass-card" style="margin-bottom: 24px; padding: 1.2rem; width: 100%; border: 1px solid var(--glass-border); background: var(--glass); box-shadow: var(--neon-glow); border-radius: 12px; transition: all 0.3s ease;">
-            <div style="font-family: 'Orbitron', sans-serif; font-size: 0.72rem; letter-spacing: 2px; color: var(--accent-main); margin-bottom: 12px; text-transform: uppercase; text-align: center; font-weight: bold;">
-                ESTILO VISUAL DEL TERMINAL
-            </div>
-            <div class="theme-grid" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px;">
-                <div class="t-swatch" data-theme="fusion-aurora" onclick="setCoachTheme('fusion-aurora')" style="cursor: pointer; text-align: center; background: rgba(255,255,255,0.02); padding: 8px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); transition: all 0.3s;">
-                    <div style="background: linear-gradient(120deg, #17c98c 0%, #15b4c6 52%, #4fa0ff 100%); border: 1px solid rgba(255,255,255,0.18); width: 22px; height: 22px; border-radius: 50%; margin: 0 auto 6px;"></div>
-                    <div style="font-size: 0.52rem; font-family: 'Orbitron', sans-serif; letter-spacing: 1px; color: #fff; font-weight: bold;">AURORA</div>
+        <div class="glass-card coach-theme-card">
+            <div class="coach-theme-title">Estilo visual</div>
+            <div class="theme-grid coach-theme-list">
+                <div class="t-swatch" data-theme="fusion-aurora" onclick="setCoachTheme('fusion-aurora')">
+                    <span class="ax-fus-chip" style="background:linear-gradient(100deg,#17c98c 0%,#15b4c6 52%,#4fa0ff 100%)"></span>
+                    <span class="ax-fus-txt">
+                        <span class="ax-fus-name">AURORA</span>
+                        <span class="ax-fus-note">jade &middot; turquesa &middot; cobalto</span>
+                    </span>
                 </div>
-                <div class="t-swatch" data-theme="fusion-acero" onclick="setCoachTheme('fusion-acero')" style="cursor: pointer; text-align: center; background: rgba(255,255,255,0.02); padding: 8px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); transition: all 0.3s;">
-                    <div style="background: linear-gradient(120deg, #5e6975 0%, #d7e0ea 52%, #f4f7fa 100%); border: 1px solid rgba(255,255,255,0.18); width: 22px; height: 22px; border-radius: 50%; margin: 0 auto 6px;"></div>
-                    <div style="font-size: 0.52rem; font-family: 'Orbitron', sans-serif; letter-spacing: 1px; color: #fff; font-weight: bold;">ACERO</div>
+                <div class="t-swatch" data-theme="fusion-acero" onclick="setCoachTheme('fusion-acero')">
+                    <span class="ax-fus-chip" style="background:linear-gradient(100deg,#5e6975 0%,#d7e0ea 52%,#f4f7fa 100%)"></span>
+                    <span class="ax-fus-txt">
+                        <span class="ax-fus-name">ACERO</span>
+                        <span class="ax-fus-note">acero &middot; titanio &middot; humo</span>
+                    </span>
                 </div>
-                <div class="t-swatch" data-theme="fusion-oro" onclick="setCoachTheme('fusion-oro')" style="cursor: pointer; text-align: center; background: rgba(255,255,255,0.02); padding: 8px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); transition: all 0.3s;">
-                    <div style="background: linear-gradient(120deg, #b5673c 0%, #e8b04a 52%, #f7e7c6 100%); border: 1px solid rgba(255,255,255,0.18); width: 22px; height: 22px; border-radius: 50%; margin: 0 auto 6px;"></div>
-                    <div style="font-size: 0.52rem; font-family: 'Orbitron', sans-serif; letter-spacing: 1px; color: #fff; font-weight: bold;">ORO</div>
+                <div class="t-swatch" data-theme="fusion-oro" onclick="setCoachTheme('fusion-oro')">
+                    <span class="ax-fus-chip" style="background:linear-gradient(100deg,#b5673c 0%,#e8b04a 52%,#f7e7c6 100%)"></span>
+                    <span class="ax-fus-txt">
+                        <span class="ax-fus-name">ORO</span>
+                        <span class="ax-fus-note">cobre &middot; oro &middot; champ&aacute;n</span>
+                    </span>
                 </div>
-                <div class="t-swatch" data-theme="fusion-fuego" onclick="setCoachTheme('fusion-fuego')" style="cursor: pointer; text-align: center; background: rgba(255,255,255,0.02); padding: 8px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); transition: all 0.3s;">
-                    <div style="background: linear-gradient(120deg, #a8402a 0%, #ff5a45 52%, #ffb08f 100%); border: 1px solid rgba(255,255,255,0.18); width: 22px; height: 22px; border-radius: 50%; margin: 0 auto 6px;"></div>
-                    <div style="font-size: 0.52rem; font-family: 'Orbitron', sans-serif; letter-spacing: 1px; color: #fff; font-weight: bold;">FUEGO</div>
+                <div class="t-swatch" data-theme="fusion-fuego" onclick="setCoachTheme('fusion-fuego')">
+                    <span class="ax-fus-chip" style="background:linear-gradient(100deg,#a8402a 0%,#ff5a45 52%,#ffb08f 100%)"></span>
+                    <span class="ax-fus-txt">
+                        <span class="ax-fus-name">FUEGO</span>
+                        <span class="ax-fus-note">terracota &middot; brasa &middot; coral</span>
+                    </span>
                 </div>
-                <div class="t-swatch" data-theme="fusion-orq" onclick="setCoachTheme('fusion-orq')" style="cursor: pointer; text-align: center; background: rgba(255,255,255,0.02); padding: 8px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); transition: all 0.3s;">
-                    <div style="background: linear-gradient(120deg, #a87bf0 0%, #dc55a8 52%, #ffb0ce 100%); border: 1px solid rgba(255,255,255,0.18); width: 22px; height: 22px; border-radius: 50%; margin: 0 auto 6px;"></div>
-                    <div style="font-size: 0.52rem; font-family: 'Orbitron', sans-serif; letter-spacing: 1px; color: #fff; font-weight: bold;">ORQU&Iacute;DEA</div>
+                <div class="t-swatch" data-theme="fusion-orq" onclick="setCoachTheme('fusion-orq')">
+                    <span class="ax-fus-chip" style="background:linear-gradient(100deg,#a87bf0 0%,#dc55a8 52%,#ffb0ce 100%)"></span>
+                    <span class="ax-fus-txt">
+                        <span class="ax-fus-name">ORQU&Iacute;DEA</span>
+                        <span class="ax-fus-note">lila &middot; orqu&iacute;dea &middot; rosa</span>
+                    </span>
                 </div>
             </div>
         </div>
@@ -585,12 +492,12 @@
             <div>
                 <h3 style="font-size:1rem; margin-bottom:2px;">${c.user}</h3>
                 <p style="font-size:0.65rem; margin-bottom:2px;">PASE: <span class="code-box" style="font-size:0.75rem; padding:2px 6px;">${c.code}</span></p>
-                <p style="color:${c.active ? '#00ff88' : '#e8394a'}; font-weight:bold; margin-top: 5px; font-size:0.6rem;">
+                <p style="color:${c.active ? 'var(--accent-main)' : 'var(--accent-alert, #e8394a)'}; font-weight:bold; margin-top: 5px; font-size:0.6rem;">
                     ${c.active ? '✅ ACTIVO' : '❌ ADEUDO'}
                 </p>
             </div>
             <div style="margin-top: 8px; display:flex; gap:6px;">
-                <button class="btn-cancel" style="flex:1; padding: 0.4rem; font-size: 0.6rem; background: ${c.active ? 'rgba(232,57,74,0.1)' : 'rgba(0,255,136,0.1)'}; border-color: ${c.active ? '#e8394a' : '#00ff88'}; color: ${c.active ? '#e8394a' : '#00ff88'};" onclick="toggleStatus('${c.code}', ${!c.active})">
+                <button class="btn-cancel" style="flex:1; padding: 0.4rem; font-size: 0.6rem; background: ${c.active ? 'rgba(232,57,74,0.1)' : 'rgba(var(--pm-green-rgb),0.12)'}; border-color: ${c.active ? 'var(--accent-alert, #e8394a)' : 'var(--accent-main)'}; color: ${c.active ? 'var(--accent-alert, #e8394a)' : 'var(--accent-main)'};" onclick="toggleStatus('${c.code}', ${!c.active})">
                     ${c.active ? 'CORTAR' : 'RESTAURAR'}
                 </button>
                 <button class="btn-premium" style="flex:1; padding: 0.4rem; font-size: 0.6rem;" onclick="shareAthleteCode('${c.user}', '${c.code}')">📱 COMPARTIR</button>
@@ -654,7 +561,7 @@
                     <div style="display:flex; align-items:center; gap:12px; margin-bottom:1rem;">
                         <span style="font-size:2rem;">🎁</span>
                         <div>
-                            <div style="font-family:'Orbitron',sans-serif; font-size:0.9rem; color:#00ff88; font-weight:900; letter-spacing:2px;">CÓDIGO REGALO VIP — EXCLUSIVO PARA TI</div>
+                            <div style="font-family:'Oswald',sans-serif; font-size:0.9rem; color:#00ff88; font-weight:900; letter-spacing:2px;">CÓDIGO REGALO VIP — EXCLUSIVO PARA TI</div>
                             <div style="font-size:0.72rem; color:rgba(255,255,255,0.5); margin-top:2px;">Incluido sin costo adicional en tu membresía</div>
                         </div>
                     </div>
@@ -663,7 +570,7 @@
                     </p>
                     <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
                         <div>
-                            <div style="font-size:0.65rem; color:rgba(0,255,136,0.6); font-family:'Orbitron',sans-serif; letter-spacing:1px; margin-bottom:4px;">TU CÓDIGO PERSONAL</div>
+                            <div style="font-size:0.65rem; color:rgba(0,255,136,0.6); font-family:'Oswald',sans-serif; letter-spacing:1px; margin-bottom:4px;">TU CÓDIGO PERSONAL</div>
                             <span class="code-box" style="font-size:1.3rem; padding:8px 16px; letter-spacing:5px; box-shadow: 0 0 20px rgba(0,255,136,0.25);">${giftCode.code}</span>
                         </div>
                         <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:4px;">
@@ -677,7 +584,7 @@
             section.innerHTML = `
                 <div style="background: rgba(0,255,136,0.04); border: 1px dashed rgba(0,255,136,0.25); border-radius: 18px; padding: 1.8rem 2rem; text-align:center;">
                     <div style="font-size:2.5rem; margin-bottom:0.8rem;">🎁</div>
-                    <div style="font-family:'Orbitron',sans-serif; font-size:0.85rem; color:#00ff88; font-weight:900; letter-spacing:2px; margin-bottom:0.6rem;">CÓDIGO REGALO VIP — PENDIENTE</div>
+                    <div style="font-family:'Oswald',sans-serif; font-size:0.85rem; color:#00ff88; font-weight:900; letter-spacing:2px; margin-bottom:0.6rem;">CÓDIGO REGALO VIP — PENDIENTE</div>
                     <p style="font-size:0.82rem; color:rgba(255,255,255,0.55); line-height:1.6; max-width:480px; margin:0 auto 1.2rem;">
                         Tu membresía incluye <strong style="color:#00ff88;">1 acceso de regalo</strong> para que tú mismo uses la app de tus atletas. Regístrate, vive su experiencia y demuéstrales que tú también lo haces.
                     </p>
