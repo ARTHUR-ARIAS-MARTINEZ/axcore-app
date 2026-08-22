@@ -276,19 +276,28 @@ document.addEventListener('DOMContentLoaded', () => {
         const slot = MEAL_SLOTS.find(s => s.key === key);
         const diet = userData.recommendedDiet || {};
         const txt = (diet[key] || '').trim();
+        const kcal = axKcal(txt);
+        const piezas = axPiezas(txt);
         const ov = document.createElement('div');
         ov.className = 'ax-view-ov';
         ov.innerHTML =
-            '<div class="ax-view">' +
-                '<div class="ax-view-title"></div>' +
-                '<div class="ax-view-body"></div>' +
+            '<div class="ax-view ax-meal">' +
+                '<div class="ax-meal-top">' +
+                    '<span class="ax-meal-ico">' + (slot ? slot.icon : '🍽️') + '</span>' +
+                    '<span class="ax-meal-name">' + (slot ? slot.name : 'COMIDA') + '</span>' +
+                    (kcal ? '<span class="ax-meal-kcal">' + kcal + ' kcal</span>' : '') +
+                '</div>' +
+                '<div class="ax-view-body ax-meal-body">' +
+                    (piezas.length
+                        ? '<ul class="ax-meal-list">' + piezas.map(function (p) {
+                              return '<li>' + p + '</li>'; }).join('') + '</ul>'
+                        : '<p class="ax-meal-vacio">Todav\u00eda sin plan. Toca EDITAR, o pega tu dieta completa en MI PLAN.</p>') +
+                '</div>' +
                 '<div class="ax-view-btns">' +
-                    '<button class="ax-modal-btn ax-view-edit">✎ EDITAR</button>' +
+                    '<button class="ax-modal-btn ax-view-edit">EDITAR</button>' +
                     '<button class="ax-modal-btn ax-ok">CERRAR</button>' +
                 '</div>' +
             '</div>';
-        ov.querySelector('.ax-view-title').textContent = slot ? `${slot.icon} ${slot.name}` : 'COMIDA';
-        ov.querySelector('.ax-view-body').textContent = txt || 'Sin contenido todavía. Pulsa ✎ EDITAR para agregarlo, o pega tu dieta completa en MI PLAN.';
         document.body.appendChild(ov);
         requestAnimationFrame(() => ov.classList.add('show'));
         const close = () => { ov.classList.remove('show'); setTimeout(() => ov.remove(), 200); };
@@ -2733,6 +2742,33 @@ document.addEventListener('DOMContentLoaded', () => {
         const hasCustomRules = userData.customDietRules && userData.customDietRules.length > 0;
         const rules = hasCustomRules ? userData.customDietRules : [];
         // Ejemplos sombreados (NO son reglas reales): se muestran mientras no haya reglas propias.
+        // ── DESMENUZAR LA DIETA ──────────────────────────────────────────
+        // El nutriólogo escribe como quiere. Estas tres funciones sacan de ahí
+        // lo único que el atleta necesita ver: las piezas y las calorías.
+        // Nada de párrafos: renglones cortos, uno por alimento.
+        function axKcal(t) {
+            const m = String(t || '').match(/(\d{2,4})\s*(?:kcal|cal\b|calor)/i);
+            return m ? m[1] : null;
+        }
+        function axCortar(t, max) {
+            t = String(t || '').trim().replace(/\s+/g, ' ');
+            if (t.length <= max) return t;
+            const corte = t.lastIndexOf(' ', max);
+            return t.slice(0, corte > max * 0.6 ? corte : max).trim() + '…';
+        }
+        function axPiezas(t) {
+            return String(t || '')
+                // fuera las calorías: van aparte, arriba
+                .replace(/\(?\s*[~≈]?\s*\d{2,4}\s*(?:kcal|cal\b|calor\w*)\s*\)?/gi, ' ')
+                // fuera la etiqueta de la comida si el nutriólogo la repitió
+                .replace(/^\s*(desayuno|media ma[nñ]ana|comida|media tarde|pre[- ]?entreno|post[- ]?entreno|cena|snack|colaci[oó]n)\s*[:\-–]\s*/i, '')
+                .split(/\n|·|;|\||\s\+\s|,/)
+                .map(s => s.trim().replace(/^[-*•\s]+/, '').replace(/[.,;]+$/, ''))
+                .filter(s => s.length > 1)
+                .map(s => s.charAt(0).toUpperCase() + s.slice(1))
+                .slice(0, 9);
+        }
+
         const RULE_EXAMPLES = [
             '3 litros de agua al día',
             'Nada de refresco ni azúcar entre semana',
@@ -2798,9 +2834,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     <!-- INGRESO AUTOMÁTICO DE DIETA -->
                     <div class="pm-diet-import-card">
-                        <div class="pm-diet-import-title">📥 INGRESO DE DIETA COMPLETA</div>
-                        <div class="pm-diet-import-sub">Pega tu plan completo. Lo distribuyo en Desayuno · Media mañana · Comida · Media tarde · Pre-entreno · Post-entreno · Cena · Snack · Recomendaciones, y detecto las calorías automáticamente.</div>
-                        <textarea class="pm-diet-import-area" id="diet-full-import" placeholder="Ejemplo:&#10;Desayuno: 2 huevos + 4 claras + 2 tortillas (~470 kcal)&#10;Media mañana: 200g yogur griego + 1 fruta (~250 kcal)&#10;Comida: pechuga 200g + arroz + ensalada (~620 kcal)&#10;Media tarde: 30g nueces&#10;Post-entreno: 1 scoop proteína (~150 kcal)&#10;Cena: 200g pollo + camote + verduras (~450 kcal)&#10;Snack: 150g cottage&#10;Recomendaciones: 3L agua, 8000 pasos"></textarea>
+                        <div class="pm-diet-import-title">INGRESA TU DIETA AQUÍ</div>
+                        <div class="pm-diet-import-sub">Pégala completa. Yo la reparto en cada comida.</div>
+                        <textarea class="pm-diet-import-area" id="diet-full-import" placeholder="Desayuno: 2 huevos, 4 claras, 2 tortillas (470 kcal)&#10;Media ma&#241;ana: yogur griego 200g, 1 manzana (250 kcal)&#10;Comida: pechuga 200g, arroz 150g, ensalada (620 kcal)&#10;Media tarde: 30g nueces&#10;Post-entreno: 1 scoop prote&#237;na (150 kcal)&#10;Cena: pollo 200g, camote, verduras (450 kcal)&#10;Snack: cottage 150g&#10;Recomendaciones: 3L agua, 8000 pasos"></textarea>
                         <button class="pm-diet-import-btn" id="btn-distribute-diet">⚡ DISTRIBUIR AUTOMÁTICAMENTE</button>
                     </div>
                     <button class="btn-premium pm-d-reset" id="btn-reset-diet" style="width:100%; margin-top:14px; background:transparent; border:1px solid rgba(255,51,102,.4); color:#ff3366;">🗑️ REINICIAR DIETA</button>
@@ -2839,11 +2875,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 <!-- ─── TAB REGLAS ─── -->
                 <div class="pm-d-panel ${pmDietTab === 'rules' ? 'on' : ''}" id="pmDt-rules">
-                    <div class="pm-d-log-hint">${hasCustomRules ? 'Las reglas de TU plan' : 'Aún no tienes reglas propias: se llenan SOLAS al pegar tu dieta completa (la parte de "Recomendaciones") o con ✏️ EDITAR REGLAS. Estos son solo ejemplos:'}</div>
+                    <div class="pm-d-log-hint">${hasCustomRules ? 'Las reglas de tu plan' : 'Ejemplos. Las tuyas salen solas al pegar tu dieta.'}</div>
                     <div class="pm-d-rules-list" id="rules-list-display">
                         ${hasCustomRules
-                            ? rules.map((r, i) => `<div class="pm-d-rule"><div class="pm-d-rule-num">${i+1}</div><div class="pm-d-rule-txt">${r}</div></div>`).join('')
-                            : RULE_EXAMPLES.map((r, i) => `<div class="pm-d-rule ax-example"><div class="pm-d-rule-num">${i+1}</div><div class="pm-d-rule-txt">Ej. ${r}</div></div>`).join('')
+                            ? rules.map((r, i) => `<div class="pm-d-rule"><div class="pm-d-rule-num">${i+1}</div><div class="pm-d-rule-txt">${axCortar(r, 64)}</div></div>`).join('')
+                            : RULE_EXAMPLES.map((r, i) => `<div class="pm-d-rule ax-example"><div class="pm-d-rule-num">${i+1}</div><div class="pm-d-rule-txt">${axCortar(r, 64)}</div></div>`).join('')
                         }
                     </div>
                     <button class="btn-premium" id="btn-edit-rules" style="width:100%; margin-top:14px;">✏️ EDITAR REGLAS</button>

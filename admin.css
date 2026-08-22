@@ -103,30 +103,52 @@ body {
 
 /* ── ESTRUCTURA ─────────────────────────────────────────────────────── */
 .admin-main {
-    display: flex; gap: 14px; align-items: flex-start;
+    display: block;
     padding: 14px; max-width: 1180px; margin: 0 auto;
 }
+
+/* MENU EN CUADROS — cinco fichas chicas arriba, en el mismo espacio donde
+   antes iba la lista larga. Cada una con su marca y su palabra. */
 .admin-sidebar {
-    flex: 0 0 220px; display: flex; flex-direction: column; gap: 7px;
-    padding: 12px; border-radius: 22px;
-    background: linear-gradient(158deg, var(--pm-s2), var(--pm-s1));
-    border: 1px solid var(--pm-border);
-    position: sticky; top: 14px;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 9px; margin-bottom: 16px;
 }
 .nav-btn {
-    cursor: pointer; text-align: left; width: 100%;
-    background: transparent; border: 1px solid transparent;
+    cursor: pointer; text-align: center;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 7px; min-height: 84px; padding: 12px 6px;
+    background: linear-gradient(158deg, var(--pm-s3), var(--pm-s1));
+    border: 1px solid var(--pm-border);
+    border-radius: 18px;
     color: var(--pm-dim2, var(--text-dim));
-    border-radius: 14px; padding: .78rem .9rem;
     font-family: var(--font-accent), 'Oswald', sans-serif;
-    font-size: .72rem; letter-spacing: 1.4px; text-transform: uppercase;
-    transition: all .2s;
+    font-size: .58rem; letter-spacing: 1.4px; text-transform: uppercase;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.05), 0 8px 18px rgba(0,0,0,.2);
+    transition: transform .14s cubic-bezier(.34,1.56,.64,1), border-color .22s, box-shadow .22s, color .22s;
 }
-.nav-btn:hover { background: rgba(255,255,255,.04); color: var(--text-primary); }
+.nav-btn i {
+    font-style: normal; font-size: 17px; line-height: 1;
+    width: 34px; height: 34px; flex: none;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%;
+    background: rgba(var(--pm-green-rgb), .10);
+    border: 1px solid rgba(var(--pm-green-rgb), .22);
+    transition: all .22s;
+}
+.nav-btn span { line-height: 1.15; }
+.nav-btn:active { transform: scale(.96); }
 .nav-btn.active {
-    background: rgba(var(--pm-green-rgb), .12);
-    border-color: rgba(var(--pm-green-rgb), .32);
     color: var(--accent-main);
+    border-color: rgba(var(--pm-green-rgb), .40);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.06),
+                0 0 18px rgba(var(--pm-green-rgb), .14),
+                0 8px 18px rgba(0,0,0,.22);
+}
+.nav-btn.active i {
+    background: rgba(var(--pm-green-rgb), .20);
+    border-color: rgba(var(--pm-green-rgb), .45);
+    box-shadow: 0 0 14px rgba(var(--pm-green-rgb), .25);
 }
 .admin-content { flex: 1; min-width: 0; }
 .admin-pane { display: none; }
@@ -297,13 +319,10 @@ tbody tr:hover td { background: rgba(var(--pm-green-rgb), .04); }
 
 /* ── CELULAR ────────────────────────────────────────────────────────── */
 @media (max-width: 860px) {
-    .admin-main { flex-direction: column; padding: 12px; gap: 12px; }
-    .admin-sidebar {
-        flex: none; width: 100%; position: static;
-        flex-direction: row; overflow-x: auto; gap: 6px;
-        padding: 9px; border-radius: 18px;
-    }
-    .nav-btn { white-space: nowrap; flex: none; padding: .6rem .8rem; font-size: .65rem; }
+    .admin-main { padding: 12px; }
+    .admin-sidebar { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .nav-btn { min-height: 76px; font-size: .54rem; }
+    .nav-btn i { width: 30px; height: 30px; font-size: 15px; }
     .admin-header { margin: 12px 12px 0; padding: 12px 14px; }
     .admin-header .logo { font-size: 1.05rem; }
     .user-info { font-size: .7rem; }

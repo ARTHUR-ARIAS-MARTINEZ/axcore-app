@@ -97,9 +97,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const db = await rb.json();
             if (db.success && Array.isArray(db.blocks)) {
-                adminData.blocks = db.blocks.map(b => ({
-                    id: b.id, name: b.name, zone: b.zone || '', created: b.created || ''
-                }));
+                // MUDANZA (una sola vez): los bloques que ya existian en ESTE
+                // navegador nunca se habian subido. Si el servidor viene vacio
+                // y aqui hay bloques, se suben en vez de borrarlos.
+                if (db.blocks.length === 0 && adminData.blocks.length > 0) {
+                    let subidos = 0;
+                    for (const b of adminData.blocks) {
+                        try {
+                            const r = await fetch(`${API_URL}/api/admin/blocks`, {
+                                method: 'POST',
+                                headers: adminHeaders({ 'Content-Type': 'application/json' }),
+                                body: JSON.stringify({
+                                    id: String(b.id), name: b.name,
+                                    zone: b.zone || '', created: b.created || ''
+                                })
+                            });
+                            const rr = await r.json();
+                            if (rr.success) subidos++;
+                        } catch (e) {}
+                    }
+                    if (subidos > 0) {
+                        alert('Se subieron ' + subidos + ' bloque(s) al servidor.\n\n' +
+                              'A partir de ahora los vas a ver igual desde la computadora y desde el celular.');
+                    }
+                } else {
+                    adminData.blocks = db.blocks.map(b => ({
+                        id: b.id, name: b.name, zone: b.zone || '', created: b.created || ''
+                    }));
+                }
             }
 
             const dg = await rg.json();

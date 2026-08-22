@@ -4705,19 +4705,19 @@ body.premium-mode #page-settings .t-swatch.ax-fus.active::after { content: none;
 body.premium-mode .pm-d-meals {
   display: grid !important;
   grid-template-columns: repeat(2, 1fr) !important;
-  gap: 10px !important;
+  gap: 8px !important;
   margin-bottom: 16px !important;
 }
 body.premium-mode .pm-d-meals .pm-d-meal {
-  min-height: 104px !important;
+  min-height: 84px !important;
   margin: 0 !important;
-  padding: 15px 10px 13px !important;
+  padding: 12px 8px 11px !important;
   border-radius: 19px !important;
   display: flex !important;
   flex-direction: column !important;
   align-items: center !important;
   justify-content: center !important;
-  gap: 9px !important;
+  gap: 7px !important;
   text-align: center !important;
   background: linear-gradient(158deg, var(--pm-s3) 0%, var(--pm-s2) 48%, var(--pm-s1) 100%) !important;
   border: 1px solid var(--pm-border) !important;
@@ -4728,9 +4728,9 @@ body.premium-mode .pm-d-meals .pm-d-meal:active { transform: scale(.97) !importa
 
 /* el icono, dentro de un disco del color del tema */
 body.premium-mode .pm-d-meal-ico {
-  width: 40px; height: 40px; flex: none;
+  width: 32px; height: 32px; flex: none;
   display: flex; align-items: center; justify-content: center;
-  font-size: 19px; line-height: 1;
+  font-size: 15px; line-height: 1;
   border-radius: 50%;
   background: rgba(var(--pm-green-rgb), .10);
   border: 1px solid rgba(var(--pm-green-rgb), .22);
@@ -4739,9 +4739,9 @@ body.premium-mode .pm-d-meal-ico {
 }
 body.premium-mode .pm-d-meals .pm-d-meal-name-c {
   font-family: 'Oswald', sans-serif !important;
-  font-size: .66rem !important;
+  font-size: .58rem !important;
   font-weight: 600 !important;
-  letter-spacing: 1.7px !important;
+  letter-spacing: 1.4px !important;
   line-height: 1.2 !important;
   color: var(--pm-dim2, #7f93a8) !important;
   text-transform: uppercase;
@@ -4787,4 +4787,66 @@ body.premium-mode .pm-d-plan-hint {
   font-size: .58rem !important;
   letter-spacing: 1.4px; text-transform: uppercase;
   opacity: .7;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   VENTANA DE UNA COMIDA — el plan desmenuzado, no un párrafo.
+   Arriba el icono, el nombre y las calorías; abajo un renglón por
+   alimento. Lo que el nutriólogo escribió corrido se parte solo.
+   ═══════════════════════════════════════════════════════════════════════ */
+.ax-meal-top {
+  display: flex; align-items: center; gap: 11px;
+  padding-bottom: 13px; margin-bottom: 13px;
+  border-bottom: 1px solid var(--pm-border, rgba(255,255,255,.10));
+}
+.ax-meal-ico {
+  width: 38px; height: 38px; flex: none;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; border-radius: 50%;
+  background: rgba(var(--pm-green-rgb), .12);
+  border: 1px solid rgba(var(--pm-green-rgb), .26);
+}
+.ax-meal-name {
+  flex: 1; font-family: 'Oswald', sans-serif; font-weight: 600;
+  font-size: .95rem; letter-spacing: 2px; color: var(--pm-white, #fff);
+}
+.ax-meal-kcal {
+  flex: none; font-family: 'Oswald', sans-serif; font-weight: 600;
+  font-size: .66rem; letter-spacing: 1px; padding: 5px 11px;
+  border-radius: 99px; color: var(--accent-main);
+  background: rgba(var(--pm-green-rgb), .12);
+  border: 1px solid rgba(var(--pm-green-rgb), .28);
+  font-variant-numeric: tabular-nums;
+}
+.ax-meal-body { white-space: normal !important; padding-bottom: 6px !important; }
+.ax-meal-list { list-style: none; margin: 0; padding: 0; }
+.ax-meal-list li {
+  position: relative; padding: 9px 0 9px 18px;
+  font-size: .92rem; line-height: 1.35;
+  color: var(--pm-white, #e8edf5);
+  border-bottom: 1px solid rgba(255,255,255,.045);
+}
+.ax-meal-list li:last-child { border-bottom: none; }
+.ax-meal-list li::before {
+  content: ''; position: absolute; left: 2px; top: 16px;
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--accent-main); box-shadow: 0 0 7px var(--accent-main);
+}
+.ax-meal-vacio { font-size: .86rem; line-height: 1.5; color: var(--pm-dim2, #7f93a8); }
+
+/* reglas: fichas cortas, no párrafos */
+body.premium-mode .pm-d-rule {
+  padding: 11px 12px !important;
+  border-radius: 14px !important;
+  gap: 11px !important;
+}
+body.premium-mode .pm-d-rule-txt {
+  font-size: .84rem !important; line-height: 1.35 !important;
+}
+body.premium-mode .pm-d-log-hint {
+  font-size: .68rem !important; line-height: 1.4 !important; opacity: .8;
+}
+body.premium-mode .pm-diet-import-sub {
+  font-size: .72rem !important; line-height: 1.45 !important;
 }

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>MAESTRO AX-CORE | Control de Bloques</title>
     <!-- PWA Support -->
-    <link rel="manifest" href="manifest_admin.json?v=20260822g">
+    <link rel="manifest" href="manifest_admin.json?v=20260822h">
     <meta name="theme-color" content="#0a0b0d">
     <link rel="icon" href="assets/icons/admin-192.png" type="image/png">
     <link rel="apple-touch-icon" href="assets/icons/admin-192.png">
@@ -13,9 +13,9 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="AX Admin">
-    <link rel="stylesheet" href="index.css?v=20260822g">
-    <link rel="stylesheet" href="premium.css?v=20260822g">
-    <link rel="stylesheet" href="admin.css?v=20260822g">
+    <link rel="stylesheet" href="index.css?v=20260822h">
+    <link rel="stylesheet" href="premium.css?v=20260822h">
+    <link rel="stylesheet" href="admin.css?v=20260822h">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
@@ -54,11 +54,11 @@
 
         <main class="admin-main">
             <aside class="admin-sidebar">
-                <button class="nav-btn active" data-tab="blocks">Gestión de Bloques</button>
-                <button class="nav-btn" data-tab="gyms">Asignación de Gimnasios</button>
-                <button class="nav-btn" data-tab="codes">Códigos Activos</button>
-                <button class="nav-btn" data-tab="profits" style="color:var(--accent-gold); border-top: 1px solid var(--glass-border); margin-top:10px; padding-top:20px;">Reporte de Ganancias</button>
-                <button class="nav-btn" onclick="window.open('MANUAL_MAESTRO.html', '_blank')" style="border-top: 1px dashed var(--border); margin-top: 20px; color: var(--primary);">📖 Manual Maestro</button>
+                <button class="nav-btn active" data-tab="blocks"><i>▦</i><span>Bloques</span></button>
+                <button class="nav-btn" data-tab="gyms"><i>⚑</i><span>Gimnasios</span></button>
+                <button class="nav-btn" data-tab="codes"><i>⌗</i><span>C&oacute;digos</span></button>
+                <button class="nav-btn" data-tab="profits"><i>▲</i><span>Ganancias</span></button>
+                <button class="nav-btn" onclick="window.open('MANUAL_MAESTRO.html', '_blank')"><i>▤</i><span>Manual</span></button>
             </aside>
 
             <section class="admin-content">
@@ -288,10 +288,10 @@
     </div>
 
     <script src="knowledge.js"></script>
-    <script src="admin.js?v=20260822g"></script>
+    <script src="admin.js?v=20260822h"></script>
     <script>
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js?v=20260822g').catch(() => {});
+            navigator.serviceWorker.register('sw.js?v=20260822h').catch(() => {});
         }
     // --- INSTALACIÓN EN EL CELULAR ---
     // Regla: la caja se muestra SIEMPRE, salvo que esta misma app ya este
