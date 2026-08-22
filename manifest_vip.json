@@ -1,22 +1,43 @@
 {
-  "name": "AX-CORE Coach Terminal VIP",
-  "short_name": "Coach VIP",
-  "description": "Terminal Élite para entrenadores de la franquicia AX-CORE",
+  "id": "./coach.html",
+  "name": "AX-CORE Coach",
+  "short_name": "AX Coach",
+  "description": "Panel del coach AX-CORE: pases, altas y estado de cuenta de tus atletas.",
   "start_url": "./coach.html",
+  "scope": "./",
   "display": "standalone",
-  "background_color": "#060610",
-  "theme_color": "#d4af37",
+  "display_override": [
+    "standalone",
+    "minimal-ui"
+  ],
+  "background_color": "#06141b",
+  "theme_color": "#06141b",
   "orientation": "portrait",
+  "lang": "es",
+  "dir": "ltr",
+  "categories": [
+    "health",
+    "fitness",
+    "productivity"
+  ],
   "icons": [
     {
-      "src": "logo_coach.png",
+      "src": "assets/icons/coach-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     },
     {
-      "src": "logo_coach.png",
+      "src": "assets/icons/coach-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icons/coach-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }

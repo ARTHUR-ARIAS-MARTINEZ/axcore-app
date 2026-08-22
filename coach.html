@@ -5,15 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>AX-CORE | COACH TERMINAL VIP</title>
     <!-- PWA Support -->
-    <link rel="manifest" href="manifest_vip.json">
-    <meta name="theme-color" content="#0a0e14">
-    <link rel="icon" href="logo_coach.png" type="image/png">
+    <link rel="manifest" href="manifest_vip.json?v=20260822c">
+    <meta name="theme-color" content="#06141b">
+    <link rel="icon" href="assets/icons/coach-192.png" type="image/png">
+    <!-- iPhone: Safari no instala solo, pero con esto queda como app -->
+    <link rel="apple-touch-icon" href="assets/icons/coach-192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="AX Coach">
     <!-- Fuentes -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="index.css?v=20260822b">
-    <link rel="stylesheet" href="premium.css?v=20260822b">
+    <link rel="stylesheet" href="index.css?v=20260822c">
+    <link rel="stylesheet" href="premium.css?v=20260822c">
     <style>
         /* ════════════════════════════════════════════════════════════════
            PANEL DEL COACH — mismo lenguaje visual que la app del atleta.
@@ -75,11 +81,6 @@
                 var(--accent-main),
                 var(--accent-secondary));
             margin: 15px auto 0;
-        }
-        #btn-install-coach {
-            position: absolute; right: 10px; top: 6px;
-            font-size: 1.3rem; text-decoration: none; cursor: pointer;
-            color: var(--accent-main);
         }
 
         /* ── ACCESO ── la tarjeta usa .glass-card de premium.css ── */
@@ -292,7 +293,7 @@
     <div class="header-brand" style="position:relative;">
         <h1 style="background: linear-gradient(120deg, var(--accent-tri, var(--accent-main)), var(--accent-main) 52%, var(--accent-secondary)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; text-shadow: none;"><span>AX-CORE</span></h1>
         <p style="font-family: 'Oswald', sans-serif; font-size: 0.85rem; color:rgba(255,255,255,0.6); letter-spacing: 4px; margin-top:5px; text-transform:uppercase;">PANEL DEL COACH</p>
-        <a id="btn-install-coach" href="#" style="position:absolute; right:16px; top:16px; font-size:1.5rem; color:var(--accent-main, #00ff88); text-decoration:none; cursor:pointer;" title="Instalar App">⬇</a>
+        <!-- (la instalacion vive ahora en la pantalla de acceso) -->
     </div>
 
     <!-- Login -->
@@ -309,6 +310,19 @@
             <input type="password" id="gym-pass" autocomplete="new-password" placeholder="Contraseña asignada" style="font-size: 1rem; text-align: center; letter-spacing: 2px;">
         </div>
         <button class="btn-premium" id="btn-login" style="width: 100%; margin-top: 1.5rem; padding: 1.2rem; font-size: 0.8rem;">INICIAR SESIÓN</button>
+
+        <!-- Instalar en el celular -->
+        <div id="install-box" style="display:none; margin-top:1.4rem; padding-top:1.2rem; border-top:1px solid var(--pm-border, rgba(255,255,255,.10));">
+            <div class="coach-theme-title" style="margin-bottom:8px;">Tenlo como app</div>
+            <p id="install-text" style="margin:0 0 12px; font-size:.78rem; line-height:1.5; color:var(--pm-dim2, #7f93a8);">
+                Inst&aacute;lalo y entras con un toque desde tu pantalla de inicio, sin abrir el navegador ni buscar la direcci&oacute;n.
+            </p>
+            <button class="btn-premium" id="btn-install-coach" style="width:100%; padding:.95rem; font-size:.75rem;">INSTALAR EN MI CELULAR</button>
+            <div id="install-ios" style="display:none; font-size:.75rem; line-height:1.6; color:var(--pm-dim2, #7f93a8);">
+                En iPhone se hace a mano: toca <b style="color:var(--accent-main)">Compartir</b> abajo en Safari
+                y luego <b style="color:var(--accent-main)">Agregar a inicio</b>.
+            </div>
+        </div>
     </div>
     </div><!-- /login-wrapper -->
 
@@ -755,29 +769,78 @@
         }
     })();
 
-    // --- INSTALACI�N PWA ---
-    let deferredPrompt = null;
-    const btnInstallCoach = document.getElementById('btn-install-coach');
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-        if (btnInstallCoach) btnInstallCoach.style.display = 'block';
-    });
-    if (btnInstallCoach) {
-        btnInstallCoach.addEventListener('click', (e) => {
+    // --- INSTALACIÓN EN EL CELULAR ---
+    // Android/Chrome avisa cuando se puede instalar (beforeinstallprompt).
+    // iPhone/Safari nunca avisa: ahí se le explica el camino a mano.
+    (function () {
+        var caja   = document.getElementById('install-box');
+        var boton  = document.getElementById('btn-install-coach');
+        var ios    = document.getElementById('install-ios');
+        var texto  = document.getElementById('install-text');
+        var guardado = null;
+
+        function yaInstalada() {
+            return window.matchMedia('(display-mode: standalone)').matches ||
+                   window.navigator.standalone === true;
+        }
+        function esIOS() {
+            return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        }
+
+        if (yaInstalada()) return;            // ya la tiene: no estorbar
+
+        if (esIOS()) {
+            caja.style.display = 'block';
+            boton.style.display = 'none';
+            ios.style.display = 'block';
+        }
+
+        window.addEventListener('beforeinstallprompt', function (e) {
             e.preventDefault();
-            if (!deferredPrompt) return;
-            deferredPrompt.prompt();
-            deferredPrompt.userChoice.then(result => {
-                if (result.outcome === 'accepted') btnInstallCoach.style.display = 'none';
-                deferredPrompt = null;
+            guardado = e;
+            caja.style.display = 'block';
+            boton.style.display = 'block';
+            ios.style.display = 'none';
+        });
+
+        boton.addEventListener('click', function (e) {
+            e.preventDefault();
+            if (!guardado) return;
+            guardado.prompt();
+            guardado.userChoice.then(function (r) {
+                if (r.outcome === 'accepted') {
+                    texto.textContent = 'Listo. Ya la tienes en tu pantalla de inicio.';
+                    boton.style.display = 'none';
+                }
+                guardado = null;
             });
         });
-    }
 
-    // Registrar Service Worker
+        window.addEventListener('appinstalled', function () {
+            texto.textContent = 'Listo. Ya la tienes en tu pantalla de inicio.';
+            boton.style.display = 'none';
+        });
+    })();
+
+    // La barra de estado del celular toma el color del tema elegido
+    (function () {
+        function pinta() {
+            try {
+                var bg = (getComputedStyle(document.body)
+                          .getPropertyValue('--bg-dark') || '').trim();
+                if (!bg) return;
+                var m = document.querySelector('meta[name="theme-color"]');
+                if (m) m.setAttribute('content', bg);
+            } catch (e) {}
+        }
+        pinta();
+        var original = window.setCoachTheme;
+        window.setCoachTheme = function (t) { original(t); pinta(); };
+    })();
+
+    // Registrar Service Worker (hace falta para que se pueda instalar)
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js').catch(() => {});
+        navigator.serviceWorker.register('sw.js?v=20260822c').catch(() => {});
     }
 </script>
 
