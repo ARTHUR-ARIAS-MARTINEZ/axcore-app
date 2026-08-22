@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@900&display=swap" rel="stylesheet">
+<style>
+  html,body{margin:0;padding:0;background:transparent;}
+  svg{display:block}
+</style></head>
+<body>
+<svg id="ico" width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="tile" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%"  stop-color="#15181d"/>
+      <stop offset="55%" stop-color="#0b0d11"/>
+      <stop offset="100%" stop-color="#050608"/>
+    </linearGradient>
+    <radialGradient id="halo" cx="50%" cy="42%" r="62%">
+      <stop offset="0%"   stop-color="var(--c)" stop-opacity=".26"/>
+      <stop offset="55%"  stop-color="var(--c)" stop-opacity=".07"/>
+      <stop offset="100%" stop-color="var(--c)" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="ink" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="var(--c2)"/>
+      <stop offset="52%"  stop-color="var(--c)"/>
+      <stop offset="100%" stop-color="var(--c3)"/>
+    </linearGradient>
+    <filter id="glow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="6" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="softglow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="5" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <g id="art">
+    <!-- placa -->
+    <rect x="0" y="0" width="512" height="512" rx="118" fill="url(#tile)"/>
+    <rect x="0" y="0" width="512" height="512" rx="118" fill="url(#halo)"/>
+
+    <!-- anillo tecnologico -->
+    <g stroke="var(--c)" fill="none" stroke-linecap="round">
+      <circle cx="256" cy="256" r="176" stroke-opacity=".16" stroke-width="2"/>
+      <circle cx="256" cy="256" r="158" stroke-opacity=".30" stroke-width="3"
+              stroke-dasharray="150 46 96 46 150 46" stroke-dashoffset="24" filter="url(#softglow)"/>
+      <circle cx="256" cy="256" r="138" stroke-opacity=".13" stroke-width="1.5"
+              stroke-dasharray="4 12"/>
+      <path d="M256 74 a182 182 0 0 1 158 91" stroke-opacity=".55" stroke-width="5" filter="url(#softglow)"/>
+      <path d="M256 438 a182 182 0 0 1 -158 -91" stroke-opacity=".55" stroke-width="5" filter="url(#softglow)"/>
+    </g>
+    <!-- marcas -->
+    <g id="ticks" stroke="var(--c)" stroke-opacity=".38" stroke-width="3" stroke-linecap="round"></g>
+
+    <!-- AX -->
+    <text x="256" y="258" text-anchor="middle" dominant-baseline="central"
+          font-family="Orbitron, sans-serif" font-weight="900" font-size="164"
+          letter-spacing="2" fill="url(#ink)" filter="url(#glow)">AX</text>
+    <text x="256" y="258" text-anchor="middle" dominant-baseline="central"
+          font-family="Orbitron, sans-serif" font-weight="900" font-size="164"
+          letter-spacing="2" fill="none" stroke="#05070a" stroke-opacity=".55" stroke-width="2.5">AX</text>
+    <text x="256" y="258" text-anchor="middle" dominant-baseline="central"
+          font-family="Orbitron, sans-serif" font-weight="900" font-size="164"
+          letter-spacing="2" fill="url(#ink)">AX</text>
+
+    <!-- filo de la placa -->
+    <rect x="3" y="3" width="506" height="506" rx="116" fill="none"
+          stroke="var(--c)" stroke-opacity=".34" stroke-width="4"/>
+    <rect x="10" y="10" width="492" height="492" rx="110" fill="none"
+          stroke="#ffffff" stroke-opacity=".05" stroke-width="1.5"/>
+  </g>
+</svg>
+<script>
+  // marcas del anillo
+  var g = document.getElementById('ticks'), N = 48, ns = 'http://www.w3.org/2000/svg';
+  for (var i = 0; i < N; i++) {
+    var a = (i / N) * Math.PI * 2, r1 = 190, r2 = (i % 4 === 0) ? 176 : 183;
+    var l = document.createElementNS(ns, 'line');
+    l.setAttribute('x1', 256 + Math.cos(a) * r1); l.setAttribute('y1', 256 + Math.sin(a) * r1);
+    l.setAttribute('x2', 256 + Math.cos(a) * r2); l.setAttribute('y2', 256 + Math.sin(a) * r2);
+    if (i % 4 === 0) l.setAttribute('stroke-width', '5');
+    g.appendChild(l);
+  }
+  // color y modo por parametro
+  var q = new URLSearchParams(location.search);
+  var c = q.get('c') || '#3b9cff', c2 = q.get('c2') || '#9fd2ff', c3 = q.get('c3') || '#1e5fd0';
+  var s = document.getElementById('ico').style;
+  s.setProperty('--c', c); s.setProperty('--c2', c2); s.setProperty('--c3', c3);
+  if (q.get('mask') === '1') {
+    // maskable: el dibujo se encoge al 66% para que el sistema no lo recorte
+    var art = document.getElementById('art');
+    art.setAttribute('transform', 'translate(87,87) scale(0.66)');
+    var f = document.createElementNS(ns, 'rect');
+    f.setAttribute('width', '512'); f.setAttribute('height', '512'); f.setAttribute('fill', '#08090b');
+    document.getElementById('ico').insertBefore(f, art);
+  }
+</script>
+</body></html>

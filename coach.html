@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>AX-CORE | COACH TERMINAL VIP</title>
     <!-- PWA Support -->
-    <link rel="manifest" href="manifest_vip.json?v=20260822c">
+    <link rel="manifest" href="manifest_vip.json?v=20260822d">
     <meta name="theme-color" content="#06141b">
     <link rel="icon" href="assets/icons/coach-192.png" type="image/png">
     <!-- iPhone: Safari no instala solo, pero con esto queda como app -->
@@ -18,8 +18,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="index.css?v=20260822c">
-    <link rel="stylesheet" href="premium.css?v=20260822c">
+    <link rel="stylesheet" href="index.css?v=20260822d">
+    <link rel="stylesheet" href="premium.css?v=20260822d">
     <style>
         /* ════════════════════════════════════════════════════════════════
            PANEL DEL COACH — mismo lenguaje visual que la app del atleta.
@@ -252,34 +252,14 @@
 
         #dashboard { display: none; }
 
-        /* ── ESTILO VISUAL: las mismas muestras de pintura que la app ── */
+        /* ── ESTILO VISUAL ── las fichas premium viven en premium.css (.ax-fus) ── */
         .coach-theme-card { padding: 1.1rem 1rem !important; margin-bottom: 18px; }
         .coach-theme-title {
             font-family: 'Oswald', sans-serif; font-size: 0.62rem;
             letter-spacing: 2.5px; text-transform: uppercase;
             color: var(--pm-dim2, #7f93a8); margin-bottom: 11px;
         }
-        .coach-theme-list { display: flex; flex-direction: column; gap: 8px; }
-        .coach-theme-list .t-swatch {
-            display: flex; align-items: center; gap: 12px;
-            text-align: left; cursor: pointer;
-            background: rgba(255,255,255,0.035);
-            border: 1px solid var(--pm-border, rgba(255,255,255,.08));
-            border-radius: 16px; padding: 10px 12px;
-            transition: border-color .2s, box-shadow .2s, transform .1s;
-            position: relative;
-        }
-        .coach-theme-list .t-swatch:active { transform: scale(.985); }
-        .coach-theme-list .t-swatch.active {
-            border-color: var(--accent-main);
-            box-shadow: 0 0 0 1px var(--accent-main), 0 0 16px rgba(var(--pm-green-rgb), 0.30);
-            background: rgba(var(--pm-green-rgb), 0.07);
-        }
-        .coach-theme-list .t-swatch.active::after {
-            content: '\2713'; position: absolute; top: 8px; right: 11px;
-            font-size: 11px; font-weight: 900; color: var(--accent-main); line-height: 1;
-        }
-        .coach-theme-list .t-swatch.active .ax-fus-name { color: var(--accent-main); }
+        .coach-theme-list { display: flex; flex-direction: column; gap: 9px; }
 
         @media (max-width: 600px) {
             .dashboard-header { padding: 0.9rem; gap: 10px; }
@@ -310,39 +290,45 @@
             <input type="password" id="gym-pass" autocomplete="new-password" placeholder="Contraseña asignada" style="font-size: 1rem; text-align: center; letter-spacing: 2px;">
         </div>
         <button class="btn-premium" id="btn-login" style="width: 100%; margin-top: 1.5rem; padding: 1.2rem; font-size: 0.8rem;">INICIAR SESIÓN</button>
-
-        <!-- Instalar en el celular -->
-        <div id="install-box" style="display:none; margin-top:1.4rem; padding-top:1.2rem; border-top:1px solid var(--pm-border, rgba(255,255,255,.10));">
-            <div class="coach-theme-title" style="margin-bottom:8px;">Tenlo como app</div>
-            <p id="install-text" style="margin:0 0 12px; font-size:.78rem; line-height:1.5; color:var(--pm-dim2, #7f93a8);">
-                Inst&aacute;lalo y entras con un toque desde tu pantalla de inicio, sin abrir el navegador ni buscar la direcci&oacute;n.
-            </p>
-            <button class="btn-premium" id="btn-install-coach" style="width:100%; padding:.95rem; font-size:.75rem;">INSTALAR EN MI CELULAR</button>
-            <div id="install-ios" style="display:none; font-size:.75rem; line-height:1.6; color:var(--pm-dim2, #7f93a8);">
-                En iPhone se hace a mano: toca <b style="color:var(--accent-main)">Compartir</b> abajo en Safari
-                y luego <b style="color:var(--accent-main)">Agregar a inicio</b>.
-            </div>
-        </div>
     </div>
     </div><!-- /login-wrapper -->
+
+    <div class="glass-card" id="install-box" style="display:none; margin-top:6px; padding:1.1rem 1.2rem;">
+        <div class="coach-theme-title" style="margin-bottom:8px;">Tenlo como app</div>
+        <p id="install-text" style="margin:0 0 12px; font-size:.78rem; line-height:1.5; color:var(--pm-dim2, #7f93a8);">
+            Inst&aacute;lalo y entras con un toque desde tu pantalla de inicio, con su propio icono azul. No abre la app del atleta.
+        </p>
+        <button class="btn-premium" id="btn-install-coach" style="width:100%; padding:.95rem; font-size:.75rem;">INSTALAR EN MI CELULAR</button>
+        <div id="install-ios" style="display:none; font-size:.75rem; line-height:1.6; color:var(--pm-dim2, #7f93a8);">
+            En iPhone se hace a mano: toca <b style="color:var(--accent-main)">Compartir</b> abajo en Safari
+            y luego <b style="color:var(--accent-main)">Agregar a inicio</b>.
+        </div>
+    </div>
 
     <!-- Dashboard -->
     <div id="dashboard" class="dashboard-container">
         
-        <div class="dashboard-header" style="flex-wrap: wrap; gap:8px;">
-            <div>
-                <h2 style="font-family: 'Oswald', sans-serif; color:#fff; margin:0; font-size:0.95rem; letter-spacing:2px;" id="gym-name-display">GIMNASIO...</h2>
-                <p style="margin:3px 0 0 0; color:var(--accent-secondary, #00ff88); opacity:0.75; font-size:0.65rem; font-family:'Oswald',sans-serif; letter-spacing:2px;" id="gym-code-display">ID: ---</p>
+        <div class="coach-hero">
+            <div class="ch-top">
+                <div class="ch-id">
+                    <h2 id="gym-name-display">GIMNASIO...</h2>
+                    <p id="gym-code-display">ID: ---</p>
+                </div>
+                <button class="ch-exit" onclick="logout()" title="Cerrar sesi&oacute;n">Salir</button>
             </div>
-            <div style="display:flex; flex-direction:column; gap:6px; align-items:flex-end;">
-                <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
-                    <div id="stats-users" class="stats-badge" style="font-size:0.7rem; padding:0.4rem 0.8rem;">CARGANDO...</div>
-                    <button class="btn-premium" style="margin:0; font-size:0.7rem; padding:0.5rem 0.9rem;" id="btn-new-code">+ PASE NUEVO</button>
-                </div>
-                <div style="display:flex; gap:6px;">
-                    <button class="btn-premium" style="padding:0.4rem 0.8rem; font-size:0.65rem; background: rgba(var(--pm-green-rgb),0.12) !important; border: 1px solid rgba(var(--pm-green-rgb),0.32) !important; color: var(--accent-main) !important; box-shadow: none !important;" onclick="window.open('MANUAL_COACH.html', '_blank')">📖 GUÍA COACH</button>
-                    <button class="btn-cancel" style="padding:0.4rem 0.8rem; font-size:0.65rem;" onclick="logout()">CERRAR SESIÓN</button>
-                </div>
+
+            <div class="ch-stats">
+                <div class="ch-stat"><strong id="ch-usados">0</strong><span>Pases usados</span></div>
+                <div class="ch-stat"><strong id="ch-cupo">0</strong><span>Cupo total</span></div>
+                <div class="ch-stat"><strong id="ch-libres">0</strong><span>Te quedan</span></div>
+            </div>
+
+            <div class="ch-meter"><i id="ch-meter-fill"></i></div>
+            <div class="ch-meter-txt" id="stats-users">Cargando&hellip;</div>
+
+            <div class="ch-actions">
+                <button class="btn-premium" id="btn-new-code">+ PASE NUEVO</button>
+                <button class="ch-ghost" onclick="window.open('MANUAL_COACH.html', '_blank')">Gu&iacute;a del coach</button>
             </div>
         </div>
 
@@ -350,40 +336,45 @@
         <div class="glass-card coach-theme-card">
             <div class="coach-theme-title">Estilo visual</div>
             <div class="theme-grid coach-theme-list">
-                <div class="t-swatch" data-theme="fusion-aurora" onclick="setCoachTheme('fusion-aurora')">
-                    <span class="ax-fus-chip" style="background:linear-gradient(100deg,#17c98c 0%,#15b4c6 52%,#4fa0ff 100%)"></span>
+                <div class="t-swatch ax-fus" data-theme="fusion-aurora" onclick="setCoachTheme('fusion-aurora')" style="--c1:#17c98c;--c2:#15b4c6;--c3:#4fa0ff;--cbg:#06141b;--c1rgb:21,180,198;--c3rgb:79,160,255">
+                    <span class="ax-fus-chip"><i class="afc-bar"></i><i class="afc-pill"></i></span>
                     <span class="ax-fus-txt">
                         <span class="ax-fus-name">AURORA</span>
                         <span class="ax-fus-note">jade &middot; turquesa &middot; cobalto</span>
                     </span>
+                    <span class="ax-fus-check"></span>
                 </div>
-                <div class="t-swatch" data-theme="fusion-acero" onclick="setCoachTheme('fusion-acero')">
-                    <span class="ax-fus-chip" style="background:linear-gradient(100deg,#5e6975 0%,#d7e0ea 52%,#f4f7fa 100%)"></span>
+                <div class="t-swatch ax-fus" data-theme="fusion-acero" onclick="setCoachTheme('fusion-acero')" style="--c1:#5e6975;--c2:#d7e0ea;--c3:#f4f7fa;--cbg:#0a0c0f;--c1rgb:215,224,234;--c3rgb:244,247,250">
+                    <span class="ax-fus-chip"><i class="afc-bar"></i><i class="afc-pill"></i></span>
                     <span class="ax-fus-txt">
                         <span class="ax-fus-name">ACERO</span>
                         <span class="ax-fus-note">acero &middot; titanio &middot; humo</span>
                     </span>
+                    <span class="ax-fus-check"></span>
                 </div>
-                <div class="t-swatch" data-theme="fusion-oro" onclick="setCoachTheme('fusion-oro')">
-                    <span class="ax-fus-chip" style="background:linear-gradient(100deg,#b5673c 0%,#e8b04a 52%,#f7e7c6 100%)"></span>
+                <div class="t-swatch ax-fus" data-theme="fusion-oro" onclick="setCoachTheme('fusion-oro')" style="--c1:#b5673c;--c2:#e8b04a;--c3:#f7e7c6;--cbg:#13100b;--c1rgb:232,176,74;--c3rgb:247,231,198">
+                    <span class="ax-fus-chip"><i class="afc-bar"></i><i class="afc-pill"></i></span>
                     <span class="ax-fus-txt">
                         <span class="ax-fus-name">ORO</span>
                         <span class="ax-fus-note">cobre &middot; oro &middot; champ&aacute;n</span>
                     </span>
+                    <span class="ax-fus-check"></span>
                 </div>
-                <div class="t-swatch" data-theme="fusion-fuego" onclick="setCoachTheme('fusion-fuego')">
-                    <span class="ax-fus-chip" style="background:linear-gradient(100deg,#a8402a 0%,#ff5a45 52%,#ffb08f 100%)"></span>
+                <div class="t-swatch ax-fus" data-theme="fusion-fuego" onclick="setCoachTheme('fusion-fuego')" style="--c1:#a8402a;--c2:#ff5a45;--c3:#ffb08f;--cbg:#140908;--c1rgb:255,90,69;--c3rgb:255,176,143">
+                    <span class="ax-fus-chip"><i class="afc-bar"></i><i class="afc-pill"></i></span>
                     <span class="ax-fus-txt">
                         <span class="ax-fus-name">FUEGO</span>
                         <span class="ax-fus-note">terracota &middot; brasa &middot; coral</span>
                     </span>
+                    <span class="ax-fus-check"></span>
                 </div>
-                <div class="t-swatch" data-theme="fusion-orq" onclick="setCoachTheme('fusion-orq')">
-                    <span class="ax-fus-chip" style="background:linear-gradient(100deg,#a87bf0 0%,#dc55a8 52%,#ffb0ce 100%)"></span>
+                <div class="t-swatch ax-fus" data-theme="fusion-orq" onclick="setCoachTheme('fusion-orq')" style="--c1:#a87bf0;--c2:#dc55a8;--c3:#ffb0ce;--cbg:#130a18;--c1rgb:220,85,168;--c3rgb:255,176,206">
+                    <span class="ax-fus-chip"><i class="afc-bar"></i><i class="afc-pill"></i></span>
                     <span class="ax-fus-txt">
                         <span class="ax-fus-name">ORQU&Iacute;DEA</span>
                         <span class="ax-fus-note">lila &middot; orqu&iacute;dea &middot; rosa</span>
                     </span>
+                    <span class="ax-fus-check"></span>
                 </div>
             </div>
         </div>
@@ -647,18 +638,37 @@
     };
 
     function updateStatsBadge() {
-        const badge = document.getElementById('stats-users');
-        const limitStr = gymData.maxUsers === 9999 ? '∞' : gymData.maxUsers;
-        const used = gymData.currentUsers;
-        
-        badge.innerHTML = `USADOS: ${used} / ${limitStr}`;
-        
-        if (gymData.maxUsers !== 9999 && used >= gymData.maxUsers) {
-            badge.classList.add('alert');
-            badge.innerHTML = `⚠️ LÍMITE ALCANZADO (${used}/${limitStr})`;
-        } else {
-            badge.classList.remove('alert');
+        // El plan del gimnasio puede venir sin tope (9999) o sin dato: antes
+        // eso pintaba "undefined" en pantalla. Ahora se lee como ilimitado.
+        var max  = Number(gymData.maxUsers);
+        var used = Number(gymData.currentUsers) || 0;
+        var sinTope = !max || max === 9999 || !isFinite(max);
+        var libres  = sinTope ? null : Math.max(0, max - used);
+
+        var elUsados = document.getElementById('ch-usados');
+        var elCupo   = document.getElementById('ch-libres');
+        var elTotal  = document.getElementById('ch-cupo');
+        var barra    = document.getElementById('ch-meter-fill');
+        var texto    = document.getElementById('stats-users');
+        var hero     = document.querySelector('.coach-hero');
+
+        if (elUsados) elUsados.textContent = used;
+        if (elTotal)  elTotal.textContent  = sinTope ? '\u221e' : max;
+        if (elCupo)   elCupo.textContent   = sinTope ? '\u221e' : libres;
+
+        if (barra) {
+            var pct = sinTope ? 0 : Math.min(100, Math.round((used / max) * 100));
+            barra.style.width = (sinTope ? 100 : pct) + '%';
         }
+
+        var lleno = !sinTope && used >= max;
+        if (texto) {
+            texto.textContent = sinTope
+                ? 'Plan sin l\u00edmite de atletas.'
+                : (lleno ? 'Ya llenaste tu cupo. Habla al corporativo para ampliarlo.'
+                         : 'Llevas ' + used + ' de ' + max + ' pases de tu plan.');
+        }
+        if (hero) hero.classList.toggle('ch-lleno', lleno);
     }
 
     btnNewCode.onclick = async () => {
@@ -840,7 +850,7 @@
 
     // Registrar Service Worker (hace falta para que se pueda instalar)
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js?v=20260822c').catch(() => {});
+        navigator.serviceWorker.register('sw.js?v=20260822d').catch(() => {});
     }
 </script>
 

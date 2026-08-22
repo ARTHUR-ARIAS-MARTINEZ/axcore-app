@@ -1,12 +1,12 @@
-﻿const CACHE_NAME = 'axcore-v5.74-coach-instalable';
+﻿const CACHE_NAME = 'axcore-v5.75-tres-apps';
 const urlsToCache = [
   './',
-  './index.html?v=20260822c',
-  './index.css?v=20260822c',
-  './premium.css?v=20260822c',
-  './profile-persist.js?v=20260822c',
-  './app.js?v=20260822c',
-  './knowledge.js?v=20260822c',
+  './index.html?v=20260822d',
+  './index.css?v=20260822d',
+  './premium.css?v=20260822d',
+  './profile-persist.js?v=20260822d',
+  './app.js?v=20260822d',
+  './knowledge.js?v=20260822d',
   './logo.png',
   './logo_coach.png',
   './manifest.json',
@@ -15,6 +15,9 @@ const urlsToCache = [
   './assets/icons/coach-512.png',
   './assets/icons/app-192.png',
   './assets/icons/app-512.png',
+  './manifest_admin.json',
+  './assets/icons/admin-192.png',
+  './assets/icons/admin-512.png',
   './coach.html',
   './aviso_privacidad.html',
   './terminos.html'
@@ -23,9 +26,9 @@ const urlsToCache = [
 // No críticos (scripts de badges + 39 imágenes de insignias): precache NO atómico.
 // Si algo aquí fallara (imagen faltante, etc.) NO rompe la instalación del Service Worker.
 const optionalCache = [
-  './premium-badges.js?v=20260822c',
-  './premium-extras.js?v=20260822c',
-  './axcore-back.js?v=20260822c',
+  './premium-badges.js?v=20260822d',
+  './premium-extras.js?v=20260822d',
+  './axcore-back.js?v=20260822d',
   './assets/insignias/racha_bronce.webp?v=3','./assets/insignias/racha_plata.webp?v=3','./assets/insignias/racha_oro.webp?v=3','./assets/insignias/racha_platino.webp?v=3','./assets/insignias/racha_leyenda.webp?v=3',
   './assets/insignias/peso_bronce.webp?v=3','./assets/insignias/peso_plata.webp?v=3','./assets/insignias/peso_oro.webp?v=3','./assets/insignias/peso_platino.webp?v=3','./assets/insignias/peso_leyenda.webp?v=3',
   './assets/insignias/medidas_bronce.webp?v=3','./assets/insignias/medidas_plata.webp?v=3','./assets/insignias/medidas_oro.webp?v=3','./assets/insignias/medidas_platino.webp?v=3',
