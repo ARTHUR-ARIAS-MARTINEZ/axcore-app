@@ -4,7 +4,7 @@
   "short_name": "AX Coach",
   "description": "Panel del coach AX-CORE: pases, altas y estado de cuenta de tus atletas.",
   "start_url": "./coach.html",
-  "scope": "./coach",
+  "scope": "./coach.html",
   "display": "standalone",
   "display_override": [
     "standalone",

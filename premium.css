@@ -4441,6 +4441,50 @@ body.premium-mode .t-swatch.ax-fus {
   align-items: center;
   gap: 13px;
   text-align: left;
+  padding: 15px 16px !important;
+  border-radius: 19px !important;
+  position: relative;
+  overflow: hidden;
+  background:
+    linear-gradient(100deg, rgba(var(--c1rgb), .17), rgba(var(--c1rgb), .05) 44%, rgba(0,0,0,0) 76%),
+    linear-gradient(158deg, var(--pm-s3), var(--pm-s1)) !important;
+  border: 1px solid var(--pm-border) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.055), 0 8px 20px rgba(0,0,0,.22) !important;
+  transition: transform .12s cubic-bezier(.34,1.56,.64,1), box-shadow .22s, border-color .22s;
+}
+/* filo de color arriba, con los tres tonos de la familia */
+body.premium-mode .t-swatch.ax-fus::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--c1), var(--c2) 52%, var(--c3));
+  opacity: .75;
+}
+body.premium-mode .t-swatch.ax-fus:active { transform: scale(.985); }
+
+/* la PALABRA AX-CORE pintada con el degradado del propio tema:
+   se lee el nombre y se ve el color al mismo tiempo, sin cuadritos */
+body.premium-mode .ax-fus-txt { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+body.premium-mode .ax-fus-name {
+  font-family: 'Oswald', sans-serif; font-size: 13px; font-weight: 600;
+  letter-spacing: 2px; color: var(--pm-white); line-height: 1.1;
+}
+body.premium-mode .ax-fus-note {
+  font-size: 9px; letter-spacing: .5px; color: var(--pm-dim2); line-height: 1.2;
+}
+body.premium-mode #page-settings .t-swatch.ax-fus.active .ax-fus-name {
+  color: var(--accent-main) !important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   ESTILO VISUAL — la ficha de cada tema es una PANTALLA EN MINIATURA:
+   su fondo real, su barra de progreso y su botón. Se ve lo que te vas a
+   llevar, no un cuadrito de color. Y la fila entera se tiñe del tema.
+   ═══════════════════════════════════════════════════════════════════════ */
+body.premium-mode .t-swatch.ax-fus {
+  display: flex !important;
+  align-items: center;
+  gap: 13px;
+  text-align: left;
   padding: 13px 14px !important;
   border-radius: 19px !important;
   position: relative;
@@ -4483,7 +4527,16 @@ body.premium-mode .ax-fus-chip .afc-pill {
   box-shadow: inset 0 1px 0 rgba(255,255,255,.35);
 }
 
-body.premium-mode .ax-fus-txt { display: flex; flex-direction: column; gap: 3px; min-width: 0; flex: 1; }
+body.premium-mode .ax-fus-txt { display: flex; flex-direction: column; gap: 5px; min-width: 0; flex: 1; }
+body.premium-mode .ax-fus-word {
+  font-family: 'Oswald', sans-serif; font-size: 19px; font-weight: 500;
+  letter-spacing: 3.2px; line-height: 1.05; white-space: nowrap;
+  background: linear-gradient(96deg, var(--c1) 0%, var(--c2) 46%, var(--c3) 100%);
+  -webkit-background-clip: text; background-clip: text;
+  color: transparent; -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 14px rgba(var(--c1rgb), .28));
+}
+body.premium-mode .ax-fus-word b { font-weight: 700; }
 body.premium-mode .ax-fus-name {
   font-family: 'Oswald', sans-serif; font-size: 14px; font-weight: 600;
   letter-spacing: 2.4px; color: var(--pm-white); line-height: 1.1;
@@ -4515,7 +4568,8 @@ body.premium-mode .t-swatch.ax-fus.active .ax-fus-check::after {
   width: 5px; height: 10px; border: solid #0a0a0a;
   border-width: 0 2.2px 2.2px 0; transform: rotate(45deg);
 }
-body.premium-mode .t-swatch.ax-fus.active .ax-fus-name { color: #fff; }
+body.premium-mode .t-swatch.ax-fus.active { filter: none; }
+body.premium-mode .t-swatch.ax-fus.active .ax-fus-word { filter: drop-shadow(0 0 18px rgba(var(--c1rgb), .45)); }
 /* la palomita vieja de #page-settings no aplica a estas filas */
 body.premium-mode #page-settings .t-swatch.ax-fus.active::after { content: none; }
 
@@ -4597,3 +4651,45 @@ body.premium-mode #page-settings .t-swatch.ax-fus.active::after { content: none;
   background: linear-gradient(90deg, #ff8a3c, #ff4757) !important;
 }
 .coach-hero.ch-lleno .ch-meter-txt { color: #ff8a7a; }
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   DESPLEGABLE (Estilo visual del coach): cerrado de entrada, para que el
+   tablero no se vea saturado. Se abre al tocarlo.
+   ═══════════════════════════════════════════════════════════════════════ */
+.ax-acc { padding: 0 !important; overflow: hidden; }
+.ax-acc-head {
+  width: 100%; display: flex; align-items: center; gap: 10px;
+  background: transparent; border: 0; cursor: pointer;
+  padding: 16px 16px; text-align: left; color: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+.ax-acc-lbl {
+  flex: 1; font-family: 'Oswald', sans-serif; font-size: .62rem;
+  letter-spacing: 2.5px; text-transform: uppercase; color: var(--pm-dim2, #7f93a8);
+}
+.ax-acc-now {
+  font-family: 'Oswald', sans-serif; font-size: .68rem; letter-spacing: 1.8px;
+  color: var(--accent-main);
+}
+.ax-acc-chev {
+  font-size: 1.35rem; line-height: 1; color: var(--pm-dim2, #7f93a8);
+  transition: transform .3s cubic-bezier(.34,1.56,.64,1), color .3s;
+}
+.ax-acc.ax-acc-open .ax-acc-chev { transform: rotate(90deg); color: var(--accent-main); }
+.ax-acc-body {
+  max-height: 0; overflow: hidden;
+  transition: max-height .45s cubic-bezier(.22,1,.36,1);
+}
+.ax-acc.ax-acc-open .ax-acc-body { max-height: 760px; }
+.ax-acc-body > .theme-grid { padding: 2px 13px 15px; }
+
+/* chapa del plan contratado, junto al nombre del gimnasio */
+.ch-plan {
+  display: inline-block; margin-top: 9px;
+  font-family: 'Oswald', sans-serif; font-size: .55rem; letter-spacing: 1.9px;
+  padding: 4px 10px; border-radius: 99px;
+  background: rgba(var(--pm-green-rgb), .12);
+  border: 1px solid rgba(var(--pm-green-rgb), .30);
+  color: var(--accent-main);
+}

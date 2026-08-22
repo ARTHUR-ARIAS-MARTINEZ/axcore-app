@@ -1,12 +1,12 @@
-﻿const CACHE_NAME = 'axcore-v5.75-tres-apps';
+﻿const CACHE_NAME = 'axcore-v5.76-cupos-y-fichas';
 const urlsToCache = [
   './',
-  './index.html?v=20260822d',
-  './index.css?v=20260822d',
-  './premium.css?v=20260822d',
-  './profile-persist.js?v=20260822d',
-  './app.js?v=20260822d',
-  './knowledge.js?v=20260822d',
+  './index.html?v=20260822e',
+  './index.css?v=20260822e',
+  './premium.css?v=20260822e',
+  './profile-persist.js?v=20260822e',
+  './app.js?v=20260822e',
+  './knowledge.js?v=20260822e',
   './logo.png',
   './logo_coach.png',
   './manifest.json',
@@ -26,9 +26,9 @@ const urlsToCache = [
 // No críticos (scripts de badges + 39 imágenes de insignias): precache NO atómico.
 // Si algo aquí fallara (imagen faltante, etc.) NO rompe la instalación del Service Worker.
 const optionalCache = [
-  './premium-badges.js?v=20260822d',
-  './premium-extras.js?v=20260822d',
-  './axcore-back.js?v=20260822d',
+  './premium-badges.js?v=20260822e',
+  './premium-extras.js?v=20260822e',
+  './axcore-back.js?v=20260822e',
   './assets/insignias/racha_bronce.webp?v=3','./assets/insignias/racha_plata.webp?v=3','./assets/insignias/racha_oro.webp?v=3','./assets/insignias/racha_platino.webp?v=3','./assets/insignias/racha_leyenda.webp?v=3',
   './assets/insignias/peso_bronce.webp?v=3','./assets/insignias/peso_plata.webp?v=3','./assets/insignias/peso_oro.webp?v=3','./assets/insignias/peso_platino.webp?v=3','./assets/insignias/peso_leyenda.webp?v=3',
   './assets/insignias/medidas_bronce.webp?v=3','./assets/insignias/medidas_plata.webp?v=3','./assets/insignias/medidas_oro.webp?v=3','./assets/insignias/medidas_platino.webp?v=3',

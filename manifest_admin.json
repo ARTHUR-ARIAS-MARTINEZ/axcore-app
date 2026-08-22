@@ -4,7 +4,7 @@
   "short_name": "AX Admin",
   "description": "Consola maestra AX-CORE: bloques, gimnasios, códigos e ingresos.",
   "start_url": "./admin.html",
-  "scope": "./admin",
+  "scope": "./admin.html",
   "display": "standalone",
   "display_override": [
     "standalone",
