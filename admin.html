@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>MAESTRO AX-CORE | Control de Bloques</title>
     <!-- PWA Support -->
-    <link rel="manifest" href="manifest_admin.json?v=20260822i">
+    <link rel="manifest" href="manifest_admin.json?v=20260822j">
     <meta name="theme-color" content="#0a0b0d">
     <link rel="icon" href="assets/icons/admin-192.png" type="image/png">
     <link rel="apple-touch-icon" href="assets/icons/admin-192.png">
@@ -13,9 +13,9 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="AX Admin">
-    <link rel="stylesheet" href="index.css?v=20260822i">
-    <link rel="stylesheet" href="premium.css?v=20260822i">
-    <link rel="stylesheet" href="admin.css?v=20260822i">
+    <link rel="stylesheet" href="index.css?v=20260822j">
+    <link rel="stylesheet" href="premium.css?v=20260822j">
+    <link rel="stylesheet" href="admin.css?v=20260822j">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
@@ -288,10 +288,33 @@
     </div>
 
     <script src="knowledge.js"></script>
-    <script src="admin.js?v=20260822i"></script>
+    <script src="admin.js?v=20260822j"></script>
     <script>
+        // ── TEMA DE LA CONSOLA ──
+        // Se recuerda en este equipo. Los mismos cinco temas de la app.
+        var NOMBRE_TEMA_ADMIN = {
+            'fusion-acero': 'ACERO', 'fusion-aurora': 'AURORA', 'fusion-oro': 'ORO',
+            'fusion-fuego': 'FUEGO', 'fusion-orq': 'ORQUÍDEA'
+        };
+        window.axSetAdminTheme = function (t) {
+            document.body.setAttribute('data-theme', t);
+            try { localStorage.setItem('admin_theme', t); } catch (e) {}
+            document.querySelectorAll('.t-swatch').forEach(function (b) {
+                b.classList.toggle('active', b.dataset.theme === t);
+            });
+            var n = document.getElementById('admin-tema-actual');
+            if (n) n.textContent = NOMBRE_TEMA_ADMIN[t] || '';
+            var m = document.querySelector('meta[name="theme-color"]');
+            if (m) {
+                var bg = (getComputedStyle(document.body).getPropertyValue('--bg-dark') || '').trim();
+                if (bg) m.setAttribute('content', bg);
+            }
+        };
+        try { axSetAdminTheme(localStorage.getItem('admin_theme') || 'fusion-acero'); } catch (e) {}
+
+
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js?v=20260822i').catch(() => {});
+            navigator.serviceWorker.register('sw.js?v=20260822j').catch(() => {});
         }
     // --- INSTALACIÓN EN EL CELULAR ---
     // Regla: la caja se muestra SIEMPRE, salvo que esta misma app ya este
