@@ -1,12 +1,12 @@
-﻿const CACHE_NAME = 'axcore-v5.81-temas-admin';
+﻿const CACHE_NAME = 'axcore-v5.82-estado-servidor';
 const urlsToCache = [
   './',
-  './index.html?v=20260822j',
-  './index.css?v=20260822j',
-  './premium.css?v=20260822j',
-  './profile-persist.js?v=20260822j',
-  './app.js?v=20260822j',
-  './knowledge.js?v=20260822j',
+  './index.html?v=20260822k',
+  './index.css?v=20260822k',
+  './premium.css?v=20260822k',
+  './profile-persist.js?v=20260822k',
+  './app.js?v=20260822k',
+  './knowledge.js?v=20260822k',
   './logo.png',
   './logo_coach.png',
   './manifest.json',
@@ -19,7 +19,7 @@ const urlsToCache = [
   './assets/icons/admin-192.png',
   './assets/icons/admin-512.png',
   './coach.html',
-  './guia.html?v=20260822j',
+  './guia.html?v=20260822k',
   './aviso_privacidad.html',
   './terminos.html'
 ];
@@ -27,9 +27,9 @@ const urlsToCache = [
 // No críticos (scripts de badges + 39 imágenes de insignias): precache NO atómico.
 // Si algo aquí fallara (imagen faltante, etc.) NO rompe la instalación del Service Worker.
 const optionalCache = [
-  './premium-badges.js?v=20260822j',
-  './premium-extras.js?v=20260822j',
-  './axcore-back.js?v=20260822j',
+  './premium-badges.js?v=20260822k',
+  './premium-extras.js?v=20260822k',
+  './axcore-back.js?v=20260822k',
   './assets/insignias/racha_bronce.webp?v=3','./assets/insignias/racha_plata.webp?v=3','./assets/insignias/racha_oro.webp?v=3','./assets/insignias/racha_platino.webp?v=3','./assets/insignias/racha_leyenda.webp?v=3',
   './assets/insignias/peso_bronce.webp?v=3','./assets/insignias/peso_plata.webp?v=3','./assets/insignias/peso_oro.webp?v=3','./assets/insignias/peso_platino.webp?v=3','./assets/insignias/peso_leyenda.webp?v=3',
   './assets/insignias/medidas_bronce.webp?v=3','./assets/insignias/medidas_plata.webp?v=3','./assets/insignias/medidas_oro.webp?v=3','./assets/insignias/medidas_platino.webp?v=3',

@@ -74,6 +74,27 @@ document.addEventListener('DOMContentLoaded', () => {
     const API_URL = location.hostname === 'localhost' || location.hostname === '127.0.0.1' ? 'http://localhost:3000' : 'https://axcore-appax-core-backend.onrender.com';
 
     // --- PERSISTENCIA ---
+    // Lo último que contestó el servidor. Se pinta en pantalla para no
+    // andar adivinando por qué no se ve algo.
+    let axEstado = { ok: false, bloques: 0, gimnasios: 0, subidos: 0, error: '' };
+
+    function axPintarEstado() {
+        const el = document.getElementById('admin-estado');
+        if (!el) return;
+        if (!axEstado.ok) {
+            el.className = 'ax-estado malo';
+            el.innerHTML = '<b>SIN CONEXI&Oacute;N CON EL SERVIDOR</b> &middot; ' +
+                (axEstado.error || 'no contest&oacute;') +
+                ' <button onclick="axRevisarBloques()">Reintentar</button>';
+            return;
+        }
+        el.className = 'ax-estado bien';
+        el.innerHTML = 'SERVIDOR &middot; <b>' + axEstado.bloques + '</b> bloque(s) &middot; <b>' +
+            axEstado.gimnasios + '</b> gimnasio(s)' +
+            (axEstado.subidos ? ' &middot; se subieron <b>' + axEstado.subidos + '</b> de este equipo' : '') +
+            ' <button onclick="axRevisarBloques()">Actualizar</button>';
+    }
+
     async function loadAdminData() {
         // El localStorage se queda SOLO como copia por si no hay internet.
         // La verdad de los bloques y de los gimnasios esta en el servidor.
@@ -95,6 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
+            axEstado = { ok: true, bloques: 0, gimnasios: 0, subidos: 0, error: '' };
             const db = await rb.json();
             if (db.success && Array.isArray(db.blocks)) {
                 // MUDANZA (una sola vez): los bloques que ya existian en ESTE
@@ -124,11 +146,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     adminData.blocks = db.blocks.map(b => ({
                         id: b.id, name: b.name, zone: b.zone || '', created: b.created || ''
                     }));
+                    axEstado.bloques = adminData.blocks.length;
                 }
             }
 
             const dg = await rg.json();
             if (dg.success && dg.gyms) {
+                axEstado.gimnasios = dg.gyms.length;
                 // El servidor manda; el blockId tambien viene de ahi.
                 adminData.gyms = dg.gyms;
             }
@@ -149,8 +173,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             saveAdminData();
         } catch (e) {
+            axEstado = { ok: false, bloques: adminData.blocks.length,
+                         gimnasios: adminData.gyms.length, subidos: 0,
+                         error: (e && e.message) ? e.message : 'error de red' };
             console.error('Sin conexión: mostrando la última copia guardada.', e);
         }
+        axPintarEstado();
     }
 
     function saveAdminData() {

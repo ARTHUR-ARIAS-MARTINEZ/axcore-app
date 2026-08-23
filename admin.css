@@ -328,3 +328,29 @@ tbody tr:hover td { background: rgba(var(--pm-green-rgb), .04); }
     .user-info { font-size: .7rem; }
     table { min-width: 560px; }
 }
+
+
+/* ── FRANJA DE ESTADO ── dice qué contestó el servidor, sin adivinar ── */
+.ax-estado {
+    display: flex; align-items: center; flex-wrap: wrap; gap: 10px;
+    margin-bottom: 14px; padding: 11px 15px; border-radius: 14px;
+    font-family: var(--font-accent), 'Oswald', sans-serif;
+    font-size: .64rem; letter-spacing: 1.4px; text-transform: uppercase;
+    background: rgba(var(--pm-green-rgb), .08);
+    border: 1px solid rgba(var(--pm-green-rgb), .22);
+    color: var(--pm-dim2, var(--text-dim));
+}
+.ax-estado b { color: var(--accent-main); font-weight: 700; }
+.ax-estado.malo {
+    background: rgba(255, 170, 0, .10);
+    border-color: rgba(255, 170, 0, .32);
+    color: #ffcf70;
+}
+.ax-estado.malo b { color: #ffcf70; }
+.ax-estado button {
+    margin-left: auto; cursor: pointer;
+    background: transparent; border: 1px solid currentColor;
+    color: inherit; border-radius: 99px; padding: .3rem .8rem;
+    font-family: inherit; font-size: .6rem; letter-spacing: 1.2px;
+    text-transform: uppercase;
+}
