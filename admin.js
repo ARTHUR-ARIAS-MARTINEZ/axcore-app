@@ -227,6 +227,44 @@ document.addEventListener('DOMContentLoaded', () => {
         alert(`✅ Bloque "${name}" creado y guardado en el servidor.\nYa lo vas a ver desde cualquier equipo.`);
     };
 
+    function renderBlocks() {
+        blocksList.innerHTML = adminData.blocks.map(b => {
+            const gymsInBlock = adminData.gyms.filter(g => g.blockId === b.id).length;
+            return `
+                <div class="block-card">
+                    <h3>${b.name.toUpperCase()}</h3>
+                    <p>Zona: ${b.zone || '—'}</p>
+                    <p>Gimnasios: ${gymsInBlock} / 20</p>
+                    <div class="block-actions">
+                        <button class="btn-cancel" style="font-size:0.6rem;" onclick="deleteBlock('${b.id}')">ELIMINAR</button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        if (adminData.blocks.length === 0) {
+            // Si este equipo no tiene bloques puede ser que se hayan creado en
+            // otra computadora y todavía no se hayan subido. Se dice qué hacer.
+            blocksList.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:2.4rem 1.4rem;">
+                <p style="color:var(--text-primary); font-family:'Oswald',sans-serif; letter-spacing:2px; margin-bottom:10px;">AQU&Iacute; NO HAY BLOQUES</p>
+                <p style="color:var(--text-dim); font-size:.85rem; line-height:1.6; max-width:46ch; margin:0 auto 16px;">
+                    Si ya los ten&iacute;as creados en tu computadora, abre la consola <b>una vez</b> desde ese equipo:
+                    al entrar se suben solos al servidor y desde ah&iacute; los ves en todos lados.
+                    Si nunca has creado ninguno, dale a <b>+ NUEVO BLOQUE</b>.
+                </p>
+                <button class="btn-premium small" onclick="axRevisarBloques()">VOLVER A REVISAR</button>
+            </div>`;
+        }
+    }
+
+    // Vuelve a preguntarle al servidor, por si ya se subieron desde otro equipo.
+    window.axRevisarBloques = async function () {
+        await loadAdminData();
+        renderBlocks();
+        updateGymBlockSelect();
+        renderGyms();
+    };
+
     window.deleteBlock = async (id) => {
         if (confirm("¿Seguro que quieres eliminar este bloque? Los gimnasios asociados también SERÁN ELIMINADOS DE LA NUBE permanentemente.")) {
             // Eliminar gimnasios asociados en la nube

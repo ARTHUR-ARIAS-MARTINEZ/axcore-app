@@ -272,6 +272,37 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Ventana de vista de una comida: título centrado arriba, contenido abajo.
+    // ── DESMENUZAR LA DIETA ──────────────────────────────────────────
+    // El nutriólogo escribe como quiere. Estas tres funciones sacan de ahí
+    // lo único que el atleta necesita ver: las piezas y las calorías.
+    // Nada de párrafos: renglones cortos, uno por alimento.
+    function axKcal(t) {
+        const m = String(t || '').match(/(\d{2,4})\s*(?:kcal|cal\b|calor)/i);
+        return m ? m[1] : null;
+    }
+    function axCortar(t, max) {
+        t = String(t || '').trim().replace(/\s+/g, ' ');
+        if (t.length <= max) return t;
+        const corte = t.lastIndexOf(' ', max);
+        return t.slice(0, corte > max * 0.6 ? corte : max).trim() + '…';
+    }
+    function axPiezas(t) {
+        return String(t || '')
+            // fuera las calorías: van aparte, arriba
+            .replace(/\(?\s*[~≈]?\s*\d{2,4}\s*(?:kcal|cal\b|calor\w*)\s*\)?/gi, ' ')
+            // fuera la etiqueta de la comida si el nutriólogo la repitió
+            .replace(/^\s*(desayuno|media ma[nñ]ana|comida|media tarde|pre[- ]?entreno|post[- ]?entreno|cena|snack|colaci[oó]n)\s*[:\-–]\s*/i, '')
+            .split(/\n|·|;|\||\s\+\s|,/)
+            .map(s => s.trim().replace(/^[-*•\s]+/, ''))
+            // se caen las palabras sueltas que quedan al quitar las calorías
+            .map(s => s.replace(/[.,;\s]*\b(en\s+)?total(es)?\b[.,;\s]*$/i, '')
+                       .replace(/[.,;\s]*\baprox(imadamente|\.)?\b[.,;\s]*$/i, '')
+                       .replace(/[.,;(\[\s]+$/, '').trim())
+            .filter(s => s.length > 1)
+            .map(s => s.charAt(0).toUpperCase() + s.slice(1))
+            .slice(0, 9);
+    }
+
     function openMealViewModal(key) {
         const slot = MEAL_SLOTS.find(s => s.key === key);
         const diet = userData.recommendedDiet || {};
@@ -2742,33 +2773,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const hasCustomRules = userData.customDietRules && userData.customDietRules.length > 0;
         const rules = hasCustomRules ? userData.customDietRules : [];
         // Ejemplos sombreados (NO son reglas reales): se muestran mientras no haya reglas propias.
-        // ── DESMENUZAR LA DIETA ──────────────────────────────────────────
-        // El nutriólogo escribe como quiere. Estas tres funciones sacan de ahí
-        // lo único que el atleta necesita ver: las piezas y las calorías.
-        // Nada de párrafos: renglones cortos, uno por alimento.
-        function axKcal(t) {
-            const m = String(t || '').match(/(\d{2,4})\s*(?:kcal|cal\b|calor)/i);
-            return m ? m[1] : null;
-        }
-        function axCortar(t, max) {
-            t = String(t || '').trim().replace(/\s+/g, ' ');
-            if (t.length <= max) return t;
-            const corte = t.lastIndexOf(' ', max);
-            return t.slice(0, corte > max * 0.6 ? corte : max).trim() + '…';
-        }
-        function axPiezas(t) {
-            return String(t || '')
-                // fuera las calorías: van aparte, arriba
-                .replace(/\(?\s*[~≈]?\s*\d{2,4}\s*(?:kcal|cal\b|calor\w*)\s*\)?/gi, ' ')
-                // fuera la etiqueta de la comida si el nutriólogo la repitió
-                .replace(/^\s*(desayuno|media ma[nñ]ana|comida|media tarde|pre[- ]?entreno|post[- ]?entreno|cena|snack|colaci[oó]n)\s*[:\-–]\s*/i, '')
-                .split(/\n|·|;|\||\s\+\s|,/)
-                .map(s => s.trim().replace(/^[-*•\s]+/, '').replace(/[.,;]+$/, ''))
-                .filter(s => s.length > 1)
-                .map(s => s.charAt(0).toUpperCase() + s.slice(1))
-                .slice(0, 9);
-        }
-
         const RULE_EXAMPLES = [
             '3 litros de agua al día',
             'Nada de refresco ni azúcar entre semana',
@@ -2836,7 +2840,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="pm-diet-import-card">
                         <div class="pm-diet-import-title">INGRESA TU DIETA AQUÍ</div>
                         <div class="pm-diet-import-sub">Pégala completa. Yo la reparto en cada comida.</div>
-                        <textarea class="pm-diet-import-area" id="diet-full-import" placeholder="Desayuno: 2 huevos, 4 claras, 2 tortillas (470 kcal)&#10;Media ma&#241;ana: yogur griego 200g, 1 manzana (250 kcal)&#10;Comida: pechuga 200g, arroz 150g, ensalada (620 kcal)&#10;Media tarde: 30g nueces&#10;Post-entreno: 1 scoop prote&#237;na (150 kcal)&#10;Cena: pollo 200g, camote, verduras (450 kcal)&#10;Snack: cottage 150g&#10;Recomendaciones: 3L agua, 8000 pasos"></textarea>
+                        <textarea class="pm-diet-import-area" id="diet-full-import" placeholder="Desayuno: 2 huevos, 4 claras, 2 tortillas (470 kcal)&#10;Media ma&#241;ana: yogur 200g, 1 manzana (250 kcal)&#10;Comida: pechuga 200g, arroz, ensalada (620 kcal)&#10;Cena: pollo 200g, camote, verduras (450 kcal)"></textarea>
                         <button class="pm-diet-import-btn" id="btn-distribute-diet">⚡ DISTRIBUIR AUTOMÁTICAMENTE</button>
                     </div>
                     <button class="btn-premium pm-d-reset" id="btn-reset-diet" style="width:100%; margin-top:14px; background:transparent; border:1px solid rgba(255,51,102,.4); color:#ff3366;">🗑️ REINICIAR DIETA</button>
