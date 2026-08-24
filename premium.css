@@ -5431,3 +5431,247 @@ body.premium-mode .ax-calc-vacio-ico {
   background: rgba(var(--pm-green-rgb), .10);
   border: 1px solid rgba(var(--pm-green-rgb), .22);
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   INICIO — el último que faltaba. No se rehizo nada: mismas piezas, mismos
+   sitios, mismos datos. Lo que cambia es el acabado, para que hable el
+   mismo idioma que la guía, el perfil, la calculadora y el workout:
+   superficie con degradado, filo de tres tonos arriba, iconos en disco y
+   los números en la tipografía de la app.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── TARJETA PRINCIPAL ── */
+body.premium-mode .pd-hero {
+  position: relative; overflow: hidden;
+  background: linear-gradient(158deg, var(--pm-s3) 0%, var(--pm-s2) 46%, var(--pm-s1) 100%) !important;
+  border: 1px solid var(--pm-border) !important;
+  border-radius: 24px !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 16px 38px rgba(0,0,0,.30) !important;
+}
+body.premium-mode .pd-hero::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg,
+      var(--accent-tri, var(--accent-main)), var(--accent-main) 52%, var(--accent-secondary));
+}
+/* halo detrás del anillo: da profundidad sin ensuciar */
+body.premium-mode .pd-hero::after {
+  content: ''; position: absolute; top: -30%; right: -18%;
+  width: 62%; height: 82%; pointer-events: none;
+  background: radial-gradient(circle, rgba(var(--pm-green-rgb), .16), rgba(0,0,0,0) 68%);
+}
+body.premium-mode .pd-hero > * { position: relative; z-index: 1; }
+
+body.premium-mode .pd-label {
+  font-family: 'Oswald', sans-serif !important;
+  font-size: .56rem !important; letter-spacing: 2.6px !important;
+  text-transform: uppercase; color: var(--pm-dim2) !important;
+}
+body.premium-mode .pd-weight {
+  font-family: 'Oswald', sans-serif !important;
+  font-weight: 700 !important; letter-spacing: -.5px !important;
+  line-height: .95 !important;
+  color: var(--pm-white) !important;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 2px 18px rgba(var(--pm-green-rgb), .22);
+}
+body.premium-mode .pd-weight small {
+  font-family: 'Oswald', sans-serif !important;
+  color: var(--accent-main) !important; opacity: .85;
+  margin-left: 4px; letter-spacing: 1px;
+}
+body.premium-mode .pd-goal-text {
+  font-size: .74rem !important; color: var(--pm-dim2) !important; margin-top: 6px !important;
+}
+body.premium-mode .pd-ring-num {
+  font-family: 'Oswald', sans-serif !important; font-weight: 600 !important;
+  color: var(--pm-white) !important; font-variant-numeric: tabular-nums;
+}
+body.premium-mode .pd-ring-lbl {
+  font-family: 'Oswald', sans-serif !important;
+  letter-spacing: 2px !important; color: var(--pm-dim2) !important;
+}
+body.premium-mode .pd-ring-wrap { filter: drop-shadow(0 0 14px rgba(var(--pm-green-rgb), .28)); }
+
+/* la racha toma el color del tema, ya no es ámbar fijo */
+body.premium-mode .pd-hero-mid {
+  display: flex !important; align-items: center !important;
+  gap: 10px !important; flex-wrap: wrap !important;
+  margin-top: 14px !important;
+}
+body.premium-mode .pd-streak {
+  background: rgba(var(--pm-green-rgb), .12) !important;
+  border: 1px solid rgba(var(--pm-green-rgb), .30) !important;
+  color: var(--accent-main) !important;
+  border-radius: 99px !important; padding: 6px 12px !important;
+  font-family: 'Oswald', sans-serif !important;
+  font-size: .62rem !important; letter-spacing: 1.4px !important;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+body.premium-mode .pd-streak-flame { fill: currentColor; width: 12px; height: 12px; }
+body.premium-mode .pd-phrase {
+  margin-left: auto !important;
+  font-family: 'Oswald', sans-serif !important;
+  font-size: .58rem !important; letter-spacing: 2.2px !important;
+  color: var(--pm-dim2) !important; opacity: .8;
+}
+
+body.premium-mode .pd-progress-bar-wrap { margin-top: 15px !important; }
+body.premium-mode .pd-progress-labels {
+  font-family: 'Oswald', sans-serif !important;
+  font-size: .56rem !important; letter-spacing: 1.2px !important;
+  color: var(--pm-dim2) !important; margin-bottom: 7px !important;
+}
+body.premium-mode #pd-progress-pct-label { color: var(--accent-main) !important; }
+body.premium-mode .pd-progress-bg {
+  height: 7px !important; border-radius: 99px !important;
+  background: rgba(var(--pm-green-rgb), .10) !important;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,.45);
+}
+body.premium-mode .pd-progress-fill {
+  background: linear-gradient(90deg,
+      var(--accent-tri, var(--accent-main)) 0%, var(--accent-main) 55%, var(--accent-secondary) 100%) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.25), 0 0 12px rgba(var(--pm-green-rgb), .30);
+}
+body.premium-mode .pd-hero-btns { margin-top: 16px !important; gap: 9px !important; }
+body.premium-mode .pd-hero-btns .btn-outline {
+  border: 1px solid rgba(var(--pm-green-rgb), .38) !important;
+  color: var(--accent-main) !important;
+  background: rgba(var(--pm-green-rgb), .07) !important;
+  border-radius: 99px !important;
+  font-family: 'Oswald', sans-serif !important;
+  font-size: .68rem !important; letter-spacing: 1.4px !important;
+  padding: .9rem 1.1rem !important;
+}
+
+/* ── TÍTULOS DE SECCIÓN: con antetítulo, como en Evolución ── */
+body.premium-mode .pd-section-title {
+  position: relative;
+  font-family: 'Oswald', sans-serif !important;
+  font-size: .62rem !important; font-weight: 600 !important;
+  letter-spacing: 2.6px !important; text-transform: uppercase;
+  color: var(--pm-dim2) !important;
+  padding-left: 13px !important;
+  margin: 22px 2px 11px !important;
+}
+body.premium-mode .pd-section-title::before {
+  content: ''; position: absolute; left: 0; top: 50%;
+  transform: translateY(-50%);
+  width: 3px; height: 12px; border-radius: 2px;
+  background: linear-gradient(180deg, var(--accent-main), var(--accent-secondary));
+}
+
+/* ── LOS CUATRO CUADROS DE HOY ── */
+body.premium-mode .pd-summary-grid { gap: 9px !important; }
+body.premium-mode .pd-sum {
+  position: relative; overflow: hidden;
+  background: linear-gradient(158deg, var(--pm-s3), var(--pm-s2) 48%, var(--pm-s1)) !important;
+  border: 1px solid var(--pm-border) !important;
+  border-radius: 18px !important;
+  padding: 13px 13px 12px !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.05), 0 8px 20px rgba(0,0,0,.22) !important;
+  transition: transform .14s cubic-bezier(.34,1.56,.64,1), box-shadow .22s;
+}
+body.premium-mode .pd-sum::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: var(--sum-color, var(--accent-main)); opacity: .7;
+}
+body.premium-mode .pd-sum.c1 { --sum-color: var(--accent-main); }
+body.premium-mode .pd-sum.c2 { --sum-color: var(--accent-secondary); }
+body.premium-mode .pd-sum.c3 { --sum-color: var(--accent-tri, var(--accent-main)); }
+body.premium-mode .pd-sum.c4 { --sum-color: var(--accent-secondary); }
+body.premium-mode .pd-sum:active { transform: scale(.985); }
+
+body.premium-mode .pd-sum-lbl {
+  font-family: 'Oswald', sans-serif !important;
+  font-size: .54rem !important; letter-spacing: 1.9px !important;
+  text-transform: uppercase; color: var(--pm-dim2) !important;
+  margin-bottom: 6px !important;
+}
+body.premium-mode .pd-sum-val {
+  font-family: 'Oswald', sans-serif !important;
+  font-weight: 600 !important; font-size: 1.5rem !important;
+  line-height: 1 !important; color: var(--pm-white) !important;
+  font-variant-numeric: tabular-nums;
+}
+body.premium-mode .pd-sum-val small {
+  font-size: .58rem !important; margin-left: 3px;
+  color: var(--sum-color, var(--accent-main)) !important; opacity: .9;
+  letter-spacing: .8px;
+}
+body.premium-mode .pd-sum-sub {
+  font-size: .62rem !important; color: var(--pm-dim2) !important;
+  margin-top: 6px !important; opacity: .8;
+}
+/* el icono, en disco del color de su cuadro */
+body.premium-mode .pd-sum-ico {
+  position: absolute !important; top: 11px !important; right: 11px !important;
+  width: 27px; height: 27px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(var(--pm-green-rgb), .10);
+  border: 1px solid rgba(var(--pm-green-rgb), .20);
+  opacity: 1 !important;
+}
+body.premium-mode .pd-sum-ico svg {
+  width: 13px; height: 13px;
+  stroke: var(--sum-color, var(--accent-main)); fill: none; stroke-width: 2;
+  opacity: .9;
+}
+
+/* ── TENDENCIA Y PRÓXIMO LOGRO ── */
+body.premium-mode .pd-spark-wrap,
+body.premium-mode .pd-next-ach-card {
+  position: relative; overflow: hidden;
+  background: linear-gradient(158deg, var(--pm-s3), var(--pm-s2) 48%, var(--pm-s1)) !important;
+  border: 1px solid var(--pm-border) !important;
+  border-radius: 20px !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.05), 0 10px 24px rgba(0,0,0,.22) !important;
+}
+body.premium-mode .pd-spark-wrap::before,
+body.premium-mode .pd-next-ach-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg,
+      var(--accent-tri, var(--accent-main)), var(--accent-main) 52%, var(--accent-secondary));
+  opacity: .7;
+}
+body.premium-mode .pd-spark-lbl,
+body.premium-mode .pd-next-ach-label {
+  font-family: 'Oswald', sans-serif !important;
+  font-size: .56rem !important; letter-spacing: 2px !important;
+  text-transform: uppercase; color: var(--pm-dim2) !important;
+}
+body.premium-mode .pd-next-ach-name {
+  font-family: 'Oswald', sans-serif !important; font-weight: 600 !important;
+  color: var(--pm-white) !important; letter-spacing: 1px !important;
+}
+body.premium-mode .pd-next-ach-pct {
+  font-family: 'Oswald', sans-serif !important; font-weight: 700 !important;
+  color: var(--accent-main) !important; font-variant-numeric: tabular-nums;
+}
+body.premium-mode .pd-next-ach-icon {
+  border-radius: 50% !important;
+  background: rgba(var(--pm-green-rgb), .12) !important;
+  border: 1px solid rgba(var(--pm-green-rgb), .26) !important;
+}
+body.premium-mode .pd-next-ach-pb {
+  background: rgba(var(--pm-green-rgb), .10) !important;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,.4);
+}
+body.premium-mode .pd-next-ach-pf {
+  background: linear-gradient(90deg, var(--accent-main), var(--accent-secondary)) !important;
+}
+body.premium-mode .pd-ach-streak-badge,
+body.premium-mode .pd-ach-pct-badge {
+  background: rgba(var(--pm-green-rgb), .10) !important;
+  border: 1px solid rgba(var(--pm-green-rgb), .24) !important;
+  color: var(--accent-main) !important;
+  border-radius: 99px !important; padding: 3px 9px !important;
+  font-family: 'Oswald', sans-serif !important;
+  font-size: .55rem !important; letter-spacing: 1.1px !important;
+}
+body.premium-mode .pd-leg-g { color: var(--accent-main) !important; }
+body.premium-mode .pd-leg-c { color: var(--accent-secondary) !important; }
+body.premium-mode .pd-badges-link {
+  color: var(--accent-main) !important;
+  font-family: 'Oswald', sans-serif !important;
+}

@@ -3,43 +3,101 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AX-CORE · Guía rápida del Atleta</title>
+<title>AX-CORE · Manual completo</title>
+<link rel="stylesheet" href="index.css?v=20260824e">
+<link rel="stylesheet" href="premium.css?v=20260824e">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#0a0e14;--s1:#0d1826;--s2:#111f30;--acc:#00c97a;--cyan:#00e5ff;--txt:#e8edf5;--dim:#7f93a8;--bd:rgba(0,201,122,.22)}
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:var(--bg);color:var(--txt);font-family:'Inter',sans-serif;line-height:1.6;font-size:15.5px}
-.wrap{max-width:720px;margin:0 auto;padding:24px 18px 70px}
-header{text-align:center;padding:30px 0 20px}
-.logo{font-family:'Oswald',sans-serif;font-size:2.1rem;letter-spacing:6px;font-weight:700;background:linear-gradient(90deg,var(--acc),var(--cyan));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-.tag{color:var(--dim);font-size:.78rem;letter-spacing:3px;text-transform:uppercase;margin-top:6px}
-.ver{display:inline-block;margin-top:12px;font-size:.66rem;color:var(--acc);border:1px solid var(--bd);border-radius:99px;padding:4px 14px;letter-spacing:1px}
-.intro{background:var(--s1);border:1px solid var(--bd);border-radius:14px;padding:14px 18px;margin-bottom:22px;font-size:.9rem;color:var(--dim)}
-.intro b{color:var(--txt)}
-nav.idx{display:grid;grid-template-columns:1fr 1fr;gap:6px 18px;background:var(--s1);border:1px solid var(--bd);border-radius:14px;padding:16px 20px;margin-bottom:24px}
-nav.idx a{color:var(--txt);text-decoration:none;font-size:.85rem;padding:3px 0}
-nav.idx a span{color:var(--acc);font-family:'Oswald',sans-serif;margin-right:8px}
-section{background:var(--s1);border:1px solid rgba(255,255,255,.07);border-left:4px solid var(--acc);border-radius:14px;padding:18px 22px;margin-bottom:14px}
-section.star{border-left-color:var(--cyan);background:linear-gradient(135deg,rgba(0,229,255,.05),var(--s1))}
-h2{font-family:'Oswald',sans-serif;font-size:1.08rem;letter-spacing:1.5px;color:var(--acc);margin-bottom:10px}
-section.star h2{color:var(--cyan)}
-p,li{color:var(--txt);font-size:.9rem}
-ul{padding-left:18px;margin:4px 0}
-li{margin-bottom:5px}
-b{color:#fff}
-.tip{background:rgba(0,201,122,.07);border:1px solid var(--bd);border-radius:10px;padding:9px 14px;margin:10px 0 0;font-size:.82rem;color:var(--dim)}
-.tip b{color:var(--acc)}
-kbd{background:var(--s2);border:1px solid rgba(255,255,255,.15);border-radius:5px;padding:1px 7px;font-size:.8rem;font-family:'Oswald',sans-serif;letter-spacing:.5px;color:var(--acc);white-space:nowrap}
-footer{text-align:center;color:var(--dim);font-size:.72rem;margin-top:30px;letter-spacing:1px}
+/* El manual usaba su propia paleta verde fija y por eso desentonaba con el
+   resto. Ahora toma los mismos tokens y el mismo tema que eligió el atleta. */
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Inter',sans-serif; line-height:1.6; font-size:15px; }
+.wrap { max-width:720px; margin:0 auto; padding:20px 16px 80px; }
+
+header { text-align:center; padding:26px 0 18px; }
+.logo {
+  font-family:'Oswald',sans-serif; font-size:2rem; letter-spacing:6px; font-weight:700;
+  background:linear-gradient(120deg, var(--accent-tri, var(--accent-main)), var(--accent-main) 52%, var(--accent-secondary));
+  -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+}
+.tag {
+  color:var(--pm-dim2,#7f93a8); font-size:.62rem; letter-spacing:3.4px;
+  text-transform:uppercase; margin-top:8px; font-family:'Oswald',sans-serif;
+}
+.ver {
+  display:inline-block; margin-top:13px; font-family:'Oswald',sans-serif;
+  font-size:.6rem; letter-spacing:1.4px; padding:5px 14px; border-radius:99px;
+  color:var(--accent-main);
+  background:rgba(var(--pm-green-rgb),.10);
+  border:1px solid rgba(var(--pm-green-rgb),.28);
+}
+
+.intro, nav.idx, section {
+  position:relative; overflow:hidden;
+  background:linear-gradient(158deg, var(--pm-s3), var(--pm-s2) 48%, var(--pm-s1));
+  border:1px solid var(--pm-border); border-radius:20px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.05), 0 10px 24px rgba(0,0,0,.22);
+}
+.intro { padding:15px 18px; margin-bottom:16px; font-size:.86rem; color:var(--pm-dim2,#7f93a8); }
+.intro b { color:var(--pm-white,#fff); }
+
+nav.idx { display:grid; grid-template-columns:1fr 1fr; gap:4px 16px; padding:16px 18px; margin-bottom:20px; }
+nav.idx a {
+  color:var(--pm-white,#fff); text-decoration:none; font-size:.82rem;
+  padding:5px 0; display:flex; gap:8px; align-items:baseline;
+}
+nav.idx a span { color:var(--accent-main); font-family:'Oswald',sans-serif; font-size:.72rem; }
+
+section { padding:17px 19px; margin-bottom:11px; }
+section::before {
+  content:''; position:absolute; top:0; left:0; bottom:0; width:3px;
+  background:linear-gradient(180deg, var(--accent-main), var(--accent-secondary)); opacity:.8;
+}
+section.star::before { background:linear-gradient(180deg, var(--accent-secondary), var(--accent-tri, var(--accent-main))); }
+h2 {
+  font-family:'Oswald',sans-serif; font-size:.98rem; font-weight:600;
+  letter-spacing:2px; color:var(--accent-main); margin-bottom:9px;
+}
+section.star h2 { color:var(--accent-secondary); }
+p, li { color:var(--pm-white,#e8edf5); font-size:.88rem; }
+ul { padding-left:17px; margin:5px 0; }
+li { margin-bottom:5px; }
+b { color:#fff; }
+.tip {
+  background:rgba(var(--pm-green-rgb),.07);
+  border:1px solid rgba(var(--pm-green-rgb),.22);
+  border-radius:13px; padding:10px 14px; margin:11px 0 0;
+  font-size:.8rem; color:var(--pm-dim2,#7f93a8);
+}
+.tip b { color:var(--accent-main); }
+kbd {
+  background:rgba(0,0,0,.28); border:1px solid var(--pm-border);
+  border-radius:7px; padding:2px 8px; font-size:.78rem;
+  font-family:'Oswald',sans-serif; letter-spacing:.5px;
+  color:var(--accent-main); white-space:nowrap;
+}
+footer {
+  text-align:center; color:var(--pm-dim2,#7f93a8); font-size:.68rem;
+  margin-top:28px; letter-spacing:1.4px; font-family:'Oswald',sans-serif;
+}
+.volver {
+  display:block; text-align:center; margin:22px auto 0; max-width:280px;
+  text-decoration:none; cursor:pointer;
+  border:1px solid var(--pm-border); color:var(--pm-dim2,#7f93a8);
+  border-radius:99px; padding:.8rem 1rem;
+  font-family:'Oswald',sans-serif; font-size:.66rem;
+  letter-spacing:1.6px; text-transform:uppercase;
+}
 </style>
 </head>
-<body>
+<body class="premium-mode" data-theme="fusion-aurora">
 <div class="wrap">
 <header>
   <div class="logo">AX-CORE</div>
-  <div class="tag">Guía rápida del Atleta</div>
-  <div class="ver">ACTUALIZADA · v5.65</div>
+  <div class="tag">Manual completo del atleta</div>
+  <div class="ver">ACTUALIZADO &middot; v5.90</div>
 </header>
 
 <div class="intro">Todo se actualiza <b>solo</b> cuando registras. Regla de oro: <b>registra algo cada día</b> —aunque sea el peso— y las insignias, la racha y tus proyecciones crecen solas.</div>
@@ -125,5 +183,22 @@ footer{text-align:center;color:var(--dim);font-size:.72rem;margin-top:30px;lette
 
 <footer>AX-CORE · DISCIPLINA. CONSTANCIA. EVOLUCIÓN.</footer>
 </div>
+<script>
+// El manual se abre con el mismo color que el atleta eligió en la app.
+(function () {
+  try {
+    var tema = null;
+    for (var i = 0; i < localStorage.length && !tema; i++) {
+      var v = localStorage.getItem(localStorage.key(i));
+      if (!v || v.indexOf('"theme"') === -1) continue;
+      try {
+        var o = JSON.parse(v);
+        if (o && typeof o.theme === 'string' && o.theme.indexOf('fusion-') === 0) tema = o.theme;
+      } catch (e) {}
+    }
+    if (tema) document.body.setAttribute('data-theme', tema);
+  } catch (e) {}
+})();
+</script>
 </body>
 </html>
