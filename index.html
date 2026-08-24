@@ -15,9 +15,9 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0a0e14">
     <link rel="apple-touch-icon" href="logo.png">
-    <link rel="stylesheet" href="index.css?v=20260824a">
+    <link rel="stylesheet" href="index.css?v=20260824b">
     <!-- Premium UI overrides (inerte si <body> NO tiene .premium-mode) -->
-    <link rel="stylesheet" href="premium.css?v=20260824a">
+    <link rel="stylesheet" href="premium.css?v=20260824b">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <!-- Fuentes: Inter para cuerpos de texto, Oswald (Heavy Gym) para titulares -->
@@ -705,91 +705,98 @@
             <!-- EVOLUTION PAGE -->
             <div id="page-evolution" class="page">
                 <!-- Se movió Perfil Antropométrico a Evolución como lo pidio el usuario -->
-                <div class="glass-card settings-panel" style="margin-bottom: 2rem;">
+                <div class="glass-card settings-panel ax-fit-card" style="margin-bottom: 18px;">
                     <div class="ax-evo-hdr"><span class="ax-evo-kicker">Punto de partida</span><h2 class="ax-evo-h2">PERFIL ANTROPOM&Eacute;TRICO</h2></div>
-                    <div class="measurement-form" style="display:grid; grid-template-columns: repeat(2, 1fr); gap:12px;">
+                    <div class="measurement-form ax-fit-form">
                         <div class="input-group" style="margin:0;">
-                            <label>ALTURA (M)</label>
-                            <input type="number" step="0.01" id="input-height" placeholder="Ej. 1.74">
+                            <label>ALTURA</label><input type="number" step="0.01" id="input-height" placeholder="Ej. 1.74"><i class="ax-unit">m</i>
                         </div>
                         <div class="input-group" style="margin:0;">
-                            <label>PESO INCIAL (KG)</label>
-                            <input type="number" step="0.1" id="input-weight" placeholder="Ej. 100">
+                            <label>PESO INICIAL</label><input type="number" step="0.1" id="input-weight" placeholder="Ej. 100"><i class="ax-unit">kg</i>
                         </div>
                         <div class="input-group" style="margin:0;">
-                            <label>CINTURA INICIAL (CM) <span class="meas-help" data-title="CINTURA" data-help="Contorno del abdomen a la altura del ombligo. De pie y relajado, sin meter la panza, al terminar de exhalar. La cinta va paralela al piso.">?</span></label>
-                            <input type="number" id="input-waist" placeholder="Ej. 115">
+                            <label>CINTURA INICIAL<span class="meas-help" data-title="CINTURA" data-help="Contorno del abdomen a la altura del ombligo. De pie y relajado, sin meter la panza, al terminar de exhalar. La cinta va paralela al piso.">?</span></label><input type="number" id="input-waist" placeholder="Ej. 115"><i class="ax-unit">cm</i>
                         </div>
                         <div class="input-group" style="margin:0;">
-                            <label>META PESO (KG)</label>
-                            <input type="number" step="0.1" id="input-target-weight" placeholder="Ej. 85">
+                            <label>META PESO</label><input type="number" step="0.1" id="input-target-weight" placeholder="Ej. 85"><i class="ax-unit">kg</i>
                         </div>
                     </div>
-                    <div style="display:flex; gap:10px; justify-content: center; margin-top: 1.5rem;">
-                        <button id="save-measurements" class="btn-premium" style="flex:1;">ACTUALIZAR PERFIL</button>
-                        <button id="btn-reset-measurements" class="btn-premium" style="flex:1; background:transparent; border:1px solid var(--accent-alert); color:var(--accent-alert);">REINICIAR</button>
+                    <div class="ax-fit-acciones">
+                        <button id="save-measurements" class="btn-premium">ACTUALIZAR PERFIL</button>
+                        <button id="btn-reset-measurements" class="ax-fit-reset">REINICIAR</button>
                     </div>
                 </div>
 
-                <div class="glass-card evolution-panel" style="border-left:5px solid var(--accent-main);">
+                <div class="glass-card evolution-panel ax-fit-card">
                     <div class="ax-evo-hdr"><span class="ax-evo-kicker">Tu registro</span><h2 class="ax-evo-h2">HISTORIAL DE MEDIDAS</h2></div>
-                    <div class="measurement-form" style="display:grid; grid-template-columns: repeat(2, 1fr); gap:10px; margin-bottom:1.5rem; padding:1rem; background:var(--glass-bg, rgba(0,0,0,0.2)); border-radius:15px; border:1px solid var(--glass-border);">
+                    <div class="measurement-form ax-fit-form">
                         <div class="input-group" style="margin:0;">
-                            <label>PESO (KG)</label>
-                            <input type="number" step="0.1" id="log-weight">
+                            <label>PESO</label><input type="number" step="0.1" id="log-weight"><i class="ax-unit">kg</i>
                         </div>
                         <div class="input-group" style="margin:0;">
-                            <label>CINTURA (CM) <span class="meas-help" data-title="CINTURA" data-help="Contorno del abdomen a la altura del ombligo. De pie y relajado, sin meter la panza, al terminar de exhalar. La cinta va paralela al piso.">?</span></label>
-                            <input type="number" id="log-waist">
+                            <label>CINTURA<span class="meas-help" data-title="CINTURA" data-help="Contorno del abdomen a la altura del ombligo. De pie y relajado, sin meter la panza, al terminar de exhalar. La cinta va paralela al piso.">?</span></label><input type="number" id="log-waist"><i class="ax-unit">cm</i>
                         </div>
                         <div class="input-group" style="margin:0;">
-                            <label>BÍCEPS (CM) <span class="meas-help" data-title="BÍCEPS / BRAZO" data-help="Contorno del brazo en su punto más grueso, flexionado y con el bíceps contraído (haciendo músculo). Esta sola medida rodea TODO el brazo, así que ya incluye al tríceps: por eso el tríceps no se mide aparte.">?</span></label>
-                            <input type="number" id="log-bicep">
+                            <label>BÍCEPS<span class="meas-help" data-title="BÍCEPS / BRAZO" data-help="Contorno del brazo en su punto más grueso, flexionado y con el bíceps contraído (haciendo músculo). Esta sola medida rodea TODO el brazo, así que ya incluye al tríceps: por eso el tríceps no se mide aparte.">?</span></label><input type="number" id="log-bicep"><i class="ax-unit">cm</i>
                         </div>
                         <div class="input-group" style="margin:0;">
-                            <label>PIERNA (CM) <span class="meas-help" data-title="PIERNA (MUSLO)" data-help="Contorno del muslo en su parte más gruesa, justo debajo del glúteo. De pie, con el peso repartido en ambas piernas.">?</span></label>
-                            <input type="number" id="log-leg">
+                            <label>PIERNA<span class="meas-help" data-title="PIERNA (MUSLO)" data-help="Contorno del muslo en su parte más gruesa, justo debajo del glúteo. De pie, con el peso repartido en ambas piernas.">?</span></label><input type="number" id="log-leg"><i class="ax-unit">cm</i>
                         </div>
                         <div class="input-group" style="margin:0;">
-                            <label>PECHO (CM) <span class="meas-help" data-title="PECHO" data-help="Contorno del torso a la altura de los pezones, con la cinta paralela al piso. De pie, brazos relajados, al terminar de exhalar (sin inflar el pecho).">?</span></label>
-                            <input type="number" id="log-chest">
+                            <label>PECHO<span class="meas-help" data-title="PECHO" data-help="Contorno del torso a la altura de los pezones, con la cinta paralela al piso. De pie, brazos relajados, al terminar de exhalar (sin inflar el pecho).">?</span></label><input type="number" id="log-chest"><i class="ax-unit">cm</i>
                         </div>
                         <div class="input-group" style="margin:0;">
-                            <label>CADERA (CM) <span class="meas-help" data-title="CADERA" data-help="Contorno alrededor de los huesos de la cadera (parte alta de la pelvis, por encima de los glúteos). De pie con los pies juntos.">?</span></label>
-                            <input type="number" id="log-hip">
+                            <label>CADERA<span class="meas-help" data-title="CADERA" data-help="Contorno alrededor de los huesos de la cadera (parte alta de la pelvis, por encima de los glúteos). De pie con los pies juntos.">?</span></label><input type="number" id="log-hip"><i class="ax-unit">cm</i>
                         </div>
                         <div class="input-group" style="margin:0;">
-                            <label>PANTORRILLA (CM) <span class="meas-help" data-title="PANTORRILLA" data-help="Contorno de la pantorrilla en su parte más gruesa. De pie, con el peso repartido en ambos pies.">?</span></label>
-                            <input type="number" id="log-calf">
+                            <label>PANTORRILLA<span class="meas-help" data-title="PANTORRILLA" data-help="Contorno de la pantorrilla en su parte más gruesa. De pie, con el peso repartido en ambos pies.">?</span></label><input type="number" id="log-calf"><i class="ax-unit">cm</i>
                         </div>
                         <div class="input-group" style="margin:0;">
-                            <label>GLÚTEO (CM) <span class="meas-help" data-title="GLÚTEO" data-help="Contorno en la parte más ancha y saliente de los glúteos (las nalgas). De pie con los pies juntos, sin apretar.">?</span></label>
-                            <input type="number" id="log-glute">
+                            <label>GLÚTEO<span class="meas-help" data-title="GLÚTEO" data-help="Contorno en la parte más ancha y saliente de los glúteos (las nalgas). De pie con los pies juntos, sin apretar.">?</span></label><input type="number" id="log-glute"><i class="ax-unit">cm</i>
                         </div>
                         <div class="input-group" style="margin:0;">
-                            <label>CUELLO (CM) <span class="meas-help" data-title="CUELLO" data-help="Contorno del cuello justo debajo de la nuez de Adán, con la cinta un poco inclinada hacia abajo por delante. Se usa para estimar el % de grasa (método Navy).">?</span></label>
-                            <input type="number" id="log-neck">
+                            <label>CUELLO<span class="meas-help" data-title="CUELLO" data-help="Contorno del cuello justo debajo de la nuez de Adán, con la cinta un poco inclinada hacia abajo por delante. Se usa para estimar el % de grasa (método Navy).">?</span></label><input type="number" id="log-neck"><i class="ax-unit">cm</i>
                         </div>
                         <div class="input-group" style="margin:0;">
-                            <label>ANTEBRAZO (CM) <span class="meas-help" data-title="ANTEBRAZO" data-help="Contorno del antebrazo en su parte más gruesa (unos dedos por debajo del codo), con el brazo extendido y relajado. Es distinto del bíceps porque mide POR DEBAJO del codo.">?</span></label>
-                            <input type="number" id="log-forearm">
+                            <label>ANTEBRAZO<span class="meas-help" data-title="ANTEBRAZO" data-help="Contorno del antebrazo en su parte más gruesa (unos dedos por debajo del codo), con el brazo extendido y relajado. Es distinto del bíceps porque mide POR DEBAJO del codo.">?</span></label><input type="number" id="log-forearm"><i class="ax-unit">cm</i>
                         </div>
                         <div class="input-group" style="margin:0;">
-                            <label>ESPALDA (CM) <span class="meas-help" data-title="ESPALDA (DORSALES)" data-help="Contorno de la espalda alta: pasa la cinta por debajo de las axilas rodeando la parte más ancha de los dorsales, con los brazos relajados a los lados. Se toma MÁS ARRIBA que el pecho, así que refleja el ancho de tu espalda, no lo mismo que el pecho.">?</span></label>
-                            <input type="number" id="log-back">
+                            <label>ESPALDA<span class="meas-help" data-title="ESPALDA (DORSALES)" data-help="Contorno de la espalda alta: pasa la cinta por debajo de las axilas rodeando la parte más ancha de los dorsales, con los brazos relajados a los lados. Se toma MÁS ARRIBA que el pecho, así que refleja el ancho de tu espalda, no lo mismo que el pecho.">?</span></label><input type="number" id="log-back"><i class="ax-unit">cm</i>
                         </div>
-                        <button class="btn-premium" id="btn-save-daily" style="align-self:end; height:50px;">LOG MEDIDA</button>
+                        <button class="btn-premium ax-fit-save" id="btn-save-daily">REGISTRAR MEDIDA DE HOY</button>
                     </div>
 
-                    <div class="ax-evo-filtros">
-                        <button class="ax-evo-f on" id="filter-all">TODO</button>
-                        <button class="ax-evo-f" id="filter-week">ESTA SEMANA</button>
-                        <button class="ax-evo-f" id="filter-month">ESTE MES</button>
+                    <div class="history-controls" style="margin-bottom:1rem; display:flex; gap:10px;">
+                        <button class="theme-btn active" id="filter-all">TODO</button>
+                        <button class="theme-btn" id="filter-week">ESTA SEMANA</button>
+                        <button class="theme-btn" id="filter-month">ESTE MES</button>
                     </div>
 
-                    <!-- Antes era una tabla de 14 columnas: en un celular no se
-                         alcanzaba a ver ni la mitad. Ahora es una tarjeta por fecha. -->
-                    <div class="ax-evo-list" id="history-body"></div>
+                    <div class="history-table-container" style="max-height:400px; overflow-y:auto; background:var(--glass-bg, rgba(0,0,0,0.2)); border-radius:15px; border:1px solid var(--glass-border);">
+                        <table style="width:100%; border-collapse:collapse; text-align:left;">
+                            <thead style="background:var(--glass); border-bottom:1px solid var(--glass-border);">
+                                <tr style="color:var(--accent-main); font-family:var(--font-accent); font-size:0.8rem;">
+                                    <th style="padding:1rem;">FECHA</th>
+                                    <th style="padding:1rem;">PESO</th>
+                                    <th style="padding:1rem;">CINTURA</th>
+                                    <th style="padding:1rem;">BÍCEPS</th>
+                                    <th style="padding:1rem;">PIERNA</th>
+                                    <th style="padding:1rem;">PECHO</th>
+                                    <th style="padding:1rem;">CADERA</th>
+                                    <th style="padding:1rem;">PANT.</th>
+                                    <th style="padding:1rem;">GLÚTEO</th>
+                                    <th style="padding:1rem;">CUELLO</th>
+                                    <th style="padding:1rem;">ANTEB.</th>
+                                    <th style="padding:1rem;">ESPALDA</th>
+                                    <th style="padding:1rem;">CAMBIO</th>
+                                    <th style="padding:1rem;">DEL</th>
+                                </tr>
+                            </thead>
+                            <tbody id="history-body">
+                                <!-- Se llena via JS -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
@@ -972,14 +979,14 @@
 
     <!-- Gráficas (Al final para no bloquear inicio rápido) -->
     <script src="https://cdn.jsdelivr.net/npm/apexcharts" defer></script>
-    <script src="profile-persist.js?v=20260824a"></script>
-    <script src="knowledge.js?v=20260824a"></script>
-    <script src="app.js?v=20260824a"></script>
+    <script src="profile-persist.js?v=20260824b"></script>
+    <script src="knowledge.js?v=20260824b"></script>
+    <script src="app.js?v=20260824b"></script>
     <!-- Premium UI: catálogo de insignias + FAB + onboarding -->
-    <script src="premium-badges.js?v=20260824a"></script>
-    <script src="premium-extras.js?v=20260824a"></script>
+    <script src="premium-badges.js?v=20260824b"></script>
+    <script src="premium-extras.js?v=20260824b"></script>
     <!-- Botón "atrás" del teléfono: retrocede dentro de la app en vez de cerrarla -->
-    <script src="axcore-back.js?v=20260824a"></script>
+    <script src="axcore-back.js?v=20260824b"></script>
 
     <!-- REGISTRO GLOBAL — funciona aunque app.js falle -->
     <script>
@@ -1057,7 +1064,7 @@
         // Registro del Service Worker de PWA unificado con detección de actualizaciones y auto-refresco
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=20260824a').then(reg => {
+                navigator.serviceWorker.register('sw.js?v=20260824b').then(reg => {
                     console.log('[AX-CORE] Service Worker registrado con éxito:', reg.scope);
 
                     // MEJORA (v5.56): revisar si hay versión nueva CADA VEZ que la app vuelve

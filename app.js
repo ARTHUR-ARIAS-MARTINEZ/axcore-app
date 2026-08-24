@@ -2679,45 +2679,31 @@ document.addEventListener('DOMContentLoaded', () => {
         if (filter === 'week') filtered = filtered.filter(h => parseAppDate(h.date) >= startOfWeek);
         if (filter === 'month') filtered = filtered.filter(h => parseAppDate(h.date) >= startOfMonth);
 
-        // Una tarjeta por fecha: el peso manda, el cambio va en chapa de color y
-        // las medidas del cuerpo abajo como fichas. Solo se muestran las que
-        // tienen valor, para no llenar la pantalla de ceros.
-        const MEDIDAS = [
-            ['waist', 'Cintura'], ['bicep', 'B\u00edceps'], ['leg', 'Pierna'],
-            ['chest', 'Pecho'], ['hip', 'Cadera'], ['calf', 'Pantorrilla'],
-            ['glute', 'Gl\u00fateo'], ['neck', 'Cuello'], ['forearm', 'Antebrazo'],
-            ['back', 'Espalda']
-        ];
-
-        const lista = filtered.reverse();
-        if (lista.length === 0) {
-            body.innerHTML = '<div class="ax-evo-vacio">Todav\u00eda no registras medidas.<br>' +
-                             'Ll\u00e9nalas arriba y toca LOG MEDIDA.</div>';
-        } else {
-            body.innerHTML = lista.map((h, i, arr) => {
-                const prev = arr[i + 1];
-                const d = prev ? +(h.weight - prev.weight).toFixed(1) : null;
-                const chapa = (d === null || d === 0)
-                    ? '<span class="ax-evo-chip nada">Sin cambio</span>'
-                    : (d < 0
-                        ? '<span class="ax-evo-chip baja">\u2193 ' + Math.abs(d) + ' kg</span>'
-                        : '<span class="ax-evo-chip sube">\u2191 ' + d + ' kg</span>');
-                const fichas = MEDIDAS
-                    .filter(m => +h[m[0]] > 0)
-                    .map(m => '<span class="ax-evo-med"><b>' + h[m[0]] + '</b><i>' + m[1] + '</i></span>')
-                    .join('');
-                return '<div class="ax-evo-card">' +
-                    '<div class="ax-evo-top">' +
-                        '<div class="ax-evo-fecha">' + h.date + '</div>' +
-                        '<div class="ax-evo-peso">' + h.weight + '<small>kg</small></div>' +
-                        chapa +
-                        '<button class="ax-evo-del" title="Borrar" aria-label="Borrar" ' +
-                            'onclick="deleteHistoryRow(' + (filtered.length - 1 - i) + ')">\u2715</button>' +
-                    '</div>' +
-                    (fichas ? '<div class="ax-evo-meds">' + fichas + '</div>' : '') +
-                '</div>';
-            }).join('');
-        }
+        body.innerHTML = filtered.reverse().map((h, i, arr) => {
+            const prev = arr[i+1];
+            const diff = prev ? (h.weight - prev.weight).toFixed(1) : "0.0";
+            const diffColor = diff < 0 ? "#00ff88" : "#ff3366";
+            return `
+                <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+                    <td style="padding:1rem; font-size:0.8rem;">${h.date}</td>
+                    <td style="padding:1rem; font-weight:bold;">${h.weight} kg</td>
+                    <td style="padding:1rem;">${h.waist} cm</td>
+                    <td style="padding:1rem;">${h.bicep || 0} cm</td>
+                    <td style="padding:1rem;">${h.leg || 0} cm</td>
+                    <td style="padding:1rem;">${h.chest || 0} cm</td>
+                    <td style="padding:1rem;">${h.hip || 0} cm</td>
+                    <td style="padding:1rem;">${h.calf || 0} cm</td>
+                    <td style="padding:1rem;">${h.glute || 0} cm</td>
+                    <td style="padding:1rem;">${h.neck || 0} cm</td>
+                    <td style="padding:1rem;">${h.forearm || 0} cm</td>
+                    <td style="padding:1rem;">${h.back || 0} cm</td>
+                    <td style="padding:1rem; color:${diffColor}; font-weight:bold;">${diff > 0 ? '+'+diff : diff} kg</td>
+                    <td style="padding:1rem;">
+                        <button class="btn-cancel" style="padding:2px 6px; font-size:0.6rem; background:transparent; border:1px solid var(--accent-alert); color:var(--accent-alert); border-radius:4px;" onclick="deleteHistoryRow(${filtered.length - 1 - i})">X</button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
 
         document.getElementById('btn-save-daily').onclick = () => {
             const w = parseFloat(document.getElementById('log-weight').value) || 0;
@@ -2770,10 +2756,6 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         // Filtros
-        ['all', 'week', 'month'].forEach(k => {
-            const b = document.getElementById('filter-' + k);
-            if (b) b.classList.toggle('on', k === filter);
-        });
         document.getElementById('filter-all').onclick = () => renderEvolutionPage('all');
         document.getElementById('filter-week').onclick = () => renderEvolutionPage('week');
         document.getElementById('filter-month').onclick = () => renderEvolutionPage('month');
