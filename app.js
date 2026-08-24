@@ -303,6 +303,64 @@ document.addEventListener('DOMContentLoaded', () => {
             .slice(0, 9);
     }
 
+    // EXTRAS — lo que acompana a la dieta, no la dieta. Se filtra tambien AQUI
+    // y no solo al importar, para que lo que ya se habia guardado mal (parrafos
+    // de comida metidos como reglas) deje de verse sin tener que borrar nada.
+    function axSoloExtras(lista) {
+        const esComida = (l) => /\b\d+\s*(g|gr|gramos|ml|kcal|cal|pzas?|piezas?|tazas?|scoops?|rebanadas?)\b/i.test(l)
+                             || /\b(desayuno|comida|cena|snack|colaci[oó]n|media ma[nñ]ana|media tarde|pre[- ]?entreno|post[- ]?entreno)\b/i.test(l);
+        return (lista || [])
+            .map(l => String(l).trim().replace(/^[-*•\d.)\s]+/, ''))
+            .filter(l => l.length > 3 && l.length <= 90 && !esComida(l))
+            .slice(0, 8);
+    }
+
+    window.openExtrasModal = function () {
+        const guardados = axSoloExtras(userData.customDietRules || []);
+        const ejemplos = ['3 litros de agua al día', 'Nada de refresco ni azúcar entre semana',
+                          'Ayuno de 8 PM a 7 AM', 'Verduras libres: come sin contar',
+                          '1 comida libre a la semana'];
+        const lista = guardados.length ? guardados : ejemplos;
+        const propios = guardados.length > 0;
+
+        const ov = document.createElement('div');
+        ov.className = 'ax-view-ov';
+        ov.innerHTML =
+            '<div class="ax-view ax-meal">' +
+                '<div class="ax-meal-top">' +
+                    '<span class="ax-meal-ico">\u2726</span>' +
+                    '<span class="ax-meal-name">EXTRAS</span>' +
+                '</div>' +
+                '<div class="ax-view-body ax-meal-body">' +
+                    '<p class="ax-extras-lead">' +
+                        (propios ? 'Lo que acompa\u00f1a a tu dieta.'
+                                 : 'Ejemplos. Los tuyos salen solos al pegar tu dieta, o los escribes t\u00fa.') +
+                    '</p>' +
+                    '<ul class="ax-meal-list">' + lista.map(function (r) {
+                        return '<li>' + String(r).replace(/</g, '&lt;') + '</li>'; }).join('') + '</ul>' +
+                '</div>' +
+                '<div class="ax-view-btns">' +
+                    '<button class="ax-modal-btn ax-view-edit">EDITAR</button>' +
+                    '<button class="ax-modal-btn ax-ok">CERRAR</button>' +
+                '</div>' +
+            '</div>';
+        document.body.appendChild(ov);
+        requestAnimationFrame(() => ov.classList.add('show'));
+        const cerrar = () => { ov.classList.remove('show'); setTimeout(() => ov.remove(), 200); };
+        ov.querySelector('.ax-ok').onclick = cerrar;
+        ov.onclick = (e) => { if (e.target === ov) cerrar(); };
+        ov.querySelector('.ax-view-edit').onclick = async () => {
+            cerrar();
+            const texto = await axPrompt(
+                'Un extra por rengl\u00f3n. Cosas generales: agua, ayuno, permitidos.\nLa comida va en MI PLAN.',
+                lista.join('\n'));
+            if (texto === null) return;
+            userData.customDietRules = texto.split('\n').map(s => s.trim()).filter(Boolean);
+            saveData();
+            renderDietPage();
+        };
+    };
+
     function openMealViewModal(key) {
         const slot = MEAL_SLOTS.find(s => s.key === key);
         const diet = userData.recommendedDiet || {};
@@ -2621,31 +2679,45 @@ document.addEventListener('DOMContentLoaded', () => {
         if (filter === 'week') filtered = filtered.filter(h => parseAppDate(h.date) >= startOfWeek);
         if (filter === 'month') filtered = filtered.filter(h => parseAppDate(h.date) >= startOfMonth);
 
-        body.innerHTML = filtered.reverse().map((h, i, arr) => {
-            const prev = arr[i+1];
-            const diff = prev ? (h.weight - prev.weight).toFixed(1) : "0.0";
-            const diffColor = diff < 0 ? "#00ff88" : "#ff3366";
-            return `
-                <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
-                    <td style="padding:1rem; font-size:0.8rem;">${h.date}</td>
-                    <td style="padding:1rem; font-weight:bold;">${h.weight} kg</td>
-                    <td style="padding:1rem;">${h.waist} cm</td>
-                    <td style="padding:1rem;">${h.bicep || 0} cm</td>
-                    <td style="padding:1rem;">${h.leg || 0} cm</td>
-                    <td style="padding:1rem;">${h.chest || 0} cm</td>
-                    <td style="padding:1rem;">${h.hip || 0} cm</td>
-                    <td style="padding:1rem;">${h.calf || 0} cm</td>
-                    <td style="padding:1rem;">${h.glute || 0} cm</td>
-                    <td style="padding:1rem;">${h.neck || 0} cm</td>
-                    <td style="padding:1rem;">${h.forearm || 0} cm</td>
-                    <td style="padding:1rem;">${h.back || 0} cm</td>
-                    <td style="padding:1rem; color:${diffColor}; font-weight:bold;">${diff > 0 ? '+'+diff : diff} kg</td>
-                    <td style="padding:1rem;">
-                        <button class="btn-cancel" style="padding:2px 6px; font-size:0.6rem; background:transparent; border:1px solid var(--accent-alert); color:var(--accent-alert); border-radius:4px;" onclick="deleteHistoryRow(${filtered.length - 1 - i})">X</button>
-                    </td>
-                </tr>
-            `;
-        }).join('');
+        // Una tarjeta por fecha: el peso manda, el cambio va en chapa de color y
+        // las medidas del cuerpo abajo como fichas. Solo se muestran las que
+        // tienen valor, para no llenar la pantalla de ceros.
+        const MEDIDAS = [
+            ['waist', 'Cintura'], ['bicep', 'B\u00edceps'], ['leg', 'Pierna'],
+            ['chest', 'Pecho'], ['hip', 'Cadera'], ['calf', 'Pantorrilla'],
+            ['glute', 'Gl\u00fateo'], ['neck', 'Cuello'], ['forearm', 'Antebrazo'],
+            ['back', 'Espalda']
+        ];
+
+        const lista = filtered.reverse();
+        if (lista.length === 0) {
+            body.innerHTML = '<div class="ax-evo-vacio">Todav\u00eda no registras medidas.<br>' +
+                             'Ll\u00e9nalas arriba y toca LOG MEDIDA.</div>';
+        } else {
+            body.innerHTML = lista.map((h, i, arr) => {
+                const prev = arr[i + 1];
+                const d = prev ? +(h.weight - prev.weight).toFixed(1) : null;
+                const chapa = (d === null || d === 0)
+                    ? '<span class="ax-evo-chip nada">Sin cambio</span>'
+                    : (d < 0
+                        ? '<span class="ax-evo-chip baja">\u2193 ' + Math.abs(d) + ' kg</span>'
+                        : '<span class="ax-evo-chip sube">\u2191 ' + d + ' kg</span>');
+                const fichas = MEDIDAS
+                    .filter(m => +h[m[0]] > 0)
+                    .map(m => '<span class="ax-evo-med"><b>' + h[m[0]] + '</b><i>' + m[1] + '</i></span>')
+                    .join('');
+                return '<div class="ax-evo-card">' +
+                    '<div class="ax-evo-top">' +
+                        '<div class="ax-evo-fecha">' + h.date + '</div>' +
+                        '<div class="ax-evo-peso">' + h.weight + '<small>kg</small></div>' +
+                        chapa +
+                        '<button class="ax-evo-del" title="Borrar" aria-label="Borrar" ' +
+                            'onclick="deleteHistoryRow(' + (filtered.length - 1 - i) + ')">\u2715</button>' +
+                    '</div>' +
+                    (fichas ? '<div class="ax-evo-meds">' + fichas + '</div>' : '') +
+                '</div>';
+            }).join('');
+        }
 
         document.getElementById('btn-save-daily').onclick = () => {
             const w = parseFloat(document.getElementById('log-weight').value) || 0;
@@ -2698,6 +2770,10 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         // Filtros
+        ['all', 'week', 'month'].forEach(k => {
+            const b = document.getElementById('filter-' + k);
+            if (b) b.classList.toggle('on', k === filter);
+        });
         document.getElementById('filter-all').onclick = () => renderEvolutionPage('all');
         document.getElementById('filter-week').onclick = () => renderEvolutionPage('week');
         document.getElementById('filter-month').onclick = () => renderEvolutionPage('month');
@@ -2798,11 +2874,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Tab activo de la página de Dieta — PERSISTE entre re-renders (renderDietPage
     // se llama al agregar/quitar alimentos y antes siempre regresaba a MI PLAN).
-    let pmDietTab = 'plan';
     function renderDietPage() {
         const diet = userData.recommendedDiet || { breakfast: '', lunch: '', dinner: '', snacks: '' };
         const hasCustomRules = userData.customDietRules && userData.customDietRules.length > 0;
-        const rules = hasCustomRules ? userData.customDietRules : [];
+        const rules = hasCustomRules ? axSoloExtras(userData.customDietRules) : [];
         // Ejemplos sombreados (NO son reglas reales): se muestran mientras no haya reglas propias.
         const RULE_EXAMPLES = [
             '3 litros de agua al día',
@@ -2874,13 +2949,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 <!-- PESTAÑAS (la activa se conserva entre re-renders: al agregar un
                      alimento se re-dibuja la página y antes te regresaba a MI PLAN) -->
-                <div class="pm-d-tabs">
-                    <div class="pm-d-tab ${pmDietTab === 'plan' ? 'on' : ''}" data-d-tab="plan">MI PLAN</div>
-                    <div class="pm-d-tab ${pmDietTab === 'rules' ? 'on' : ''}" data-d-tab="rules">EXTRAS</div>
                 </div>
 
                 <!-- ─── TAB MI PLAN ─── -->
-                <div class="pm-d-panel ${pmDietTab === 'plan' ? 'on' : ''}" id="pmDt-plan">
+                <div class="pm-d-panel on" id="pmDt-plan">
                     <div class="pm-d-plan-hint">Toca una comida para abrirla · el lápiz ✎ para editarla</div>
                     <div class="pm-d-meals">
                     ${MEAL_SLOTS.map(m => {
@@ -2892,6 +2964,14 @@ document.addEventListener('DOMContentLoaded', () => {
                             <button class="pm-d-meal-edit" data-edit="${m.key}" title="Editar" aria-label="Editar">✎</button>
                         </div>`;
                     }).join('')}
+                        <div class="pm-d-meal pm-d-extras ${(rules.length ? 'has-content' : '')}" id="pm-open-extras">
+                            <span class="pm-d-meal-ico">\u2726</span>
+                            <span class="pm-d-extras-txt">
+                                <span class="pm-d-meal-name-c">EXTRAS</span>
+                                <span class="pm-d-extras-sub">${rules.length ? rules.length + ' cosas que acompa\u00f1an tu dieta' : 'Agua, ayuno, permitidos\u2026'}</span>
+                            </span>
+                            <span class="pm-d-extras-go">\u203A</span>
+                        </div>
                     </div>
 
                     <!-- INGRESO AUTOMÁTICO DE DIETA -->
@@ -2906,16 +2986,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 <!-- ─── TAB REGISTRAR ALIMENTO ─── -->
                 <!-- ─── TAB REGLAS ─── -->
-                <div class="pm-d-panel ${pmDietTab === 'rules' ? 'on' : ''}" id="pmDt-rules">
-                    <div class="pm-d-log-hint">${hasCustomRules ? 'Lo que acompaña a tu dieta: agua, ayuno, permitidos.' : 'Ejemplos. Los tuyos salen solos al pegar tu dieta.'}</div>
-                    <div class="pm-d-rules-list" id="rules-list-display">
-                        ${hasCustomRules
-                            ? rules.map((r, i) => `<div class="pm-d-rule"><div class="pm-d-rule-num">${i+1}</div><div class="pm-d-rule-txt">${axCortar(r, 64)}</div></div>`).join('')
-                            : RULE_EXAMPLES.map((r, i) => `<div class="pm-d-rule ax-example"><div class="pm-d-rule-num">${i+1}</div><div class="pm-d-rule-txt">${axCortar(r, 64)}</div></div>`).join('')
-                        }
-                    </div>
-                    <button class="btn-premium" id="btn-edit-rules" style="width:100%; margin-top:14px;">EDITAR EXTRAS</button>
-                </div>
             </div>
         `;
 
@@ -2923,41 +2993,22 @@ document.addEventListener('DOMContentLoaded', () => {
         setupFoodAutocomplete('food-desc', 'food-unit-lbl');
 
         // ─── Lógica de pestañas ───
-        dietEl.querySelectorAll('.pm-d-tab').forEach(tab => {
-            tab.onclick = () => {
-                const target = tab.dataset.dTab;
-                pmDietTab = target;   // recordar para sobrevivir re-renders
-                dietEl.querySelectorAll('.pm-d-tab').forEach(t => t.classList.toggle('on', t === tab));
-                dietEl.querySelectorAll('.pm-d-panel').forEach(p => p.classList.toggle('on', p.id === `pmDt-${target}`));
-            };
-        });
 
         // ─── Tocar la comida abre su ventana; el lápiz abre el editor ───
-        dietEl.querySelectorAll('.pm-d-meal').forEach(card => {
+        dietEl.querySelectorAll('.pm-d-meal[data-meal]').forEach(card => {
             card.onclick = (e) => {
                 if (e.target.closest('.pm-d-meal-edit')) return;
                 openMealViewModal(card.dataset.meal);
             };
         });
+        const btnExtras = document.getElementById('pm-open-extras');
+        if (btnExtras) btnExtras.onclick = () => openExtrasModal();
+
         dietEl.querySelectorAll('.pm-d-meal-edit').forEach(btn => {
             btn.onclick = (e) => { e.stopPropagation(); openMealModal(btn.dataset.edit); };
         });
 
         // Editar reglas de protocolo
-        const btnEditRules = document.getElementById('btn-edit-rules');
-        if (btnEditRules) {
-            btnEditRules.onclick = async () => {
-                const current = (userData.customDietRules && userData.customDietRules.length > 0)
-                    ? userData.customDietRules
-                    : rules;
-                const text = await axPrompt("Un extra por renglón. Cosas generales, agua, ayuno, permitidos. La comida va en MI PLAN.", current.join('\n'));
-                if (text === null) return;
-                const newRules = text.split('\n').map(s => s.trim()).filter(Boolean);
-                userData.customDietRules = newRules;
-                saveData();
-                renderDietPage();
-            };
-        }
 
         // Distribuir dieta completa automáticamente y guardar de inmediato
         document.getElementById('btn-distribute-diet').onclick = () => {

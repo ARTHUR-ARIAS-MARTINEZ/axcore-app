@@ -15,9 +15,9 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0a0e14">
     <link rel="apple-touch-icon" href="logo.png">
-    <link rel="stylesheet" href="index.css?v=20260823c">
+    <link rel="stylesheet" href="index.css?v=20260824a">
     <!-- Premium UI overrides (inerte si <body> NO tiene .premium-mode) -->
-    <link rel="stylesheet" href="premium.css?v=20260823c">
+    <link rel="stylesheet" href="premium.css?v=20260824a">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <!-- Fuentes: Inter para cuerpos de texto, Oswald (Heavy Gym) para titulares -->
@@ -706,7 +706,7 @@
             <div id="page-evolution" class="page">
                 <!-- Se movió Perfil Antropométrico a Evolución como lo pidio el usuario -->
                 <div class="glass-card settings-panel" style="margin-bottom: 2rem;">
-                    <h2 style="color:var(--accent-main); margin-bottom:1.2rem; text-align:center; font-size:1.1rem;">PERFIL ANTROPOMÉTRICO BASE</h2>
+                    <div class="ax-evo-hdr"><span class="ax-evo-kicker">Punto de partida</span><h2 class="ax-evo-h2">PERFIL ANTROPOM&Eacute;TRICO</h2></div>
                     <div class="measurement-form" style="display:grid; grid-template-columns: repeat(2, 1fr); gap:12px;">
                         <div class="input-group" style="margin:0;">
                             <label>ALTURA (M)</label>
@@ -732,7 +732,7 @@
                 </div>
 
                 <div class="glass-card evolution-panel" style="border-left:5px solid var(--accent-main);">
-                    <h2 style="font-family:var(--font-accent); color:var(--accent-main); margin-bottom:1.2rem; font-size:1.1rem;">HISTORIAL DE MEDIDAS (DIARIO)</h2>
+                    <div class="ax-evo-hdr"><span class="ax-evo-kicker">Tu registro</span><h2 class="ax-evo-h2">HISTORIAL DE MEDIDAS</h2></div>
                     <div class="measurement-form" style="display:grid; grid-template-columns: repeat(2, 1fr); gap:10px; margin-bottom:1.5rem; padding:1rem; background:var(--glass-bg, rgba(0,0,0,0.2)); border-radius:15px; border:1px solid var(--glass-border);">
                         <div class="input-group" style="margin:0;">
                             <label>PESO (KG)</label>
@@ -781,37 +781,15 @@
                         <button class="btn-premium" id="btn-save-daily" style="align-self:end; height:50px;">LOG MEDIDA</button>
                     </div>
 
-                    <div class="history-controls" style="margin-bottom:1rem; display:flex; gap:10px;">
-                        <button class="theme-btn active" id="filter-all">TODO</button>
-                        <button class="theme-btn" id="filter-week">ESTA SEMANA</button>
-                        <button class="theme-btn" id="filter-month">ESTE MES</button>
+                    <div class="ax-evo-filtros">
+                        <button class="ax-evo-f on" id="filter-all">TODO</button>
+                        <button class="ax-evo-f" id="filter-week">ESTA SEMANA</button>
+                        <button class="ax-evo-f" id="filter-month">ESTE MES</button>
                     </div>
 
-                    <div class="history-table-container" style="max-height:400px; overflow-y:auto; background:var(--glass-bg, rgba(0,0,0,0.2)); border-radius:15px; border:1px solid var(--glass-border);">
-                        <table style="width:100%; border-collapse:collapse; text-align:left;">
-                            <thead style="background:var(--glass); border-bottom:1px solid var(--glass-border);">
-                                <tr style="color:var(--accent-main); font-family:var(--font-accent); font-size:0.8rem;">
-                                    <th style="padding:1rem;">FECHA</th>
-                                    <th style="padding:1rem;">PESO</th>
-                                    <th style="padding:1rem;">CINTURA</th>
-                                    <th style="padding:1rem;">BÍCEPS</th>
-                                    <th style="padding:1rem;">PIERNA</th>
-                                    <th style="padding:1rem;">PECHO</th>
-                                    <th style="padding:1rem;">CADERA</th>
-                                    <th style="padding:1rem;">PANT.</th>
-                                    <th style="padding:1rem;">GLÚTEO</th>
-                                    <th style="padding:1rem;">CUELLO</th>
-                                    <th style="padding:1rem;">ANTEB.</th>
-                                    <th style="padding:1rem;">ESPALDA</th>
-                                    <th style="padding:1rem;">CAMBIO</th>
-                                    <th style="padding:1rem;">DEL</th>
-                                </tr>
-                            </thead>
-                            <tbody id="history-body">
-                                <!-- Se llena via JS -->
-                            </tbody>
-                        </table>
-                    </div>
+                    <!-- Antes era una tabla de 14 columnas: en un celular no se
+                         alcanzaba a ver ni la mitad. Ahora es una tarjeta por fecha. -->
+                    <div class="ax-evo-list" id="history-body"></div>
                 </div>
             </div>
 
@@ -994,14 +972,14 @@
 
     <!-- Gráficas (Al final para no bloquear inicio rápido) -->
     <script src="https://cdn.jsdelivr.net/npm/apexcharts" defer></script>
-    <script src="profile-persist.js?v=20260823c"></script>
-    <script src="knowledge.js?v=20260823c"></script>
-    <script src="app.js?v=20260823c"></script>
+    <script src="profile-persist.js?v=20260824a"></script>
+    <script src="knowledge.js?v=20260824a"></script>
+    <script src="app.js?v=20260824a"></script>
     <!-- Premium UI: catálogo de insignias + FAB + onboarding -->
-    <script src="premium-badges.js?v=20260823c"></script>
-    <script src="premium-extras.js?v=20260823c"></script>
+    <script src="premium-badges.js?v=20260824a"></script>
+    <script src="premium-extras.js?v=20260824a"></script>
     <!-- Botón "atrás" del teléfono: retrocede dentro de la app en vez de cerrarla -->
-    <script src="axcore-back.js?v=20260823c"></script>
+    <script src="axcore-back.js?v=20260824a"></script>
 
     <!-- REGISTRO GLOBAL — funciona aunque app.js falle -->
     <script>
@@ -1079,7 +1057,7 @@
         // Registro del Service Worker de PWA unificado con detección de actualizaciones y auto-refresco
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=20260823c').then(reg => {
+                navigator.serviceWorker.register('sw.js?v=20260824a').then(reg => {
                     console.log('[AX-CORE] Service Worker registrado con éxito:', reg.scope);
 
                     // MEJORA (v5.56): revisar si hay versión nueva CADA VEZ que la app vuelve
