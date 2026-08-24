@@ -62,7 +62,19 @@
     display: flex; align-items: center; justify-content: center;
   }
   .gx-shot img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  /* velo de abajo: sin esto la letra se pierde sobre la foto */
+  .gx-veil {
+    position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(to top,
+        rgba(0,0,0,.92) 0%, rgba(0,0,0,.75) 26%, rgba(0,0,0,.28) 52%, rgba(0,0,0,0) 78%);
+  }
+  .gx-over {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    padding: 20px 20px 22px;
+  }
   .gx-ph {
+    position: absolute; inset: 0;
+    align-items: center; justify-content: center; flex-direction: column;
     text-align: center; padding: 24px;
     font-family: 'Oswald', sans-serif; letter-spacing: 2px;
     color: var(--pm-dim2, #7f93a8); font-size: .68rem; line-height: 1.9;
@@ -75,7 +87,7 @@
     color: transparent; -webkit-text-fill-color: transparent;
   }
 
-  .gx-txt { flex: none; padding: 16px 4px 4px; }
+  .gx-txt { padding: 0; }
   .gx-step {
     font-family: 'Oswald', sans-serif; font-size: .58rem;
     letter-spacing: 2.6px; text-transform: uppercase;
@@ -87,9 +99,11 @@
     color: var(--pm-white, #fff); margin: 0 0 8px;
   }
   .gx-line {
-    font-size: .86rem; line-height: 1.5;
-    color: var(--pm-dim2, #7f93a8); margin: 0; max-width: 46ch;
+    font-size: .88rem; line-height: 1.5;
+    color: rgba(255,255,255,.88); margin: 0; max-width: 46ch;
+    text-shadow: 0 1px 8px rgba(0,0,0,.65);
   }
+  .gx-title { text-shadow: 0 2px 12px rgba(0,0,0,.6); }
 
   /* ── pie: puntos y botón ── */
   .gx-foot { flex: none; padding: 12px 16px calc(14px + env(safe-area-inset-bottom)); }
@@ -122,8 +136,8 @@
 
 <div class="gx">
   <div class="gx-top">
-    <span class="gx-brand">AX-CORE</span>
-    <a class="gx-close" href="index.html">Salir</a>
+    <span class="gx-brand" id="gxBrand">AX-CORE</span>
+    <a class="gx-close" id="gxSalir" href="index.html">Salir</a>
   </div>
 
   <div class="gx-track" id="gxTrack"></div>
@@ -138,28 +152,59 @@
 // Cada paso: número de imagen, título y la línea que lo explica.
 // La imagen vive en assets/guia/NN.png. Si todavía no está, sale el hueco
 // con su número para que se sepa cuál falta.
-var PASOS = [
-  { img: '01', step: 'Paso 1', title: 'Entra con tu pase',
-    line: 'Tu coach te da un pase de una sola vez. Lo escribes, pones tu nombre y ya quedaste dentro. No se comparte: queda amarrado a ti.' },
-  { img: '02', step: 'Paso 2', title: 'Tu tablero',
-    line: 'Lo primero que ves: tu peso de hoy, cuántas calorías llevas y tu racha. Todo de un vistazo, sin buscarle.' },
-  { img: '03', step: 'Paso 3', title: 'Registra tu peso',
-    line: 'Te pesas, lo anotas y la app hace el resto. Es el número que manda: de ahí sale todo lo demás.' },
-  { img: '04', step: 'Paso 4', title: 'Tu plan de comidas',
-    line: 'Ocho cuadros, uno por comida. El que ya tiene plan se enciende. Tocas uno y ves qué te toca comer.' },
-  { img: '05', step: 'Paso 5', title: 'Registra lo que comes',
-    line: 'Escribes el alimento y la cantidad. La app le pone las calorías sola y te dice cuánto te queda del día.' },
-  { img: '06', step: 'Paso 6', title: 'Tu entrenamiento',
-    line: 'La rutina que te tocó, ejercicio por ejercicio. Vas marcando lo que ya hiciste.' },
-  { img: '07', step: 'Paso 7', title: 'Mira cómo vas',
-    line: 'Tu peso y tu cintura semana con semana, en gráfica. Aquí se ve el avance que en el espejo tarda en notarse.' },
-  { img: '08', step: 'Paso 8', title: 'Presume tu avance',
-    line: 'El Estudio te arma una tarjeta con tus números para mandarla por WhatsApp o subirla. Tú eliges el estilo.' },
-  { img: '09', step: 'Paso 9', title: 'Tus insignias',
-    line: 'Cada racha, cada kilo y cada centímetro te dan una medalla. Bronce, plata, oro, platino y leyenda.' },
-  { img: '10', step: 'Paso 10', title: 'Ponla a tu gusto',
-    line: 'En Ajustes escoges el color de toda la app: Aurora, Acero, Oro, Fuego u Orquídea. Y desde ahí la instalas en tu pantalla de inicio.' }
-];
+var GUIAS = {
+  atleta: {
+    nombre: 'C\u00d3MO SE USA',
+    salida: 'index.html',
+    pasos: [
+      ['Entra con tu pase', 'Tu coach te da un pase de una sola vez. Lo escribes, pones tu nombre y ya quedaste dentro. Queda amarrado a ti: no se comparte.'],
+      ['Tu tablero', 'Lo primero que ves: tu peso de hoy, cu\u00e1ntas calor\u00edas llevas y tu racha. Todo de un vistazo.'],
+      ['Registra tu peso', 'Te pesas, lo anotas y la app hace el resto. Es el n\u00famero que manda: de ah\u00ed sale todo lo dem\u00e1s.'],
+      ['Tu plan de comidas', 'Ocho cuadros, uno por comida. El que ya tiene plan se enciende. Tocas uno y ves qu\u00e9 te toca comer.'],
+      ['Registra lo que comes', 'Escribes el alimento y cu\u00e1ntos. La app le pone las calor\u00edas sola y te dice cu\u00e1nto te queda del d\u00eda.'],
+      ['Tu entrenamiento', 'La rutina que te toc\u00f3, ejercicio por ejercicio. Vas marcando lo que ya hiciste.'],
+      ['Mira c\u00f3mo vas', 'Tu peso y tu cintura semana con semana, en gr\u00e1fica. Aqu\u00ed se ve el avance que en el espejo tarda en notarse.'],
+      ['Presume tu avance', 'El Estudio te arma una tarjeta con tus n\u00fameros para mandarla por WhatsApp. T\u00fa eliges el estilo.'],
+      ['Tus insignias', 'Cada racha, cada kilo y cada cent\u00edmetro te dan una medalla. Bronce, plata, oro, platino y leyenda.'],
+      ['Ponla a tu gusto', 'En Ajustes escoges el color de toda la app, y desde ah\u00ed la instalas en tu pantalla de inicio.']
+    ]
+  },
+  coach: {
+    nombre: 'GU\u00cdA DEL COACH',
+    salida: 'coach.html',
+    pasos: [
+      ['Entra a tu terminal', 'Con el c\u00f3digo de franquicia y la contrase\u00f1a que te dio el corporativo. Inst\u00e1lala desde ah\u00ed y te queda como app aparte.'],
+      ['Tu cupo de un vistazo', 'Pases usados, cupo total de tu plan y cu\u00e1ntos te quedan. La barra te dice qu\u00e9 tanto llevas.'],
+      ['Da de alta un atleta', 'Toca PASE NUEVO, escribe su nombre y listo: sale un pase de un solo uso.'],
+      ['P\u00e1sale su pase', 'Con COMPARTIR se lo mandas por WhatsApp junto con la liga de la app. \u00c9l entra y queda vinculado a ti.'],
+      ['Cuando alguien deja de pagar', 'CORTAR le cierra la app sin borrarlo. Cuando se ponga al corriente, RESTAURAR y sigue donde iba.'],
+      ['Ponla a tu gusto', 'En Estilo visual escoges el color de toda la terminal. Se guarda en tu equipo.']
+    ]
+  },
+  admin: {
+    nombre: 'CONSOLA MAESTRA',
+    salida: 'admin.html',
+    pasos: [
+      ['Entra con tu clave', 'La clave de mando solo la tienes t\u00fa. Inst\u00e1lala en tu celular y te queda con su icono rojo, aparte de las otras dos.'],
+      ['Crea un bloque', 'Un bloque es una zona: Cd. Guzm\u00e1n, Aguascalientes. Ah\u00ed dentro van los gimnasios de esa plaza.'],
+      ['Da de alta un gimnasio', 'Escoges su bloque y su plan. El sistema le genera su c\u00f3digo y su contrase\u00f1a para el coach.'],
+      ['Entrega el acceso', 'En C\u00f3digos copias lo que le toca al gimnasio. Con eso su coach entra a su terminal.'],
+      ['Mira qui\u00e9n la usa', 'En Atletas ves cu\u00e1ntas veces abri\u00f3 la app cada quien y cu\u00e1ndo fue la \u00faltima. Ah\u00ed se nota qui\u00e9n la trabaja.'],
+      ['El freno de mano', 'CORTAR le cierra la app a un atleta al instante. Y de un golpe puedes cortar un gimnasio completo.'],
+      ['Tus n\u00fameros', 'Ganancias suma lo que entra al mes, la proyecci\u00f3n del a\u00f1o y el desglose por plan.']
+    ]
+  }
+};
+
+var _q = new URLSearchParams(location.search).get('g') || 'atleta';
+var GUIA = GUIAS[_q] || GUIAS.atleta;
+var PASOS = GUIA.pasos.map(function (p, i) {
+  return { img: _q + '-' + ('0' + (i + 1)).slice(-2), step: 'Paso ' + (i + 1),
+           title: p[0], line: p[1] };
+});
+
+document.getElementById('gxBrand').textContent = 'AX-CORE \u00b7 ' + GUIA.nombre;
+document.getElementById('gxSalir').setAttribute('href', GUIA.salida);
 
 var track = document.getElementById('gxTrack');
 var dots  = document.getElementById('gxDots');
@@ -169,13 +214,14 @@ track.innerHTML = PASOS.map(function (p, i) {
   return '<div class="gx-slide">' +
     '<div class="gx-shot">' +
       '<img src="assets/guia/' + p.img + '.png" alt="' + p.title + '" ' +
-      'onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'block\'">' +
-      '<div class="gx-ph" style="display:none"><b>' + p.img + '</b>Aqu&iacute; va la imagen ' + p.img + '<br>assets/guia/' + p.img + '.png</div>' +
-    '</div>' +
-    '<div class="gx-txt">' +
-      '<div class="gx-step">' + p.step + ' de ' + PASOS.length + '</div>' +
-      '<h1 class="gx-title">' + p.title + '</h1>' +
-      '<p class="gx-line">' + p.line + '</p>' +
+      'onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">' +
+      '<div class="gx-ph" style="display:none"><b>' + (i + 1) + '</b>Aqu&iacute; va la imagen<br>assets/guia/' + p.img + '.png</div>' +
+      '<div class="gx-veil"></div>' +
+      '<div class="gx-over">' +
+        '<div class="gx-step">' + p.step + ' de ' + PASOS.length + '</div>' +
+        '<h1 class="gx-title">' + p.title + '</h1>' +
+        '<p class="gx-line">' + p.line + '</p>' +
+      '</div>' +
     '</div>' +
   '</div>';
 }).join('');
@@ -204,7 +250,7 @@ track.addEventListener('scroll', function () {
 });
 next.addEventListener('click', function () {
   var i = actual();
-  if (i >= PASOS.length - 1) { location.href = 'index.html'; return; }
+  if (i >= PASOS.length - 1) { location.href = GUIA.salida; return; }
   ir(i + 1);
 });
 dots.addEventListener('click', function (e) {
