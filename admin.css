@@ -104,8 +104,13 @@ body {
 /* ── ESTRUCTURA ─────────────────────────────────────────────────────── */
 .admin-main {
     display: block;
-    padding: 14px; max-width: 1180px; margin: 0 auto;
+    padding: 14px 14px 90px; max-width: 1180px; margin: 0 auto;
 }
+/* El desglose por plan quedaba pegado al borde de abajo y en el celular ni
+   se alcanzaba a ver: aire suficiente y una rejilla que sí baja a una
+   columna en pantalla chica. */
+#tab-profits .grid-container { margin-bottom: 22px; }
+#tab-profits h3 { line-height: 1.25; }
 
 /* MENU EN CUADROS — cinco fichas chicas arriba, en el mismo espacio donde
    antes iba la lista larga. Cada una con su marca y su palabra. */

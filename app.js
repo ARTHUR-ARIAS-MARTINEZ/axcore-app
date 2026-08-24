@@ -2813,10 +2813,37 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="pm-diet-bar-bg"><div id="dCalBar" class="pm-diet-bar-fill" style="width:${calPct}%;"></div></div>
                 </div>
 
+
+                <!-- REGISTRO RAPIDO — vive entre las calorias y el plan, sin pestaña -->
+                <div class="pm-d-quick" id="pmDt-log">
+                    <div class="pm-d-quick-row">
+                        <input type="text" id="food-desc" class="pm-d-reg-input" placeholder="¿Qué comiste? Ej. taco de adobada">
+                        <div class="ax-qty">
+                            <button type="button" class="ax-qty-btn" data-qty="food-qty" data-dir="-1">−</button>
+                            <input type="number" id="food-qty" class="ax-qty-input" value="1" min="1" step="1">
+                            <button type="button" class="ax-qty-btn" data-qty="food-qty" data-dir="1">+</button>
+                        </div>
+                        <button class="pm-d-reg-add" id="btn-add-food">AGREGAR</button>
+                    </div>
+                    <label id="food-unit-lbl" class="pm-d-quick-unit">Cantidad</label>
+
+                    <div class="pm-d-quick-macros">
+                        <span><b>${macroTot.p}g</b> proteína</span>
+                        <span><b>${macroTot.c}g</b> carbos</span>
+                        <span><b>${macroTot.f}g</b> grasa</span>
+                    </div>
+
+                    <div class="pm-d-food-log" id="pmFoodLogList">
+                        ${foodLog.length === 0
+                            ? '<div class="pm-d-food-empty">Sin registros hoy.</div>'
+                            : foodLog.map((f, i) => `<div class="pm-d-food-item"><div style="flex:1; min-width:0;"><span class="pm-d-food-name">${(f.desc || '').toString().replace(/</g,'&lt;')}</span></div><span class="pm-d-food-cal">${f.cal || 0}<small>kcal</small></span><button class="pm-d-food-del" onclick="window.deleteFoodLog(${i})" title="Quitar" aria-label="Quitar" style="background:transparent;border:none;color:#ff5c6c;font-size:1rem;line-height:1;cursor:pointer;padding:2px 8px;margin-left:6px;flex-shrink:0;">✕</button></div>`).join('')
+                        }
+                    </div>
+                </div>
+
                 <!-- PESTAÑAS (la activa se conserva entre re-renders: al agregar un
                      alimento se re-dibuja la página y antes te regresaba a MI PLAN) -->
                 <div class="pm-d-tabs">
-                    <div class="pm-d-tab ${pmDietTab === 'log' ? 'on' : ''}" data-d-tab="log">REGISTRAR</div>
                     <div class="pm-d-tab ${pmDietTab === 'plan' ? 'on' : ''}" data-d-tab="plan">MI PLAN</div>
                     <div class="pm-d-tab ${pmDietTab === 'rules' ? 'on' : ''}" data-d-tab="rules">REGLAS</div>
                 </div>
@@ -2847,36 +2874,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
 
                 <!-- ─── TAB REGISTRAR ALIMENTO ─── -->
-                <div class="pm-d-panel ${pmDietTab === 'log' ? 'on' : ''}" id="pmDt-log">
-                    <div class="pm-d-reg-title">🍽️ REGISTRA LO QUE COMES HOY</div>
-                    <div class="pm-d-reg-sub">Solo escribe el alimento (te sugiero mientras escribes) y cuántas piezas, platos o tazas. Las calorías y macros se calculan SOLAS.</div>
-
-                    <div class="pm-d-reg-totals">
-                        <div><strong>${macroTot.cal.toLocaleString()}</strong><span>KCAL HOY</span></div>
-                        <div><strong style="color:#00c97a">${macroTot.p}g</strong><span>PROTEÍNA</span></div>
-                        <div><strong style="color:#2979ff">${macroTot.c}g</strong><span>CARBOS</span></div>
-                        <div><strong style="color:#ff9f43">${macroTot.f}g</strong><span>GRASA</span></div>
-                    </div>
-
-                    <input type="text" id="food-desc" class="pm-d-reg-input" placeholder="Ej. taco de adobada, sushi, caldo de pollo...">
-                    <div class="pm-d-reg-qtyrow">
-                        <label id="food-unit-lbl">Cantidad</label>
-                        <div class="ax-qty">
-                            <button type="button" class="ax-qty-btn" data-qty="food-qty" data-dir="-1">−</button>
-                            <input type="number" id="food-qty" class="ax-qty-input" value="1" min="1" step="1">
-                            <button type="button" class="ax-qty-btn" data-qty="food-qty" data-dir="1">+</button>
-                        </div>
-                    </div>
-                    <button class="pm-d-reg-add" id="btn-add-food">+ AGREGAR A MI DÍA</button>
-
-                    <div class="pm-d-food-log" id="pmFoodLogList" style="margin-top:1.2rem;">
-                        ${foodLog.length === 0
-                            ? '<div class="pm-d-food-empty">Sin registros hoy. Agrega tu primera comida arriba ↑</div>'
-                            : foodLog.map((f, i) => `<div class="pm-d-food-item"><div style="flex:1; min-width:0;"><span class="pm-d-food-name">${(f.desc || '').toString().replace(/</g,'&lt;')}</span>${(f.p || f.c || f.f) ? `<div style="font-size:0.62rem; color:var(--text-dim); margin-top:2px;">P ${f.p || 0}g · C ${f.c || 0}g · G ${f.f || 0}g</div>` : ''}</div><span class="pm-d-food-cal">${f.cal || 0}<small>kcal</small></span><button class="pm-d-food-del" onclick="window.deleteFoodLog(${i})" title="Quitar este registro" aria-label="Quitar" style="background:transparent;border:none;color:#ff5c6c;font-size:1rem;line-height:1;cursor:pointer;padding:2px 8px;margin-left:6px;flex-shrink:0;">✕</button></div>`).join('')
-                        }
-                    </div>
-                </div>
-
                 <!-- ─── TAB REGLAS ─── -->
                 <div class="pm-d-panel ${pmDietTab === 'rules' ? 'on' : ''}" id="pmDt-rules">
                     <div class="pm-d-log-hint">${hasCustomRules ? 'Las reglas de tu plan' : 'Ejemplos. Las tuyas salen solas al pegar tu dieta.'}</div>

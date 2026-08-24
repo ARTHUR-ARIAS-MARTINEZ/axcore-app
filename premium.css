@@ -4850,3 +4850,79 @@ body.premium-mode .pm-d-log-hint {
 body.premium-mode .pm-diet-import-sub {
   font-size: .72rem !important; line-height: 1.45 !important;
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   DIETA › REGISTRO RÁPIDO — ya no es pestaña. Vive entre las calorías de
+   hoy y el plan, en una sola tira: qué comiste, cuántos, agregar.
+   Minimalista a propósito: es lo que más se usa y lo que menos debe pesar.
+   ═══════════════════════════════════════════════════════════════════════ */
+body.premium-mode .pm-d-quick {
+  background: linear-gradient(158deg, var(--pm-s3), var(--pm-s2) 46%, var(--pm-s1));
+  border: 1px solid var(--pm-border);
+  border-radius: 20px;
+  padding: 13px 13px 11px;
+  margin: 12px 0 14px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.05), 0 8px 20px rgba(0,0,0,.2);
+}
+body.premium-mode .pm-d-quick-row {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+}
+body.premium-mode .pm-d-quick-row .pm-d-reg-input {
+  flex: 1 1 160px; min-width: 0; margin: 0 !important;
+  padding: .72rem .9rem !important; font-size: .9rem !important;
+  border-radius: 12px !important;
+}
+body.premium-mode .pm-d-quick-row .ax-qty { flex: none; border-radius: 12px; }
+body.premium-mode .pm-d-quick-row .ax-qty-btn { width: 32px; height: 36px; font-size: 1.1rem; }
+body.premium-mode .pm-d-quick-row .ax-qty-input { width: 40px; height: 36px; font-size: .9rem; }
+body.premium-mode .pm-d-quick-row .pm-d-reg-add {
+  flex: none; width: auto !important; margin: 0 !important;
+  padding: .72rem 1.1rem !important; font-size: .68rem !important;
+  border-radius: 99px !important; letter-spacing: 1.4px;
+}
+body.premium-mode .pm-d-quick-unit {
+  display: block; margin-top: 7px;
+  font-family: 'Oswald', sans-serif; font-size: .54rem;
+  letter-spacing: 1.6px; text-transform: uppercase;
+  color: var(--pm-dim2, #7f93a8); opacity: .75;
+}
+body.premium-mode .pm-d-quick-macros {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  margin: 10px 0 4px; padding-top: 10px;
+  border-top: 1px solid rgba(255,255,255,.05);
+  font-size: .68rem; color: var(--pm-dim2, #7f93a8);
+}
+body.premium-mode .pm-d-quick-macros b {
+  font-family: 'Oswald', sans-serif; color: var(--accent-main);
+  font-size: .82rem; font-variant-numeric: tabular-nums;
+}
+body.premium-mode .pm-d-quick .pm-d-food-log { margin-top: 4px; }
+body.premium-mode .pm-d-quick .pm-d-food-empty {
+  font-size: .72rem; opacity: .6; padding: 8px 0 2px;
+}
+body.premium-mode .pm-d-quick .pm-d-food-item { padding: 8px 0 !important; }
+
+/* ── REGLAS: menos peso visual ── */
+body.premium-mode .pm-d-rules-list {
+  display: grid; grid-template-columns: 1fr; gap: 7px;
+}
+@media (min-width: 620px) {
+  body.premium-mode .pm-d-rules-list { grid-template-columns: 1fr 1fr; }
+}
+body.premium-mode .pm-d-rule {
+  padding: 9px 11px !important;
+  border-radius: 12px !important;
+  gap: 9px !important;
+  background: rgba(255,255,255,.028) !important;
+  border: 1px solid var(--pm-border) !important;
+  align-items: center !important;
+}
+body.premium-mode .pm-d-rule-num {
+  width: 20px !important; height: 20px !important; flex: none;
+  font-size: .58rem !important; line-height: 20px !important;
+  border-radius: 50% !important;
+}
+body.premium-mode .pm-d-rule-txt {
+  font-size: .78rem !important; line-height: 1.3 !important;
+}

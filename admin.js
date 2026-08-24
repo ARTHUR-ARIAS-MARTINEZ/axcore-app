@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- PERSISTENCIA ---
     // Lo último que contestó el servidor. Se pinta en pantalla para no
     // andar adivinando por qué no se ve algo.
-    let axEstado = { ok: false, bloques: 0, gimnasios: 0, subidos: 0, error: '' };
+    let axEstado = { ok: false, bloques: 0, gimnasios: 0, subidos: 0, error: '', fallo: '' };
 
     function axPintarEstado() {
         const el = document.getElementById('admin-estado');
@@ -116,30 +116,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            axEstado = { ok: true, bloques: 0, gimnasios: 0, subidos: 0, error: '' };
+            axEstado = { ok: true, bloques: 0, gimnasios: 0, subidos: 0, error: '', fallo: '' };
             const db = await rb.json();
             if (db.success && Array.isArray(db.blocks)) {
                 // MUDANZA (una sola vez): los bloques que ya existian en ESTE
                 // navegador nunca se habian subido. Si el servidor viene vacio
                 // y aqui hay bloques, se suben en vez de borrarlos.
                 if (db.blocks.length === 0 && adminData.blocks.length > 0) {
-                    let subidos = 0;
-                    for (const b of adminData.blocks) {
-                        try {
-                            const r = await fetch(`${API_URL}/api/admin/blocks`, {
-                                method: 'POST',
-                                headers: adminHeaders({ 'Content-Type': 'application/json' }),
-                                body: JSON.stringify({
-                                    id: String(b.id), name: b.name,
-                                    zone: b.zone || '', created: b.created || ''
-                                })
-                            });
-                            const rr = await r.json();
-                            if (rr.success) subidos++;
-                        } catch (e) {}
-                    }
-                    if (subidos > 0) {
-                        alert('Se subieron ' + subidos + ' bloque(s) al servidor.\n\n' +
+                    const r = await axSubirBloques(false);
+                    axEstado.subidos = r.ok;
+                    axEstado.bloques = r.ok;
+                    if (r.fallos.length) axEstado.fallo = r.fallos[0];
+                    if (r.ok > 0) {
+                        alert('Se subieron ' + r.ok + ' bloque(s) al servidor.\n\n' +
                               'A partir de ahora los vas a ver igual desde la computadora y desde el celular.');
                     }
                 } else {
@@ -181,6 +170,42 @@ document.addEventListener('DOMContentLoaded', () => {
         axPintarEstado();
     }
 
+    // Sube al servidor los bloques que viven en ESTE navegador.
+    // Devuelve cuantos entraron y por que fallaron los que fallaron: antes
+    // el error se tragaba un catch vacio y nadie se enteraba de nada.
+    window.axSubirBloques = async function (avisar) {
+        const fallos = [];
+        let ok = 0;
+        for (const b of adminData.blocks) {
+            try {
+                const r = await fetch(`${API_URL}/api/admin/blocks`, {
+                    method: 'POST',
+                    headers: adminHeaders({ 'Content-Type': 'application/json' }),
+                    body: JSON.stringify({
+                        id: String(b.id), name: b.name,
+                        zone: b.zone || '', created: b.created || ''
+                    })
+                });
+                let msg = '';
+                try {
+                    const rr = await r.json();
+                    if (rr && rr.success) { ok++; continue; }
+                    msg = (rr && rr.message) ? rr.message : '';
+                } catch (e) { msg = 'respuesta ilegible'; }
+                fallos.push('HTTP ' + r.status + (msg ? ' — ' + msg : ''));
+            } catch (e) {
+                fallos.push((e && e.message) ? e.message : 'no salio la petición');
+            }
+        }
+        if (avisar) {
+            alert(ok > 0
+                ? ('Subidos: ' + ok + ' bloque(s).' + (fallos.length ? '\n\nFallaron ' + fallos.length + ': ' + fallos[0] : ''))
+                : ('No subió ninguno.\n\nMotivo: ' + (fallos[0] || 'sin bloques que subir')));
+            await axRevisarBloques();
+        }
+        return { ok: ok, fallos: fallos };
+    };
+
     function saveAdminData() {
         localStorage.setItem('arthur_admin_blocks_data', JSON.stringify(adminData));
     }
@@ -189,6 +214,10 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.nav-btn').forEach(btn => {
         btn.onclick = () => {
             const tab = btn.dataset.tab;
+            // El cuadro MANUAL abre otra pagina: no es pestana. Sin esta guarda,
+            // buscaba un panel "tab-undefined", tronaba, y dejaba la pantalla
+            // en blanco con todo escondido.
+            if (!tab) return;
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.admin-pane').forEach(p => p.classList.remove('active'));
             
@@ -281,6 +310,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     Si nunca has creado ninguno, dale a <b>+ NUEVO BLOQUE</b>.
                 </p>
                 <button class="btn-premium small" onclick="axRevisarBloques()">VOLVER A REVISAR</button>
+                <button class="btn-cancel" style="margin-left:8px;" onclick="axSubirBloques(true)">SUBIR LOS DE ESTE EQUIPO</button>
             </div>`;
         }
     }
