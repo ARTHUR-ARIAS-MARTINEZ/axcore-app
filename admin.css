@@ -126,7 +126,7 @@ body {
    antes iba la lista larga. Cada una con su marca y su palabra. */
 .admin-sidebar {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(6, 1fr);
     gap: 9px; margin-bottom: 16px;
 }
 .nav-btn {

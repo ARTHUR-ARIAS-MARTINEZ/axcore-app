@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>MAESTRO AX-CORE | Control de Bloques</title>
     <!-- PWA Support -->
-    <link rel="manifest" href="manifest_admin.json?v=20260823a">
+    <link rel="manifest" href="manifest_admin.json?v=20260823c">
     <meta name="theme-color" content="#0a0b0d">
     <link rel="icon" href="assets/icons/admin-192.png" type="image/png">
     <link rel="apple-touch-icon" href="assets/icons/admin-192.png">
@@ -13,9 +13,9 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="AX Admin">
-    <link rel="stylesheet" href="index.css?v=20260823a">
-    <link rel="stylesheet" href="premium.css?v=20260823a">
-    <link rel="stylesheet" href="admin.css?v=20260823a">
+    <link rel="stylesheet" href="index.css?v=20260823c">
+    <link rel="stylesheet" href="premium.css?v=20260823c">
+    <link rel="stylesheet" href="admin.css?v=20260823c">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
@@ -57,6 +57,7 @@
                 <button class="nav-btn active" data-tab="blocks"><i>▦</i><span>Bloques</span></button>
                 <button class="nav-btn" data-tab="gyms"><i>⚑</i><span>Gimnasios</span></button>
                 <button class="nav-btn" data-tab="codes"><i>⌗</i><span>C&oacute;digos</span></button>
+                <button class="nav-btn" data-tab="users"><i>●</i><span>Atletas</span></button>
                 <button class="nav-btn" data-tab="profits"><i>▲</i><span>Ganancias</span></button>
                 <button class="nav-btn" onclick="window.open('MANUAL_MAESTRO.html', '_blank')"><i>▤</i><span>Manual</span></button>
             </aside>
@@ -125,6 +126,29 @@
                 </div>
 
                 <!-- Tab Ganancias -->
+                <!-- Tab Atletas -->
+                <div id="tab-users" class="admin-pane">
+                    <div class="pane-header">
+                        <h2>QUI&Eacute;N USA LA APP</h2>
+                        <button class="btn-premium small" onclick="renderUsers()">ACTUALIZAR</button>
+                    </div>
+                    <p style="color:var(--text-dim); font-size:.82rem; line-height:1.6; margin-bottom:16px; max-width:60ch;">
+                        Cada atleta que abre la app deja su huella aqu&iacute;: cu&aacute;ntas veces la ha
+                        abierto y cu&aacute;ndo fue la &uacute;ltima. Con <b>CORTAR</b> le cierras el acceso
+                        al instante; con el bot&oacute;n rojo de arriba cortas un gimnasio completo.
+                    </p>
+                    <div id="users-gym-actions" style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px;"></div>
+                    <div class="table-container">
+                        <table>
+                            <thead><tr>
+                                <th>Atleta</th><th>Gimnasio</th><th>Aperturas</th>
+                                <th>&Uacute;ltima vez</th><th>Estado</th><th>Acci&oacute;n</th>
+                            </tr></thead>
+                            <tbody id="users-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+
                 <div id="tab-profits" class="admin-pane">
                     <div class="pane-header">
                         <h2>METRICAS DE TRACCIÓN (INGRESOS)</h2>
@@ -290,7 +314,7 @@
     </div>
 
     <script src="knowledge.js"></script>
-    <script src="admin.js?v=20260823a"></script>
+    <script src="admin.js?v=20260823c"></script>
     <script>
         // ── TEMA DE LA CONSOLA ──
         // Se recuerda en este equipo. Los mismos cinco temas de la app.
@@ -316,7 +340,7 @@
 
 
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js?v=20260823a').catch(() => {});
+            navigator.serviceWorker.register('sw.js?v=20260823c').catch(() => {});
         }
     // --- INSTALACIÓN EN EL CELULAR ---
     // Regla: la caja se muestra SIEMPRE, salvo que esta misma app ya este

@@ -684,6 +684,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (typeof checkAchievements === 'function') checkAchievements();
     }
 
+    // Se llama al abrir y cada 10 minutos mientras la app está abierta.
+    setTimeout(function () { try { window.axLatido(); } catch (e) {} }, 2500);
+    setInterval(function () { try { window.axLatido(); } catch (e) {} }, 600000);
+
     function applySettings() {
         // Migración 2026-08-22: los 10 temas viejos se retiraron. Al atleta que
         // tenía uno de ellos se le pasa a la fusión más cercana de su familia,
@@ -1824,6 +1828,33 @@ document.addEventListener('DOMContentLoaded', () => {
     // Pinta la barra de estado del celular (arriba, donde va la hora y la
     // señal) del mismo color de fondo del tema activo. Sin esto se quedaba
     // siempre en el azul oscuro original y se veía un "escalón" de color.
+    // LATIDO — al abrir, la app le avisa al servidor. Si el maestro cortó el
+    // acceso (a este atleta o a su gimnasio entero), el servidor contesta 403
+    // y la app se cierra sola con el motivo. Es el freno de mano.
+    window.axLatido = async function () {
+        try {
+            const tok = localStorage.getItem('axcore_token');
+            if (!tok) return;
+            const base = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+                ? 'http://localhost:3000'
+                : 'https://axcore-appax-core-backend.onrender.com';
+            const r = await fetch(base + '/api/user/ping', {
+                method: 'POST',
+                headers: { 'Authorization': 'Bearer ' + tok }
+            });
+            if (r.status === 403) {
+                let msg = 'Tu acceso fue suspendido.';
+                try { const d = await r.json(); if (d && d.message) msg = d.message; } catch (e) {}
+                try {
+                    localStorage.removeItem('axcore_token');
+                    localStorage.removeItem('arthur_current_user');
+                } catch (e) {}
+                alert(msg);
+                location.reload();
+            }
+        } catch (e) { /* sin internet: se deja pasar */ }
+    };
+
     window.axSyncThemeColor = function() {
         try {
             const bg = (getComputedStyle(document.body).getPropertyValue('--bg-dark') || '').trim();

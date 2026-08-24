@@ -214,6 +214,94 @@ document.addEventListener('DOMContentLoaded', () => {
         return { ok: ok, fallos: fallos };
     };
 
+    // ── QUIÉN USA LA APP ──
+    let axUsuarios = [];
+
+    window.renderUsers = async function () {
+        const cuerpo = document.getElementById('users-table-body');
+        const acciones = document.getElementById('users-gym-actions');
+        if (!cuerpo) return;
+        cuerpo.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--text-dim);">Consultando&hellip;</td></tr>';
+        try {
+            const r = await fetch(`${API_URL}/api/admin/users`, { headers: adminHeaders() });
+            const d = await r.json();
+            if (!d.success) throw new Error(d.message || 'el servidor no contestó bien');
+            axUsuarios = d.users || [];
+        } catch (e) {
+            cuerpo.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:2rem;color:#ffcf70;">No se pudo consultar: ' + e.message + '</td></tr>';
+            return;
+        }
+
+        if (axUsuarios.length === 0) {
+            cuerpo.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:2.4rem;color:var(--text-dim);line-height:1.6;">Todav&iacute;a nadie ha entrado a la app.<br>En cuanto un atleta la abra, aparece aqu&iacute;.</td></tr>';
+            acciones.innerHTML = '';
+            return;
+        }
+
+        const fecha = (d) => {
+            if (!d) return '—';
+            const x = new Date(d);
+            const dias = Math.floor((Date.now() - x.getTime()) / 86400000);
+            if (dias === 0) return 'Hoy';
+            if (dias === 1) return 'Ayer';
+            if (dias < 30) return 'Hace ' + dias + ' días';
+            return x.toLocaleDateString();
+        };
+
+        cuerpo.innerHTML = axUsuarios
+            .sort((a, b) => new Date(b.lastOpen || 0) - new Date(a.lastOpen || 0))
+            .map(u => `
+            <tr>
+                <td><b>${(u.username || '').replace(/</g, '&lt;')}</b><br><span style="font-size:.7rem;color:var(--text-dim);">${u.code}</span></td>
+                <td>${u.gymCode || '—'}</td>
+                <td style="font-variant-numeric:tabular-nums;">${u.opens || 0}</td>
+                <td>${fecha(u.lastOpen || u.lastSync)}</td>
+                <td>${u.blocked
+                        ? '<span style="color:var(--accent-alert);font-weight:700;">CORTADO</span>'
+                        : '<span style="color:var(--accent-main);font-weight:700;">ACTIVO</span>'}</td>
+                <td>${u.blocked
+                        ? `<button class="btn-premium small" onclick="axCortarAtleta('${u.code}', false)">DEVOLVER</button>`
+                        : `<button class="btn-cancel" onclick="axCortarAtleta('${u.code}', true)">CORTAR</button>`}</td>
+            </tr>`).join('');
+
+        // un botón por gimnasio, para cortar al grupo completo
+        const gyms = [...new Set(axUsuarios.map(u => u.gymCode).filter(Boolean))];
+        acciones.innerHTML = gyms.map(g => {
+            const n = axUsuarios.filter(u => u.gymCode === g).length;
+            return `<button class="btn-cancel" onclick="axCortarGimnasio('${g}', true)">CORTAR ${g} (${n})</button>
+                    <button class="btn-premium small" onclick="axCortarGimnasio('${g}', false)">DEVOLVER ${g}</button>`;
+        }).join('');
+    };
+
+    window.axCortarAtleta = async function (code, cortar) {
+        if (cortar && !confirm('Vas a cerrarle la app a ' + code + '.\n\nSe sale en el acto la próxima vez que su app hable con el servidor. ¿Le seguimos?')) return;
+        try {
+            const r = await fetch(`${API_URL}/api/admin/users/block`, {
+                method: 'POST',
+                headers: adminHeaders({ 'Content-Type': 'application/json' }),
+                body: JSON.stringify({ code, blocked: !!cortar })
+            });
+            const d = await r.json();
+            if (!d.success) throw new Error(d.message || 'HTTP ' + r.status);
+        } catch (e) { return alert('No se pudo: ' + e.message); }
+        renderUsers();
+    };
+
+    window.axCortarGimnasio = async function (gymCode, cortar) {
+        if (cortar && !confirm('Vas a cerrarle la app a TODOS los atletas de ' + gymCode + '.\n\n¿Seguro?')) return;
+        try {
+            const r = await fetch(`${API_URL}/api/admin/users/block-gym`, {
+                method: 'POST',
+                headers: adminHeaders({ 'Content-Type': 'application/json' }),
+                body: JSON.stringify({ gymCode, blocked: !!cortar })
+            });
+            const d = await r.json();
+            if (!d.success) throw new Error(d.message || 'HTTP ' + r.status);
+            alert((cortar ? 'Cortados' : 'Devueltos') + ': ' + (d.afectados || 0) + ' atleta(s).');
+        } catch (e) { return alert('No se pudo: ' + e.message); }
+        renderUsers();
+    };
+
     function saveAdminData() {
         localStorage.setItem('arthur_admin_blocks_data', JSON.stringify(adminData));
     }
@@ -235,6 +323,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (tab === 'codes') renderCodes();
             if (tab === 'profits') calculateProfits();
             if (tab === 'gyms') renderGyms();
+            if (tab === 'users') renderUsers();
         };
     });
 

@@ -125,6 +125,11 @@ const userSchema = new mongoose.Schema({
     data:        { type: mongoose.Schema.Types.Mixed, default: {} }, // payload completo del atleta
     achievements:{ type: [String], default: [] },
     activeSessionId: { type: String, default: '' }, // ID de sesión activa (un solo dispositivo)
+    // Control de uso y de acceso (2026-08-23)
+    blocked:     { type: Boolean, default: false },  // cortado por el maestro
+    blockedAt:   { type: Date, default: null },
+    opens:       { type: Number, default: 0 },       // cuántas veces ha abierto la app
+    lastOpen:    { type: Date, default: null },      // última vez que la abrió
     createdAt:   { type: Date, default: Date.now },
     lastSync:    { type: Date, default: Date.now }
 });
@@ -186,15 +191,32 @@ async function requireUserAuth(req, res, next) {
         const payload = jwt.verify(token, JWT_SECRET);
         req.user = payload; // { code, gymCode, username, sid }
         // Verificar que la sesión siga siendo la activa en la BD
-        if (payload.sid) {
-            const user = await User.findOne({ code: payload.code }, 'activeSessionId').lean();
-            if (!user || user.activeSessionId !== payload.sid) {
-                return res.status(401).json({
-                    success: false,
-                    message: 'Sesión desplazada.',
-                    displaced: true
-                });
-            }
+        // Un solo control para las dos llaves: la sesión activa y el corte de
+        // acceso. Si el maestro cortó al atleta, o apagó su gimnasio completo,
+        // aquí se cae — sin importar que su token siga siendo válido.
+        const user = await User.findOne({ code: payload.code },
+                                        'activeSessionId blocked gymCode').lean();
+        if (!user) return res.status(401).json({ success: false, message: 'Cuenta no encontrada.' });
+
+        if (user.blocked) {
+            return res.status(403).json({
+                success: false, blocked: true,
+                message: 'Tu acceso fue suspendido. Habla con tu gimnasio.'
+            });
+        }
+        const gym = await Gym.findOne({ gymCode: user.gymCode }, 'active').lean();
+        if (gym && gym.active === false) {
+            return res.status(403).json({
+                success: false, blocked: true,
+                message: 'El acceso de tu gimnasio está suspendido.'
+            });
+        }
+        if (payload.sid && user.activeSessionId !== payload.sid) {
+            return res.status(401).json({
+                success: false,
+                message: 'Sesión desplazada.',
+                displaced: true
+            });
         }
         next();
     } catch {
@@ -327,6 +349,40 @@ app.delete('/api/admin/blocks/:id', requireAdminAuth, async (req, res) => {
     try {
         await Block.deleteOne({ id: req.params.id });
         res.json({ success: true });
+    } catch (e) { res.status(500).json({ success: false, message: e.message }); }
+});
+
+// ── QUIÉN USA LA APP ─────────────────────────────────────────────────────
+app.get('/api/admin/users', requireAdminAuth, async (req, res) => {
+    try {
+        const users = await User.find({},
+            'code gymCode username email opens lastOpen lastSync blocked createdAt').lean();
+        res.json({ success: true, users });
+    } catch (e) { res.status(500).json({ success: false, message: e.message }); }
+});
+
+// Cortar o devolver el acceso de UN atleta. Al cortar se le tumba la sesión
+// en el acto: la próxima vez que la app hable con el servidor, se sale sola.
+app.post('/api/admin/users/block', requireAdminAuth, async (req, res) => {
+    try {
+        const { code, blocked } = req.body || {};
+        if (!code) return res.status(400).json({ success: false, message: 'code requerido.' });
+        const set = { blocked: !!blocked, blockedAt: blocked ? new Date() : null };
+        if (blocked) set.activeSessionId = '';
+        await User.updateOne({ code: String(code).toUpperCase() }, { $set: set });
+        res.json({ success: true });
+    } catch (e) { res.status(500).json({ success: false, message: e.message }); }
+});
+
+// Cortar o devolver el acceso de TODO un gimnasio de un golpe.
+app.post('/api/admin/users/block-gym', requireAdminAuth, async (req, res) => {
+    try {
+        const { gymCode, blocked } = req.body || {};
+        if (!gymCode) return res.status(400).json({ success: false, message: 'gymCode requerido.' });
+        const set = { blocked: !!blocked, blockedAt: blocked ? new Date() : null };
+        if (blocked) set.activeSessionId = '';
+        const r = await User.updateMany({ gymCode: String(gymCode).toUpperCase() }, { $set: set });
+        res.json({ success: true, afectados: r.modifiedCount || 0 });
     } catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
@@ -636,6 +692,17 @@ app.post('/api/user/sync', requireUserAuth, async (req, res) => {
             );
         }
         res.json({ success: true, lastSync: update.lastSync });
+    } catch (e) { res.status(500).json({ success: false, message: e.message }); }
+});
+
+// LATIDO — la app del atleta avisa cada vez que se abre. Es lo único que
+// permite saber quién la usa de verdad y quién solo la instaló. No guarda
+// NADA de lo que hizo: solo que la abrió y cuándo.
+app.post('/api/user/ping', requireUserAuth, async (req, res) => {
+    try {
+        await User.updateOne({ code: req.user.code },
+                             { $inc: { opens: 1 }, $set: { lastOpen: new Date() } });
+        res.json({ success: true });
     } catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
