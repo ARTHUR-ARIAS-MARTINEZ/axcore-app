@@ -5185,3 +5185,200 @@ body.premium-mode .ax-fit-reset:hover { background: rgba(255,71,87,.10); }
 @media (max-width: 380px) {
   body.premium-mode .ax-fit-form { grid-template-columns: 1fr !important; }
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   CALCULADORA — mismo trato que el perfil antropométrico: cada número es
+   una ficha, no una caja gris. Filo de tres tonos arriba de cada tarjeta.
+   ═══════════════════════════════════════════════════════════════════════ */
+body.premium-mode #page-assistant .glass-card {
+  position: relative; overflow: hidden;
+  border-radius: 22px !important;
+}
+body.premium-mode #page-assistant .glass-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg,
+      var(--accent-tri, var(--accent-main)), var(--accent-main) 52%, var(--accent-secondary));
+}
+/* el borde suelto de la izquierda ya no hace falta */
+body.premium-mode #page-assistant .glass-card[style*="border-left"] {
+  border-left: 1px solid var(--pm-border) !important;
+}
+
+/* HOY INGERISTE — tres fichas con el número en grande */
+body.premium-mode #page-assistant .ax-tiles { gap: 9px !important; margin-top: 14px !important; }
+body.premium-mode #page-assistant .ax-tile {
+  background: rgba(0,0,0,.24) !important;
+  border: 1px solid var(--pm-border) !important;
+  border-radius: 15px !important;
+  padding: 12px 8px 10px !important;
+  position: relative; overflow: hidden;
+}
+body.premium-mode #page-assistant .ax-tile::after {
+  content: ''; position: absolute; left: 12px; right: 12px; bottom: 0; height: 2px;
+  border-radius: 2px; opacity: .55;
+  background: linear-gradient(90deg, var(--accent-main), var(--accent-secondary));
+}
+body.premium-mode #page-assistant .ax-tile strong {
+  font-family: 'Oswald', sans-serif !important;
+  font-size: 1.32rem !important; font-weight: 600 !important;
+  line-height: 1.1 !important; color: var(--accent-main) !important;
+  font-variant-numeric: tabular-nums;
+}
+body.premium-mode #page-assistant .ax-tile span {
+  font-family: 'Oswald', sans-serif !important;
+  font-size: .5rem !important; letter-spacing: 1.6px !important;
+  text-transform: uppercase; color: var(--pm-dim2) !important;
+  margin-top: 5px; display: block;
+}
+
+/* encabezado de cada herramienta */
+body.premium-mode .pm-calc-hdr { align-items: center !important; gap: 10px !important; }
+body.premium-mode .pm-calc-icon {
+  width: 34px !important; height: 34px !important; flex: none;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  background: rgba(var(--pm-green-rgb), .10);
+  border: 1px solid rgba(var(--pm-green-rgb), .22);
+}
+body.premium-mode .pm-calc-icon svg { width: 17px; height: 17px; }
+body.premium-mode .pm-calc-title {
+  font-family: 'Oswald', sans-serif !important;
+  font-size: .92rem !important; font-weight: 700 !important;
+  letter-spacing: 2px !important; text-transform: uppercase;
+  color: var(--pm-white) !important;
+}
+body.premium-mode .pm-calc-desc {
+  font-size: .76rem !important; line-height: 1.5 !important;
+  color: var(--pm-dim2) !important; margin: 9px 0 14px !important;
+}
+body.premium-mode .pm-calc-sub {
+  font-size: .68rem !important; color: var(--pm-dim2) !important; opacity: .8;
+  margin-top: 10px !important;
+}
+
+/* el campo de escribir el alimento: ficha, no caja */
+body.premium-mode .pm-calc-input {
+  background: rgba(0,0,0,.24) !important;
+  border: 1px solid var(--pm-border) !important;
+  border-radius: 15px !important;
+  padding: 14px 15px !important;
+  color: var(--pm-white) !important;
+  font-family: 'Inter', sans-serif !important; font-size: .95rem !important;
+  outline: none !important; transition: border-color .22s, box-shadow .22s !important;
+}
+body.premium-mode .pm-calc-input:focus {
+  border-color: rgba(var(--pm-green-rgb), .45) !important;
+  box-shadow: 0 0 0 3px rgba(var(--pm-green-rgb), .12) !important;
+}
+body.premium-mode .pm-calc-input::placeholder { color: var(--pm-dim2) !important; opacity: .5; }
+
+body.premium-mode #page-assistant .ax-qty-line { gap: 9px !important; margin-top: 11px !important; }
+body.premium-mode #page-assistant .ax-qty-line label {
+  font-family: 'Oswald', sans-serif; font-size: .54rem;
+  letter-spacing: 1.6px; text-transform: uppercase;
+  color: var(--pm-dim2) !important;
+}
+body.premium-mode #page-assistant .ax-qty {
+  border-radius: 13px !important; border-color: var(--pm-border) !important;
+  background: rgba(0,0,0,.24);
+}
+body.premium-mode #page-assistant .ax-qty-btn { color: var(--accent-main) !important; }
+body.premium-mode #page-assistant .ax-qty-input {
+  font-family: 'Oswald', sans-serif !important; color: var(--pm-white) !important;
+}
+body.premium-mode .pm-calc-btn {
+  border: none !important; border-radius: 99px !important;
+  padding: .8rem 1.2rem !important;
+  font-family: 'Oswald', sans-serif !important; font-weight: 700 !important;
+  font-size: .7rem !important; letter-spacing: 1.6px !important;
+  color: #0a0a0a !important;
+  background: linear-gradient(122deg,
+      var(--accent-tri, var(--accent-main)) 0%, var(--accent-main) 30%, var(--accent-secondary) 100%) !important;
+  box-shadow: 0 5px 18px rgba(var(--pm-green-rgb), .26), inset 0 1px 0 rgba(255,255,255,.22) !important;
+}
+body.premium-mode .pm-calc-btn:active { transform: scale(.97); }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   WORKOUT — mismas medidas, mejor acabado: superficie con degradado, filo
+   de luz arriba, franja del color de su grupo muscular (sobrepuesta, no
+   mueve nada), el número como ficha y la palomita como píldora.
+   ═══════════════════════════════════════════════════════════════════════ */
+body.premium-mode .exercise-card {
+  position: relative; overflow: hidden;
+  background: linear-gradient(158deg, var(--pm-s3), var(--pm-s2) 48%, var(--pm-s1)) !important;
+  border: 1px solid var(--pm-border) !important;
+  border-radius: 15px !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.05), 0 6px 16px rgba(0,0,0,.20) !important;
+  transition: transform .14s cubic-bezier(.34,1.56,.64,1), border-color .2s, box-shadow .22s !important;
+}
+/* franja del grupo muscular: va encima, no empuja el contenido */
+body.premium-mode .exercise-card::before {
+  content: ''; position: absolute; top: 0; left: 0; bottom: 0; width: 3px;
+  background: var(--ex-color, rgba(255,255,255,.14));
+  opacity: .85;
+}
+body.premium-mode .exercise-card[data-filter-key="cardio"]  { --ex-color: #22d3ee; }
+body.premium-mode .exercise-card[data-filter-key="hiit"]    { --ex-color: #f43f5e; }
+body.premium-mode .exercise-card[data-filter-key="pierna"]  { --ex-color: #a78bfa; }
+body.premium-mode .exercise-card[data-filter-key="gluteo"]  { --ex-color: #ec4899; }
+body.premium-mode .exercise-card[data-filter-key="pecho"]   { --ex-color: #f97316; }
+body.premium-mode .exercise-card[data-filter-key="espalda"] { --ex-color: #3b82f6; }
+body.premium-mode .exercise-card[data-filter-key="hombro"]  { --ex-color: #facc15; }
+body.premium-mode .exercise-card[data-filter-key="brazo"]   { --ex-color: #84cc16; }
+body.premium-mode .exercise-card[data-filter-key="core"]    { --ex-color: #94a3b8; }
+
+body.premium-mode .exercise-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(var(--pm-green-rgb), .28) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 12px 26px rgba(0,0,0,.30) !important;
+}
+body.premium-mode .exercise-card:active { transform: scale(.985); }
+
+body.premium-mode .ex-badge {
+  display: inline-block;
+  border-radius: 99px !important;
+  padding: 2px 7px !important;
+  font-family: 'Oswald', sans-serif !important;
+  letter-spacing: 1px !important; font-weight: 600 !important;
+}
+body.premium-mode .ex-title { letter-spacing: .6px !important; }
+body.premium-mode .ex-cal-info {
+  font-family: 'Oswald', sans-serif !important;
+  letter-spacing: .8px !important;
+  color: var(--accent-main) !important; opacity: .85;
+}
+/* el número, como ficha */
+body.premium-mode .ex-input-wrapper {
+  background: rgba(0,0,0,.26);
+  border: 1px solid var(--pm-border);
+  border-radius: 11px;
+  padding: 3px 8px 3px 9px;
+  transition: border-color .2s, box-shadow .2s;
+}
+body.premium-mode .ex-input-wrapper:focus-within {
+  border-color: rgba(var(--pm-green-rgb), .45);
+  box-shadow: 0 0 0 2px rgba(var(--pm-green-rgb), .12);
+}
+body.premium-mode .ex-input.ex-num {
+  background: transparent !important; border: none !important; outline: none !important;
+  font-family: 'Oswald', sans-serif !important; font-weight: 600 !important;
+  color: var(--pm-white) !important; font-variant-numeric: tabular-nums;
+  -moz-appearance: textfield;
+}
+body.premium-mode .ex-input.ex-num::-webkit-outer-spin-button,
+body.premium-mode .ex-input.ex-num::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+body.premium-mode .ex-unit-lbl {
+  font-family: 'Oswald', sans-serif !important;
+  letter-spacing: 1px !important; color: var(--pm-dim2) !important;
+}
+/* la palomita, píldora con el degradado del tema */
+body.premium-mode .btn-ex-check.ex-ok {
+  border: none !important; border-radius: 99px !important;
+  color: #0a0a0a !important; font-weight: 800 !important;
+  background: linear-gradient(122deg,
+      var(--accent-tri, var(--accent-main)) 0%, var(--accent-main) 30%, var(--accent-secondary) 100%) !important;
+  box-shadow: 0 3px 12px rgba(var(--pm-green-rgb), .28), inset 0 1px 0 rgba(255,255,255,.22) !important;
+  transition: transform .12s !important;
+}
+body.premium-mode .btn-ex-check.ex-ok:active { transform: scale(.9); }
