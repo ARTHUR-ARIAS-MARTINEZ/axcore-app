@@ -15,9 +15,9 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0a0e14">
     <link rel="apple-touch-icon" href="logo.png">
-    <link rel="stylesheet" href="index.css?v=20260824c">
+    <link rel="stylesheet" href="index.css?v=20260824d">
     <!-- Premium UI overrides (inerte si <body> NO tiene .premium-mode) -->
-    <link rel="stylesheet" href="premium.css?v=20260824c">
+    <link rel="stylesheet" href="premium.css?v=20260824d">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <!-- Fuentes: Inter para cuerpos de texto, Oswald (Heavy Gym) para titulares -->
@@ -827,8 +827,20 @@
                         </div>
                         <button class="pm-calc-btn pm-calc-btn-green" id="btn-calc-compensate" style="flex:1;">ANALIZAR</button>
                     </div>
-                    <div class="pm-calc-sub">También puedes escribir directamente las kcal (ej. <strong>300</strong>).</div>
-                    <div id="calc-compensate-result" style="margin-top:1rem;"></div>
+                    <div class="ax-calc-atajos">
+                        <button type="button" class="ax-chip" onclick="axLlenaCalc('taco de adobada')">Taco</button>
+                        <button type="button" class="ax-chip" onclick="axLlenaCalc('refresco')">Refresco</button>
+                        <button type="button" class="ax-chip" onclick="axLlenaCalc('cerveza')">Cerveza</button>
+                        <button type="button" class="ax-chip" onclick="axLlenaCalc('pizza')">Pizza</button>
+                        <button type="button" class="ax-chip" onclick="axLlenaCalc('300')">300 kcal</button>
+                    </div>
+                    <div class="pm-calc-sub">Tambi&eacute;n puedes escribir las kcal directas (ej. <strong>300</strong>).</div>
+                    <div id="calc-compensate-result" class="ax-calc-out">
+                        <div class="ax-calc-vacio">
+                            <span class="ax-calc-vacio-ico">&#9788;</span>
+                            <span>Escribe algo y toca <b>ANALIZAR</b>.<br>Aqu&iacute; te salen las calor&iacute;as, los macros y qu&eacute; ejercicio lo quema.</span>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- 4. PROYECCIÓN A META -->
@@ -839,7 +851,12 @@
                     </div>
                     <p class="pm-calc-desc">Con tu ritmo actual, cuándo llegas a tu peso meta y cuántos gramos por día.</p>
                     <button class="btn-premium" id="btn-calc-projection" style="width:100%; padding:0.9rem; font-weight:bold;">VER PROYECCIÓN</button>
-                    <div id="calc-projection-result" style="margin-top:1rem;"></div>
+                    <div id="calc-projection-result" class="ax-calc-out">
+                        <div class="ax-calc-vacio">
+                            <span class="ax-calc-vacio-ico">&#9873;</span>
+                            <span>Toca <b>VER PROYECCI&Oacute;N</b>.<br>Te digo la fecha en que llegas a tu meta con el ritmo que traes.</span>
+                        </div>
+                    </div>
                 </div>
 
             </div>
@@ -979,14 +996,14 @@
 
     <!-- Gráficas (Al final para no bloquear inicio rápido) -->
     <script src="https://cdn.jsdelivr.net/npm/apexcharts" defer></script>
-    <script src="profile-persist.js?v=20260824c"></script>
-    <script src="knowledge.js?v=20260824c"></script>
-    <script src="app.js?v=20260824c"></script>
+    <script src="profile-persist.js?v=20260824d"></script>
+    <script src="knowledge.js?v=20260824d"></script>
+    <script src="app.js?v=20260824d"></script>
     <!-- Premium UI: catálogo de insignias + FAB + onboarding -->
-    <script src="premium-badges.js?v=20260824c"></script>
-    <script src="premium-extras.js?v=20260824c"></script>
+    <script src="premium-badges.js?v=20260824d"></script>
+    <script src="premium-extras.js?v=20260824d"></script>
     <!-- Botón "atrás" del teléfono: retrocede dentro de la app en vez de cerrarla -->
-    <script src="axcore-back.js?v=20260824c"></script>
+    <script src="axcore-back.js?v=20260824d"></script>
 
     <!-- REGISTRO GLOBAL — funciona aunque app.js falle -->
     <script>
@@ -1064,7 +1081,7 @@
         // Registro del Service Worker de PWA unificado con detección de actualizaciones y auto-refresco
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=20260824c').then(reg => {
+                navigator.serviceWorker.register('sw.js?v=20260824d').then(reg => {
                     console.log('[AX-CORE] Service Worker registrado con éxito:', reg.scope);
 
                     // MEJORA (v5.56): revisar si hay versión nueva CADA VEZ que la app vuelve

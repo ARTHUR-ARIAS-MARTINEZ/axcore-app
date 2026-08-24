@@ -2904,8 +2904,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 <!-- REGISTRO RAPIDO — vive entre las calorias y el plan, sin pestaña -->
                 <div class="pm-d-quick" id="pmDt-log">
+                    <input type="text" id="food-desc" class="pm-d-reg-input" placeholder="¿Qué comiste? Ej. taco de adobada">
                     <div class="pm-d-quick-row">
-                        <input type="text" id="food-desc" class="pm-d-reg-input" placeholder="¿Qué comiste? Ej. taco de adobada">
+                        <label id="food-unit-lbl" class="pm-d-quick-unit">Cantidad</label>
                         <div class="ax-qty">
                             <button type="button" class="ax-qty-btn" data-qty="food-qty" data-dir="-1">−</button>
                             <input type="number" id="food-qty" class="ax-qty-input" value="1" min="1" step="1">
@@ -2913,7 +2914,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                         <button class="pm-d-reg-add" id="btn-add-food">AGREGAR</button>
                     </div>
-                    <label id="food-unit-lbl" class="pm-d-quick-unit">Cantidad</label>
 
                     <div class="pm-d-quick-macros">
                         <span><b>${macroTot.p}g</b> proteína</span>
@@ -2927,10 +2927,6 @@ document.addEventListener('DOMContentLoaded', () => {
                             : foodLog.map((f, i) => `<div class="pm-d-food-item"><div style="flex:1; min-width:0;"><span class="pm-d-food-name">${(f.desc || '').toString().replace(/</g,'&lt;')}</span></div><span class="pm-d-food-cal">${f.cal || 0}<small>kcal</small></span><button class="pm-d-food-del" onclick="window.deleteFoodLog(${i})" title="Quitar" aria-label="Quitar" style="background:transparent;border:none;color:#ff5c6c;font-size:1rem;line-height:1;cursor:pointer;padding:2px 8px;margin-left:6px;flex-shrink:0;">✕</button></div>`).join('')
                         }
                     </div>
-                </div>
-
-                <!-- PESTAÑAS (la activa se conserva entre re-renders: al agregar un
-                     alimento se re-dibuja la página y antes te regresaba a MI PLAN) -->
                 </div>
 
                 <!-- ─── TAB MI PLAN ─── -->
@@ -4779,6 +4775,16 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.clear();
             location.reload();
         }
+    };
+
+    // Los atajos de la calculadora: se toca uno y el campo se llena solo.
+    // Es lo que mas se come, para no tener que escribirlo cada vez.
+    window.axLlenaCalc = function (texto) {
+        const campo = document.getElementById('calc-extra-cal');
+        if (!campo) return;
+        campo.value = texto;
+        campo.focus();
+        campo.dispatchEvent(new Event('input', { bubbles: true }));
     };
 
     // --- CALCULADORA INTELIGENTE 100% CÓDIGO (sin IA) ---

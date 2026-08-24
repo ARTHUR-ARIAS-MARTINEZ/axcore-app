@@ -5280,9 +5280,13 @@ body.premium-mode #page-assistant .ax-qty-line label {
   color: var(--pm-dim2) !important;
 }
 body.premium-mode #page-assistant .ax-qty {
+  flex: none !important; width: auto !important;
   border-radius: 13px !important; border-color: var(--pm-border) !important;
   background: rgba(0,0,0,.24);
 }
+body.premium-mode #page-assistant .ax-qty-line { flex-wrap: wrap; align-items: center; }
+body.premium-mode #page-assistant .ax-qty-line label { flex: none; }
+body.premium-mode #page-assistant .pm-calc-btn { flex: 1 1 130px; }
 body.premium-mode #page-assistant .ax-qty-btn { color: var(--accent-main) !important; }
 body.premium-mode #page-assistant .ax-qty-input {
   font-family: 'Oswald', sans-serif !important; color: var(--pm-white) !important;
@@ -5382,3 +5386,48 @@ body.premium-mode .btn-ex-check.ex-ok {
   transition: transform .12s !important;
 }
 body.premium-mode .btn-ex-check.ex-ok:active { transform: scale(.9); }
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   CALCULADORA — se veía vacía porque el resultado era un recuadro en
+   blanco esperando. Ahora ese espacio dice para qué sirve, y arriba hay
+   atajos de lo que más se come: se toca uno y el campo se llena solo.
+   ═══════════════════════════════════════════════════════════════════════ */
+body.premium-mode .ax-calc-atajos {
+  display: flex; flex-wrap: wrap; gap: 6px; margin-top: 11px;
+}
+body.premium-mode .ax-chip {
+  cursor: pointer;
+  background: rgba(var(--pm-green-rgb), .09);
+  border: 1px solid rgba(var(--pm-green-rgb), .24);
+  color: var(--accent-main);
+  border-radius: 99px; padding: .42rem .85rem;
+  font-family: 'Oswald', sans-serif; font-size: .62rem;
+  letter-spacing: 1.1px; text-transform: uppercase;
+  transition: all .18s;
+}
+body.premium-mode .ax-chip:hover { background: rgba(var(--pm-green-rgb), .17); }
+body.premium-mode .ax-chip:active { transform: scale(.94); }
+
+body.premium-mode .ax-calc-out {
+  margin-top: 13px;
+  background: rgba(0,0,0,.24);
+  border: 1px solid var(--pm-border);
+  border-radius: 16px;
+  padding: 14px;
+  min-height: 0;
+}
+body.premium-mode .ax-calc-vacio {
+  display: flex; align-items: flex-start; gap: 11px;
+  font-size: .78rem; line-height: 1.5;
+  color: var(--pm-dim2, #7f93a8);
+}
+body.premium-mode .ax-calc-vacio b { color: var(--accent-main); font-weight: 600; }
+body.premium-mode .ax-calc-vacio-ico {
+  flex: none; width: 30px; height: 30px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%; font-size: 14px;
+  color: var(--accent-main);
+  background: rgba(var(--pm-green-rgb), .10);
+  border: 1px solid rgba(var(--pm-green-rgb), .22);
+}
