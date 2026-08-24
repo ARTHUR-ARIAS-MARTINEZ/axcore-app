@@ -213,8 +213,7 @@ var next  = document.getElementById('gxNext');
 track.innerHTML = PASOS.map(function (p, i) {
   return '<div class="gx-slide">' +
     '<div class="gx-shot">' +
-      '<img src="assets/guia/' + p.img + '.png" alt="' + p.title + '" ' +
-      'onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">' +
+      '<img data-img="' + p.img + '" alt="' + p.title + '">' +
       '<div class="gx-ph" style="display:none"><b>' + (i + 1) + '</b>Aqu&iacute; va la imagen<br>assets/guia/' + p.img + '.png</div>' +
       '<div class="gx-veil"></div>' +
       '<div class="gx-over">' +
@@ -225,6 +224,23 @@ track.innerHTML = PASOS.map(function (p, i) {
     '</div>' +
   '</div>';
 }).join('');
+
+// Las fotos van en WebP: pesan una décima parte que el original y en el
+// celular se ven igual. Si alguna no estuviera en WebP se intenta el PNG, y
+// si tampoco, sale el hueco con su número. El src se pone DESPUÉS de
+// enganchar el plan B, para no perder el aviso si la imagen falla rápido.
+track.querySelectorAll('.gx-shot img').forEach(function (im) {
+  im.addEventListener('error', function () {
+    if (!this.dataset.b) {
+      this.dataset.b = '1';
+      this.src = 'assets/guia/' + this.dataset.img + '.png';
+    } else {
+      this.style.display = 'none';
+      this.nextElementSibling.style.display = 'flex';
+    }
+  });
+  im.src = 'assets/guia/' + im.dataset.img + '.webp';
+});
 
 dots.innerHTML = PASOS.map(function (p, i) {
   return '<span class="gx-dot' + (i === 0 ? ' on' : '') + '" data-i="' + i + '"></span>';
