@@ -2845,7 +2845,7 @@ document.addEventListener('DOMContentLoaded', () => {
                      alimento se re-dibuja la página y antes te regresaba a MI PLAN) -->
                 <div class="pm-d-tabs">
                     <div class="pm-d-tab ${pmDietTab === 'plan' ? 'on' : ''}" data-d-tab="plan">MI PLAN</div>
-                    <div class="pm-d-tab ${pmDietTab === 'rules' ? 'on' : ''}" data-d-tab="rules">REGLAS</div>
+                    <div class="pm-d-tab ${pmDietTab === 'rules' ? 'on' : ''}" data-d-tab="rules">EXTRAS</div>
                 </div>
 
                 <!-- ─── TAB MI PLAN ─── -->
@@ -2876,14 +2876,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 <!-- ─── TAB REGISTRAR ALIMENTO ─── -->
                 <!-- ─── TAB REGLAS ─── -->
                 <div class="pm-d-panel ${pmDietTab === 'rules' ? 'on' : ''}" id="pmDt-rules">
-                    <div class="pm-d-log-hint">${hasCustomRules ? 'Las reglas de tu plan' : 'Ejemplos. Las tuyas salen solas al pegar tu dieta.'}</div>
+                    <div class="pm-d-log-hint">${hasCustomRules ? 'Lo que acompaña a tu dieta: agua, ayuno, permitidos.' : 'Ejemplos. Los tuyos salen solos al pegar tu dieta.'}</div>
                     <div class="pm-d-rules-list" id="rules-list-display">
                         ${hasCustomRules
                             ? rules.map((r, i) => `<div class="pm-d-rule"><div class="pm-d-rule-num">${i+1}</div><div class="pm-d-rule-txt">${axCortar(r, 64)}</div></div>`).join('')
                             : RULE_EXAMPLES.map((r, i) => `<div class="pm-d-rule ax-example"><div class="pm-d-rule-num">${i+1}</div><div class="pm-d-rule-txt">${axCortar(r, 64)}</div></div>`).join('')
                         }
                     </div>
-                    <button class="btn-premium" id="btn-edit-rules" style="width:100%; margin-top:14px;">✏️ EDITAR REGLAS</button>
+                    <button class="btn-premium" id="btn-edit-rules" style="width:100%; margin-top:14px;">EDITAR EXTRAS</button>
                 </div>
             </div>
         `;
@@ -2919,7 +2919,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const current = (userData.customDietRules && userData.customDietRules.length > 0)
                     ? userData.customDietRules
                     : rules;
-                const text = await axPrompt("Edita tus reglas de protocolo (una por línea):", current.join('\n'));
+                const text = await axPrompt("Un extra por renglón. Cosas generales, agua, ayuno, permitidos. La comida va en MI PLAN.", current.join('\n'));
                 if (text === null) return;
                 const newRules = text.split('\n').map(s => s.trim()).filter(Boolean);
                 userData.customDietRules = newRules;

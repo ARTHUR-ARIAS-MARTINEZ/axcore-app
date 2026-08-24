@@ -4888,7 +4888,8 @@ body.premium-mode .pm-d-quick-unit {
   color: var(--pm-dim2, #7f93a8); opacity: .75;
 }
 body.premium-mode .pm-d-quick-macros {
-  display: flex; gap: 14px; flex-wrap: wrap;
+  display: flex; gap: 18px; flex-wrap: wrap;
+  justify-content: center; text-align: center;
   margin: 10px 0 4px; padding-top: 10px;
   border-top: 1px solid rgba(255,255,255,.05);
   font-size: .68rem; color: var(--pm-dim2, #7f93a8);

@@ -15,11 +15,21 @@
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
+/* index.css deja el <body> clavado a la altura de la pantalla y sin scroll,
+   porque en la app del atleta quien scrollea es .content-area. La consola no
+   tiene ese contenedor: aquí scrollea la página, o no se ve nada de la mitad
+   para abajo (bloques, desglose de ganancias, tablas). */
+html, body {
+    height: auto !important;
+    min-height: 100% !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    position: static !important;
+}
 body {
     color: var(--text-primary);
     font-family: var(--font-main), 'Inter', sans-serif;
-    min-height: 100vh;
-    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
 }
 
 .hidden { display: none !important; }

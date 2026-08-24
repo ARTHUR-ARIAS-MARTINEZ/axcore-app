@@ -63,7 +63,15 @@ document.addEventListener('DOMContentLoaded', () => {
     async function showAdmin() {
         loginOverlay.classList.add('hidden');
         adminContainer.classList.remove('hidden');
-        await loadAdminData();   // ESPERAR a que cargue
+        // Primero se pinta con lo que ya hay guardado en este equipo, para que
+        // la pantalla NUNCA se vea vacia mientras el servidor contesta (Render
+        // tarda en despertar). Cuando contesta, se vuelve a pintar.
+        try {
+            const cache = localStorage.getItem('arthur_admin_blocks_data');
+            if (cache) { adminData = JSON.parse(cache); renderBlocks(); updateGymBlockSelect(); }
+        } catch (e) {}
+
+        await loadAdminData();
         renderBlocks();
         updateGymBlockSelect();  // Actualizar dropdown después de cargar
         renderGyms();
