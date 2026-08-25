@@ -45,3 +45,7 @@ GUIA_CONFIGURACION.html
 
 # Originales pesados de insignias (se sirven las .webp optimizadas)
 assets/insignias/_originales/
+
+# La carpeta de venta NO se publica: trae el guion, los margenes y lo que
+# gana Arthur por gimnasio. Vive solo en su computadora.
+VENTA/
