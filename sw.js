@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'axcore-v5.91-compartir';
+﻿const CACHE_NAME = 'axcore-v5.92-seguridad';
 const urlsToCache = [
   './',
   './index.html?v=20260824e',

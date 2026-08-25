@@ -166,10 +166,8 @@ const NUTRITION_ADVANCES = [
  * SISTEMA DE PLANES Y CÓDIGOS DE GIMNASIO
  * ================================================================
  * 
- * PLANES DISPONIBLES:
- *   BÁSICO   → $1,500 MXN/mes → Hasta 50 usuarios
- *   ESTÁNDAR → $2,000 MXN/mes → Hasta 100 usuarios
- *   PREMIUM  → $3,000 MXN/mes → Hasta 200 usuarios
+ * PLANES DISPONIBLES: BÁSICO, PRO y ÉLITE.
+ * La renta de cada uno vive en el servidor, no en este archivo (se publica).
  * 
  * Los códigos se generan AUTOMÁTICAMENTE desde el Panel Admin (admin.html).
  * Arthur NO necesita tocar este archivo para nada.
@@ -186,30 +184,29 @@ const NUTRITION_ADVANCES = [
 
 // Planes de negocio.
 // maxUsers = TOTAL de códigos que puede generar el coach (atletas + los de regalo
-// para los propios coaches). El gimnasio revende el acceso a $60/atleta: su utilidad
-// mensual es (atletas × 60) − price.
-//   BÁSICO 35 atletas + 1 coach = 36 → 35×60 = $2,100 − $1,500 = $600 de utilidad
-//   PRO    70 atletas + 2 coach = 72 → 70×60 = $4,200 − $2,500 = $1,700 de utilidad
-//   ÉLITE 140 atletas + 3 coach = 143 → 140×60 = $8,400 − $3,000 = $5,400 de utilidad
+// para los propios coaches).
 // Las claves (basico/estandar/premium) NO se cambian: hay gimnasios ya guardados con
-// ellas en MongoDB. Solo cambian el nombre visible, el precio y el cupo.
+// ellas en MongoDB. Solo cambian el nombre visible y el cupo.
+// Cupos por plan. La RENTA no vive aqui: este archivo se publica y cualquiera
+// lo puede leer. El precio de cada plan lo pone el servidor (PLAN_LIMITS.rent),
+// que si pide clave, y viaja en el campo "rent" de cada gimnasio.
 const AX_PLANS = {
-    basico:   { name: "BÁSICO", price: 1500, maxUsers: 36,  athletes: 35,  coaches: 1, color: "#00ff88" },
-    estandar: { name: "PRO",    price: 2500, maxUsers: 72,  athletes: 70,  coaches: 2, color: "#00d4ff" },
-    premium:  { name: "ÉLITE",  price: 3000, maxUsers: 143, athletes: 140, coaches: 3, color: "#ffd700" }
+    basico:   { name: "BÁSICO", maxUsers: 36,  athletes: 35,  coaches: 1, color: "#00ff88" },
+    estandar: { name: "PRO",    maxUsers: 72,  athletes: 70,  coaches: 2, color: "#00d4ff" },
+    premium:  { name: "ÉLITE",  maxUsers: 143, athletes: 140, coaches: 3, color: "#ffd700" }
 };
 
 // Lo que el gimnasio le cobra de más a cada atleta por el acceso a la app.
-const AX_PRECIO_ATLETA = 60;
+const AX_PRECIO_ATLETA = 0; // lo define Arthur en cada negociacion; no se publica
 
 /**
  * GYM_CODES se carga DINÁMICAMENTE desde localStorage (admin genera los códigos).
  * Se mantiene AXV-DEMO como código de prueba manual.
  */
+// Solo el codigo de demostracion. Los codigos reales los genera el coach
+// desde su panel y viven en el servidor, nunca en este archivo publico.
 const GYM_CODES_STATIC = {
-    "AXV-DEMO": { plan: "basico", active: true },
-    "AX-BOSS1": { plan: "estandar", active: true },
-    "AX-BOSS2": { plan: "premium", active: true }
+    "AXV-DEMO": { plan: "basico", active: true }
 };
 
 // Cargar códigos dinámicos del Admin

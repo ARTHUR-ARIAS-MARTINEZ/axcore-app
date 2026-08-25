@@ -505,7 +505,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const planInfo = AX_PLANS[selectedPlan];
         const gymCode = generateGymCode(selectedPlan);
         const password = generatePassword();
-        const rent = planInfo.price;
+        // La renta la pone el servidor segun el plan (PLAN_LIMITS.rent).
 
         // Encontrar el nombre del bloque
         const block = adminData.blocks.find(b => b.id === bid);
@@ -518,7 +518,6 @@ document.addEventListener('DOMContentLoaded', () => {
             coach: gcoach,
             plan: selectedPlan,
             maxUsers: planInfo.maxUsers,
-            rent: rent,
             active: true,
             blockId: bid,
             password: password
@@ -714,7 +713,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                     <div style="font-size:0.75rem; color:#ffaa00; text-align:center; margin-bottom:5px;">🔑 Contraseña: <strong>${g.password || '1234'}</strong></div>
                     <div style="font-size:0.7rem; color:var(--text-dim);">
-                        <div>Plan: <strong style="color:${planInfo.color};">${planInfo.name}</strong> ($${planInfo.price.toLocaleString()}/mes)</div>
+                        <div>Plan: <strong style="color:${planInfo.color};">${planInfo.name}</strong> ($${(g.rent || 0).toLocaleString()}/mes)</div>
                         <div>Usuarios: <strong>${userCount}/${maxUsers}</strong></div>
                         <div>Dueño: ${g.owner}</div>
                     </div>
@@ -772,7 +771,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="glass-card profit-card" style="border-color:${plan.color}33;">
                         <h3 style="color:${plan.color};">${plan.name}</h3>
                         <div class="profit-value" style="font-size:1.2rem;">$ ${planRevenue.toLocaleString()}</div>
-                        <p style="font-size:0.7rem; color:var(--text-dim);">${planGyms.length} gimnasio(s) × $${plan.price.toLocaleString()}</p>
+                        <p style="font-size:0.7rem; color:var(--text-dim);">${planGyms.length} gimnasio(s) × $${(planGyms[0] && planGyms[0].rent ? planGyms[0].rent : 0).toLocaleString()}</p>
                     </div>
                 `;
             }).join('');
