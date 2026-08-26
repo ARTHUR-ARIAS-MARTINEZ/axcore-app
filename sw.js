@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'axcore-v5.97-una-ventana';
+﻿const CACHE_NAME = 'axcore-v5.98-reloj-arreglado';
 const urlsToCache = [
   './',
   './index.html?v=20260824e',

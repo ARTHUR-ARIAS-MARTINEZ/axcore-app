@@ -564,19 +564,47 @@ document.addEventListener('DOMContentLoaded', () => {
     // AHORA ESTA EN UNA HORA, para poder probarlo el mismo dia.
     // El plazo definitivo son 3 dias: cambiar el numero de abajo por
     // 3 * 24 * 60 * 60 * 1000 y listo. Es lo unico que hay que tocar.
-    var AX_PRUEBA_MS = 60 * 60 * 1000;   // 1 hora  (definitivo: 3 dias)
+    var AX_PRUEBA_MS = 5 * 60 * 1000;    // 5 minutos (para probar; definitivo: 3 dias)
+
+    // El reloj de la prueba se guarda en DOS lados: el almacen de la app y una
+    // galleta del navegador. Al leerlo gana SIEMPRE la fecha mas vieja de las
+    // dos. Asi, borrar los datos de la app no regala tiempo nuevo: la galleta
+    // sobrevive y delata cuando empezo de verdad.
+    function axRelojGalleta() {
+        try {
+            var m = document.cookie.match(/(?:^|;\s*)axcore_pi=(\d+)/);
+            return m ? parseInt(m[1], 10) : 0;
+        } catch (e) { return 0; }
+    }
+    function axGuardaReloj(cuando) {
+        try { localStorage.setItem('axcore_prueba_inicio', String(cuando)); } catch (e) {}
+        try {
+            // Un ano de vida, para que aguante bastante mas que la prueba.
+            document.cookie = 'axcore_pi=' + cuando + ';path=/;max-age=31536000;SameSite=Lax';
+        } catch (e) {}
+    }
 
     // Devuelve en que punto va la prueba de este telefono.
     function axPrueba() {
+        var a = 0, b = axRelojGalleta();
+        try { a = parseInt(localStorage.getItem('axcore_prueba_inicio') || '0', 10); } catch (e) {}
+
+        // La mas vieja de las dos manda. Si solo hay una, esa.
         var ini = 0;
-        try { ini = parseInt(localStorage.getItem('axcore_prueba_inicio') || '0', 10); } catch (e) {}
+        if (a && b) ini = Math.min(a, b);
+        else ini = a || b;
+
         if (!ini) return { arranca: true, viva: true, restante: AX_PRUEBA_MS };
+
+        // Si una de las dos se perdio, se repone con la buena.
+        if (a !== ini || b !== ini) axGuardaReloj(ini);
+
         var restante = (ini + AX_PRUEBA_MS) - Date.now();
         return { arranca: false, viva: restante > 0, restante: restante };
     }
 
     function axPruebaArranca() {
-        try { localStorage.setItem('axcore_prueba_inicio', String(Date.now())); } catch (e) {}
+        axGuardaReloj(Date.now());
     }
 
     // "58 minutos", "2 dias", "40 segundos" — para decirselo como se habla.
@@ -642,7 +670,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     axPruebaAviso(e.restante);
                 }
             } catch (err) {}
-        }, 60000);
+        }, 15000);
     }
 
     function initAuth() {
@@ -658,7 +686,14 @@ document.addEventListener('DOMContentLoaded', () => {
         // que la persona escribio.
         // Las sesiones falsas del bypass viejo (usuario literal 'DEMO')
         // no cuentan como cuenta: pasan a ser una prueba mas.
-        if (currentUser === 'DEMO') {
+        // 'DEMO' venia del bypass viejo; 'INVITADO' lo pone el modo prueba.
+        // NINGUNO de los dos es una cuenta de verdad, y por eso a los dos hay
+        // que volver a medirles el reloj cada vez que abren la app.
+        //
+        // Aqui estuvo el error: solo se limpiaba 'DEMO'. Con 'INVITADO'
+        // guardado, la segunda vez que alguien abria la app la puerta lo
+        // tomaba por cuenta buena y ni miraba el reloj. Nunca cortaba.
+        if (currentUser === 'DEMO' || currentUser === 'INVITADO') {
             try {
                 localStorage.removeItem('arthur_current_user');
                 localStorage.removeItem('axcore_token');
@@ -5010,7 +5045,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('btn-reset-all').onclick = async () => {
         if (await axConfirm("ESTO ELIMINARÁ TODA TU CUENTA Y DATOS. ¿ESTÁS SEGURO?", { ok: 'ELIMINAR CUENTA', danger: true })) {
+            // El reloj de la prueba NO se borra: si no, bastaria con tocar
+            // este boton para volver a tener el plazo completo, una y otra vez.
+            // Se rescata antes de limpiar y se vuelve a poner despues.
+            var reloj = 0;
+            try { reloj = parseInt(localStorage.getItem('axcore_prueba_inicio') || '0', 10); } catch (e) {}
+            if (!reloj) reloj = axRelojGalleta();
+
             localStorage.clear();
+            if (reloj) axGuardaReloj(reloj);
             location.reload();
         }
     };
