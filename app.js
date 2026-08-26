@@ -599,29 +599,14 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!t) {
                 t = document.createElement('div');
                 t.id = 'ax-prueba-tira';
-                t.onclick = function (ev) {
-                    // El lado derecho abre la ayuda para bajarla; el resto,
-                    // el registro con el pase del coach.
-                    if (ev.target && ev.target.classList.contains('ax-prueba-baja')) {
-                        window.axComoInstalar();
-                        return;
-                    }
-                    document.getElementById('register-overlay').classList.remove('hidden');
-                    document.getElementById('login-overlay').classList.add('hidden');
-                };
+                // Un solo toque, una sola ventana: adentro va lo de
+                // quedarse con la app y lo de dejarla en el telefono.
+                t.onclick = function () { window.axComoInstalar(); };
                 document.body.appendChild(t);
                 document.body.classList.add('ax-con-prueba');
             }
-            t.innerHTML =
-              '<div class="ax-prueba-l1">' +
-                '<b>MODO PRUEBA</b> · te quedan ' + axPruebaTexto(restante) +
-                '<span class="ax-prueba-cta">Activar con mi pase ›</span>' +
-              '</div>' +
-              '<div class="ax-prueba-l2 ax-prueba-baja">' +
-                '¿La quieres en tu teléfono? Entra a <b>AJUSTES</b> y toca ' +
-                '<b>Instalar en dispositivo</b>. ¿Te dice que no se puede? ' +
-                'Es un bloqueo de Play Store — <u>toca aquí y te digo cómo quitarlo</u>.' +
-              '</div>';
+            t.innerHTML = '<b>MODO PRUEBA</b> \u00b7 te quedan ' + axPruebaTexto(restante) +
+                          '<span class="ax-prueba-cta">Activar con mi pase \u203a</span>';
 
             // El espacio de arriba se mide de la tira misma: segun el ancho
             // del telefono el texto se acomoda en mas o menos renglones, y un
@@ -3631,37 +3616,67 @@ document.addEventListener('DOMContentLoaded', () => {
         m.innerHTML =
           '<div class="ax-ins-caja">' +
             '<button class="ax-ins-x" onclick="axCerrarInstalar()">&times;</button>' +
-            '<h3>C&oacute;mo dejarla en tu tel&eacute;fono</h3>' +
-            '<p class="ax-ins-sub">Se instala como cualquier app y te queda con su icono. ' +
-            'No pesa nada y funciona sin internet.</p>' +
 
-            '<div class="ax-ins-paso"><b>1</b><div>Toca el engrane de <b>AJUSTES</b>, abajo a la derecha.</div></div>' +
-            '<div class="ax-ins-paso"><b>2</b><div>Busca <b>Instalar en dispositivo</b> y t&oacute;calo.</div></div>' +
-            '<div class="ax-ins-paso"><b>3</b><div>Cuando te pregunte, dile que s&iacute;. Listo.</div></div>' +
+            // ── quedarse con la app ──
+            '<h3>Qu&eacute;date con AX-CORE</h3>' +
+            '<p class="ax-ins-sub">Est&aacute;s en modo prueba. Para que no se te acabe, ' +
+            'p&iacute;dele a tu coach tu <b>pase</b> &mdash; son unas letras como AXV-1234 &mdash; ' +
+            'y reg&iacute;strate. <b>Lo que ya llevas capturado no se pierde.</b></p>' +
+            '<button class="ax-ins-ok" onclick="axIrAlRegistro()">TENGO MI PASE, REGISTRARME</button>' +
+
+            '<div class="ax-ins-sep">y adem&aacute;s</div>' +
+
+            // ── dejarla en el telefono ──
+            '<h3>D&eacute;jala en tu tel&eacute;fono</h3>' +
+            '<p class="ax-ins-sub">Te queda con su icono, como cualquier app, ' +
+            'y funciona sin internet.</p>' +
+
+            '<div class="ax-ins-paso"><b>1</b><div>Toca el engrane de <b>AJUSTES</b>, ' +
+            'abajo a la derecha.</div></div>' +
+            '<div class="ax-ins-paso"><b>2</b><div>Busca <b>Instalar en dispositivo</b> ' +
+            'y t&oacute;calo.</div></div>' +
+            '<div class="ax-ins-paso"><b>3</b><div>Cuando te pregunte, dile que s&iacute;.</div></div>' +
 
             '<div class="ax-ins-alerta">' +
-              '<b>&iquest;Te sali&oacute; &ldquo;Se bloque&oacute; la app no segura&rdquo;?</b><br>' +
-              'No le pasa nada a tu tel&eacute;fono. Es Google, que desconf&iacute;a de todo lo que ' +
-              'no baj&oacute; de su tienda. Se arregla as&iacute;:' +
+              '<b>&iquest;Te sali&oacute; que se bloque&oacute;?</b><br>' +
+              'No le pasa nada a tu tel&eacute;fono, y la app no tiene nada malo. Android ' +
+              'desconf&iacute;a de todo lo que no baj&oacute; de su tienda. Prueba en este orden ' +
+              'y p&aacute;rate en el que te funcione:' +
             '</div>' +
 
-            '<div class="ax-ins-paso"><b>A</b><div>En ese mismo aviso, busca abajo el rengl&oacute;n que dice ' +
-            '<b>Instalar de todas formas</b> y t&oacute;calo. Con eso basta casi siempre.</div></div>' +
+            '<div class="ax-ins-paso"><b>A</b><div>En ese mismo aviso, busca abajo el rengl&oacute;n ' +
+            '<b>Instalar de todas formas</b> y t&oacute;calo. Puede pedirte tu huella o tu PIN.</div></div>' +
 
-            '<div class="ax-ins-paso"><b>B</b><div>Si no aparece ese rengl&oacute;n, abre la <b>Play Store</b>. ' +
-            'Arriba a la derecha toca <b>tu foto</b>, luego <b>Play Protect</b>, luego el ' +
-            '<b>engrane</b>, y apaga <b>Analizar aplicaciones con Play Protect</b>.</div></div>' +
+            '<div class="ax-ins-paso"><b>B</b><div><b>Si tu tel&eacute;fono es Samsung:</b> entra a los ' +
+            '<b>Ajustes del tel&eacute;fono</b> (no los de la app) &rarr; <b>Seguridad y privacidad</b> ' +
+            '&rarr; <b>Bloqueador autom&aacute;tico</b>, y ap&aacute;galo. Esta es aparte de la de Google y ' +
+            'es la que bloquea m&aacute;s seguido.</div></div>' +
 
-            '<div class="ax-ins-paso"><b>C</b><div>Regresa aqu&iacute; e inst&aacute;lala. ' +
-            '<b>Y luego vuelve a encender ese interruptor</b>, que te protege de otras cosas.</div></div>' +
+            '<div class="ax-ins-paso"><b>C</b><div>Abre la <b>Play Store</b> &rarr; toca <b>tu foto</b> ' +
+            'arriba a la derecha &rarr; <b>Play Protect</b> &rarr; el <b>engrane</b> &rarr; apaga ' +
+            '<b>Analizar aplicaciones con Play Protect</b>.</div></div>' +
 
-            '<div class="ax-ins-tip">Si nada de eso sale, tambi&eacute;n sirve el men&uacute; de tu ' +
-            'navegador (los tres puntitos de arriba) &rarr; <b>Agregar a la pantalla principal</b>.</div>' +
+            '<div class="ax-ins-paso"><b>D</b><div>Vuelve aqu&iacute; e int&eacute;ntalo otra vez. ' +
+            '<b>Y luego vuelve a encender lo que apagaste</b>, que te protege de otras cosas.</div></div>' +
 
-            '<button class="ax-ins-ok" onclick="axCerrarInstalar()">ENTENDIDO</button>' +
+            '<div class="ax-ins-tip">' +
+              '<b>&iquest;Y si nada de eso sirve?</b> No pasa nada: usa el men&uacute; de tu navegador ' +
+              '(los tres puntitos de arriba) y toca <b>Agregar a la pantalla principal</b>. ' +
+              'Te queda el mismo icono y la app funciona <b>exactamente igual</b>.' +
+            '</div>' +
+
+            '<button class="ax-ins-cerrar" onclick="axCerrarInstalar()">CERRAR</button>' +
           '</div>';
         m.onclick = function (ev) { if (ev.target === m) window.axCerrarInstalar(); };
         document.body.appendChild(m);
+    };
+
+    window.axIrAlRegistro = function () {
+        window.axCerrarInstalar();
+        try {
+            document.getElementById('register-overlay').classList.remove('hidden');
+            document.getElementById('login-overlay').classList.add('hidden');
+        } catch (e) {}
     };
 
     window.axCerrarInstalar = function () {
