@@ -553,6 +553,81 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch(e) { console.warn('[header-watchdog]', e.message); }
     }, 500);
 
+    // ═══════════════════════════════════════════════════════════════════
+    // MODO PRUEBA — la puerta se abre un rato para el que llega de nuevo
+    // ═══════════════════════════════════════════════════════════════════
+    // Quien entra sin pase puede usar la app completa durante este plazo:
+    // toca todo, registra su comida, se pesa y hasta la instala en su
+    // telefono. Cuando se cumple el plazo, se le pide el pase que le dio su
+    // coach y que se registre; lo que capturo NO se borra.
+    //
+    // AHORA ESTA EN UNA HORA, para poder probarlo el mismo dia.
+    // El plazo definitivo son 3 dias: cambiar el numero de abajo por
+    // 3 * 24 * 60 * 60 * 1000 y listo. Es lo unico que hay que tocar.
+    var AX_PRUEBA_MS = 60 * 60 * 1000;   // 1 hora  (definitivo: 3 dias)
+
+    // Devuelve en que punto va la prueba de este telefono.
+    function axPrueba() {
+        var ini = 0;
+        try { ini = parseInt(localStorage.getItem('axcore_prueba_inicio') || '0', 10); } catch (e) {}
+        if (!ini) return { arranca: true, viva: true, restante: AX_PRUEBA_MS };
+        var restante = (ini + AX_PRUEBA_MS) - Date.now();
+        return { arranca: false, viva: restante > 0, restante: restante };
+    }
+
+    function axPruebaArranca() {
+        try { localStorage.setItem('axcore_prueba_inicio', String(Date.now())); } catch (e) {}
+    }
+
+    // "58 minutos", "2 dias", "40 segundos" — para decirselo como se habla.
+    function axPruebaTexto(ms) {
+        if (ms <= 0) return 'se acab\u00f3';
+        var min = Math.floor(ms / 60000);
+        if (min >= 2880) return Math.floor(min / 1440) + ' d\u00edas';
+        if (min >= 1440) return '1 d\u00eda';
+        if (min >= 120)  return Math.floor(min / 60) + ' horas';
+        if (min >= 60)   return '1 hora';
+        if (min >= 2)    return min + ' minutos';
+        if (min === 1)   return '1 minuto';
+        return Math.max(1, Math.floor(ms / 1000)) + ' segundos';
+    }
+
+    // La tira de arriba que le dice cuanto le queda y como quedarse.
+    function axPruebaAviso(restante) {
+        try {
+            var t = document.getElementById('ax-prueba-tira');
+            if (!t) {
+                t = document.createElement('div');
+                t.id = 'ax-prueba-tira';
+                t.onclick = function () {
+                    document.getElementById('register-overlay').classList.remove('hidden');
+                    document.getElementById('login-overlay').classList.add('hidden');
+                };
+                document.body.appendChild(t);
+                document.body.classList.add('ax-con-prueba');
+            }
+            t.innerHTML = '<b>MODO PRUEBA</b> \u00b7 te quedan ' + axPruebaTexto(restante) +
+                          '<span class="ax-prueba-cta">Activar con mi pase \u203a</span>';
+        } catch (e) {}
+    }
+
+    // Cada minuto se revisa; al cumplirse el plazo se le avisa y se le pide
+    // el pase. Lo suyo queda guardado en el telefono.
+    function axPruebaVigila() {
+        setInterval(function () {
+            try {
+                if (localStorage.getItem('axcore_token')) return;   // ya se registro
+                var e = axPrueba();
+                if (!e.viva) {
+                    alert('Se acab\u00f3 tu prueba de AX-CORE.\n\nPide tu pase a tu coach y reg\u00edstrate para no perder lo que ya llevas.');
+                    location.reload();
+                } else {
+                    axPruebaAviso(e.restante);
+                }
+            } catch (err) {}
+        }, 60000);
+    }
+
     function initAuth() {
         // ── LA PUERTA ────────────────────────────────────
         // Aqui habia un "force bypass" de cuando se estaba construyendo la
@@ -564,6 +639,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // usuario es literalmente la palabra DEMO, cosa que el modo demo de
         // verdad (el de AXV-DEMO) nunca hace, porque ese guarda el nombre
         // que la persona escribio.
+        // Las sesiones falsas del bypass viejo (usuario literal 'DEMO')
+        // no cuentan como cuenta: pasan a ser una prueba mas.
         if (currentUser === 'DEMO') {
             try {
                 localStorage.removeItem('arthur_current_user');
@@ -571,9 +648,21 @@ document.addEventListener('DOMContentLoaded', () => {
             } catch (e) {}
             currentUser = null;
         }
+
         if (!currentUser) {
-            showLogin();
-            return;
+            var pr = axPrueba();
+            if (!pr.viva) {
+                // Se acabo el plazo: ahora si, el pase del coach.
+                showLogin();
+                var av = document.getElementById('ax-login-aviso');
+                if (av) av.style.display = 'block';
+                return;
+            }
+            if (pr.arranca) axPruebaArranca();
+            currentUser = 'INVITADO';
+            try { localStorage.setItem('arthur_current_user', currentUser); } catch (e) {}
+            setTimeout(function () { axPruebaAviso(axPrueba().restante); }, 300);
+            axPruebaVigila();
         }
 
         {

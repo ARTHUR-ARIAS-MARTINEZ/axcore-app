@@ -5675,3 +5675,44 @@ body.premium-mode .pd-badges-link {
   color: var(--accent-main) !important;
   font-family: 'Oswald', sans-serif !important;
 }
+
+
+/* ══════════════════════════════════════════════════════
+   MODO PRUEBA — la tira de arriba
+   ───────────────────────────────────────────────────────
+   Quien llega sin pase ve cuanto le queda de prueba y como quedarse. Va
+   pegada arriba, no tapa nada, y al tocarla se abre el registro.
+   ══════════════════════════════════════════════════════ */
+#ax-prueba-tira {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 9000;
+  display: flex; align-items: center; justify-content: center;
+  gap: 10px; flex-wrap: wrap;
+  padding: 7px 14px; cursor: pointer;
+  font-family: 'Oswald', sans-serif;
+  font-size: .64rem; letter-spacing: 1.4px; text-transform: uppercase;
+  color: #0a0a0a;
+  background: linear-gradient(122deg,
+      var(--accent-tri, var(--accent-main)) 0%, var(--accent-main) 34%, var(--accent-secondary) 100%);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, .34);
+}
+#ax-prueba-tira b { font-weight: 700; letter-spacing: 2px; }
+#ax-prueba-tira .ax-prueba-cta {
+  background: rgba(0, 0, 0, .22);
+  border-radius: 99px; padding: 3px 11px;
+  font-size: .6rem; letter-spacing: 1.2px;
+}
+#ax-prueba-tira:active { filter: brightness(.94); }
+/* el contenido baja para que la tira no lo tape */
+body.ax-con-prueba .app-container,
+body.ax-con-prueba #app-container { padding-top: 38px; }
+
+/* el aviso de que se acabo, dentro de la pantalla de acceso */
+#ax-login-aviso {
+  margin: 0 0 16px; padding: 11px 15px;
+  border-radius: 14px; text-align: left;
+  font-size: .8rem; line-height: 1.5;
+  color: var(--pm-dim2, #7f93a8);
+  background: rgba(var(--pm-green-rgb, 0, 255, 136), .07);
+  border: 1px solid rgba(var(--pm-green-rgb, 0, 255, 136), .24);
+}
+#ax-login-aviso b { color: var(--accent-main); }
