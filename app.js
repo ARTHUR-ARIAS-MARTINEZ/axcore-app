@@ -599,15 +599,47 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!t) {
                 t = document.createElement('div');
                 t.id = 'ax-prueba-tira';
-                t.onclick = function () {
+                t.onclick = function (ev) {
+                    // El lado derecho abre la ayuda para bajarla; el resto,
+                    // el registro con el pase del coach.
+                    if (ev.target && ev.target.classList.contains('ax-prueba-baja')) {
+                        window.axComoInstalar();
+                        return;
+                    }
                     document.getElementById('register-overlay').classList.remove('hidden');
                     document.getElementById('login-overlay').classList.add('hidden');
                 };
                 document.body.appendChild(t);
                 document.body.classList.add('ax-con-prueba');
             }
-            t.innerHTML = '<b>MODO PRUEBA</b> \u00b7 te quedan ' + axPruebaTexto(restante) +
-                          '<span class="ax-prueba-cta">Activar con mi pase \u203a</span>';
+            t.innerHTML =
+              '<div class="ax-prueba-l1">' +
+                '<b>MODO PRUEBA</b> · te quedan ' + axPruebaTexto(restante) +
+                '<span class="ax-prueba-cta">Activar con mi pase ›</span>' +
+              '</div>' +
+              '<div class="ax-prueba-l2 ax-prueba-baja">' +
+                '¿La quieres en tu teléfono? Entra a <b>AJUSTES</b> y toca ' +
+                '<b>Instalar en dispositivo</b>. ¿Te dice que no se puede? ' +
+                'Es un bloqueo de Play Store — <u>toca aquí y te digo cómo quitarlo</u>.' +
+              '</div>';
+
+            // El espacio de arriba se mide de la tira misma: segun el ancho
+            // del telefono el texto se acomoda en mas o menos renglones, y un
+            // numero fijo tapaba el encabezado en las pantallas angostas.
+            var acomoda = function () {
+                try {
+                    var alto = Math.ceil(t.getBoundingClientRect().height) + 6;
+                    var cont = document.getElementById('app-container');
+                    if (cont && alto > 20) cont.style.paddingTop = alto + 'px';
+                } catch (e) {}
+            };
+            setTimeout(acomoda, 60);
+            setTimeout(acomoda, 400);
+            if (!t.dataset.girado) {
+                t.dataset.girado = '1';
+                window.addEventListener('resize', acomoda);
+                window.addEventListener('orientationchange', function () { setTimeout(acomoda, 250); });
+            }
         } catch (e) {}
     }
 
@@ -3583,6 +3615,60 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    // ═══════════════════════════════════════════════════════════════════
+    // CÓMO SE BAJA LA APP — y qué hacer si Android la bloquea
+    // ═══════════════════════════════════════════════════════════════════
+    // Android desconfia de todo lo que no viene de su tienda y a veces saca un
+    // "Se bloqueo la app no segura". La app no tiene nada malo: es Play Protect
+    // siendo receloso. Aqui se le explica a la persona que hacer, con las
+    // palabras que va a ver en su pantalla.
+    window.axComoInstalar = function () {
+        var yaHay = document.getElementById('ax-instalar-modal');
+        if (yaHay) { yaHay.classList.remove('hidden'); return; }
+
+        var m = document.createElement('div');
+        m.id = 'ax-instalar-modal';
+        m.innerHTML =
+          '<div class="ax-ins-caja">' +
+            '<button class="ax-ins-x" onclick="axCerrarInstalar()">&times;</button>' +
+            '<h3>C&oacute;mo dejarla en tu tel&eacute;fono</h3>' +
+            '<p class="ax-ins-sub">Se instala como cualquier app y te queda con su icono. ' +
+            'No pesa nada y funciona sin internet.</p>' +
+
+            '<div class="ax-ins-paso"><b>1</b><div>Toca el engrane de <b>AJUSTES</b>, abajo a la derecha.</div></div>' +
+            '<div class="ax-ins-paso"><b>2</b><div>Busca <b>Instalar en dispositivo</b> y t&oacute;calo.</div></div>' +
+            '<div class="ax-ins-paso"><b>3</b><div>Cuando te pregunte, dile que s&iacute;. Listo.</div></div>' +
+
+            '<div class="ax-ins-alerta">' +
+              '<b>&iquest;Te sali&oacute; &ldquo;Se bloque&oacute; la app no segura&rdquo;?</b><br>' +
+              'No le pasa nada a tu tel&eacute;fono. Es Google, que desconf&iacute;a de todo lo que ' +
+              'no baj&oacute; de su tienda. Se arregla as&iacute;:' +
+            '</div>' +
+
+            '<div class="ax-ins-paso"><b>A</b><div>En ese mismo aviso, busca abajo el rengl&oacute;n que dice ' +
+            '<b>Instalar de todas formas</b> y t&oacute;calo. Con eso basta casi siempre.</div></div>' +
+
+            '<div class="ax-ins-paso"><b>B</b><div>Si no aparece ese rengl&oacute;n, abre la <b>Play Store</b>. ' +
+            'Arriba a la derecha toca <b>tu foto</b>, luego <b>Play Protect</b>, luego el ' +
+            '<b>engrane</b>, y apaga <b>Analizar aplicaciones con Play Protect</b>.</div></div>' +
+
+            '<div class="ax-ins-paso"><b>C</b><div>Regresa aqu&iacute; e inst&aacute;lala. ' +
+            '<b>Y luego vuelve a encender ese interruptor</b>, que te protege de otras cosas.</div></div>' +
+
+            '<div class="ax-ins-tip">Si nada de eso sale, tambi&eacute;n sirve el men&uacute; de tu ' +
+            'navegador (los tres puntitos de arriba) &rarr; <b>Agregar a la pantalla principal</b>.</div>' +
+
+            '<button class="ax-ins-ok" onclick="axCerrarInstalar()">ENTENDIDO</button>' +
+          '</div>';
+        m.onclick = function (ev) { if (ev.target === m) window.axCerrarInstalar(); };
+        document.body.appendChild(m);
+    };
+
+    window.axCerrarInstalar = function () {
+        var m = document.getElementById('ax-instalar-modal');
+        if (m) m.classList.add('hidden');
+    };
+
     window.pmInstallApp = function() {
         if (deferredPrompt) {
             deferredPrompt.prompt();
@@ -3596,7 +3682,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (typeof window.pmSyncInstallRow === 'function') window.pmSyncInstallRow();
             });
         } else {
-            pmShowToast('Ya está instalada o no disponible', 'blue');
+            // Antes solo decia "no disponible" y ahi se quedaba la persona.
+            // Ahora se le explica que hacer, que es justo cuando mas lo necesita.
+            window.axComoInstalar();
         }
     };
 

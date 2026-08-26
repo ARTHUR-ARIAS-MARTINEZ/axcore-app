@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'axcore-v5.95-modo-prueba';
+﻿const CACHE_NAME = 'axcore-v5.96-ayuda-instalar';
 const urlsToCache = [
   './',
   './index.html?v=20260824e',
