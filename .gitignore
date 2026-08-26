@@ -66,3 +66,6 @@ DEMO_INSIGNIAS.html
 laboratorio-insignias.html
 *.url
 SEGURIDAD/
+
+# Originales pesados de la guia (se publican las .webp)
+assets/guia/*.jfif

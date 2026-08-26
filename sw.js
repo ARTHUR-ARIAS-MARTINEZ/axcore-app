@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'axcore-v5.92-seguridad';
+﻿const CACHE_NAME = 'axcore-v5.93-guias-completas';
 const urlsToCache = [
   './',
   './index.html?v=20260824e',
