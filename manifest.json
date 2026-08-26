@@ -25,8 +25,25 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
+    },
+    {
+      "src": "assets/icons/app-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ],
-  "scope": "./index.html",
-  "id": "./index.html"
+  "scope": "./",
+  "id": "./index.html",
+  "lang": "es",
+  "dir": "ltr",
+  "categories": [
+    "health",
+    "fitness",
+    "lifestyle"
+  ],
+  "display_override": [
+    "standalone",
+    "minimal-ui"
+  ]
 }

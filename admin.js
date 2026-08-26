@@ -309,10 +309,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- NAVEGACIÓN TABS ---
     document.querySelectorAll('.nav-btn').forEach(btn => {
         btn.onclick = () => {
+            // Los botones que llevan a otra pagina (la Guia) traen data-href.
+            // Este onclick PISABA el onclick que traian escrito en el HTML, y
+            // por eso el boton de la Guia no hacia absolutamente nada.
+            if (btn.dataset.href) { location.href = btn.dataset.href; return; }
+
             const tab = btn.dataset.tab;
-            // El cuadro MANUAL abre otra pagina: no es pestana. Sin esta guarda,
-            // buscaba un panel "tab-undefined", tronaba, y dejaba la pantalla
-            // en blanco con todo escondido.
+            // Sin esta guarda buscaba un panel "tab-undefined", tronaba, y
+            // dejaba la pantalla en blanco con todo escondido.
             if (!tab) return;
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.admin-pane').forEach(p => p.classList.remove('active'));

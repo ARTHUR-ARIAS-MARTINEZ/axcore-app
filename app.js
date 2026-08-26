@@ -554,13 +554,29 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 500);
 
     function initAuth() {
-        // ALWAYS pass auth check to bypass login overlay
-        if (!currentUser) {
-            currentUser = 'DEMO';
-            localStorage.setItem('arthur_current_user', currentUser);
+        // ── LA PUERTA ────────────────────────────────────
+        // Aqui habia un "force bypass" de cuando se estaba construyendo la
+        // app: si no habia sesion, se inventaba un usuario llamado DEMO y se
+        // dejaba pasar. En la practica, cualquiera que abriera la direccion
+        // entraba sin pase. Se cierra.
+        //
+        // Y a quien haya entrado por ese hueco se le retira la sesion: su
+        // usuario es literalmente la palabra DEMO, cosa que el modo demo de
+        // verdad (el de AXV-DEMO) nunca hace, porque ese guarda el nombre
+        // que la persona escribio.
+        if (currentUser === 'DEMO') {
+            try {
+                localStorage.removeItem('arthur_current_user');
+                localStorage.removeItem('axcore_token');
+            } catch (e) {}
+            currentUser = null;
         }
-        
-        if (true) { // Force bypass
+        if (!currentUser) {
+            showLogin();
+            return;
+        }
+
+        {
             // CRÍTICO: showApp() PRIMERO para garantizar que la UI esté visible
             // aunque loadUserData() falle por cualquier razón
             try { showApp(); } catch (e) { console.error('[initAuth] showApp err:', e); }
@@ -601,8 +617,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (contentArea) contentArea.scrollTop = 0;
                 }, 100);
             } catch (e) { console.error('[initAuth] savedPage err:', e); }
-        } else {
-            showLogin();
         }
     }
     function loadUserData() {
@@ -743,7 +757,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Se llama al abrir y cada 10 minutos mientras la app está abierta.
-    setTimeout(function () { try { window.axLatido(); } catch (e) {} }, 2500);
+    setTimeout(function () { try { window.axLatido(); } catch (e) {} }, 400);
     setInterval(function () { try { window.axLatido(); } catch (e) {} }, 600000);
 
     function applySettings() {
@@ -1889,6 +1903,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // LATIDO — al abrir, la app le avisa al servidor. Si el maestro cortó el
     // acceso (a este atleta o a su gimnasio entero), el servidor contesta 403
     // y la app se cierra sola con el motivo. Es el freno de mano.
+    // Saca al atleta y borra su sesion. No borra su historial: si vuelve con
+    // un pase bueno y el mismo correo, recupera todo su avance.
+    function axCerrarSesion(mensaje) {
+        try {
+            localStorage.removeItem('axcore_token');
+            localStorage.removeItem('arthur_current_user');
+            localStorage.removeItem('axcore_ultimo_ok');
+        } catch (e) {}
+        try { alert(mensaje); } catch (e) {}
+        location.reload();
+    }
+
     window.axLatido = async function () {
         try {
             const tok = localStorage.getItem('axcore_token');
@@ -1900,17 +1926,37 @@ document.addEventListener('DOMContentLoaded', () => {
                 method: 'POST',
                 headers: { 'Authorization': 'Bearer ' + tok }
             });
-            if (r.status === 403) {
-                let msg = 'Tu acceso fue suspendido.';
+
+            // 403 = suspendido. 401 = la cuenta ya no existe, el pase se
+            // cancelo o la sesion se abrio en otro telefono. En los dos casos
+            // se sale. Antes solo se atendia el 403 y por eso los atletas de
+            // un bloque borrado se quedaban dentro para siempre.
+            if (r.status === 403 || r.status === 401) {
+                let msg = r.status === 401
+                    ? 'Tu pase ya no está activo. Pide uno nuevo a tu coach.'
+                    : 'Tu acceso fue suspendido.';
                 try { const d = await r.json(); if (d && d.message) msg = d.message; } catch (e) {}
-                try {
-                    localStorage.removeItem('axcore_token');
-                    localStorage.removeItem('arthur_current_user');
-                } catch (e) {}
-                alert(msg);
-                location.reload();
+                axCerrarSesion(msg);
+                return;
             }
-        } catch (e) { /* sin internet: se deja pasar */ }
+
+            if (r.ok) {
+                // Queda constancia del ultimo dia en que el servidor dijo que si.
+                try { localStorage.setItem('axcore_ultimo_ok', String(Date.now())); } catch (e) {}
+            }
+        } catch (e) {
+            // Sin internet no se echa a nadie de inmediato: se le dan 7 dias.
+            // Pasados esos 7 dias sin poder confirmar, la app se traba. Si no,
+            // bastaria con poner el telefono en modo avion para usarla siempre.
+            try {
+                const ultimo = parseInt(localStorage.getItem('axcore_ultimo_ok') || '0', 10);
+                if (!ultimo) {
+                    localStorage.setItem('axcore_ultimo_ok', String(Date.now()));
+                } else if (Date.now() - ultimo > 7 * 24 * 60 * 60 * 1000) {
+                    axCerrarSesion('Llevas 7 días sin conexión. Conéctate a internet para seguir usando AX-CORE.');
+                }
+            } catch (e2) {}
+        }
     };
 
     window.axSyncThemeColor = function() {

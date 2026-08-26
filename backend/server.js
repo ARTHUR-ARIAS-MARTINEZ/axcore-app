@@ -204,8 +204,18 @@ async function requireUserAuth(req, res, next) {
                 message: 'Tu acceso fue suspendido. Habla con tu gimnasio.'
             });
         }
+        // Un gimnasio BORRADO tambien deja fuera al atleta. Antes solo se
+        // revisaba "existe y esta apagado", asi que al borrar el bloque los
+        // atletas viejos seguian entrando: su gimnasio ya no existia y por eso
+        // mismo nadie los frenaba.
         const gym = await Gym.findOne({ gymCode: user.gymCode }, 'active').lean();
-        if (gym && gym.active === false) {
+        if (!gym) {
+            return res.status(403).json({
+                success: false, blocked: true,
+                message: 'Tu gimnasio ya no está dado de alta. Pide un pase nuevo a tu coach.'
+            });
+        }
+        if (gym.active === false) {
             return res.status(403).json({
                 success: false, blocked: true,
                 message: 'El acceso de tu gimnasio está suspendido.'
